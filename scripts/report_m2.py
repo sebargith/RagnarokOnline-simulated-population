@@ -147,7 +147,7 @@ def main():
         row = group[0]
         lines += [f"- {len(group)} occurrence(s); first `{row['phase']}`, identity {row['session']}, `{row['case']}`, finish `{row.get('done_reason')}`: `{json.dumps(row.get('score', {}))}`", "",
                   "```text", row.get("content", row.get("error", "missing")), "```", ""]
-    (target / "M2-conversations.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (target / "M2-conversations.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
     print(json.dumps(acceptance, indent=2))
 
 
