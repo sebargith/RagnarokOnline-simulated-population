@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from bridge.client import Bridge
 from inference.m2 import BoundedInference, api, score, stream_chat
+from inference.m2_context import messages_for
 
 
 def save(path, value):
@@ -201,6 +202,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", default="config/m2-candidates.json")
     parser.add_argument("--limits", default="config/m2-limits.json")
+    parser.add_argument("--fixtures", default="fixtures/m2-scenarios.json")
+    parser.add_argument("--cases", nargs="+")
     parser.add_argument("--models", nargs="+", type=int, choices=(0, 1), default=[0, 1])
     parser.add_argument("--profiles", nargs="+", type=int, choices=(1, 3, 5), default=[1, 3, 5])
     parser.add_argument("--repeats", type=int, default=3)
@@ -210,7 +213,11 @@ def main():
         parser.error("repeats must be 1..5")
     config_path = ROOT / args.config
     config = json.loads(config_path.read_text())
-    fixtures = json.loads((ROOT / "fixtures/m2-scenarios.json").read_text())
+    fixtures = json.loads((ROOT / args.fixtures).read_text())
+    if args.cases:
+        if set(args.cases) - {case["id"] for case in fixtures["cases"]}:
+            parser.error("unknown fixture case")
+        fixtures["cases"] = [case for case in fixtures["cases"] if case["id"] in args.cases]
     output = ROOT / "runtime/evidence" / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-m2-" + args.label)
     output.mkdir(parents=True)
     print(str(output), flush=True)
@@ -226,7 +233,7 @@ def main():
                 "started_utc": datetime.now(timezone.utc).isoformat(),
                 "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
                 "source_hashes": {path: digest(ROOT/path) for path in (
-                    "inference/m2.py", "scripts/bench_m2.py", "fixtures/m2-scenarios.json", args.config, args.limits)},
+                    "inference/m2.py", "inference/m2_context.py", "scripts/bench_m2.py", args.fixtures, args.config, args.limits)},
                 "python": sys.version}
     for index in args.models:
         model = config["models"][index]
@@ -263,11 +270,9 @@ def main():
                                     if monitor.violation.is_set():
                                         raise RuntimeError("resource/monitor guard tripped")
                                     identity = fixtures["identities"][session]
-                                    system = fixtures["system"].format(**identity)
-                                    # Action JSON includes braces; substitute identity placeholders only.
-                                    user = case["user"].replace("{friend}", identity["friend"])
-                                    history = histories[session] if case["kind"] == "conversation" else []
-                                    messages = [{"role": "system", "content": system}] + history + [{"role": "user", "content": user}]
+                                    history = (case.get("history", []) if case.get("independent") else histories[session]) if case["kind"] == "conversation" else []
+                                    messages = messages_for(fixtures, identity, case, history)
+                                    user = messages[-1]["content"]
                                     cold = temperature == "cold" and turn == 0 and session == 0
                                     future = scheduler.submit(str(session), messages, 42+repeat, cold, case.get("format"))
                                     pending.append((session, identity, user, messages, cold, future))
