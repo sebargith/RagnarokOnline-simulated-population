@@ -2,6 +2,8 @@
 
 Work on one milestone outcome at a time. Default order: M0 -> M1 -> M2 -> M3 -> M4 -> M5. M1 and M2 can be investigated independently after M0, but sequential work is the default for this single-machine setup. Evaluation begins with the first experiment. The first community demonstration targets cooperative PvE and simple trade on classic/pre-Renewal rules; five agents are a later scale check, not a prerequisite for that experience.
 
+On 2026-10-29 the user selected the measured Qwen3.5 9B Q6_K model and stopped further model comparison. M2's unresolved dialogue-grounding findings remain recorded rather than being called a quality pass. Continue with M3 using that model; assess naturalness and factual grounding in the live agent scenario. The local SearXNG web-search slice is available for M3 integration, with web claims kept separate from game observations.
+
 For each milestone, record starting state, commands and versions, observable outcomes, relevant failures, and evidence. Use `docs/evidence/M<number>-<topic>.md` when actual findings exist; keep large raw traces outside Git. Performance targets chosen after a baseline must be fixed before the final acceptance run. A failed target calls for a recorded decision, not silent relaxation.
 
 ## M0 - Environment audit and setup decision
@@ -51,9 +53,10 @@ Done when:
 
 - A repeatable 30-minute scenario includes gameplay, conversation, one recorded commitment, and an orchestrator restart. The agent retains its identity and retrieves specified observed facts after restart.
 - The agent can distinguish a rumor from an observed fact, lacks knowledge it was never given, and does not record a failed action as completed.
+- A bounded public web query can inform dialogue with source attribution, without exporting private identity/game context in the query or treating search snippets as game truth. Search outage leaves routine gameplay responsive.
 - Inference outage/timeout, stale proposals, invalid model output, and client reconnection have observable fallback behavior. Routine gameplay continues when inference alone fails.
 - Critical state/action boundaries have automated checks; the end-to-end scenario has retained evidence and human review for continuity and naturalness.
-- Measured latency and resource use meet the operating budget from M2, or the milestone remains explicitly incomplete pending an agreed adjustment.
+- No-search inference meets the M2 operating budget. Measure web-assisted turns separately under their configured tool/model deadlines; neither slow search nor search failure may pause routine gameplay. Report any budget adjustment explicitly.
 
 ## M4 - Three-agent community with cooperative PvE and simple trade
 

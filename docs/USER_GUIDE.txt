@@ -20,21 +20,18 @@ WHERE WE ARE
          passed a targeted test and a five-second live run; it has not
          had a second 600-second run. No autonomous AI player exists yet.
 
-  [RETEST] M2 - English grounding repair requested by you.
-         Original benchmark preserved. Revised context/prompt fixtures
-         are being retested, with paraphrases and positive controls.
-         Operating/resource targets stay fixed; sampling changes are
-         recorded and frozen before retesting.
-         Two installed models completed 540 requests beside M1.
-         9B Q6_K passed the fixed automated targets; the smaller 4B
-         model failed recall/action agreement and truncated replies.
-         Review docs/evidence/M2-conversations.md and M2-inference.md.
-         Some 9B dialogue adds unsupported potion/timeout details.
-         The milestone is not accepted until your quality review.
+  [SELECTED] M2 - Local Qwen3.5 9B Q6_K.
+         You stopped model comparison and selected 9B for implementation.
+         Fixed technical targets passed; later probes still found
+         unsupported dialogue details. Quality review moves to M3.
 
-  [WAIT] M3 - One persistent agent, after M2 is accepted.
+  [DONE] Web-search slice - 9B plus local SearXNG.
+         A standalone 9B turn can request one public search and receive
+         short source-linked results. This is not connected to game play.
+
+  [NEXT] M3 - One persistent agent with optional public web search.
          Identity, grounded dialogue, routine gameplay, memory across
-         restart and reliable fallback behavior.
+         restart, search-source separation and reliable fallback.
 
   [WAIT] M4 - Three-agent community, after M3 is accepted.
          Distinct identities, cooperative PvE, simple trade and a
@@ -48,13 +45,13 @@ docs/CURRENT_STATE.md; M0 through M2 evidence is under docs/evidence/.
 
 YOUR NEXT MOVE
 --------------
-1. Read docs/evidence/M2-conversations.md, including the grounding
-   caveats and grouped failure examples, and M2-inference.md.
-2. Return to "Evaluar arquitectura de población IA", the coordinator,
-   for the M2 evidence review. The work is pushed on codex/m2-inference;
-   it has not been merged into main.
-3. Accept the provisional 9B model/budget and conversation quality,
-   or request a specific M2 repair. Do not begin M3 until accepted.
+1. Keep this chat, "Evaluar arquitectura de población IA", as the
+   coordinator and evaluator. The selected 9B and SearXNG slice are
+   recorded in docs/CURRENT_STATE.md and README.md.
+2. Open one focused implementation chat for M3 and use the prompt below.
+   The M2 branch and web-search branch are not yet merged into main.
+3. Return here with the M3 evidence and real conversation excerpts.
+   Review factual grounding and social quality before M4 starts.
 
 HOW TO USE THE CHATS
 --------------------
@@ -76,9 +73,9 @@ HOW TO USE THE CHATS
   Update this guide when milestone status or direction changes; use
   docs/CURRENT_STATE.md for more detailed handoffs.
 
-PROMPT FOR CHAT 03 - LOCAL INFERENCE BENCHMARK (M2)
+ARCHIVED PROMPT FOR CHAT 03 - LOCAL INFERENCE BENCHMARK (M2)
 -------------------------------------------------
-Copy the text between BEGIN and END into the new chat.
+Historical reference only. Do not restart model comparison.
 
 BEGIN PROMPT
 Implement M2 only. Read AGENTS.md, docs/CURRENT_STATE.md and the M2
@@ -103,19 +100,24 @@ END PROMPT
 
 PROMPT FOR CHAT 04 - ONE PERSISTENT AGENT (M3)
 ---------------------------------------------
-Use only after M2's model, budget and sample quality are accepted.
+Use the user-selected 9B model. M2's grounding caveat remains open.
 
 BEGIN PROMPT
-Implement M3 only with the accepted M2 configuration and M1 bridge.
+Implement M3 only with the user-selected 9B configuration, M1 bridge
+and local SearXNG search slice.
 Read AGENTS.md, docs/CURRENT_STATE.md and M3 in docs/ROADMAP.md. Build
 one identity, deterministic routine gameplay, grounded dialogue,
-bounded memory and a commitment that survives restart. Keep observed
-events, beliefs, dialogue and confirmed actions distinct. Validate
-proposed actions against fresh game state.
+bounded memory and a commitment that survives restart. Integrate at
+most one public search for dialogue, retaining source URLs while keeping
+private memories and game observations out of search queries. Search
+snippets are external claims, not game truth. Keep observed events,
+beliefs, dialogue and confirmed actions distinct. Validate proposed
+actions against fresh game state.
 
 Run the 30-minute scenario plus inference failure, stale proposal,
-invalid output and reconnect checks. Retain evidence and conversation
-excerpts for my review. Commit and push small verified steps, update
+invalid output, search outage and reconnect checks. Retain evidence
+and conversation excerpts for my review. Commit and push small
+verified steps, update
 CURRENT_STATE and hand off to the coordinator. Do not expand the
 population or mark human review complete yourself.
 END PROMPT

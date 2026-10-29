@@ -2,7 +2,7 @@
 
 A local-first project for persistent, socially believable AI players on a classic/pre-Renewal Ragnarok Online private server. The first target is one autonomous player with grounded conversation and memory across restarts, followed by three to five distinct players.
 
-**Status:** M1 passed. M2's local inference benchmark is implemented and measured: the 9B configuration passes the fixed automated targets; human conversation quality review is pending. See [M1 results](docs/evidence/M1-server-client-bridge.md), [M2 evidence](docs/evidence/M2-inference.md) and [review samples](docs/evidence/M2-conversations.md). No persistent social agent exists yet.
+**Status:** M1 passed. The user selected the local Qwen3.5 9B Q6_K model after M2 measurement and stopped further model comparison. A standalone 9B turn can now call the existing local SearXNG service for public web search. Human dialogue quality remains unverified; no persistent social agent exists yet. See [current state](docs/CURRENT_STATE.md).
 
 ## Start here
 
@@ -65,4 +65,16 @@ Reuse installed Windows Ollama **0.40.12** and the two exact assets in [candidat
 & .\.venv\Scripts\python.exe scripts/bench_m2.py --repeats 3 --label acceptance
 ```
 
-This runs 540 short fixture requests plus 18 warm-up requests and prints its ignored evidence directory. It sends no model action to the game. [M2 evidence](docs/evidence/M2-inference.md) records the pilot/final/export commands, exact operating limits, failure patterns, resource measurement limits and the pending review. The [provisional 9B configuration](config/m2-operating.json) passed the fixed technical targets; it is not approval to start M3. Stop M1 with the existing command when finished.
+This runs 540 short fixture requests plus 18 warm-up requests and prints its ignored evidence directory. It sends no model action to the game. [M2 evidence](docs/evidence/M2-inference.md) records the pilot/final/export commands, exact operating limits, failure patterns and resource measurement limits. The [9B configuration](config/m2-operating.json) passed fixed technical targets, but later grounding probes found unsupported claims. The user selected 9B for implementation and deferred conversational quality review to M3.
+
+## Local 9B web search slice
+
+The existing self-hosted SearXNG container serves JSON search on `127.0.0.1:8080`. The model uses Ollama's local tool-call API; Python validates one search request, queries SearXNG, and returns at most three short, source-linked snippets. Search results are external claims and never establish game actions or rAthena state. This standalone turn is not yet connected to the game agent.
+
+With SearXNG and Ollama running, this command was verified:
+
+```powershell
+& .\.venv\Scripts\python.exe scripts/ask_9b.py 'Search the web for the iRO Wiki Prontera page and tell me its URL.'
+```
+
+The endpoint and limits are in [web-search configuration](config/web-search.json). SearXNG needs no API key, but sends public queries to its configured internet search engines. If the local service is unavailable, the turn reports the failure. M3 must connect this tool through identity-scoped context and keep search failure from stopping routine gameplay.

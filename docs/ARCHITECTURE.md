@@ -1,6 +1,6 @@
 # Architecture and constraints
 
-Status: M1's native server/client bridge passed its acceptance checks. M2 has a benchmark-only inference boundary and a [provisional 9B budget](evidence/M2-inference.md), pending human conversation quality review. Gameplay integration, persistence and social components below remain design direction. Milestone criteria belong in [ROADMAP](ROADMAP.md); observed progress belongs in [CURRENT_STATE](CURRENT_STATE.md).
+Status: M1's native server/client bridge passed its acceptance checks. The user selected the measured 9B model and stopped further comparison; M2 dialogue-grounding findings remain open for M3 live review. A standalone 9B turn can call a local SearXNG search adapter. Gameplay integration, persistence and social components below remain design direction. Milestone criteria belong in [ROADMAP](ROADMAP.md); observed progress belongs in [CURRENT_STATE](CURRENT_STATE.md).
 
 ## Components and ownership
 
@@ -11,7 +11,8 @@ Status: M1's native server/client bridge passed its acceptance checks. M2 has a 
 | Client/controller | Pinned native OpenKore plus project plugin | M1 implements login, scoped perception, validated adjacent movement/public chat and bounded reconnect |
 | Orchestrator | Python bridge client now; one orchestrator planned | M1 reads normalized events and submits requests; scheduling and inference queue remain later work |
 | Agent persistence | SQLite initially | Identities, observations, beliefs, relationships, commitments; separate from game DB |
-| Language inference | Shared native Windows runtime; existing Ollama reuse or llama.cpp candidate | Bounded requests with isolated per-agent context |
+| Language inference | Selected Qwen3.5 9B Q6_K on native Windows Ollama | Bounded requests with isolated per-agent context; game integration remains M3 work |
+| Public web search | Existing local SearXNG container, JSON API on loopback | At most one bounded search per standalone 9B turn; snippets are external claims with URLs, not game truth |
 
 Prefer one orchestrator and a simple persistence owner initially. An agent is a logical identity, not necessarily a separate process or loaded model. Avoid services and frameworks that the first slice does not need.
 
@@ -41,6 +42,7 @@ M1 contains no LLM, durable agent memory or automatic retry of uncertain actions
 - Validate model proposals against an allowed command schema and current state. Player messages cannot change system instructions or grant administrative access.
 - Store raw observations separately from summaries where needed for diagnosis. Bound retrieval and retention; do not append an entire lifetime of chat to each request. Begin with simple structured retrieval before considering embeddings.
 - Define finite inference budgets, stale-request handling, and a fallback. Gameplay continues through inference outages; conversation may wait or be skipped without fabricated claims.
+- Integrate the standalone web-search turn through identity-scoped context. Never place private memory or observed game state in a query; keep web results source-labeled, short and untrusted. Search failure must not block the deterministic gameplay controller.
 
 ## Hardware and environment
 
@@ -53,8 +55,8 @@ Portable MariaDB 10.11.19 x64 runs as an explicitly started process. rAthena bui
 ## Provisional decisions and alternatives
 
 - Retain OpenKore for the first slice: the pinned protocol now supports login, decoded observations and restricted external control. Global routing/combat and long-run social behavior are not established by M1.
-- Benchmark a small shortlist of local models against realistic prompts. Qwen-family and 27B-class candidates may be considered, but neither family nor size is a requirement. Include a smaller viable baseline.
-- A model loading successfully is insufficient evidence. Measure prompt processing, end-to-end latency, queueing, memory, and quality under one, three, and five logical sessions. Shared weights do not eliminate context-memory costs.
+- Use the user-selected Qwen3.5 9B Q6_K for M3. M2 measured latency, queueing, memory and short-prompt structured behavior under one, three and five logical sessions; failed grounding probes remain a live quality risk.
+- Keep public web search in the Python tool boundary through the existing local SearXNG service. SearXNG is self-hosted, but forwards public queries to configured external engines. The current standalone turn permits one search and no game action; M3 must supply identity-scoped context and explicit query privacy rules before game integration.
 - Add only minimal identity and memory to the first conversational slice. Expand relationships and goals after restart continuity works.
 - Expand from one persistent agent to three only after continuity works. The first community demonstration includes cooperative PvE and simple trade; extend the restricted bridge and deterministic controllers in measured slices, confirming combat, loot and transfers from game observations before claiming success. Five agents are a later capacity check.
 - M1 uses English test messages and stock pre-Renewal data/rates on Prontera. An exact historical episode and future conversation language remain choices before content/social customization.
