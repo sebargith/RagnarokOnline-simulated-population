@@ -20,9 +20,13 @@ WHERE WE ARE
          passed a targeted test and a five-second live run; it has not
          had a second 600-second run. No autonomous AI player exists yet.
 
-  [NEXT] M2 - Local inference benchmark.
-         Compare two local model candidates, measure performance and
-         bring sample conversations to you for quality review.
+  [REVIEW] M2 - Local inference benchmark measured; your review pending.
+         Two installed models completed 540 requests beside M1.
+         9B Q6_K passed the fixed automated targets; the smaller 4B
+         model failed recall/action agreement and truncated replies.
+         Review docs/evidence/M2-conversations.md and M2-inference.md.
+         Some 9B dialogue adds unsupported potion/timeout details.
+         The milestone is not accepted until your quality review.
 
   [WAIT] M3 - One persistent agent, after M2 is accepted.
          Identity, grounded dialogue, routine gameplay, memory across
@@ -36,16 +40,17 @@ WHERE WE ARE
 
 These labels reflect evidence, not just completed code. The detailed
 acceptance criteria are in docs/ROADMAP.md. Actual handoff facts are in
-docs/CURRENT_STATE.md; M0 and M1 evidence is under docs/evidence/.
+docs/CURRENT_STATE.md; M0 through M2 evidence is under docs/evidence/.
 
 YOUR NEXT MOVE
 --------------
-1. In the existing D:\Ragnarok Agents local project, create a chat named
-   "03 - Local inference benchmark".
-2. Copy the M2 prompt below into that chat.
-3. When it hands off, return to the main coordinator chat and ask for
-   a milestone review. Do not begin M3 until the model choice, budget
-   and conversation samples are accepted.
+1. Read docs/evidence/M2-conversations.md, including the grounding
+   caveats and grouped failure examples, and M2-inference.md.
+2. Return to "Evaluar arquitectura de población IA", the coordinator,
+   for the M2 evidence review. The work is pushed on codex/m2-inference;
+   it has not been merged into main.
+3. Accept the provisional 9B model/budget and conversation quality,
+   or request a specific M2 repair. Do not begin M3 until accepted.
 
 HOW TO USE THE CHATS
 --------------------

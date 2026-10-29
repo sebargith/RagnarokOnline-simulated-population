@@ -1,6 +1,6 @@
 # Architecture and constraints
 
-Status: M1's native server/client bridge passed its acceptance checks. The inference, persistence and social components below remain design direction. Milestone criteria belong in [ROADMAP](ROADMAP.md); observed progress belongs in [CURRENT_STATE](CURRENT_STATE.md).
+Status: M1's native server/client bridge passed its acceptance checks. M2 has a benchmark-only inference boundary and a [provisional 9B budget](evidence/M2-inference.md), pending human conversation quality review. Gameplay integration, persistence and social components below remain design direction. Milestone criteria belong in [ROADMAP](ROADMAP.md); observed progress belongs in [CURRENT_STATE](CURRENT_STATE.md).
 
 ## Components and ownership
 

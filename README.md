@@ -2,7 +2,7 @@
 
 A local-first project for persistent, socially believable AI players on a classic/pre-Renewal Ragnarok Online private server. The first target is one autonomous player with grounded conversation and memory across restarts, followed by three to five distinct players.
 
-**Status:** M1 passed: native Windows server/client bridge, a ten-minute connection/routine, confirmed movement/chat, and failure/reconnect checks. See [actual M1 results](docs/evidence/M1-server-client-bridge.md). Local inference and the persistent social agent remain later milestones.
+**Status:** M1 passed. M2's local inference benchmark is implemented and measured: the 9B configuration passes the fixed automated targets; human conversation quality review is pending. See [M1 results](docs/evidence/M1-server-client-bridge.md), [M2 evidence](docs/evidence/M2-inference.md) and [review samples](docs/evidence/M2-conversations.md). No persistent social agent exists yet.
 
 ## Start here
 
@@ -56,3 +56,13 @@ The live check includes a ten-minute connection/routine, bidirectional chat, inv
 External sources/builds/portable tools are in `vendor/`; mutable databases, credentials, configuration, logs and evidence are in `runtime/`; Python is in `.venv/`. Keep these ignored directories out of Git. M1 leaves existing Ollama/model stores in place and uses no WSL/Docker or inference runtime.
 
 See [BRIDGE](docs/BRIDGE.md) for schemas, confirmation limits, reconnect budgets and known setup fixes. The [M0 audit](docs/evidence/M0-environment.md) is historical environment evidence; M1 records actual implementation results separately.
+
+## Local inference benchmark (M2)
+
+Reuse installed Windows Ollama **0.40.12** and the two exact assets in [candidate pins](config/m2-candidates.json). The harness checks version/digests, requires no preloaded model and does not download assets or alter global Ollama settings. Start both M1 clients using the commands above, then run:
+
+```powershell
+& .\.venv\Scripts\python.exe scripts/bench_m2.py --repeats 3 --label acceptance
+```
+
+This runs 540 short fixture requests plus 18 warm-up requests and prints its ignored evidence directory. It sends no model action to the game. [M2 evidence](docs/evidence/M2-inference.md) records the pilot/final/export commands, exact operating limits, failure patterns, resource measurement limits and the pending review. The [provisional 9B configuration](config/m2-operating.json) passed the fixed technical targets; it is not approval to start M3. Stop M1 with the existing command when finished.
