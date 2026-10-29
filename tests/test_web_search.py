@@ -12,18 +12,13 @@ CONFIG = {
 
 
 class FakeSearch:
-    def __init__(self, timeout):
-        assert timeout == 8
-
-    def text(self, query, **kwargs):
+    def __call__(self, config, query):
         assert query == "Prontera guide"
-        assert kwargs["backend"] == "duckduckgo"
-        assert kwargs["max_results"] == 2
-        return [
-            {"title": "First useful result", "href": "https://example.org/a", "body": "A long public excerpt of search results"},
-            {"title": "Private address", "href": "http://127.0.0.1/secret", "body": "ignore"},
-            {"title": "Second result", "href": "https://example.org/b", "body": "another"},
-        ]
+        return {"results": [
+            {"title": "First useful result", "url": "https://example.org/a", "content": "A long public excerpt of search results"},
+            {"title": "Private address", "url": "http://127.0.0.1/secret", "content": "ignore"},
+            {"title": "Second result", "url": "https://example.org/b", "content": "another"},
+        ]}
 
 
 class WebSearchTests(unittest.TestCase):
@@ -35,7 +30,7 @@ class WebSearchTests(unittest.TestCase):
             validate_query("Where is the copper wren?", private_terms=("copper wren",))
 
     def test_bounded_result_and_public_links(self):
-        result = search_public_web(" Prontera   guide ", CONFIG, client_factory=FakeSearch)
+        result = search_public_web(" Prontera   guide ", CONFIG, transport=FakeSearch())
         self.assertEqual(result["kind"], "external_web_search")
         self.assertEqual(len(result["results"]), 2)
         self.assertEqual(result["results"][0]["title"], "First useful")
@@ -43,15 +38,17 @@ class WebSearchTests(unittest.TestCase):
         self.assertEqual(result["results"][1]["url"], "https://example.org/b")
 
     def test_provider_failure_is_explicit(self):
-        class Broken:
-            def __init__(self, timeout):
-                pass
-
-            def text(self, query, **kwargs):
-                raise RuntimeError("provider failed")
+        def broken(config, query):
+            raise RuntimeError("provider failed")
 
         with self.assertRaises(SearchUnavailable):
-            search_public_web("Prontera guide", CONFIG, client_factory=Broken)
+            search_public_web("Prontera guide", CONFIG, transport=broken)
+
+    def test_rejects_nonlocal_endpoint(self):
+        from inference.web_search import _fetch_searx
+
+        with self.assertRaises(ValueError):
+            _fetch_searx(dict(CONFIG, endpoint="https://example.org"), "Prontera")
 
 
 if __name__ == "__main__":

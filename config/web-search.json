@@ -1,7 +1,8 @@
 {
-  "provider": "ddgs==9.16.1",
-  "backend": "duckduckgo",
-  "timeout_s": 8,
+  "provider": "local-searxng",
+  "endpoint": "http://127.0.0.1:8080",
+  "timeout_s": 15,
+  "max_response_bytes": 262144,
   "max_results": 3,
   "max_title_chars": 120,
   "max_snippet_chars": 300,

@@ -2,9 +2,13 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import http.client
 import ipaddress
+import json
 import re
-from urllib.parse import urlsplit
+import socket
+import threading
+from urllib.parse import urlencode, urlsplit
 
 
 class SearchUnavailable(RuntimeError):
@@ -53,38 +57,68 @@ def _short(value: object, limit: int) -> str:
     return " ".join(value.split())[:limit]
 
 
-def search_public_web(query: str, config: dict, *, private_terms=(), client_factory=None) -> dict:
-    """Return at most a few snippets from a fixed public search backend.
+def _fetch_searx(config: dict, query: str) -> dict:
+    endpoint = urlsplit(config["endpoint"])
+    if (endpoint.scheme != "http" or endpoint.hostname not in ("127.0.0.1", "localhost")
+            or endpoint.path not in ("", "/") or endpoint.query or endpoint.fragment):
+        raise ValueError("web search requires a local SearXNG endpoint")
+    timeout = config["timeout_s"]
+    connection = http.client.HTTPConnection(endpoint.hostname, endpoint.port, timeout=timeout)
+    connection.connect()
+    sock = connection.sock
+
+    def abort():
+        try:
+            sock.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+
+    watchdog = threading.Timer(timeout, abort)
+    watchdog.daemon = True
+    watchdog.start()
+    try:
+        params = urlencode({"q": query, "format": "json", "categories": "general",
+                            "language": "en", "safesearch": "1"})
+        connection.request("GET", "/search?" + params,
+                           headers={"Accept": "application/json"})
+        response = connection.getresponse()
+        if response.status != 200:
+            raise SearchUnavailable(f"SearXNG returned HTTP {response.status}")
+        raw = response.read(config["max_response_bytes"] + 1)
+        if len(raw) > config["max_response_bytes"]:
+            raise SearchUnavailable("SearXNG response exceeded byte budget")
+        return json.loads(raw)
+    finally:
+        watchdog.cancel()
+        connection.close()
+
+
+def search_public_web(query: str, config: dict, *, private_terms=(), transport=None) -> dict:
+    """Return bounded snippets from the local SearXNG instance.
 
     The caller owns consent and identity scoping. No page is fetched by URL.
     """
     clean = validate_query(query, private_terms=private_terms)
-    if client_factory is None:
-        from ddgs import DDGS
-        client_factory = DDGS
+    transport = transport or _fetch_searx
     try:
-        raw = client_factory(timeout=config["timeout_s"]).text(
-            clean,
-            region="us-en",
-            safesearch="moderate",
-            max_results=config["max_results"],
-            backend="duckduckgo",
-        )
+        payload = transport(config, clean)
     except Exception as exc:
         raise SearchUnavailable("public search unavailable") from exc
+    if not isinstance(payload, dict) or not isinstance(payload.get("results"), list):
+        raise SearchUnavailable("SearXNG returned invalid results")
     results = []
     seen = set()
-    for item in raw or ():
+    for item in payload["results"]:
         if not isinstance(item, dict):
             continue
-        url = _public_url(item.get("href"))
+        url = _public_url(item.get("url"))
         if not url or url in seen:
             continue
         seen.add(url)
         results.append({
             "title": _short(item.get("title"), config["max_title_chars"]),
             "url": url,
-            "snippet": _short(item.get("body"), config["max_snippet_chars"]),
+            "snippet": _short(item.get("content"), config["max_snippet_chars"]),
         })
         if len(results) == config["max_results"]:
             break
