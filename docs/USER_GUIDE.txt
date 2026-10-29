@@ -1,0 +1,167 @@
+RAGNAROK AGENTS - USER GUIDE
+===========================
+Updated: 2026-10-29 (America/Santiago)
+
+WHAT WE ARE BUILDING
+--------------------
+Believable AI players on a classic/pre-Renewal Ragnarok Online private
+server. First prove one persistent, grounded player. Then build a small
+community whose first shared experience is cooperative PvE and simple
+trade. Expand to five players only if quality and resources allow it.
+
+WHERE WE ARE
+------------
+  [DONE] M0 - Environment and deployment choice.
+         Native Windows setup selected and documented.
+
+  [DONE] M1 - Server/client bridge.
+         rAthena, OpenKore and Python passed a 600-second connection
+         trial with movement, chat and reconnect. A later framing fix
+         passed a targeted test and a five-second live run; it has not
+         had a second 600-second run. No autonomous AI player exists yet.
+
+  [NEXT] M2 - Local inference benchmark.
+         Compare two local model candidates, measure performance and
+         bring sample conversations to you for quality review.
+
+  [WAIT] M3 - One persistent agent, after M2 is accepted.
+         Identity, grounded dialogue, routine gameplay, memory across
+         restart and reliable fallback behavior.
+
+  [WAIT] M4 - Three-agent community, after M3 is accepted.
+         Distinct identities, cooperative PvE, simple trade and a
+         one-hour trial with human review.
+
+  [OPTIONAL] M5 - Five-agent scale check, after M4 passes.
+
+These labels reflect evidence, not just completed code. The detailed
+acceptance criteria are in docs/ROADMAP.md. Actual handoff facts are in
+docs/CURRENT_STATE.md; M0 and M1 evidence is under docs/evidence/.
+
+YOUR NEXT MOVE
+--------------
+1. In the existing D:\Ragnarok Agents local project, create a chat named
+   "03 - Local inference benchmark".
+2. Copy the M2 prompt below into that chat.
+3. When it hands off, return to the main coordinator chat and ask for
+   a milestone review. Do not begin M3 until the model choice, budget
+   and conversation samples are accepted.
+
+HOW TO USE THE CHATS
+--------------------
+- Keep this existing planning/review chat as the main coordinator. Use
+  it to assess evidence, decide whether a milestone passes and update
+  the plan. It integrates accepted work into GitHub main.
+- Use one focused implementation chat per milestone. Continue fixes in
+  that chat; do not make a separate chat for every file or test.
+- The implementation chat should inspect Git status and relevant docs,
+  work on a codex/ branch, commit small verified steps with descriptive
+  messages and push regularly. One prompt does not require one commit.
+- Avoid two chats writing to the same checkout at the same time. Use
+  separate worktrees only if parallel work becomes useful; shared game
+  services, database, ports and GPU still need coordination.
+- At handoff, ask for: branch/commit range, changed behavior, checks
+  actually run, evidence paths, limits and one proposed next action.
+  Bring social-quality samples back here for your own review.
+- Keep credentials, raw logs, model weights and databases out of Git.
+  Update this guide when milestone status or direction changes; use
+  docs/CURRENT_STATE.md for more detailed handoffs.
+
+PROMPT FOR CHAT 03 - LOCAL INFERENCE BENCHMARK (M2)
+-------------------------------------------------
+Copy the text between BEGIN and END into the new chat.
+
+BEGIN PROMPT
+Implement M2 only. Read AGENTS.md, docs/CURRENT_STATE.md and the M2
+criteria in docs/ROADMAP.md. Inspect Git status, installed Windows
+Ollama/model assets, RAM/VRAM and disk space first. Compare two
+justified local candidates, including a smaller baseline; add a third
+only if a specific gap requires it.
+
+Build reproducible conversation, recall and bounded-action fixtures.
+Measure cold and warm one-, three- and five-session profiles, ideally
+beside the running M1 server/client. Record model artifacts/settings,
+sample counts, token counts, latency, queue delay, failures and peak
+RAM/VRAM. Fix explicit operating limits before the final acceptance
+run. Prepare sample conversations for my quality review; do not mark
+that review complete yourself.
+
+Commit and push small verified steps. Update docs/evidence/M2-inference.md
+and docs/CURRENT_STATE.md, then hand off to the coordinator chat. Do
+not start M3. If a model download or resource-budget change is material,
+explain its size and reason before proceeding.
+END PROMPT
+
+PROMPT FOR CHAT 04 - ONE PERSISTENT AGENT (M3)
+---------------------------------------------
+Use only after M2's model, budget and sample quality are accepted.
+
+BEGIN PROMPT
+Implement M3 only with the accepted M2 configuration and M1 bridge.
+Read AGENTS.md, docs/CURRENT_STATE.md and M3 in docs/ROADMAP.md. Build
+one identity, deterministic routine gameplay, grounded dialogue,
+bounded memory and a commitment that survives restart. Keep observed
+events, beliefs, dialogue and confirmed actions distinct. Validate
+proposed actions against fresh game state.
+
+Run the 30-minute scenario plus inference failure, stale proposal,
+invalid output and reconnect checks. Retain evidence and conversation
+excerpts for my review. Commit and push small verified steps, update
+CURRENT_STATE and hand off to the coordinator. Do not expand the
+population or mark human review complete yourself.
+END PROMPT
+
+PROMPT FOR CHAT 05 - THREE-AGENT COMMUNITY (M4)
+-----------------------------------------------
+Use only after M3 passes. Keep major verified slices in separate commits.
+
+BEGIN PROMPT
+Implement M4 only. Read AGENTS.md, docs/CURRENT_STATE.md and M4 in
+docs/ROADMAP.md. Prove three isolated persistent identities and
+controlled conversation. Then extend the restricted bridge and
+deterministic controllers for a solo PvE fixture, cooperative PvE with
+two agents and simple trade between project agents. Recheck game state
+before actions and reconcile unknown transfers before retrying.
+
+Run the one-hour scenario, knowledge-isolation, reconnect and resource
+checks. Record game-confirmed combat, loot and both sides of the trade.
+Prepare social excerpts for my review. Commit and push each verified
+slice, then hand off to the coordinator. Do not claim cooperation from
+coincidental proximity or start M5.
+END PROMPT
+
+PROMPT FOR CHAT 06 - FIVE-AGENT SCALE CHECK (M5)
+------------------------------------------------
+Use only if M4 passes and resource measurements support five agents.
+
+BEGIN PROMPT
+Implement M5 only. Reuse the accepted three-agent design and fixed
+quality/resource targets. Add two distinct agents and repeat isolation,
+persistence, cooperative PvE, trade, reconnect and social review with
+five agents. Record load and limits; commit and push verified steps.
+If targets fail, keep the proven three-agent community and report the
+limit instead of silently weakening acceptance criteria.
+END PROMPT
+
+PROMPT FOR A REVIEW IN THE MAIN COORDINATOR CHAT
+------------------------------------------------
+Use after an implementation chat hands off.
+
+BEGIN PROMPT
+Review the current milestone against docs/ROADMAP.md. Inspect the
+branch diff, docs/CURRENT_STATE.md and retained evidence. Separate
+verified outcomes from claims and untested limits; run proportional
+checks. Tell me whether the milestone is accepted, what needs repair or
+human review, and the exact next action. Update this guide and the
+status, then integrate accepted commits into GitHub main when
+appropriate. Do not start the next milestone unless I request it.
+END PROMPT
+
+WHERE TO LOOK FOR DETAILS
+-------------------------
+- README.md: setup, start, stop and verified M1 commands.
+- AGENTS.md: repository rules for Codex.
+- docs/ROADMAP.md: milestone scope and acceptance criteria.
+- docs/CURRENT_STATE.md: latest verified handoff and next action.
+- docs/ARCHITECTURE.md: component boundaries and design rationale.
+- docs/BRIDGE.md: implemented M1 protocol and its limits.

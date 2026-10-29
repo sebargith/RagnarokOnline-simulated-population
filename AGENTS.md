@@ -41,4 +41,4 @@ Build a persistent community of believable AI players on a classic/pre-Renewal R
 - [Architecture](docs/ARCHITECTURE.md): component boundaries, constraints, and decision rationale.
 - [Roadmap](docs/ROADMAP.md): milestone scope and acceptance criteria.
 - [Current state](docs/CURRENT_STATE.md): compact handoff; consult when starting implementation or resuming after a gap.
-- [User guide](docs/USER_GUIDE.md): milestone status, chat structure and starter prompts; update when status or direction changes.
+- [User guide](docs/USER_GUIDE.txt): milestone status, chat structure and starter prompts; update when status or direction changes.
