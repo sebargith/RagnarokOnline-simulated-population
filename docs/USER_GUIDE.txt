@@ -48,8 +48,10 @@ YOUR NEXT MOVE
 1. Keep this chat, "Evaluar arquitectura de población IA", as the
    coordinator and evaluator. The selected 9B and SearXNG slice are
    recorded in docs/CURRENT_STATE.md and README.md.
-2. Open one focused implementation chat for M3 and use the prompt below.
-   The M2 branch and web-search branch are not yet merged into main.
+2. Open one focused implementation chat for M3 from codex/web-search,
+   preferably in a separate worktree. Three unfinished M2 repair files
+   remain in this checkout; do not carry them into M3. The M2 and web
+   branches are not yet merged into main.
 3. Return here with the M3 evidence and real conversation excerpts.
    Review factual grounding and social quality before M4 starts.
 
@@ -105,6 +107,8 @@ Use the user-selected 9B model. M2's grounding caveat remains open.
 BEGIN PROMPT
 Implement M3 only with the user-selected 9B configuration, M1 bridge
 and local SearXNG search slice.
+Start from codex/web-search in a clean worktree; do not include the
+unfinished M2 repair files from the coordinator checkout.
 Read AGENTS.md, docs/CURRENT_STATE.md and M3 in docs/ROADMAP.md. Build
 one identity, deterministic routine gameplay, grounded dialogue,
 bounded memory and a commitment that survives restart. Integrate at

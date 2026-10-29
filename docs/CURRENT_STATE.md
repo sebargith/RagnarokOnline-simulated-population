@@ -31,4 +31,4 @@ Updated: 2026-10-29 (America/Santiago).
 
 ## Next action
 
-Start one focused M3 implementation chat using the selected 9B configuration, M1 bridge and local SearXNG adapter. First prove one persistent identity and bounded routine behavior, then integrate source-labeled public search into dialogue. Retain a 30-minute restart/commitment scenario and human review of grounding and social quality before M4.
+Start one focused M3 implementation chat from `codex/web-search` in a clean worktree, excluding the three unfinished M2 repair files in this checkout. Use the selected 9B configuration, M1 bridge and local SearXNG adapter. First prove one persistent identity and bounded routine behavior, then integrate source-labeled public search into dialogue. Retain a 30-minute restart/commitment scenario and human review of grounding and social quality before M4.
