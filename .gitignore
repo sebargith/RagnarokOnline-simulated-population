@@ -1,0 +1,38 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# External installations, model weights, and generated runtime data
+/vendor/
+/models/
+/runtime/
+/artifacts/raw/
+*.gguf
+*.safetensors
+
+# Local databases and raw logs
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.log
+/logs/
+
+# Editor and OS temporary files
+.DS_Store
+Thumbs.db
+*.swp
