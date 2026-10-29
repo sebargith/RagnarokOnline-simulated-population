@@ -6,12 +6,13 @@ A local-first project for persistent, socially believable AI players on a classi
 
 ## Start here
 
-Open the existing **Ragnarok Agents** local project in Codex, rooted at `D:\Ragnarok Agents`. Read the [current state](docs/CURRENT_STATE.md), [bridge contract and troubleshooting](docs/BRIDGE.md), and [milestone assignments](docs/CODEX_WORKFLOW.md).
+Open the existing **Ragnarok Agents** local project in Codex, rooted at `D:\Ragnarok Agents`. Read the [user direction guide](docs/USER_GUIDE.md) for status, chats and prompts; use the [current state](docs/CURRENT_STATE.md) for the verified handoff and [bridge contract](docs/BRIDGE.md) for M1 operation.
 
 - [General development rules](AGENTS.md)
 - [Architecture and remaining design](docs/ARCHITECTURE.md)
 - [Milestones and acceptance criteria](docs/ROADMAP.md)
 - [Verified current state and next action](docs/CURRENT_STATE.md)
+- [Project direction guide and starter prompts](docs/USER_GUIDE.md)
 
 ## Setup and operation
 
