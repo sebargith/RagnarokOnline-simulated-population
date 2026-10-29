@@ -2,14 +2,16 @@
 
 Use the existing **Ragnarok Agents** local project at `D:\Ragnarok Agents`. The repository files carry durable context; each chat has its own conversation. Keep implementation and debugging of the same outcome in one chat, and start a fresh chat when moving to the next milestone.
 
+Current deployment choice: **native Windows**, using PowerShell and project-local `vendor\`, `runtime\` and `.venv\` where practical. Reuse installed system tools and existing model stores in place. WSL/Docker are outside the selected runtime. This documentation choice does not start M1 or authorize installation in a documentation-only chat.
+
 ## How to start
 
 1. Open **Ragnarok Agents** in Codex and create **01 - Environment audit** in **Local / This computer** mode.
 2. Paste the first prompt below. The repository already contains the general rules; do not paste the original long setup prompt again.
-3. Review the resulting environment recommendation. Start **02 - Server and client bridge** when you accept it, adding any selected option to the prompt.
+3. Review the native Windows procedure in M0 evidence. Start **02 - Server and client bridge** when ready to implement the selected layout, adding any adjustment to the prompt.
 4. Continue with **03 - Local inference benchmark**, then **04 - One persistent agent**, after their prerequisites pass.
 
-Create these chats as needed, not all at once. This existing setup conversation can remain a reference; a separate permanent coordinator chat is unnecessary initially.
+Create milestone chats as needed, not all at once. Use the main coordinator chat to evaluate evidence, track progress and GitHub publication, and decide when to start the next milestone. Keep implementation of each milestone in its focused chat.
 
 For routine implementation, begin with your usual capable coding model at medium reasoning if available. Use higher reasoning for difficult integration or architectural debugging when it helps. Avoid changing models for every small step; judge by completed, verified work and rework. These are configuration recommendations, not settings applied by this document.
 
@@ -41,13 +43,20 @@ unless I ask you to continue.
 
 ## 02 - Server and client bridge
 
-Prerequisite: accept the M0 recommendation, or state the chosen adjustment when pasting this prompt.
+Prerequisite: review the native Windows, project-local procedure in M0 evidence. The user has selected that layout; starting this assignment authorizes its scoped implementation. State any adjustment when pasting the prompt.
 
 ```text
-Implement M1 from docs/ROADMAP.md using the recommended setup in
+Implement M1 from docs/ROADMAP.md using the native Windows setup in
 docs/evidence/M0-environment.md, which I approve for this task.
 Read AGENTS.md and CURRENT_STATE, verify prerequisites, and proceed
 through the scoped local setup and bridge implementation.
+
+Use PowerShell at D:\Ragnarok Agents. Prefer project-local vendor,
+runtime and .venv directories, portable MariaDB/Perl, and existing
+system Git/Python/Visual Studio tools. Test the space in the project
+path and match native tool/DLL architectures. Keep PATH changes local
+to the launching process. Preserve existing Ollama/model stores.
+Use a local TCP bridge; do not switch to WSL/Docker implicitly.
 
 Pin the tested server, client/protocol, and OpenKore revisions. Prove
 Python can receive an observation and request a validated action.

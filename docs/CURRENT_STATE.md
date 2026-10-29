@@ -17,7 +17,7 @@ Updated: 2026-10-29 (America/Santiago).
 - Snapshot positions can be OpenKore estimates; movement acknowledgment is not proof of arrival. Independent peer perception verifies this scenario. Durable reconciliation of uncertain actions remains M3 work.
 - Stock pre-Renewal Prontera was tested; exact episode, graphical assets, combat/global routing, social behavior and long-duration operation are unverified. Unsupported modern server features disable themselves with warnings. Retry exhaustion, deliberately lost acknowledgments and output-buffer saturation were not separately fault-injected.
 - The initial failed DB bootstrap directory is preserved at `runtime/mariadb/data-initialization-attempt-1`. Active data is `runtime/mariadb/data`; never reinitialize or remove it as a routine troubleshooting step.
-- M0's pre-existing uncommitted changes to `docs/CODEX_WORKFLOW.md` and `docs/evidence/M0-environment.md` remain outside the M1 commit. M1's local commit is discoverable in Git history; nothing was pushed.
+- M0's native-Windows follow-up is tracked separately from the M1 implementation. This chat is the main coordinator and evaluator of milestone evidence and GitHub publication.
 
 ## Next action
 
