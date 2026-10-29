@@ -2,6 +2,18 @@
 
 Status: **the 9B configuration passes the frozen automated M2 targets; human conversation quality review and coordinator acceptance are pending**. M3 was not started. The 4B baseline fails the fixed suitability criteria.
 
+## Requested English grounding repair - final retest pending
+
+The user chose **repair and retest**, with **English** as the target language, through the coordinator on 2026-10-29. The original benchmark/results/samples below are preserved as historical comparison, not acceptance of the revised prompt.
+
+The repair is limited to benchmark prompt/context assembly: source-labeled observed events, future commitments, reported claims, confirmed results and unknowns; prior generated speech is not confirmation. Each fixture explicitly scopes the context needed for that question. A greeting omits unrelated loan/meeting memories; an arrival question gets an unknown arrival rather than a network diagnosis inferred from the controller's deadline. Full recall still receives the memory record. This is static test-fixture scoping, not an implemented retrieval or persistent-agent system. Conversation requests short natural English; structured output requests compact JSON with unchanged fields/meaning. There is no answer blacklist, hardcoded dialogue, second-model judge or post-generation repair filter.
+
+Four five-session 9B development pilots are retained: `20261029T175809Z-m2-grounding-pilot`, `20261029T180114Z-m2-grounding-pilot-2`, `20261029T180347Z-m2-scoped-grounding-pilot`, and `20261029T180649Z-m2-compact-grounding-pilot`. Each has 50 measured requests and one excluded prime. The first two still invented facts; the second/third warm response p95 also missed 8s (8.031s / 9.391s). The compact-output pilot passed 30 structured checks, warm response p95 4.687s, with 37-39 recall output tokens rather than about 63. Those pilot failures remain evidence; no operating threshold was relaxed.
+
+`20261029T180527Z-m2-grounding-dev-probes` ran six requests for the three development questions (loan benefit, walk/network cause, future meeting/current location), one cold/warm repetition. They are diagnostics with semantic rubrics, not automatic proof of quality. The meeting answer's distinction between a future promise and an unknown current spot still deserves human judgment.
+
+Freeze for the next final run: fixture v3, context renderer, the **unchanged** `config/m2-candidates.json` runtime/sampling/buffer/deadline settings and **unchanged** `config/m2-limits.json` automated thresholds. Re-run both candidates over the full 540-request matrix beside M1. Then run [grounding probes](../../fixtures/m2-grounding-probes.json): 11 independent cases (three development, eight not yet sampled), cold/warm profile 1, seeds 42/43/44 = 66 diagnostic replies. Held-out cases include a different item, a pending handover/payment premise, different present/future locations, a rumor paraphrase, correction of an unsupported previous assistant reply, and three positive controls with explicitly observed healing/disconnection/location. Expected semantic behavior is frozen in each rubric; inspect every output and retain failures. Human naturalness/grounding acceptance remains pending regardless of machine checks.
+
 ## Starting conditions and decision
 
 On 2026-10-29, PowerShell at `D:\Ragnarok Agents`: clean `main` at `8162e9e`, remote `origin` on GitHub; work uses `codex/m2-inference`. Windows 11 Home Single Language 10.0.26200; Ryzen 9 5900HX, 8 cores/16 threads; 31.86 GiB visible RAM, initially 7.62 GiB available. RTX 3080 Laptop GPU, 16,384 MiB VRAM, NVIDIA driver 591.59; initially 1,348 MiB used. C: 181.78 GiB free, D: 156.86 GiB free (snapshots, not reservations).
