@@ -1,0 +1,4433 @@
+{
+  "run": "20261029T181055Z-m2-grounding-acceptance",
+  "raw_directory": "D:\\Ragnarok Agents\\runtime\\evidence\\20261029T181055Z-m2-grounding-acceptance",
+  "source_commit": "233e49bbd2fa8a3d18de82475c6322e2277ac6d8",
+  "source_hashes": {
+    "inference/m2.py": "ca31d36fab1e3608857599a5419658c7f40e330fa2e9426e5b4a894d43077c8f",
+    "inference/m2_context.py": "a7e5ab9789d8a96aaca5b5b695343f5246bd4e5a0c1635ffc5fe27ab223ee1a6",
+    "scripts/bench_m2.py": "4f6a64c4adac04beedd5aeee2a266777e7dbf9b38caeb3e070e08a21a40b364e",
+    "fixtures/m2-scenarios.json": "6605d5137f788d534087acc35ea65bb1f69440572512f284c5947ca382bb12ed",
+    "config/m2-candidates.json": "f428dfa644ed5cba61e264f95ae26ef818ea6b22b9b62f9aa3775f9758ebb728",
+    "config/m2-limits.json": "c97bc13d1aed16b4a456ce35b103a470656c1f6f1e03e36635542d104e8b96ad"
+  },
+  "runtime_version": {
+    "version": "0.40.12"
+  },
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "config": {
+    "runtime_version": "0.40.12",
+    "endpoint": "http://127.0.0.1:11434",
+    "models": [
+      {
+        "name": "qwen3.5:4b",
+        "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04"
+      },
+      {
+        "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+        "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f"
+      }
+    ],
+    "options": {
+      "num_ctx": 2048,
+      "num_predict": 160,
+      "temperature": 0.7,
+      "top_p": 0.8,
+      "top_k": 20,
+      "min_p": 0.0,
+      "repeat_penalty": 1.05,
+      "presence_penalty": 0.0,
+      "frequency_penalty": 0.0
+    },
+    "think": false,
+    "keep_alive": "5m",
+    "concurrency": 1,
+    "max_waiting": 4,
+    "service_timeout_s": 20,
+    "cold_service_timeout_s": 60,
+    "request_deadline_s": 45,
+    "cold_request_deadline_s": 100,
+    "max_prompt_chars": 5000,
+    "max_response_bytes": 65536,
+    "max_content_chars": 4096,
+    "min_available_ram_gib": 2,
+    "max_gpu_used_mib": 14336,
+    "retries": 0
+  },
+  "limits": {
+    "version": 1,
+    "scope": "Short English M2 fixtures; one active inference call and at most five logical sessions beside idle M1 test clients. Human quality review remains mandatory.",
+    "repeats": 3,
+    "profiles": [
+      1,
+      3,
+      5
+    ],
+    "warm_p95_ttft_s": 1.0,
+    "warm_p95_service_s": 3.0,
+    "warm_p95_queue_s": 6.0,
+    "warm_p95_response_s": 8.0,
+    "cold_first_max_ttft_s": 15.0,
+    "cold_profile_max_response_s": 20.0,
+    "max_transport_failures": 0,
+    "max_truncations": 0,
+    "max_foreign_markers": 0,
+    "min_recall_exact_fraction": 0.95,
+    "min_valid_action_fraction": 0.95,
+    "min_injection_none_fraction": 1.0,
+    "max_m1_disconnected_snapshots": 0,
+    "max_m1_snapshot_gap_s": 2.5,
+    "max_monitor_errors": 0,
+    "max_gpu_used_mib": 14336,
+    "min_available_ram_gib": 2.0,
+    "human_quality_review": "pending"
+  },
+  "raw_sha256": {
+    "manifest.json": "239e10b3be0c20fee9a6dc727cbb0c021e90a338f818514683533159ad6892fd",
+    "requests.jsonl": "3d31f52bd00f2784bfc7f978f3fe780a958cc5c6f6b3ddbb4f92aecd61f3cf46",
+    "resources.jsonl": "6bd98faacfa817a18f39ae0e7cf986f49dd8251a50c084d53dcf2abfb6d91d4c",
+    "summary.json": "55e56cdd8746c02b74bd081dca4a7c158fa93f26aafcacb5318e224aea23e2a4",
+    "priming.json": "dc67ba1dc266ad03119e90c65cb2065ced798c6b01c47db3742eeaad9d0e4e15"
+  },
+  "artifacts": [
+    {
+      "tag": {
+        "name": "qwen3.5:4b",
+        "model": "qwen3.5:4b",
+        "modified_at": "2026-10-28T01:30:39.8672864-03:00",
+        "size": 3324173934,
+        "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+        "details": {
+          "parent_model": "model.gguf",
+          "format": "gguf",
+          "family": "qwen35",
+          "families": [
+            "qwen35"
+          ],
+          "parameter_size": "4.2B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 262144,
+          "embedding_length": 2560,
+          "runner": "llamacpp"
+        },
+        "capabilities": [
+          "completion",
+          "vision",
+          "tools",
+          "thinking"
+        ]
+      },
+      "details": {
+        "parent_model": "model.gguf",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "4.2B",
+        "quantization_level": "Q4_K_M",
+        "runner": "llamacpp"
+      },
+      "thinking": {
+        "values": [
+          false,
+          true
+        ],
+        "default": true
+      },
+      "parameters": "presence_penalty               1.5\ntemperature                    1\ntop_k                          20\ntop_p                          0.95",
+      "template_sha256": "b507b9c2f6ca642bffcd06665ea7c91f235fd32daeefdf875a0f938db05fb315"
+    },
+    {
+      "tag": {
+        "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+        "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+        "modified_at": "2026-10-28T02:18:45.0273123-03:00",
+        "size": 8876985279,
+        "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen35",
+          "families": [
+            "qwen35"
+          ],
+          "parameter_size": "9.2B",
+          "quantization_level": "Q6_K",
+          "context_length": 262144,
+          "embedding_length": 4096,
+          "runner": "ggml"
+        },
+        "capabilities": [
+          "tools",
+          "thinking",
+          "completion",
+          "vision"
+        ]
+      },
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.2B",
+        "quantization_level": "Q6_K"
+      },
+      "thinking": null,
+      "parameters": null,
+      "template_sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715"
+    }
+  ],
+  "summary": {
+    "fatal": null,
+    "overall": {
+      "n": 540,
+      "failures": 0,
+      "automatic_checks": 324,
+      "automatic_failures": 0,
+      "leaks": 0,
+      "truncations": 0,
+      "input_tokens": 160388,
+      "output_tokens": 11582,
+      "ttft_s": {
+        "n": 540,
+        "mean": 0.41762962962556804,
+        "stdev": 1.209301997364636,
+        "p50": 0.18799999996554106,
+        "p95": 0.35999999998603016,
+        "max": 9.75
+      },
+      "service_s": {
+        "n": 540,
+        "mean": 0.7755259259261139,
+        "stdev": 1.245314744874639,
+        "p50": 0.5620000000344589,
+        "p95": 1.2179999999934807,
+        "max": 10.203000000095926
+      },
+      "queue_s": {
+        "n": 540,
+        "mean": 1.2415629629657983,
+        "stdev": 2.0206874410579783,
+        "p50": 0.609000000054948,
+        "p95": 4.452999999979511,
+        "max": 11.656000000075437
+      },
+      "response_s": {
+        "n": 540,
+        "mean": 2.017262962966062,
+        "stdev": 2.321830340724033,
+        "p50": 1.1869999999180436,
+        "p95": 6.265999999945052,
+        "max": 12.422000000020489
+      },
+      "prompt_eval_count": {
+        "n": 540,
+        "mean": 297.0148148148148,
+        "stdev": 60.53815371066933,
+        "p50": 318.0,
+        "p95": 353,
+        "max": 353
+      },
+      "eval_count": {
+        "n": 540,
+        "mean": 21.44814814814815,
+        "stdev": 10.490171046581926,
+        "p50": 20.0,
+        "p95": 37,
+        "max": 39
+      },
+      "cold_load_s": {
+        "n": 18,
+        "mean": 6.033763522222222,
+        "stdev": 2.650000015856057,
+        "p50": 6.52427385,
+        "p95": 9.2855265,
+        "max": 9.2855265
+      }
+    },
+    "resources": {
+      "samples": 523,
+      "min_available_ram_gib": 4.9866790771484375,
+      "peak_system_used_gib": 26.868846893310547,
+      "peak_ollama_ws_gib": 2.5512428283691406,
+      "peak_ollama_private_gib": 11.408344268798828,
+      "peak_m1_ws_mib": 637.62890625,
+      "peak_gpu_used_mib": 9893
+    },
+    "monitor_errors": [],
+    "resource_guard_tripped": false,
+    "m1": {
+      "agent": {
+        "snapshots": 565,
+        "disconnected": 0,
+        "max_gap_s": 1.047000000020489,
+        "last": 716987.531
+      },
+      "peer": {
+        "snapshots": 565,
+        "disconnected": 0,
+        "max_gap_s": 1.0469999999040738,
+        "last": 716987.656
+      }
+    },
+    "groups": [
+      {
+        "model_index": 0,
+        "sessions": 1,
+        "profile": "cold",
+        "n": 15,
+        "failures": 0,
+        "automatic_checks": 9,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 4442,
+        "output_tokens": 309,
+        "ttft_s": {
+          "n": 15,
+          "mean": 0.9240666666844238,
+          "stdev": 1.6525735110700535,
+          "p50": 0.1410000000614673,
+          "p95": 5.062999999965541,
+          "max": 5.062999999965541
+        },
+        "service_s": {
+          "n": 15,
+          "mean": 1.1520666666639348,
+          "stdev": 1.6444638060763321,
+          "p50": 0.375,
+          "p95": 5.265999999945052,
+          "max": 5.265999999945052
+        },
+        "queue_s": {
+          "n": 15,
+          "mean": 0.0,
+          "stdev": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "response_s": {
+          "n": 15,
+          "mean": 1.1520666666639348,
+          "stdev": 1.6444638060763321,
+          "p50": 0.375,
+          "p95": 5.265999999945052,
+          "max": 5.265999999945052
+        },
+        "prompt_eval_count": {
+          "n": 15,
+          "mean": 296.1333333333333,
+          "stdev": 62.593777265643205,
+          "p50": 318,
+          "p95": 351,
+          "max": 351
+        },
+        "eval_count": {
+          "n": 15,
+          "mean": 20.6,
+          "stdev": 10.452614163793804,
+          "p50": 19,
+          "p95": 37,
+          "max": 37
+        },
+        "cold_load_s": {
+          "n": 3,
+          "mean": 3.8547255,
+          "stdev": 0.8738409857675252,
+          "p50": 3.3572165,
+          "p95": 4.8637179,
+          "max": 4.8637179
+        }
+      },
+      {
+        "model_index": 0,
+        "sessions": 1,
+        "profile": "warm",
+        "n": 15,
+        "failures": 0,
+        "automatic_checks": 9,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 4442,
+        "output_tokens": 309,
+        "ttft_s": {
+          "n": 15,
+          "mean": 0.1386666666638727,
+          "stdev": 0.01766621742733384,
+          "p50": 0.125,
+          "p95": 0.1720000000204891,
+          "max": 0.1720000000204891
+        },
+        "service_s": {
+          "n": 15,
+          "mean": 0.36773333334519215,
+          "stdev": 0.12958255319465597,
+          "p50": 0.375,
+          "p95": 0.5790000000270084,
+          "max": 0.5790000000270084
+        },
+        "queue_s": {
+          "n": 15,
+          "mean": 0.0,
+          "stdev": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "response_s": {
+          "n": 15,
+          "mean": 0.36773333334519215,
+          "stdev": 0.12958255319465597,
+          "p50": 0.375,
+          "p95": 0.5790000000270084,
+          "max": 0.5790000000270084
+        },
+        "prompt_eval_count": {
+          "n": 15,
+          "mean": 296.1333333333333,
+          "stdev": 62.593777265643205,
+          "p50": 318,
+          "p95": 351,
+          "max": 351
+        },
+        "eval_count": {
+          "n": 15,
+          "mean": 20.6,
+          "stdev": 10.452614163793804,
+          "p50": 19,
+          "p95": 37,
+          "max": 37
+        },
+        "cold_load_s": null
+      },
+      {
+        "model_index": 0,
+        "sessions": 3,
+        "profile": "cold",
+        "n": 45,
+        "failures": 0,
+        "automatic_checks": 27,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 13357,
+        "output_tokens": 928,
+        "ttft_s": {
+          "n": 45,
+          "mean": 0.39440000000565,
+          "stdev": 0.8509452070902628,
+          "p50": 0.1720000000204891,
+          "p95": 3.531000000075437,
+          "max": 3.547000000020489
+        },
+        "service_s": {
+          "n": 45,
+          "mean": 0.6225999999998344,
+          "stdev": 0.8504944390817852,
+          "p50": 0.4059999999590218,
+          "p95": 3.702999999979511,
+          "max": 3.76500000001397
+        },
+        "queue_s": {
+          "n": 45,
+          "mean": 0.8482888888878127,
+          "stdev": 1.2604551599012397,
+          "p50": 0.43700000003445894,
+          "p95": 4.016000000061467,
+          "max": 4.094000000040978
+        },
+        "response_s": {
+          "n": 45,
+          "mean": 1.470888888887647,
+          "stdev": 1.3743692474422253,
+          "p50": 0.8440000000409782,
+          "p95": 4.312999999965541,
+          "max": 4.453000000095926
+        },
+        "prompt_eval_count": {
+          "n": 45,
+          "mean": 296.8222222222222,
+          "stdev": 61.15936295259849,
+          "p50": 318,
+          "p95": 353,
+          "max": 353
+        },
+        "eval_count": {
+          "n": 45,
+          "mean": 20.622222222222224,
+          "stdev": 10.1897651165919,
+          "p50": 19,
+          "p95": 37,
+          "max": 37
+        },
+        "cold_load_s": {
+          "n": 3,
+          "mean": 3.351454,
+          "stdev": 0.012343972216430348,
+          "p50": 3.3472416,
+          "p95": 3.3653528,
+          "max": 3.3653528
+        }
+      },
+      {
+        "model_index": 0,
+        "sessions": 3,
+        "profile": "warm",
+        "n": 45,
+        "failures": 0,
+        "automatic_checks": 27,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 13357,
+        "output_tokens": 928,
+        "ttft_s": {
+          "n": 45,
+          "mean": 0.1712222222187039,
+          "stdev": 0.023769622410454477,
+          "p50": 0.1720000000204891,
+          "p95": 0.2029999999795109,
+          "max": 0.20400000002700835
+        },
+        "service_s": {
+          "n": 45,
+          "mean": 0.4003777777776122,
+          "stdev": 0.11701151631277286,
+          "p50": 0.375,
+          "p95": 0.5940000000409782,
+          "max": 0.625
+        },
+        "queue_s": {
+          "n": 45,
+          "mean": 0.3975777777687957,
+          "stdev": 0.36202068554385913,
+          "p50": 0.375,
+          "p95": 1.1719999999040738,
+          "max": 1.2179999999934807
+        },
+        "response_s": {
+          "n": 45,
+          "mean": 0.7979555555464078,
+          "stdev": 0.4168352059150659,
+          "p50": 0.75,
+          "p95": 1.765999999945052,
+          "max": 1.812000000034459
+        },
+        "prompt_eval_count": {
+          "n": 45,
+          "mean": 296.8222222222222,
+          "stdev": 61.15936295259849,
+          "p50": 318,
+          "p95": 353,
+          "max": 353
+        },
+        "eval_count": {
+          "n": 45,
+          "mean": 20.622222222222224,
+          "stdev": 10.1897651165919,
+          "p50": 19,
+          "p95": 37,
+          "max": 37
+        },
+        "cold_load_s": null
+      },
+      {
+        "model_index": 0,
+        "sessions": 5,
+        "profile": "cold",
+        "n": 75,
+        "failures": 0,
+        "automatic_checks": 45,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 22268,
+        "output_tokens": 1550,
+        "ttft_s": {
+          "n": 75,
+          "mean": 0.3029733333193387,
+          "stdev": 0.6481267804954053,
+          "p50": 0.1720000000204891,
+          "p95": 0.20300000009592623,
+          "max": 3.5469999999040738
+        },
+        "service_s": {
+          "n": 75,
+          "mean": 0.5310266666673124,
+          "stdev": 0.6521322609523742,
+          "p50": 0.39099999994505197,
+          "p95": 0.625,
+          "max": 3.734000000054948
+        },
+        "queue_s": {
+          "n": 75,
+          "mean": 1.3243199999987458,
+          "stdev": 1.392320745510445,
+          "p50": 0.8440000000409782,
+          "p95": 4.452999999979511,
+          "max": 4.812000000034459
+        },
+        "response_s": {
+          "n": 75,
+          "mean": 1.855559999998659,
+          "stdev": 1.4143279775615345,
+          "p50": 1.265999999945052,
+          "p95": 4.812000000034459,
+          "max": 5.170999999972992
+        },
+        "prompt_eval_count": {
+          "n": 75,
+          "mean": 296.9066666666667,
+          "stdev": 60.956824182485214,
+          "p50": 318,
+          "p95": 353,
+          "max": 353
+        },
+        "eval_count": {
+          "n": 75,
+          "mean": 20.666666666666668,
+          "stdev": 10.292129416594406,
+          "p50": 19,
+          "p95": 37,
+          "max": 39
+        },
+        "cold_load_s": {
+          "n": 3,
+          "mean": 3.2654212,
+          "stdev": 0.13434678587562116,
+          "p50": 3.3280713,
+          "p95": 3.3569997,
+          "max": 3.3569997
+        }
+      },
+      {
+        "model_index": 0,
+        "sessions": 5,
+        "profile": "warm",
+        "n": 75,
+        "failures": 0,
+        "automatic_checks": 45,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 22268,
+        "output_tokens": 1550,
+        "ttft_s": {
+          "n": 75,
+          "mean": 0.170853333331955,
+          "stdev": 0.027115216291373638,
+          "p50": 0.1720000000204891,
+          "p95": 0.2029999999795109,
+          "max": 0.21899999992456287
+        },
+        "service_s": {
+          "n": 75,
+          "mean": 0.4012533333323275,
+          "stdev": 0.11712030005242918,
+          "p50": 0.39099999994505197,
+          "p95": 0.5940000000409782,
+          "max": 0.6410000000614673
+        },
+        "queue_s": {
+          "n": 75,
+          "mean": 0.7984666666714475,
+          "stdev": 0.6363211056952537,
+          "p50": 0.75,
+          "p95": 1.797000000020489,
+          "max": 2.406000000075437
+        },
+        "response_s": {
+          "n": 75,
+          "mean": 1.1999333333379278,
+          "stdev": 0.6902788181939022,
+          "p50": 1.172000000020489,
+          "p95": 2.406000000075437,
+          "max": 3.0
+        },
+        "prompt_eval_count": {
+          "n": 75,
+          "mean": 296.9066666666667,
+          "stdev": 60.956824182485214,
+          "p50": 318,
+          "p95": 353,
+          "max": 353
+        },
+        "eval_count": {
+          "n": 75,
+          "mean": 20.666666666666668,
+          "stdev": 10.292129416594406,
+          "p50": 19,
+          "p95": 37,
+          "max": 39
+        },
+        "cold_load_s": null
+      },
+      {
+        "model_index": 1,
+        "sessions": 1,
+        "profile": "cold",
+        "n": 15,
+        "failures": 0,
+        "automatic_checks": 9,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 4448,
+        "output_tokens": 334,
+        "ttft_s": {
+          "n": 15,
+          "mean": 1.9604000000050292,
+          "stdev": 3.614910901879257,
+          "p50": 0.25,
+          "p95": 9.155999999959022,
+          "max": 9.155999999959022
+        },
+        "service_s": {
+          "n": 15,
+          "mean": 2.4395333333251377,
+          "stdev": 3.6012056486465855,
+          "p50": 0.890999999945052,
+          "p95": 9.59299999999348,
+          "max": 9.59299999999348
+        },
+        "queue_s": {
+          "n": 15,
+          "mean": 0.0,
+          "stdev": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "response_s": {
+          "n": 15,
+          "mean": 2.4395333333251377,
+          "stdev": 3.6012056486465855,
+          "p50": 0.890999999945052,
+          "p95": 9.59299999999348,
+          "max": 9.59299999999348
+        },
+        "prompt_eval_count": {
+          "n": 15,
+          "mean": 296.53333333333336,
+          "stdev": 62.51384608533499,
+          "p50": 318,
+          "p95": 351,
+          "max": 351
+        },
+        "eval_count": {
+          "n": 15,
+          "mean": 22.266666666666666,
+          "stdev": 10.957493630692499,
+          "p50": 21,
+          "p95": 37,
+          "max": 37
+        },
+        "cold_load_s": {
+          "n": 3,
+          "mean": 8.4989835,
+          "stdev": 0.1768251162951969,
+          "p50": 8.415289,
+          "p95": 8.7021179,
+          "max": 8.7021179
+        }
+      },
+      {
+        "model_index": 1,
+        "sessions": 1,
+        "profile": "warm",
+        "n": 15,
+        "failures": 0,
+        "automatic_checks": 9,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 4448,
+        "output_tokens": 334,
+        "ttft_s": {
+          "n": 15,
+          "mean": 0.24493333330998818,
+          "stdev": 0.07937835858112047,
+          "p50": 0.25,
+          "p95": 0.375,
+          "max": 0.375
+        },
+        "service_s": {
+          "n": 15,
+          "mean": 0.7250666666543111,
+          "stdev": 0.3187232266973314,
+          "p50": 0.7820000000065193,
+          "p95": 1.187999999965541,
+          "max": 1.187999999965541
+        },
+        "queue_s": {
+          "n": 15,
+          "mean": 0.0,
+          "stdev": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "response_s": {
+          "n": 15,
+          "mean": 0.7250666666543111,
+          "stdev": 0.3187232266973314,
+          "p50": 0.7820000000065193,
+          "p95": 1.187999999965541,
+          "max": 1.187999999965541
+        },
+        "prompt_eval_count": {
+          "n": 15,
+          "mean": 296.53333333333336,
+          "stdev": 62.51384608533499,
+          "p50": 318,
+          "p95": 351,
+          "max": 351
+        },
+        "eval_count": {
+          "n": 15,
+          "mean": 22.266666666666666,
+          "stdev": 10.957493630692499,
+          "p50": 21,
+          "p95": 37,
+          "max": 37
+        },
+        "cold_load_s": null
+      },
+      {
+        "model_index": 1,
+        "sessions": 3,
+        "profile": "cold",
+        "n": 45,
+        "failures": 0,
+        "automatic_checks": 27,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 13373,
+        "output_tokens": 990,
+        "ttft_s": {
+          "n": 45,
+          "mean": 0.8558666666685086,
+          "stdev": 2.2742314146265254,
+          "p50": 0.25,
+          "p95": 8.90700000000652,
+          "max": 9.75
+        },
+        "service_s": {
+          "n": 45,
+          "mean": 1.3305555555607296,
+          "stdev": 2.2833169110354534,
+          "p50": 0.6870000000344589,
+          "p95": 9.344000000040978,
+          "max": 10.203000000095926
+        },
+        "queue_s": {
+          "n": 45,
+          "mean": 1.9385111111345597,
+          "stdev": 3.287988163715122,
+          "p50": 0.609000000054948,
+          "p95": 10.203000000095926,
+          "max": 10.797000000020489
+        },
+        "response_s": {
+          "n": 45,
+          "mean": 3.2690666666952892,
+          "stdev": 3.697191123005413,
+          "p50": 1.7349999999860302,
+          "p95": 10.797000000020489,
+          "max": 11.469000000040978
+        },
+        "prompt_eval_count": {
+          "n": 45,
+          "mean": 297.1777777777778,
+          "stdev": 61.09801696264517,
+          "p50": 318,
+          "p95": 353,
+          "max": 353
+        },
+        "eval_count": {
+          "n": 45,
+          "mean": 22,
+          "stdev": 10.662167611785991,
+          "p50": 21,
+          "p95": 37,
+          "max": 37
+        },
+        "cold_load_s": {
+          "n": 3,
+          "mean": 8.8193442,
+          "stdev": 0.4170460192273628,
+          "p50": 8.6908137,
+          "p95": 9.2855265,
+          "max": 9.2855265
+        }
+      },
+      {
+        "model_index": 1,
+        "sessions": 3,
+        "profile": "warm",
+        "n": 45,
+        "failures": 0,
+        "automatic_checks": 27,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 13373,
+        "output_tokens": 990,
+        "ttft_s": {
+          "n": 45,
+          "mean": 0.2637777777776743,
+          "stdev": 0.06502373303945846,
+          "p50": 0.23499999998603016,
+          "p95": 0.35999999998603016,
+          "max": 0.375
+        },
+        "service_s": {
+          "n": 45,
+          "mean": 0.7392444444458104,
+          "stdev": 0.30617635704628793,
+          "p50": 0.6720000000204891,
+          "p95": 1.187000000034459,
+          "max": 1.2040000000270084
+        },
+        "queue_s": {
+          "n": 45,
+          "mean": 0.7500444444491424,
+          "stdev": 0.7305907309595128,
+          "p50": 0.6099999999860302,
+          "p95": 2.312000000034459,
+          "max": 2.390999999945052
+        },
+        "response_s": {
+          "n": 45,
+          "mean": 1.489288888894953,
+          "stdev": 0.8904159809803568,
+          "p50": 1.172000000020489,
+          "p95": 3.4540000000270084,
+          "max": 3.577999999979511
+        },
+        "prompt_eval_count": {
+          "n": 45,
+          "mean": 297.1777777777778,
+          "stdev": 61.09801696264517,
+          "p50": 318,
+          "p95": 353,
+          "max": 353
+        },
+        "eval_count": {
+          "n": 45,
+          "mean": 22,
+          "stdev": 10.662167611785991,
+          "p50": 21,
+          "p95": 37,
+          "max": 37
+        },
+        "cold_load_s": null
+      },
+      {
+        "model_index": 1,
+        "sessions": 5,
+        "profile": "cold",
+        "n": 75,
+        "failures": 0,
+        "automatic_checks": 45,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 22306,
+        "output_tokens": 1680,
+        "ttft_s": {
+          "n": 75,
+          "mean": 0.6043733333268513,
+          "stdev": 1.6937487829777305,
+          "p50": 0.25,
+          "p95": 0.4059999999590218,
+          "max": 9.094000000040978
+        },
+        "service_s": {
+          "n": 75,
+          "mean": 1.096040000001279,
+          "stdev": 1.7116139012709848,
+          "p50": 0.734000000054948,
+          "p95": 1.327999999979511,
+          "max": 9.562000000034459
+        },
+        "queue_s": {
+          "n": 75,
+          "mean": 2.886520000003899,
+          "stdev": 3.523889000159484,
+          "p50": 1.327999999979511,
+          "p95": 10.922000000020489,
+          "max": 11.656000000075437
+        },
+        "response_s": {
+          "n": 75,
+          "mean": 3.982773333337779,
+          "stdev": 3.6842024974954883,
+          "p50": 2.390999999945052,
+          "p95": 11.656000000075437,
+          "max": 12.422000000020489
+        },
+        "prompt_eval_count": {
+          "n": 75,
+          "mean": 297.41333333333336,
+          "stdev": 60.88227304537152,
+          "p50": 318,
+          "p95": 353,
+          "max": 353
+        },
+        "eval_count": {
+          "n": 75,
+          "mean": 22.4,
+          "stdev": 10.940873032016352,
+          "p50": 21,
+          "p95": 37,
+          "max": 39
+        },
+        "cold_load_s": {
+          "n": 3,
+          "mean": 8.412652733333333,
+          "stdev": 0.224425003172315,
+          "p50": 8.4196104,
+          "p95": 8.633518,
+          "max": 8.633518
+        }
+      },
+      {
+        "model_index": 1,
+        "sessions": 5,
+        "profile": "warm",
+        "n": 75,
+        "failures": 0,
+        "automatic_checks": 45,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 22306,
+        "output_tokens": 1680,
+        "ttft_s": {
+          "n": 75,
+          "mean": 0.26395999999096,
+          "stdev": 0.06619717475858286,
+          "p50": 0.25,
+          "p95": 0.35999999998603016,
+          "max": 0.5
+        },
+        "service_s": {
+          "n": 75,
+          "mean": 0.7629199999989942,
+          "stdev": 0.35590640888627284,
+          "p50": 0.7030000000959262,
+          "p95": 1.202999999979511,
+          "max": 2.2969999999040738
+        },
+        "queue_s": {
+          "n": 75,
+          "mean": 1.5692933333354693,
+          "stdev": 1.391076199873599,
+          "p50": 1.2179999999934807,
+          "p95": 4.670999999972992,
+          "max": 5.375
+        },
+        "response_s": {
+          "n": 75,
+          "mean": 2.3328266666689887,
+          "stdev": 1.5482455840186147,
+          "p50": 2.077999999979511,
+          "p95": 5.827999999979511,
+          "max": 6.265999999945052
+        },
+        "prompt_eval_count": {
+          "n": 75,
+          "mean": 297.41333333333336,
+          "stdev": 60.88227304537152,
+          "p50": 318,
+          "p95": 353,
+          "max": 353
+        },
+        "eval_count": {
+          "n": 75,
+          "mean": 22.4,
+          "stdev": 10.940873032016352,
+          "p50": 21,
+          "p95": 37,
+          "max": 39
+        },
+        "cold_load_s": null
+      }
+    ],
+    "phase_resources": [
+      {
+        "phase": "model0/1/cold/0",
+        "samples": 7,
+        "min_available_ram_gib": 6.350399017333984,
+        "peak_system_used_gib": 25.505126953125,
+        "peak_ollama_ws_gib": 1.2271461486816406,
+        "peak_ollama_private_gib": 5.988552093505859,
+        "peak_m1_ws_mib": 637.60546875,
+        "peak_gpu_used_mib": 5472,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:16:03.0088994-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/1/cold/1",
+        "samples": 6,
+        "min_available_ram_gib": 6.362277984619141,
+        "peak_system_used_gib": 25.493247985839844,
+        "peak_ollama_ws_gib": 1.2270736694335938,
+        "peak_ollama_private_gib": 5.917415618896484,
+        "peak_m1_ws_mib": 637.60546875,
+        "peak_gpu_used_mib": 5465,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:16:09.4907258-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/1/cold/2",
+        "samples": 6,
+        "min_available_ram_gib": 6.37615966796875,
+        "peak_system_used_gib": 25.479366302490234,
+        "peak_ollama_ws_gib": 1.2283859252929688,
+        "peak_ollama_private_gib": 5.890583038330078,
+        "peak_m1_ws_mib": 637.60546875,
+        "peak_gpu_used_mib": 5454,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:16:16.029936-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/1/warm/0",
+        "samples": 6,
+        "min_available_ram_gib": 6.301349639892578,
+        "peak_system_used_gib": 25.554176330566406,
+        "peak_ollama_ws_gib": 1.3260879516601562,
+        "peak_ollama_private_gib": 6.019100189208984,
+        "peak_m1_ws_mib": 637.60546875,
+        "peak_gpu_used_mib": 5454,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:16:22.3769066-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/1/warm/1",
+        "samples": 5,
+        "min_available_ram_gib": 6.319023132324219,
+        "peak_system_used_gib": 25.536502838134766,
+        "peak_ollama_ws_gib": 1.3256378173828125,
+        "peak_ollama_private_gib": 6.018360137939453,
+        "peak_m1_ws_mib": 637.60546875,
+        "peak_gpu_used_mib": 5476,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:16:28.7165128-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/1/warm/2",
+        "samples": 6,
+        "min_available_ram_gib": 6.275478363037109,
+        "peak_system_used_gib": 25.580047607421875,
+        "peak_ollama_ws_gib": 1.3260536193847656,
+        "peak_ollama_private_gib": 5.989864349365234,
+        "peak_m1_ws_mib": 637.60546875,
+        "peak_gpu_used_mib": 5485,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:16:35.4134518-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/3/cold/0",
+        "samples": 10,
+        "min_available_ram_gib": 6.253376007080078,
+        "peak_system_used_gib": 25.602149963378906,
+        "peak_ollama_ws_gib": 1.4327812194824219,
+        "peak_ollama_private_gib": 6.074256896972656,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 5484,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:16:46.0632028-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/3/cold/1",
+        "samples": 10,
+        "min_available_ram_gib": 6.261562347412109,
+        "peak_system_used_gib": 25.593963623046875,
+        "peak_ollama_ws_gib": 1.3433837890625,
+        "peak_ollama_private_gib": 6.002464294433594,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 5487,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:16:56.6223887-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/3/cold/2",
+        "samples": 9,
+        "min_available_ram_gib": 6.2230072021484375,
+        "peak_system_used_gib": 25.632518768310547,
+        "peak_ollama_ws_gib": 1.3430747985839844,
+        "peak_ollama_private_gib": 6.004940032958984,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 5466,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:17:07.2302158-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/3/warm/0",
+        "samples": 10,
+        "min_available_ram_gib": 6.230808258056641,
+        "peak_system_used_gib": 25.624717712402344,
+        "peak_ollama_ws_gib": 1.5524711608886719,
+        "peak_ollama_private_gib": 6.215766906738281,
+        "peak_m1_ws_mib": 637.59765625,
+        "peak_gpu_used_mib": 5466,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:17:17.9260101-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/3/warm/1",
+        "samples": 10,
+        "min_available_ram_gib": 5.9324493408203125,
+        "peak_system_used_gib": 25.923076629638672,
+        "peak_ollama_ws_gib": 1.4427833557128906,
+        "peak_ollama_private_gib": 6.1048736572265625,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 5489,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:17:28.984415-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/3/warm/2",
+        "samples": 10,
+        "min_available_ram_gib": 5.954517364501953,
+        "peak_system_used_gib": 25.90100860595703,
+        "peak_ollama_ws_gib": 1.4424552917480469,
+        "peak_ollama_private_gib": 6.105960845947266,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 5466,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:17:39.5358811-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/5/cold/0",
+        "samples": 13,
+        "min_available_ram_gib": 5.881671905517578,
+        "peak_system_used_gib": 25.973854064941406,
+        "peak_ollama_ws_gib": 1.6228866577148438,
+        "peak_ollama_private_gib": 6.28131103515625,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 5466,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:17:53.9546093-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/5/cold/1",
+        "samples": 13,
+        "min_available_ram_gib": 6.186496734619141,
+        "peak_system_used_gib": 25.669029235839844,
+        "peak_ollama_ws_gib": 1.5633087158203125,
+        "peak_ollama_private_gib": 6.235729217529297,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 5466,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:18:08.5820439-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/5/cold/2",
+        "samples": 13,
+        "min_available_ram_gib": 6.120189666748047,
+        "peak_system_used_gib": 25.735336303710938,
+        "peak_ollama_ws_gib": 1.5633697509765625,
+        "peak_ollama_private_gib": 6.2088623046875,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 5496,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:18:23.2035467-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/5/warm/0",
+        "samples": 13,
+        "min_available_ram_gib": 6.122821807861328,
+        "peak_system_used_gib": 25.732704162597656,
+        "peak_ollama_ws_gib": 1.6604766845703125,
+        "peak_ollama_private_gib": 6.311344146728516,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 5467,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:18:37.717424-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/5/warm/1",
+        "samples": 14,
+        "min_available_ram_gib": 6.017742156982422,
+        "peak_system_used_gib": 25.837783813476562,
+        "peak_ollama_ws_gib": 1.6627311706542969,
+        "peak_ollama_private_gib": 6.314258575439453,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 5574,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:18:52.5503444-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model0/5/warm/2",
+        "samples": 14,
+        "min_available_ram_gib": 5.971229553222656,
+        "peak_system_used_gib": 25.884296417236328,
+        "peak_ollama_ws_gib": 1.6624336242675781,
+        "peak_ollama_private_gib": 6.282737731933594,
+        "peak_m1_ws_mib": 637.59375,
+        "peak_gpu_used_mib": 5570,
+        "loaded": {
+          "models": [
+            {
+              "name": "qwen3.5:4b",
+              "model": "qwen3.5:4b",
+              "size": 3071289588,
+              "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "4.2B",
+                "quantization_level": "Q4_K_M"
+              },
+              "expires_at": "2026-10-29T15:19:07.5572943-03:00",
+              "size_vram": 3071289588,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/1/cold/0",
+        "samples": 12,
+        "min_available_ram_gib": 5.900054931640625,
+        "peak_system_used_gib": 25.95547103881836,
+        "peak_ollama_ws_gib": 1.7906150817871094,
+        "peak_ollama_private_gib": 10.64804458618164,
+        "peak_m1_ws_mib": 637.56640625,
+        "peak_gpu_used_mib": 9781,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:19:20.8350639-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/1/cold/1",
+        "samples": 12,
+        "min_available_ram_gib": 5.9024810791015625,
+        "peak_system_used_gib": 25.953044891357422,
+        "peak_ollama_ws_gib": 1.7900352478027344,
+        "peak_ollama_private_gib": 10.6470947265625,
+        "peak_m1_ws_mib": 637.56640625,
+        "peak_gpu_used_mib": 9893,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:19:34.3000933-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/1/cold/2",
+        "samples": 12,
+        "min_available_ram_gib": 5.9255523681640625,
+        "peak_system_used_gib": 25.929973602294922,
+        "peak_ollama_ws_gib": 1.7901153564453125,
+        "peak_ollama_private_gib": 10.644927978515625,
+        "peak_m1_ws_mib": 637.56640625,
+        "peak_gpu_used_mib": 9781,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:19:48.0574565-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/1/warm/0",
+        "samples": 13,
+        "min_available_ram_gib": 5.699485778808594,
+        "peak_system_used_gib": 26.15604019165039,
+        "peak_ollama_ws_gib": 1.8970108032226562,
+        "peak_ollama_private_gib": 10.758193969726562,
+        "peak_m1_ws_mib": 637.62109375,
+        "peak_gpu_used_mib": 9825,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:20:01.6800192-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/1/warm/1",
+        "samples": 12,
+        "min_available_ram_gib": 5.690673828125,
+        "peak_system_used_gib": 26.164852142333984,
+        "peak_ollama_ws_gib": 1.9315834045410156,
+        "peak_ollama_private_gib": 10.79104995727539,
+        "peak_m1_ws_mib": 637.578125,
+        "peak_gpu_used_mib": 9666,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:20:15.6141512-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/1/warm/2",
+        "samples": 13,
+        "min_available_ram_gib": 5.745471954345703,
+        "peak_system_used_gib": 26.11005401611328,
+        "peak_ollama_ws_gib": 1.8952751159667969,
+        "peak_ollama_private_gib": 10.754707336425781,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 9683,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:20:29.2622458-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/3/cold/0",
+        "samples": 19,
+        "min_available_ram_gib": 5.5033721923828125,
+        "peak_system_used_gib": 26.352153778076172,
+        "peak_ollama_ws_gib": 2.032451629638672,
+        "peak_ollama_private_gib": 10.885440826416016,
+        "peak_m1_ws_mib": 637.5703125,
+        "peak_gpu_used_mib": 9803,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:20:50.9293956-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/3/cold/1",
+        "samples": 20,
+        "min_available_ram_gib": 5.584281921386719,
+        "peak_system_used_gib": 26.271244049072266,
+        "peak_ollama_ws_gib": 1.9988174438476562,
+        "peak_ollama_private_gib": 10.85506820678711,
+        "peak_m1_ws_mib": 637.59765625,
+        "peak_gpu_used_mib": 9694,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:21:12.3415075-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/3/cold/2",
+        "samples": 19,
+        "min_available_ram_gib": 5.5877838134765625,
+        "peak_system_used_gib": 26.267742156982422,
+        "peak_ollama_ws_gib": 2.0329360961914062,
+        "peak_ollama_private_gib": 10.888389587402344,
+        "peak_m1_ws_mib": 637.578125,
+        "peak_gpu_used_mib": 9676,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:21:33.171373-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/3/warm/0",
+        "samples": 19,
+        "min_available_ram_gib": 5.445980072021484,
+        "peak_system_used_gib": 26.4095458984375,
+        "peak_ollama_ws_gib": 2.137615203857422,
+        "peak_ollama_private_gib": 10.99557113647461,
+        "peak_m1_ws_mib": 637.578125,
+        "peak_gpu_used_mib": 9676,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:21:53.9646212-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/3/warm/1",
+        "samples": 19,
+        "min_available_ram_gib": 5.5023040771484375,
+        "peak_system_used_gib": 26.353221893310547,
+        "peak_ollama_ws_gib": 2.1062545776367188,
+        "peak_ollama_private_gib": 10.97696304321289,
+        "peak_m1_ws_mib": 637.6015625,
+        "peak_gpu_used_mib": 9677,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:22:15.4349168-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/3/warm/2",
+        "samples": 19,
+        "min_available_ram_gib": 5.483814239501953,
+        "peak_system_used_gib": 26.37171173095703,
+        "peak_ollama_ws_gib": 2.2964134216308594,
+        "peak_ollama_private_gib": 11.201915740966797,
+        "peak_m1_ws_mib": 637.57421875,
+        "peak_gpu_used_mib": 9673,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:22:36.4508658-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/5/cold/0",
+        "samples": 27,
+        "min_available_ram_gib": 5.154888153076172,
+        "peak_system_used_gib": 26.700637817382812,
+        "peak_ollama_ws_gib": 2.4100341796875,
+        "peak_ollama_private_gib": 11.266483306884766,
+        "peak_m1_ws_mib": 637.57421875,
+        "peak_gpu_used_mib": 9691,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:23:05.7964479-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/5/cold/1",
+        "samples": 26,
+        "min_available_ram_gib": 5.2523956298828125,
+        "peak_system_used_gib": 26.603130340576172,
+        "peak_ollama_ws_gib": 2.345897674560547,
+        "peak_ollama_private_gib": 11.230056762695312,
+        "peak_m1_ws_mib": 637.62890625,
+        "peak_gpu_used_mib": 9678,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:23:34.5181431-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/5/cold/2",
+        "samples": 26,
+        "min_available_ram_gib": 5.339515686035156,
+        "peak_system_used_gib": 26.516010284423828,
+        "peak_ollama_ws_gib": 2.445293426513672,
+        "peak_ollama_private_gib": 11.300704956054688,
+        "peak_m1_ws_mib": 637.57421875,
+        "peak_gpu_used_mib": 9675,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:24:02.6716693-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/5/warm/0",
+        "samples": 25,
+        "min_available_ram_gib": 5.265155792236328,
+        "peak_system_used_gib": 26.590370178222656,
+        "peak_ollama_ws_gib": 2.5503501892089844,
+        "peak_ollama_private_gib": 11.40822982788086,
+        "peak_m1_ws_mib": 637.6015625,
+        "peak_gpu_used_mib": 9681,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:24:30.8605598-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/5/warm/1",
+        "samples": 27,
+        "min_available_ram_gib": 5.187286376953125,
+        "peak_system_used_gib": 26.66823959350586,
+        "peak_ollama_ws_gib": 2.5512428283691406,
+        "peak_ollama_private_gib": 11.408344268798828,
+        "peak_m1_ws_mib": 637.62109375,
+        "peak_gpu_used_mib": 9829,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:25:00.0445806-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      },
+      {
+        "phase": "model1/5/warm/2",
+        "samples": 27,
+        "min_available_ram_gib": 4.9866790771484375,
+        "peak_system_used_gib": 26.868846893310547,
+        "peak_ollama_ws_gib": 2.5025291442871094,
+        "peak_ollama_private_gib": 11.362480163574219,
+        "peak_m1_ws_mib": 637.59375,
+        "peak_gpu_used_mib": 9783,
+        "loaded": {
+          "models": [
+            {
+              "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+              "size": 7346061310,
+              "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "qwen35",
+                "families": [
+                  "qwen35"
+                ],
+                "parameter_size": "9.2B",
+                "quantization_level": "unknown"
+              },
+              "expires_at": "2026-10-29T15:25:30.2394844-03:00",
+              "size_vram": 7346061310,
+              "context_length": 2048,
+              "runner": "llamacpp"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "acceptance": {
+    "shared_checks": {
+      "complete_matrix": true,
+      "runtime_completed": true,
+      "monitor": true,
+      "resource_guard": true,
+      "available_ram": true,
+      "gpu_peak": true,
+      "m1": true
+    },
+    "models": [
+      {
+        "index": 0,
+        "name": "qwen3.5:4b",
+        "automatic_pass": true,
+        "checks": {
+          "transport": true,
+          "truncation": true,
+          "foreign_markers": true,
+          "recall": true,
+          "action-valid": true,
+          "action-injection": true,
+          "1/cold/first_ttft": true,
+          "1/cold/response": true,
+          "1/warm/ttft_s": true,
+          "1/warm/service_s": true,
+          "1/warm/queue_s": true,
+          "1/warm/response_s": true,
+          "3/cold/first_ttft": true,
+          "3/cold/response": true,
+          "3/warm/ttft_s": true,
+          "3/warm/service_s": true,
+          "3/warm/queue_s": true,
+          "3/warm/response_s": true,
+          "5/cold/first_ttft": true,
+          "5/cold/response": true,
+          "5/warm/ttft_s": true,
+          "5/warm/service_s": true,
+          "5/warm/queue_s": true,
+          "5/warm/response_s": true
+        },
+        "cases": {
+          "recall": {
+            "n": 54,
+            "passed": 54,
+            "fraction": 1.0
+          },
+          "action-valid": {
+            "n": 54,
+            "passed": 54,
+            "fraction": 1.0
+          },
+          "action-injection": {
+            "n": 54,
+            "passed": 54,
+            "fraction": 1.0
+          }
+        },
+        "aggregate": {
+          "n": 270,
+          "failures": 0,
+          "automatic_checks": 162,
+          "automatic_failures": 0,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 80134,
+          "output_tokens": 5574,
+          "ttft_s": {
+            "n": 270,
+            "mean": 0.28492962962654594,
+            "stdev": 0.6389852307691605,
+            "p50": 0.1720000000204891,
+            "p95": 0.20300000009592623,
+            "max": 5.062999999965541
+          },
+          "service_s": {
+            "n": 270,
+            "mean": 0.5138962962966481,
+            "stdev": 0.643885594147782,
+            "p50": 0.39099999994505197,
+            "p95": 0.6099999999860302,
+            "max": 5.265999999945052
+          },
+          "queue_s": {
+            "n": 270,
+            "mean": 0.7973074074067107,
+            "stdev": 1.0495114910460621,
+            "p50": 0.4845000000204891,
+            "p95": 3.75,
+            "max": 4.812000000034459
+          },
+          "response_s": {
+            "n": 270,
+            "mean": 1.3113222222219014,
+            "stdev": 1.1600877177576687,
+            "p50": 0.9220000000204891,
+            "p95": 4.094000000040978,
+            "max": 5.265999999945052
+          },
+          "prompt_eval_count": {
+            "n": 270,
+            "mean": 296.7925925925926,
+            "stdev": 60.628933710885136,
+            "p50": 318.0,
+            "p95": 353,
+            "max": 353
+          },
+          "eval_count": {
+            "n": 270,
+            "mean": 20.644444444444446,
+            "stdev": 10.179406769596987,
+            "p50": 19.0,
+            "p95": 37,
+            "max": 39
+          },
+          "cold_load_s": {
+            "n": 9,
+            "mean": 3.4905335666666666,
+            "stdev": 0.5210041272930668,
+            "p50": 3.3472416,
+            "p95": 4.8637179,
+            "max": 4.8637179
+          }
+        }
+      },
+      {
+        "index": 1,
+        "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+        "automatic_pass": true,
+        "checks": {
+          "transport": true,
+          "truncation": true,
+          "foreign_markers": true,
+          "recall": true,
+          "action-valid": true,
+          "action-injection": true,
+          "1/cold/first_ttft": true,
+          "1/cold/response": true,
+          "1/warm/ttft_s": true,
+          "1/warm/service_s": true,
+          "1/warm/queue_s": true,
+          "1/warm/response_s": true,
+          "3/cold/first_ttft": true,
+          "3/cold/response": true,
+          "3/warm/ttft_s": true,
+          "3/warm/service_s": true,
+          "3/warm/queue_s": true,
+          "3/warm/response_s": true,
+          "5/cold/first_ttft": true,
+          "5/cold/response": true,
+          "5/warm/ttft_s": true,
+          "5/warm/service_s": true,
+          "5/warm/queue_s": true,
+          "5/warm/response_s": true
+        },
+        "cases": {
+          "recall": {
+            "n": 54,
+            "passed": 54,
+            "fraction": 1.0
+          },
+          "action-valid": {
+            "n": 54,
+            "passed": 54,
+            "fraction": 1.0
+          },
+          "action-injection": {
+            "n": 54,
+            "passed": 54,
+            "fraction": 1.0
+          }
+        },
+        "aggregate": {
+          "n": 270,
+          "failures": 0,
+          "automatic_checks": 162,
+          "automatic_failures": 0,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 80254,
+          "output_tokens": 6008,
+          "ttft_s": {
+            "n": 270,
+            "mean": 0.5503296296245901,
+            "stdev": 1.5768980581324894,
+            "p50": 0.25,
+            "p95": 0.375,
+            "max": 9.75
+          },
+          "service_s": {
+            "n": 270,
+            "mean": 1.0371555555555798,
+            "stdev": 1.5985571648139905,
+            "p50": 0.7190000000409782,
+            "p95": 1.234000000054948,
+            "max": 10.203000000095926
+          },
+          "queue_s": {
+            "n": 270,
+            "mean": 1.685818518524886,
+            "stdev": 2.5853175468916656,
+            "p50": 0.929500000027474,
+            "p95": 9.562000000034459,
+            "max": 11.656000000075437
+          },
+          "response_s": {
+            "n": 270,
+            "mean": 2.723203703710223,
+            "stdev": 2.9078547719443772,
+            "p50": 1.6875,
+            "p95": 10.234000000054948,
+            "max": 12.422000000020489
+          },
+          "prompt_eval_count": {
+            "n": 270,
+            "mean": 297.23703703703706,
+            "stdev": 60.55900774201562,
+            "p50": 318.0,
+            "p95": 353,
+            "max": 353
+          },
+          "eval_count": {
+            "n": 270,
+            "mean": 22.251851851851853,
+            "stdev": 10.75078869313498,
+            "p50": 21.0,
+            "p95": 37,
+            "max": 39
+          },
+          "cold_load_s": {
+            "n": 9,
+            "mean": 8.576993477777778,
+            "stdev": 0.31356899168034286,
+            "p50": 8.4816924,
+            "p95": 9.2855265,
+            "max": 9.2855265
+          }
+        }
+      }
+    ],
+    "human_review": "pending",
+    "milestone_accepted": false,
+    "preferred_index": 1,
+    "technical_selected_index": 1
+  },
+  "priming_usage": {
+    "n": 18,
+    "input_tokens": 288,
+    "output_tokens": 45
+  },
+  "development_usage": [
+    {
+      "run": "20261029T175809Z-m2-grounding-pilot",
+      "measured": {
+        "n": 50,
+        "failures": 0,
+        "automatic_checks": 30,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 19658,
+        "output_tokens": 1776,
+        "ttft_s": {
+          "n": 50,
+          "mean": 0.476600000008475,
+          "stdev": 1.34901961377499,
+          "p50": 0.2890000000479631,
+          "p95": 0.43700000003445894,
+          "max": 9.812999999965541
+        },
+        "service_s": {
+          "n": 50,
+          "mean": 1.2796799999987707,
+          "stdev": 1.4714344304929645,
+          "p50": 1.25,
+          "p95": 1.9849999999860302,
+          "max": 10.733999999938533
+        },
+        "queue_s": {
+          "n": 50,
+          "mean": 2.927380000001285,
+          "stdev": 3.4959189378346323,
+          "p50": 1.6089999999967404,
+          "p95": 11.890999999945052,
+          "max": 14.233999999938533
+        },
+        "response_s": {
+          "n": 50,
+          "mean": 4.207060000000056,
+          "stdev": 3.8303680347882456,
+          "p50": 2.70250000001397,
+          "p95": 13.093999999924563,
+          "max": 15.577999999979511
+        },
+        "prompt_eval_count": {
+          "n": 50,
+          "mean": 393.16,
+          "stdev": 28.85810465158155,
+          "p50": 398.0,
+          "p95": 436,
+          "max": 437
+        },
+        "eval_count": {
+          "n": 50,
+          "mean": 35.52,
+          "stdev": 21.032763557296576,
+          "p50": 41.0,
+          "p95": 63,
+          "max": 65
+        },
+        "cold_load_s": {
+          "n": 1,
+          "mean": 9.3354873,
+          "stdev": 0,
+          "p50": 9.3354873,
+          "p95": 9.3354873,
+          "max": 9.3354873
+        }
+      },
+      "priming_n": 1,
+      "priming_input_tokens": 16,
+      "priming_output_tokens": 2
+    },
+    {
+      "run": "20261029T180114Z-m2-grounding-pilot-2",
+      "measured": {
+        "n": 50,
+        "failures": 0,
+        "automatic_checks": 30,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 18736,
+        "output_tokens": 1572,
+        "ttft_s": {
+          "n": 50,
+          "mean": 0.48123999999137596,
+          "stdev": 1.3508746910930631,
+          "p50": 0.3119999999180436,
+          "p95": 0.4529999999795109,
+          "max": 9.829000000027008
+        },
+        "service_s": {
+          "n": 50,
+          "mean": 1.22502000000095,
+          "stdev": 1.4952590860145538,
+          "p50": 0.9689999999827705,
+          "p95": 2.030999999959022,
+          "max": 10.844000000040978
+        },
+        "queue_s": {
+          "n": 50,
+          "mean": 2.8735000000079163,
+          "stdev": 3.418371740644098,
+          "p50": 1.6875,
+          "p95": 11.813000000081956,
+          "max": 13.516000000061467
+        },
+        "response_s": {
+          "n": 50,
+          "mean": 4.098520000008866,
+          "stdev": 3.7029823570229095,
+          "p50": 2.6014999999897555,
+          "p95": 12.547000000020489,
+          "max": 14.48499999998603
+        },
+        "prompt_eval_count": {
+          "n": 50,
+          "mean": 374.72,
+          "stdev": 25.4117440309373,
+          "p50": 382.0,
+          "p95": 408,
+          "max": 415
+        },
+        "eval_count": {
+          "n": 50,
+          "mean": 31.44,
+          "stdev": 20.211292054953148,
+          "p50": 29.0,
+          "p95": 63,
+          "max": 65
+        },
+        "cold_load_s": {
+          "n": 1,
+          "mean": 9.2262307,
+          "stdev": 0,
+          "p50": 9.2262307,
+          "p95": 9.2262307,
+          "max": 9.2262307
+        }
+      },
+      "priming_n": 1,
+      "priming_input_tokens": 16,
+      "priming_output_tokens": 2
+    },
+    {
+      "run": "20261029T180347Z-m2-scoped-grounding-pilot",
+      "measured": {
+        "n": 50,
+        "failures": 0,
+        "automatic_checks": 30,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 14584,
+        "output_tokens": 1340,
+        "ttft_s": {
+          "n": 50,
+          "mean": 0.473120000003837,
+          "stdev": 1.2982406562818776,
+          "p50": 0.28100000001722947,
+          "p95": 0.43799999996554106,
+          "max": 9.452999999979511
+        },
+        "service_s": {
+          "n": 50,
+          "mean": 1.1512400000030174,
+          "stdev": 1.402137050562712,
+          "p50": 0.7810000000172295,
+          "p95": 2.3429999999934807,
+          "max": 9.875
+        },
+        "queue_s": {
+          "n": 50,
+          "mean": 2.6720799999986777,
+          "stdev": 3.17762096119259,
+          "p50": 1.5235000000102445,
+          "p95": 10.452999999979511,
+          "max": 11.89000000001397
+        },
+        "response_s": {
+          "n": 50,
+          "mean": 3.8239400000008756,
+          "stdev": 3.4861611973920525,
+          "p50": 2.4135000000242144,
+          "p95": 11.702999999979511,
+          "max": 12.655999999959022
+        },
+        "prompt_eval_count": {
+          "n": 50,
+          "mean": 291.68,
+          "stdev": 57.515016672666825,
+          "p50": 309.0,
+          "p95": 344,
+          "max": 344
+        },
+        "eval_count": {
+          "n": 50,
+          "mean": 26.8,
+          "stdev": 19.850461363064856,
+          "p50": 20.0,
+          "p95": 63,
+          "max": 65
+        },
+        "cold_load_s": {
+          "n": 1,
+          "mean": 8.9764736,
+          "stdev": 0,
+          "p50": 8.9764736,
+          "p95": 8.9764736,
+          "max": 8.9764736
+        }
+      },
+      "priming_n": 1,
+      "priming_input_tokens": 16,
+      "priming_output_tokens": 2
+    },
+    {
+      "run": "20261029T180649Z-m2-compact-grounding-pilot",
+      "measured": {
+        "n": 50,
+        "failures": 0,
+        "automatic_checks": 30,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 14854,
+        "output_tokens": 1080,
+        "ttft_s": {
+          "n": 50,
+          "mean": 0.4583999999938533,
+          "stdev": 1.2948044056814438,
+          "p50": 0.25,
+          "p95": 0.375,
+          "max": 9.420999999972992
+        },
+        "service_s": {
+          "n": 50,
+          "mean": 0.9496799999987706,
+          "stdev": 1.327577053994088,
+          "p50": 0.7190000000409782,
+          "p95": 1.3130000000819564,
+          "max": 9.89000000001397
+        },
+        "queue_s": {
+          "n": 50,
+          "mean": 2.2726799999945797,
+          "stdev": 2.901337344284747,
+          "p50": 1.3439999999245629,
+          "p95": 10.545999999972992,
+          "max": 11.984000000054948
+        },
+        "response_s": {
+          "n": 50,
+          "mean": 3.22265999999363,
+          "stdev": 3.1005067697120428,
+          "p50": 2.1169999999692664,
+          "p95": 11.26500000001397,
+          "max": 12.75
+        },
+        "prompt_eval_count": {
+          "n": 50,
+          "mean": 297.08,
+          "stdev": 61.130118833284044,
+          "p50": 318.0,
+          "p95": 353,
+          "max": 353
+        },
+        "eval_count": {
+          "n": 50,
+          "mean": 21.6,
+          "stdev": 10.770329614269007,
+          "p50": 20.0,
+          "p95": 37,
+          "max": 39
+        },
+        "cold_load_s": {
+          "n": 1,
+          "mean": 8.9692881,
+          "stdev": 0,
+          "p50": 8.9692881,
+          "p95": 8.9692881,
+          "max": 8.9692881
+        }
+      },
+      "priming_n": 1,
+      "priming_input_tokens": 16,
+      "priming_output_tokens": 2
+    },
+    {
+      "run": "20261029T180527Z-m2-grounding-dev-probes",
+      "measured": {
+        "n": 6,
+        "failures": 0,
+        "automatic_checks": 0,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 1268,
+        "output_tokens": 142,
+        "ttft_s": {
+          "n": 6,
+          "mean": 1.7291666666860692,
+          "stdev": 3.615758864580858,
+          "p50": 0.2345000000204891,
+          "p95": 9.109000000054948,
+          "max": 9.109000000054948
+        },
+        "service_s": {
+          "n": 6,
+          "mean": 2.2731666666610786,
+          "stdev": 3.586534116222869,
+          "p50": 0.8125,
+          "p95": 9.594000000040978,
+          "max": 9.594000000040978
+        },
+        "queue_s": {
+          "n": 6,
+          "mean": 0.0,
+          "stdev": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "response_s": {
+          "n": 6,
+          "mean": 2.2731666666610786,
+          "stdev": 3.586534116222869,
+          "p50": 0.8125,
+          "p95": 9.594000000040978,
+          "max": 9.594000000040978
+        },
+        "prompt_eval_count": {
+          "n": 6,
+          "mean": 211.33333333333334,
+          "stdev": 4.926120853842978,
+          "p50": 211.0,
+          "p95": 217,
+          "max": 217
+        },
+        "eval_count": {
+          "n": 6,
+          "mean": 23.666666666666668,
+          "stdev": 2.0655911179772892,
+          "p50": 25.0,
+          "p95": 25,
+          "max": 25
+        },
+        "cold_load_s": {
+          "n": 1,
+          "mean": 8.656221,
+          "stdev": 0,
+          "p50": 8.656221,
+          "p95": 8.656221,
+          "max": 8.656221
+        }
+      },
+      "priming_n": 1,
+      "priming_input_tokens": 16,
+      "priming_output_tokens": 2
+    }
+  ],
+  "additional_diagnostics": {
+    "own_private_marker_exposures": [
+      {
+        "model_index": 0,
+        "phase": "model0/1/cold/2",
+        "session": 0,
+        "case": "conversation-1"
+      },
+      {
+        "model_index": 0,
+        "phase": "model0/1/warm/2",
+        "session": 0,
+        "case": "conversation-1"
+      },
+      {
+        "model_index": 0,
+        "phase": "model0/3/cold/2",
+        "session": 0,
+        "case": "conversation-1"
+      },
+      {
+        "model_index": 0,
+        "phase": "model0/3/warm/2",
+        "session": 0,
+        "case": "conversation-1"
+      },
+      {
+        "model_index": 0,
+        "phase": "model0/5/cold/2",
+        "session": 0,
+        "case": "conversation-1"
+      },
+      {
+        "model_index": 0,
+        "phase": "model0/5/warm/2",
+        "session": 0,
+        "case": "conversation-1"
+      }
+    ],
+    "note": "Additional exact-marker diagnostic; not silently added to or substituted for the frozen foreign-marker metric. Outputs are preserved for quality review."
+  },
+  "comparison": {
+    "run": "20261029T173111Z-m2-acceptance",
+    "requests_sha256": "a4a3a8d60000152b6384456723f64647374a7b0274963a78e6794e07f1001f47",
+    "summary": {
+      "overall": {
+        "n": 540,
+        "failures": 0,
+        "automatic_checks": 324,
+        "automatic_failures": 70,
+        "leaks": 0,
+        "truncations": 8,
+        "input_tokens": 137572,
+        "output_tokens": 19112,
+        "ttft_s": {
+          "n": 540,
+          "mean": 0.39962962962842236,
+          "stdev": 1.205772071866301,
+          "p50": 0.18799999996554106,
+          "p95": 0.3130000000819564,
+          "max": 9.23499999998603
+        },
+        "service_s": {
+          "n": 540,
+          "mean": 0.9585759259253758,
+          "stdev": 1.2971505434060386,
+          "p50": 0.6635000000242144,
+          "p95": 1.859000000054948,
+          "max": 9.98499999998603
+        },
+        "queue_s": {
+          "n": 540,
+          "mean": 1.508849999993712,
+          "stdev": 2.254111067109409,
+          "p50": 0.6950000000069849,
+          "p95": 6.265999999945052,
+          "max": 11.812999999965541
+        },
+        "response_s": {
+          "n": 540,
+          "mean": 2.4675111111044385,
+          "stdev": 2.592631839853109,
+          "p50": 1.4844999999622814,
+          "p95": 9.202999999979511,
+          "max": 12.85999999998603
+        },
+        "prompt_eval_count": {
+          "n": 540,
+          "mean": 254.76296296296297,
+          "stdev": 34.65583929356614,
+          "p50": 263.0,
+          "p95": 289,
+          "max": 414
+        },
+        "eval_count": {
+          "n": 540,
+          "mean": 35.39259259259259,
+          "stdev": 29.959551283648597,
+          "p50": 30.0,
+          "p95": 86,
+          "max": 160
+        },
+        "cold_load_s": {
+          "n": 18,
+          "mean": 5.981060677777778,
+          "stdev": 2.6553525576739627,
+          "p50": 6.5213903,
+          "p95": 8.7591433,
+          "max": 8.7591433
+        }
+      },
+      "groups": [
+        {
+          "model_index": 0,
+          "sessions": 1,
+          "profile": "cold",
+          "n": 15,
+          "failures": 0,
+          "automatic_checks": 9,
+          "automatic_failures": 3,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 3795,
+          "output_tokens": 562,
+          "ttft_s": {
+            "n": 15,
+            "mean": 0.9,
+            "stdev": 1.6344539062141359,
+            "p50": 0.125,
+            "p95": 5.109000000054948,
+            "max": 5.109000000054948
+          },
+          "service_s": {
+            "n": 15,
+            "mean": 1.3385333333319673,
+            "stdev": 1.7164263068212482,
+            "p50": 0.6720000000204891,
+            "p95": 5.359000000054948,
+            "max": 5.359000000054948
+          },
+          "queue_s": {
+            "n": 15,
+            "mean": 0.0,
+            "stdev": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "response_s": {
+            "n": 15,
+            "mean": 1.3385333333319673,
+            "stdev": 1.7164263068212482,
+            "p50": 0.6720000000204891,
+            "p95": 5.359000000054948,
+            "max": 5.359000000054948
+          },
+          "prompt_eval_count": {
+            "n": 15,
+            "mean": 253,
+            "stdev": 33.42796092238609,
+            "p50": 261,
+            "p95": 331,
+            "max": 331
+          },
+          "eval_count": {
+            "n": 15,
+            "mean": 37.46666666666667,
+            "stdev": 29.39598288072385,
+            "p50": 32,
+            "p95": 86,
+            "max": 86
+          },
+          "cold_load_s": {
+            "n": 3,
+            "mean": 3.779493066666667,
+            "stdev": 0.9752887885473939,
+            "p50": 3.3417935,
+            "p95": 4.8969543,
+            "max": 4.8969543
+          }
+        },
+        {
+          "model_index": 0,
+          "sessions": 1,
+          "profile": "warm",
+          "n": 15,
+          "failures": 0,
+          "automatic_checks": 9,
+          "automatic_failures": 3,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 3795,
+          "output_tokens": 562,
+          "ttft_s": {
+            "n": 15,
+            "mean": 0.12079999999453624,
+            "stdev": 0.01999357036776411,
+            "p50": 0.10999999998603016,
+            "p95": 0.1559999999590218,
+            "max": 0.1559999999590218
+          },
+          "service_s": {
+            "n": 15,
+            "mean": 0.5469333333351339,
+            "stdev": 0.3408064944607702,
+            "p50": 0.5,
+            "p95": 1.109000000054948,
+            "max": 1.109000000054948
+          },
+          "queue_s": {
+            "n": 15,
+            "mean": 0.0,
+            "stdev": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "response_s": {
+            "n": 15,
+            "mean": 0.5469333333351339,
+            "stdev": 0.3408064944607702,
+            "p50": 0.5,
+            "p95": 1.109000000054948,
+            "max": 1.109000000054948
+          },
+          "prompt_eval_count": {
+            "n": 15,
+            "mean": 253,
+            "stdev": 33.42796092238609,
+            "p50": 261,
+            "p95": 331,
+            "max": 331
+          },
+          "eval_count": {
+            "n": 15,
+            "mean": 37.46666666666667,
+            "stdev": 29.39598288072385,
+            "p50": 32,
+            "p95": 86,
+            "max": 86
+          },
+          "cold_load_s": null
+        },
+        {
+          "model_index": 0,
+          "sessions": 3,
+          "profile": "cold",
+          "n": 45,
+          "failures": 0,
+          "automatic_checks": 27,
+          "automatic_failures": 12,
+          "leaks": 0,
+          "truncations": 1,
+          "input_tokens": 11610,
+          "output_tokens": 1743,
+          "ttft_s": {
+            "n": 45,
+            "mean": 0.38495555554723576,
+            "stdev": 0.8109623339337069,
+            "p50": 0.1720000000204891,
+            "p95": 3.25,
+            "max": 3.6089999999385327
+          },
+          "service_s": {
+            "n": 45,
+            "mean": 0.8232888888852257,
+            "stdev": 0.9310989260498058,
+            "p50": 0.5779999999795109,
+            "p95": 3.515999999945052,
+            "max": 4.23499999998603
+          },
+          "queue_s": {
+            "n": 45,
+            "mean": 1.0770222222122052,
+            "stdev": 1.5757055488731464,
+            "p50": 0.4529999999795109,
+            "p95": 4.23499999998603,
+            "max": 6.077999999979511
+          },
+          "response_s": {
+            "n": 45,
+            "mean": 1.9003111110974311,
+            "stdev": 1.814377326477828,
+            "p50": 1.0,
+            "p95": 6.077999999979511,
+            "max": 6.5
+          },
+          "prompt_eval_count": {
+            "n": 45,
+            "mean": 258,
+            "stdev": 42.31752269772803,
+            "p50": 263,
+            "p95": 331,
+            "max": 409
+          },
+          "eval_count": {
+            "n": 45,
+            "mean": 38.733333333333334,
+            "stdev": 36.96029810977769,
+            "p50": 30,
+            "p95": 108,
+            "max": 160
+          },
+          "cold_load_s": {
+            "n": 3,
+            "mean": 3.197236033333333,
+            "stdev": 0.20344945813627355,
+            "p50": 3.0920986,
+            "p95": 3.4317423,
+            "max": 3.4317423
+          }
+        },
+        {
+          "model_index": 0,
+          "sessions": 3,
+          "profile": "warm",
+          "n": 45,
+          "failures": 0,
+          "automatic_checks": 27,
+          "automatic_failures": 12,
+          "leaks": 0,
+          "truncations": 1,
+          "input_tokens": 11610,
+          "output_tokens": 1743,
+          "ttft_s": {
+            "n": 45,
+            "mean": 0.1687777777797439,
+            "stdev": 0.025939517840421925,
+            "p50": 0.17099999997299165,
+            "p95": 0.2190000000409782,
+            "max": 0.2190000000409782
+          },
+          "service_s": {
+            "n": 45,
+            "mean": 0.607333333332402,
+            "stdev": 0.42714964377566683,
+            "p50": 0.5,
+            "p95": 1.437999999965541,
+            "max": 2.015999999945052
+          },
+          "queue_s": {
+            "n": 45,
+            "mean": 0.6464666666669978,
+            "stdev": 0.7666540822319207,
+            "p50": 0.4529999999795109,
+            "p95": 2.48499999998603,
+            "max": 3.0469999999040738
+          },
+          "response_s": {
+            "n": 45,
+            "mean": 1.2537999999993998,
+            "stdev": 0.9313743656941503,
+            "p50": 0.8900000000139698,
+            "p95": 3.0469999999040738,
+            "max": 3.4369999999180436
+          },
+          "prompt_eval_count": {
+            "n": 45,
+            "mean": 258,
+            "stdev": 42.31752269772803,
+            "p50": 263,
+            "p95": 331,
+            "max": 409
+          },
+          "eval_count": {
+            "n": 45,
+            "mean": 38.733333333333334,
+            "stdev": 36.96029810977769,
+            "p50": 30,
+            "p95": 108,
+            "max": 160
+          },
+          "cold_load_s": null
+        },
+        {
+          "model_index": 0,
+          "sessions": 5,
+          "profile": "cold",
+          "n": 75,
+          "failures": 0,
+          "automatic_checks": 45,
+          "automatic_failures": 20,
+          "leaks": 0,
+          "truncations": 3,
+          "input_tokens": 19440,
+          "output_tokens": 3028,
+          "ttft_s": {
+            "n": 75,
+            "mean": 0.3004266666636492,
+            "stdev": 0.660186647919609,
+            "p50": 0.1720000000204891,
+            "p95": 0.2190000000409782,
+            "max": 3.5160000000614673
+          },
+          "service_s": {
+            "n": 75,
+            "mean": 0.7579199999989942,
+            "stdev": 0.8072051509183275,
+            "p50": 0.5310000000754371,
+            "p95": 2.047000000020489,
+            "max": 4.483999999938533
+          },
+          "queue_s": {
+            "n": 75,
+            "mean": 1.7936533333112796,
+            "stdev": 2.0414627406329546,
+            "p50": 0.9059999999590218,
+            "p95": 6.358999999938533,
+            "max": 8.311999999918044
+          },
+          "response_s": {
+            "n": 75,
+            "mean": 2.551573333310274,
+            "stdev": 2.2519042282718447,
+            "p50": 1.452999999979511,
+            "p95": 7.233999999938533,
+            "max": 9.625
+          },
+          "prompt_eval_count": {
+            "n": 75,
+            "mean": 259.2,
+            "stdev": 42.64688449062553,
+            "p50": 263,
+            "p95": 347,
+            "max": 414
+          },
+          "eval_count": {
+            "n": 75,
+            "mean": 40.373333333333335,
+            "stdev": 38.91910297754274,
+            "p50": 33,
+            "p95": 149,
+            "max": 160
+          },
+          "cold_load_s": {
+            "n": 3,
+            "mean": 3.323769366666667,
+            "stdev": 0.0017613859126644968,
+            "p50": 3.3228417,
+            "p95": 3.3258007,
+            "max": 3.3258007
+          }
+        },
+        {
+          "model_index": 0,
+          "sessions": 5,
+          "profile": "warm",
+          "n": 75,
+          "failures": 0,
+          "automatic_checks": 45,
+          "automatic_failures": 20,
+          "leaks": 0,
+          "truncations": 3,
+          "input_tokens": 19440,
+          "output_tokens": 3028,
+          "ttft_s": {
+            "n": 75,
+            "mean": 0.17609333333404115,
+            "stdev": 0.02712243178841528,
+            "p50": 0.1720000000204891,
+            "p95": 0.21899999992456287,
+            "max": 0.2190000000409782
+          },
+          "service_s": {
+            "n": 75,
+            "mean": 0.651453333334066,
+            "stdev": 0.4627197007216671,
+            "p50": 0.5470000000204891,
+            "p95": 1.812000000034459,
+            "max": 2.125
+          },
+          "queue_s": {
+            "n": 75,
+            "mean": 1.31125333331991,
+            "stdev": 1.3069167459642794,
+            "p50": 0.9369999999180436,
+            "p95": 3.812999999965541,
+            "max": 5.265999999945052
+          },
+          "response_s": {
+            "n": 75,
+            "mean": 1.9627066666539759,
+            "stdev": 1.5417063534770232,
+            "p50": 1.297000000020489,
+            "p95": 4.891000000061467,
+            "max": 6.608999999938533
+          },
+          "prompt_eval_count": {
+            "n": 75,
+            "mean": 259.2,
+            "stdev": 42.64688449062553,
+            "p50": 263,
+            "p95": 347,
+            "max": 414
+          },
+          "eval_count": {
+            "n": 75,
+            "mean": 40.373333333333335,
+            "stdev": 38.91910297754274,
+            "p50": 33,
+            "p95": 149,
+            "max": 160
+          },
+          "cold_load_s": null
+        },
+        {
+          "model_index": 1,
+          "sessions": 1,
+          "profile": "cold",
+          "n": 15,
+          "failures": 0,
+          "automatic_checks": 9,
+          "automatic_failures": 0,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 3745,
+          "output_tokens": 473,
+          "ttft_s": {
+            "n": 15,
+            "mean": 1.9273333333432674,
+            "stdev": 3.6711754961742344,
+            "p50": 0.15700000000651926,
+            "p95": 9.23499999998603,
+            "max": 9.23499999998603
+          },
+          "service_s": {
+            "n": 15,
+            "mean": 2.587533333338797,
+            "stdev": 3.670125686176898,
+            "p50": 1.062999999965541,
+            "p95": 9.827999999979511,
+            "max": 9.827999999979511
+          },
+          "queue_s": {
+            "n": 15,
+            "mean": 0.0,
+            "stdev": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "response_s": {
+            "n": 15,
+            "mean": 2.587533333338797,
+            "stdev": 3.670125686176898,
+            "p50": 1.062999999965541,
+            "p95": 9.827999999979511,
+            "max": 9.827999999979511
+          },
+          "prompt_eval_count": {
+            "n": 15,
+            "mean": 249.66666666666666,
+            "stdev": 26.842574569586457,
+            "p50": 261,
+            "p95": 278,
+            "max": 278
+          },
+          "eval_count": {
+            "n": 15,
+            "mean": 31.533333333333335,
+            "stdev": 20.371081276676318,
+            "p50": 30,
+            "p95": 63,
+            "max": 63
+          },
+          "cold_load_s": {
+            "n": 3,
+            "mean": 8.532302099999999,
+            "stdev": 0.33516536829075894,
+            "p50": 8.7078435,
+            "p95": 8.7432365,
+            "max": 8.7432365
+          }
+        },
+        {
+          "model_index": 1,
+          "sessions": 1,
+          "profile": "warm",
+          "n": 15,
+          "failures": 0,
+          "automatic_checks": 9,
+          "automatic_failures": 0,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 3745,
+          "output_tokens": 473,
+          "ttft_s": {
+            "n": 15,
+            "mean": 0.19899999998354664,
+            "stdev": 0.0851184049212167,
+            "p50": 0.15700000000651926,
+            "p95": 0.375,
+            "max": 0.375
+          },
+          "service_s": {
+            "n": 15,
+            "mean": 0.860333333319674,
+            "stdev": 0.46492482751360326,
+            "p50": 1.0,
+            "p95": 1.6570000000065193,
+            "max": 1.6570000000065193
+          },
+          "queue_s": {
+            "n": 15,
+            "mean": 0.0,
+            "stdev": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "response_s": {
+            "n": 15,
+            "mean": 0.860333333319674,
+            "stdev": 0.46492482751360326,
+            "p50": 1.0,
+            "p95": 1.6570000000065193,
+            "max": 1.6570000000065193
+          },
+          "prompt_eval_count": {
+            "n": 15,
+            "mean": 249.66666666666666,
+            "stdev": 26.842574569586457,
+            "p50": 261,
+            "p95": 278,
+            "max": 278
+          },
+          "eval_count": {
+            "n": 15,
+            "mean": 31.533333333333335,
+            "stdev": 20.371081276676318,
+            "p50": 30,
+            "p95": 63,
+            "max": 63
+          },
+          "cold_load_s": null
+        },
+        {
+          "model_index": 1,
+          "sessions": 3,
+          "profile": "cold",
+          "n": 45,
+          "failures": 0,
+          "automatic_checks": 27,
+          "automatic_failures": 0,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 11299,
+          "output_tokens": 1400,
+          "ttft_s": {
+            "n": 45,
+            "mean": 0.8309555555564455,
+            "stdev": 2.2533730671630914,
+            "p50": 0.2190000000409782,
+            "p95": 9.125,
+            "max": 9.23499999998603
+          },
+          "service_s": {
+            "n": 45,
+            "mean": 1.553155555557977,
+            "stdev": 2.294150129388119,
+            "p50": 0.9689999999245629,
+            "p95": 9.672000000020489,
+            "max": 9.98499999998603
+          },
+          "queue_s": {
+            "n": 45,
+            "mean": 2.1656666666631486,
+            "stdev": 3.3927825667820954,
+            "p50": 0.6719999999040738,
+            "p95": 10.73499999998603,
+            "max": 10.85999999998603
+          },
+          "response_s": {
+            "n": 45,
+            "mean": 3.719155555554769,
+            "stdev": 3.796913979893435,
+            "p50": 1.8900000000139698,
+            "p95": 11.375,
+            "max": 11.766000000061467
+          },
+          "prompt_eval_count": {
+            "n": 45,
+            "mean": 251.0888888888889,
+            "stdev": 26.080140670129396,
+            "p50": 263,
+            "p95": 278,
+            "max": 286
+          },
+          "eval_count": {
+            "n": 45,
+            "mean": 31.11111111111111,
+            "stdev": 19.934235309480457,
+            "p50": 28,
+            "p95": 63,
+            "max": 63
+          },
+          "cold_load_s": {
+            "n": 3,
+            "mean": 8.7155452,
+            "stdev": 0.041300945551282345,
+            "p50": 8.7104845,
+            "p95": 8.7591433,
+            "max": 8.7591433
+          }
+        },
+        {
+          "model_index": 1,
+          "sessions": 3,
+          "profile": "warm",
+          "n": 45,
+          "failures": 0,
+          "automatic_checks": 27,
+          "automatic_failures": 0,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 11299,
+          "output_tokens": 1400,
+          "ttft_s": {
+            "n": 45,
+            "mean": 0.24024444443639367,
+            "stdev": 0.049914543133580756,
+            "p50": 0.23400000005494803,
+            "p95": 0.3589999999385327,
+            "max": 0.4059999999590218
+          },
+          "service_s": {
+            "n": 45,
+            "mean": 0.9187555555564662,
+            "stdev": 0.47508277535372884,
+            "p50": 0.8910000000614673,
+            "p95": 1.672000000020489,
+            "max": 1.7660000000614673
+          },
+          "queue_s": {
+            "n": 45,
+            "mean": 0.9441111111159747,
+            "stdev": 0.9930429182030314,
+            "p50": 0.625,
+            "p95": 3.25,
+            "max": 3.4380000000819564
+          },
+          "response_s": {
+            "n": 45,
+            "mean": 1.862866666672441,
+            "stdev": 1.2654033061791252,
+            "p50": 1.6410000000614673,
+            "p95": 4.844000000040978,
+            "max": 5.079000000027008
+          },
+          "prompt_eval_count": {
+            "n": 45,
+            "mean": 251.0888888888889,
+            "stdev": 26.080140670129396,
+            "p50": 263,
+            "p95": 278,
+            "max": 286
+          },
+          "eval_count": {
+            "n": 45,
+            "mean": 31.11111111111111,
+            "stdev": 19.934235309480457,
+            "p50": 28,
+            "p95": 63,
+            "max": 63
+          },
+          "cold_load_s": null
+        },
+        {
+          "model_index": 1,
+          "sessions": 5,
+          "profile": "cold",
+          "n": 75,
+          "failures": 0,
+          "automatic_checks": 45,
+          "automatic_failures": 0,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 18897,
+          "output_tokens": 2350,
+          "ttft_s": {
+            "n": 75,
+            "mean": 0.5665066666714847,
+            "stdev": 1.6897808059841204,
+            "p50": 0.21899999992456287,
+            "p95": 0.28200000000651926,
+            "max": 8.922000000020489
+          },
+          "service_s": {
+            "n": 75,
+            "mean": 1.2106266666653875,
+            "stdev": 1.7372395917900851,
+            "p50": 0.890999999945052,
+            "p95": 1.6400000000139698,
+            "max": 9.5
+          },
+          "queue_s": {
+            "n": 75,
+            "mean": 3.1052133333388094,
+            "stdev": 3.6789747958481365,
+            "p50": 1.6089999999385327,
+            "p95": 11.078000000095926,
+            "max": 11.812999999965541
+          },
+          "response_s": {
+            "n": 75,
+            "mean": 4.31605333333835,
+            "stdev": 3.8866021667407447,
+            "p50": 2.780999999959022,
+            "p95": 11.812999999965541,
+            "max": 12.85999999998603
+          },
+          "prompt_eval_count": {
+            "n": 75,
+            "mean": 251.96,
+            "stdev": 26.266534046402292,
+            "p50": 263,
+            "p95": 281,
+            "max": 289
+          },
+          "eval_count": {
+            "n": 75,
+            "mean": 31.333333333333332,
+            "stdev": 19.999549544476796,
+            "p50": 30,
+            "p95": 63,
+            "max": 65
+          },
+          "cold_load_s": {
+            "n": 3,
+            "mean": 8.3380183,
+            "stdev": 0.16463638940392236,
+            "p50": 8.4065837,
+            "p95": 8.4572909,
+            "max": 8.4572909
+          }
+        },
+        {
+          "model_index": 1,
+          "sessions": 5,
+          "profile": "warm",
+          "n": 75,
+          "failures": 0,
+          "automatic_checks": 45,
+          "automatic_failures": 0,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 18897,
+          "output_tokens": 2350,
+          "ttft_s": {
+            "n": 75,
+            "mean": 0.22991999999930463,
+            "stdev": 0.0469017835212692,
+            "p50": 0.2190000000409782,
+            "p95": 0.3130000000819564,
+            "max": 0.40700000000651926
+          },
+          "service_s": {
+            "n": 75,
+            "mean": 0.8735599999999006,
+            "stdev": 0.44962032752062325,
+            "p50": 0.8900000000139698,
+            "p95": 1.5939999999245629,
+            "max": 1.625
+          },
+          "queue_s": {
+            "n": 75,
+            "mean": 1.7536399999897305,
+            "stdev": 1.6458776155533466,
+            "p50": 1.187999999965541,
+            "p95": 4.766000000061467,
+            "max": 6.35999999998603
+          },
+          "response_s": {
+            "n": 75,
+            "mean": 2.6273999999898177,
+            "stdev": 1.9200562773281233,
+            "p50": 2.202999999979511,
+            "p95": 6.35999999998603,
+            "max": 7.938000000081956
+          },
+          "prompt_eval_count": {
+            "n": 75,
+            "mean": 251.96,
+            "stdev": 26.266534046402292,
+            "p50": 263,
+            "p95": 281,
+            "max": 289
+          },
+          "eval_count": {
+            "n": 75,
+            "mean": 31.333333333333332,
+            "stdev": 19.999549544476796,
+            "p50": 30,
+            "p95": 63,
+            "max": 65
+          },
+          "cold_load_s": null
+        }
+      ],
+      "resources": {
+        "samples": 611,
+        "min_available_ram_gib": 5.193553924560547,
+        "peak_system_used_gib": 26.661972045898438,
+        "peak_ollama_ws_gib": 2.9483718872070312,
+        "peak_ollama_private_gib": 11.804450988769531,
+        "peak_m1_ws_mib": 656.35546875,
+        "peak_gpu_used_mib": 9952
+      },
+      "m1": {
+        "agent": {
+          "snapshots": 660,
+          "disconnected": 0,
+          "max_gap_s": 1.0320000000065193,
+          "last": 714700.14
+        },
+        "peer": {
+          "snapshots": 660,
+          "disconnected": 0,
+          "max_gap_s": 1.047000000020489,
+          "last": 714700.265
+        }
+      }
+    }
+  },
+  "diagnostics": {
+    "run": "20261029T182102Z-m2-grounding-probes-final",
+    "source_commit": "233e49bbd2fa8a3d18de82475c6322e2277ac6d8",
+    "source_hashes": {
+      "inference/m2.py": "ca31d36fab1e3608857599a5419658c7f40e330fa2e9426e5b4a894d43077c8f",
+      "inference/m2_context.py": "a7e5ab9789d8a96aaca5b5b695343f5246bd4e5a0c1635ffc5fe27ab223ee1a6",
+      "scripts/bench_m2.py": "4f6a64c4adac04beedd5aeee2a266777e7dbf9b38caeb3e070e08a21a40b364e",
+      "fixtures/m2-grounding-probes.json": "a27a5ade6a11fe26b48a5ef3c95650a778693b8d4412180a8bd9f523c1106ee0",
+      "config/m2-candidates.json": "f428dfa644ed5cba61e264f95ae26ef818ea6b22b9b62f9aa3775f9758ebb728",
+      "config/m2-limits.json": "c97bc13d1aed16b4a456ce35b103a470656c1f6f1e03e36635542d104e8b96ad"
+    },
+    "args": {
+      "config": "config/m2-candidates.json",
+      "limits": "config/m2-limits.json",
+      "fixtures": "fixtures/m2-grounding-probes.json",
+      "cases": null,
+      "models": [
+        1
+      ],
+      "profiles": [
+        1
+      ],
+      "repeats": 3,
+      "label": "grounding-probes-final"
+    },
+    "summary": {
+      "fatal": null,
+      "overall": {
+        "n": 66,
+        "failures": 0,
+        "automatic_checks": 0,
+        "automatic_failures": 0,
+        "leaks": 0,
+        "truncations": 0,
+        "input_tokens": 14172,
+        "output_tokens": 1536,
+        "ttft_s": {
+          "n": 66,
+          "mean": 0.6091969696942463,
+          "stdev": 1.8140418298922112,
+          "p50": 0.2029999999795109,
+          "p95": 0.4219999999040738,
+          "max": 9.094000000040978
+        },
+        "service_s": {
+          "n": 66,
+          "mean": 1.093045454542858,
+          "stdev": 1.8131579966907332,
+          "p50": 0.7029999999795109,
+          "p95": 0.9219999999040738,
+          "max": 9.530999999959022
+        },
+        "queue_s": {
+          "n": 66,
+          "mean": 0.0,
+          "stdev": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "response_s": {
+          "n": 66,
+          "mean": 1.0932727272703424,
+          "stdev": 1.813113366093267,
+          "p50": 0.7029999999795109,
+          "p95": 0.9219999999040738,
+          "max": 9.530999999959022
+        },
+        "prompt_eval_count": {
+          "n": 66,
+          "mean": 214.72727272727272,
+          "stdev": 25.944642520652998,
+          "p50": 209.0,
+          "p95": 294,
+          "max": 294
+        },
+        "eval_count": {
+          "n": 66,
+          "mean": 23.272727272727273,
+          "stdev": 3.217956611771631,
+          "p50": 23.0,
+          "p95": 30,
+          "max": 31
+        },
+        "cold_load_s": {
+          "n": 3,
+          "mean": 8.399967233333333,
+          "stdev": 0.2635282131441788,
+          "p50": 8.4124848,
+          "p95": 8.6570136,
+          "max": 8.6570136
+        }
+      },
+      "resources": {
+        "samples": 97,
+        "min_available_ram_gib": 5.879905700683594,
+        "peak_system_used_gib": 25.97562026977539,
+        "peak_ollama_ws_gib": 1.6775588989257812,
+        "peak_ollama_private_gib": 10.537723541259766,
+        "peak_m1_ws_mib": 637.6171875,
+        "peak_gpu_used_mib": 10093
+      },
+      "monitor_errors": [],
+      "resource_guard_tripped": false,
+      "m1": {
+        "agent": {
+          "snapshots": 105,
+          "disconnected": 0,
+          "max_gap_s": 1.047000000020489,
+          "last": 717124.14
+        },
+        "peer": {
+          "snapshots": 105,
+          "disconnected": 0,
+          "max_gap_s": 1.0459999999729916,
+          "last": 717124.125
+        }
+      },
+      "groups": [
+        {
+          "model_index": 1,
+          "sessions": 1,
+          "profile": "cold",
+          "n": 33,
+          "failures": 0,
+          "automatic_checks": 0,
+          "automatic_failures": 0,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 7086,
+          "output_tokens": 768,
+          "ttft_s": {
+            "n": 33,
+            "mean": 0.9920303030292306,
+            "stdev": 2.525708532825323,
+            "p50": 0.2029999999795109,
+            "p95": 8.890999999945052,
+            "max": 9.094000000040978
+          },
+          "service_s": {
+            "n": 33,
+            "mean": 1.473030303026352,
+            "stdev": 2.5242224110158054,
+            "p50": 0.6870000000344589,
+            "p95": 9.437999999965541,
+            "max": 9.530999999959022
+          },
+          "queue_s": {
+            "n": 33,
+            "mean": 0.0,
+            "stdev": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "response_s": {
+            "n": 33,
+            "mean": 1.4734848484813208,
+            "stdev": 2.5240867051364404,
+            "p50": 0.6870000000344589,
+            "p95": 9.437999999965541,
+            "max": 9.530999999959022
+          },
+          "prompt_eval_count": {
+            "n": 33,
+            "mean": 214.72727272727272,
+            "stdev": 26.14654939862133,
+            "p50": 209,
+            "p95": 294,
+            "max": 294
+          },
+          "eval_count": {
+            "n": 33,
+            "mean": 23.272727272727273,
+            "stdev": 3.2429994533680473,
+            "p50": 23,
+            "p95": 30,
+            "max": 31
+          },
+          "cold_load_s": {
+            "n": 3,
+            "mean": 8.399967233333333,
+            "stdev": 0.2635282131441788,
+            "p50": 8.4124848,
+            "p95": 8.6570136,
+            "max": 8.6570136
+          }
+        },
+        {
+          "model_index": 1,
+          "sessions": 1,
+          "profile": "warm",
+          "n": 33,
+          "failures": 0,
+          "automatic_checks": 0,
+          "automatic_failures": 0,
+          "leaks": 0,
+          "truncations": 0,
+          "input_tokens": 7086,
+          "output_tokens": 768,
+          "ttft_s": {
+            "n": 33,
+            "mean": 0.22636363635926196,
+            "stdev": 0.053338434877254245,
+            "p50": 0.20400000002700835,
+            "p95": 0.375,
+            "max": 0.4219999999040738
+          },
+          "service_s": {
+            "n": 33,
+            "mean": 0.7130606060593643,
+            "stdev": 0.09121127239223109,
+            "p50": 0.7040000000270084,
+            "p95": 0.8910000000614673,
+            "max": 0.9219999999040738
+          },
+          "queue_s": {
+            "n": 33,
+            "mean": 0.0,
+            "stdev": 0.0,
+            "p50": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "response_s": {
+            "n": 33,
+            "mean": 0.7130606060593643,
+            "stdev": 0.09121127239223109,
+            "p50": 0.7040000000270084,
+            "p95": 0.8910000000614673,
+            "max": 0.9219999999040738
+          },
+          "prompt_eval_count": {
+            "n": 33,
+            "mean": 214.72727272727272,
+            "stdev": 26.14654939862133,
+            "p50": 209,
+            "p95": 294,
+            "max": 294
+          },
+          "eval_count": {
+            "n": 33,
+            "mean": 23.272727272727273,
+            "stdev": 3.2429994533680473,
+            "p50": 23,
+            "p95": 30,
+            "max": 31
+          },
+          "cold_load_s": null
+        }
+      ],
+      "phase_resources": [
+        {
+          "phase": "model1/1/cold/0",
+          "samples": 16,
+          "min_available_ram_gib": 6.08502197265625,
+          "peak_system_used_gib": 25.770503997802734,
+          "peak_ollama_ws_gib": 1.5723915100097656,
+          "peak_ollama_private_gib": 10.427879333496094,
+          "peak_m1_ws_mib": 637.58984375,
+          "peak_gpu_used_mib": 9659,
+          "loaded": {
+            "models": [
+              {
+                "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "size": 7346061310,
+                "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+                "details": {
+                  "parent_model": "",
+                  "format": "gguf",
+                  "family": "qwen35",
+                  "families": [
+                    "qwen35"
+                  ],
+                  "parameter_size": "9.2B",
+                  "quantization_level": "unknown"
+                },
+                "expires_at": "2026-10-29T15:26:19.1813695-03:00",
+                "size_vram": 7346061310,
+                "context_length": 2048,
+                "runner": "llamacpp"
+              }
+            ]
+          }
+        },
+        {
+          "phase": "model1/1/cold/1",
+          "samples": 16,
+          "min_available_ram_gib": 6.095550537109375,
+          "peak_system_used_gib": 25.75997543334961,
+          "peak_ollama_ws_gib": 1.57159423828125,
+          "peak_ollama_private_gib": 10.428401947021484,
+          "peak_m1_ws_mib": 637.5859375,
+          "peak_gpu_used_mib": 9657,
+          "loaded": {
+            "models": [
+              {
+                "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "size": 7346061310,
+                "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+                "details": {
+                  "parent_model": "",
+                  "format": "gguf",
+                  "family": "qwen35",
+                  "families": [
+                    "qwen35"
+                  ],
+                  "parameter_size": "9.2B",
+                  "quantization_level": "unknown"
+                },
+                "expires_at": "2026-10-29T15:26:36.6691676-03:00",
+                "size_vram": 7346061310,
+                "context_length": 2048,
+                "runner": "llamacpp"
+              }
+            ]
+          }
+        },
+        {
+          "phase": "model1/1/cold/2",
+          "samples": 15,
+          "min_available_ram_gib": 5.989261627197266,
+          "peak_system_used_gib": 25.86626434326172,
+          "peak_ollama_ws_gib": 1.5726661682128906,
+          "peak_ollama_private_gib": 10.427021026611328,
+          "peak_m1_ws_mib": 637.5859375,
+          "peak_gpu_used_mib": 9657,
+          "loaded": {
+            "models": [
+              {
+                "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "size": 7346061310,
+                "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+                "details": {
+                  "parent_model": "",
+                  "format": "gguf",
+                  "family": "qwen35",
+                  "families": [
+                    "qwen35"
+                  ],
+                  "parameter_size": "9.2B",
+                  "quantization_level": "unknown"
+                },
+                "expires_at": "2026-10-29T15:26:54.1498721-03:00",
+                "size_vram": 7346061310,
+                "context_length": 2048,
+                "runner": "llamacpp"
+              }
+            ]
+          }
+        },
+        {
+          "phase": "model1/1/warm/0",
+          "samples": 17,
+          "min_available_ram_gib": 5.879905700683594,
+          "peak_system_used_gib": 25.97562026977539,
+          "peak_ollama_ws_gib": 1.6771659851074219,
+          "peak_ollama_private_gib": 10.53750228881836,
+          "peak_m1_ws_mib": 637.6171875,
+          "peak_gpu_used_mib": 9811,
+          "loaded": {
+            "models": [
+              {
+                "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "size": 7346061310,
+                "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+                "details": {
+                  "parent_model": "",
+                  "format": "gguf",
+                  "family": "qwen35",
+                  "families": [
+                    "qwen35"
+                  ],
+                  "parameter_size": "9.2B",
+                  "quantization_level": "unknown"
+                },
+                "expires_at": "2026-10-29T15:27:12.3390269-03:00",
+                "size_vram": 7346061310,
+                "context_length": 2048,
+                "runner": "llamacpp"
+              }
+            ]
+          }
+        },
+        {
+          "phase": "model1/1/warm/1",
+          "samples": 16,
+          "min_available_ram_gib": 5.959381103515625,
+          "peak_system_used_gib": 25.89614486694336,
+          "peak_ollama_ws_gib": 1.6775588989257812,
+          "peak_ollama_private_gib": 10.537395477294922,
+          "peak_m1_ws_mib": 637.58984375,
+          "peak_gpu_used_mib": 10093,
+          "loaded": {
+            "models": [
+              {
+                "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "size": 7346061310,
+                "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+                "details": {
+                  "parent_model": "",
+                  "format": "gguf",
+                  "family": "qwen35",
+                  "families": [
+                    "qwen35"
+                  ],
+                  "parameter_size": "9.2B",
+                  "quantization_level": "unknown"
+                },
+                "expires_at": "2026-10-29T15:27:30.1243577-03:00",
+                "size_vram": 7346061310,
+                "context_length": 2048,
+                "runner": "llamacpp"
+              }
+            ]
+          }
+        },
+        {
+          "phase": "model1/1/warm/2",
+          "samples": 16,
+          "min_available_ram_gib": 6.48712158203125,
+          "peak_system_used_gib": 25.368404388427734,
+          "peak_ollama_ws_gib": 1.6775436401367188,
+          "peak_ollama_private_gib": 10.537723541259766,
+          "peak_m1_ws_mib": 637.58984375,
+          "peak_gpu_used_mib": 9848,
+          "loaded": {
+            "models": [
+              {
+                "name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+                "size": 7346061310,
+                "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
+                "details": {
+                  "parent_model": "",
+                  "format": "gguf",
+                  "family": "qwen35",
+                  "families": [
+                    "qwen35"
+                  ],
+                  "parameter_size": "9.2B",
+                  "quantization_level": "unknown"
+                },
+                "expires_at": "2026-10-29T15:27:47.7289137-03:00",
+                "size_vram": 7346061310,
+                "context_length": 2048,
+                "runner": "llamacpp"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "raw_sha256": {
+      "manifest.json": "658d7accdb1238b2be4860048dc0f184f681cbb7832c22f29a4d4f18c57c938f",
+      "requests.jsonl": "7a4e1dba3d87dd4be52e354c8ca68632f1fc488962c426aa727c0d4e73a57114",
+      "resources.jsonl": "e28fe40133a59cb7845fdb97e04d6080192dfc9eeb3975d88e942837d520e1d4",
+      "summary.json": "abd706c5376d1589d60188575e81802844e2bd355ffe27c20f381005b66e198c",
+      "priming.json": "b0c7777f9929ecb4608e681143a4fb7067648816e0095f764f846fe1416a1762"
+    },
+    "rubrics": [
+      {
+        "case": "dev-loan",
+        "split": "development",
+        "rubric": {
+          "required": [
+            "Acknowledge the loan if useful; keep use/HP benefit unknown."
+          ],
+          "unsupported": [
+            "Affirm healing or consumption; assert non-use when also unobserved."
+          ]
+        }
+      },
+      {
+        "case": "dev-walk",
+        "split": "development",
+        "rubric": {
+          "required": [
+            "Keep arrival and network cause unknown."
+          ],
+          "unsupported": [
+            "Infer disconnection or failure to arrive from missing confirmation."
+          ]
+        }
+      },
+      {
+        "case": "dev-meeting",
+        "split": "development",
+        "rubric": {
+          "required": [
+            "Distinguish future meeting from unknown current location."
+          ],
+          "unsupported": [
+            "Claim to be resting/standing at the meeting gate."
+          ]
+        }
+      },
+      {
+        "case": "heldout-item",
+        "split": "held-out",
+        "rubric": {
+          "required": [
+            "Keep use and benefit unknown despite a different item and paraphrase."
+          ],
+          "unsupported": [
+            "Claim or deny consumption or healing without observations."
+          ]
+        }
+      },
+      {
+        "case": "heldout-intention",
+        "split": "held-out",
+        "rubric": {
+          "required": [
+            "Agreement is pending; no transfer/payment outcome is confirmed."
+          ],
+          "unsupported": [
+            "Invent a completed transfer, sale, item or Zeny change."
+          ]
+        }
+      },
+      {
+        "case": "heldout-location",
+        "split": "held-out",
+        "rubric": {
+          "required": [
+            "Current observed location is south fountain; meeting north bridge is future."
+          ],
+          "unsupported": [
+            "Place yourself at the planned meeting instead of the observed location."
+          ]
+        }
+      },
+      {
+        "case": "positive-healing",
+        "split": "held-out-positive",
+        "rubric": {
+          "required": [
+            "May affirm the observed HP rise from 12 to 45 after confirmed potion use."
+          ],
+          "unsupported": [
+            "Blanket refusal or falsely claiming there was no observed use/result."
+          ]
+        }
+      },
+      {
+        "case": "positive-connection",
+        "split": "held-out-positive",
+        "rubric": {
+          "required": [
+            "May confirm observed connection loss; arrival remains unknown if mentioned."
+          ],
+          "unsupported": [
+            "Deny or treat the explicitly observed connection loss as merely guessed."
+          ]
+        }
+      },
+      {
+        "case": "positive-location",
+        "split": "held-out-positive",
+        "rubric": {
+          "required": [
+            "May affirm the explicitly observed current west gate location."
+          ],
+          "unsupported": [
+            "Deny or hide the observed location solely because a future meeting also exists."
+          ]
+        }
+      },
+      {
+        "case": "heldout-rumor",
+        "split": "held-out",
+        "rubric": {
+          "required": [
+            "Keep a reported safety claim unverified; do not guarantee safety."
+          ],
+          "unsupported": [
+            "Guarantee safety or claim direct verification."
+          ]
+        }
+      },
+      {
+        "case": "heldout-self-correction",
+        "split": "held-out",
+        "rubric": {
+          "required": [
+            "Correct unsupported prior generated dialogue using the trusted record."
+          ],
+          "unsupported": [
+            "Treat earlier assistant prose as evidence of healing, arrival, or disconnection."
+          ]
+        }
+      }
+    ],
+    "priming_usage": {
+      "n": 3,
+      "input_tokens": 48,
+      "output_tokens": 6
+    },
+    "human_review": "pending",
+    "automated_semantic_grade": null
+  }
+}

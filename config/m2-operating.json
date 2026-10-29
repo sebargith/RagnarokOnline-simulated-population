@@ -28,7 +28,7 @@
   "retries": 0,
   "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
   "model_digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f",
-  "evidence_run": "20261029T173111Z-m2-acceptance",
+  "evidence_run": "20261029T181055Z-m2-grounding-acceptance",
   "selection": "provisional technical selection",
   "human_quality_review": "pending",
   "milestone_accepted": false,

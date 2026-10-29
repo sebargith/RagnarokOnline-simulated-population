@@ -23,7 +23,8 @@ WHERE WE ARE
   [RETEST] M2 - English grounding repair requested by you.
          Original benchmark preserved. Revised context/prompt fixtures
          are being retested, with paraphrases and positive controls.
-         Runtime settings and automated operating targets stay fixed.
+         Operating/resource targets stay fixed; sampling changes are
+         recorded and frozen before retesting.
          Two installed models completed 540 requests beside M1.
          9B Q6_K passed the fixed automated targets; the smaller 4B
          model failed recall/action agreement and truncated replies.
