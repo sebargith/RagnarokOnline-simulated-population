@@ -19,12 +19,14 @@ def api(endpoint, route, body=None, timeout=30):
         return json.load(response)
 
 
-def stream_chat(config, model, messages, seed, cold=False):
+def stream_chat(config, model, messages, seed, cold=False, response_format=None):
     """Absolute service deadline, bounded NDJSON/content, no network retries."""
     if sum(len(m["content"]) for m in messages) > config["max_prompt_chars"]:
         raise ValueError("prompt character budget exceeded")
     body = {"model": model, "messages": messages, "stream": True, "think": config["think"],
             "keep_alive": config["keep_alive"], "options": dict(config["options"], seed=seed)}
+    if response_format is not None:
+        body["format"] = response_format
     started = time.monotonic()
     limit = config["cold_service_timeout_s" if cold else "service_timeout_s"]
     deadline = started + limit
@@ -106,7 +108,7 @@ class BoundedInference:
         self.thread = threading.Thread(target=self._work, daemon=True)
         self.thread.start()
 
-    def submit(self, identity, messages, seed, cold=False):
+    def submit(self, identity, messages, seed, cold=False, response_format=None):
         future = Future()
         with self.condition:
             if self.closed or self.circuit.is_set():
@@ -119,7 +121,7 @@ class BoundedInference:
             if sum(len(m["content"]) for m in messages) > self.config["max_prompt_chars"]:
                 raise ValueError("prompt character budget exceeded")
             self.identities.add(identity)
-            self.queue.append((identity, messages, seed, cold, time.monotonic(), future))
+            self.queue.append((identity, messages, seed, cold, response_format, time.monotonic(), future))
             self.condition.notify()
         return future
 
@@ -129,7 +131,7 @@ class BoundedInference:
                 self.condition.wait_for(lambda: self.queue or self.closed)
                 if not self.queue:
                     return
-                identity, messages, seed, cold, admitted, future = self.queue.popleft()
+                identity, messages, seed, cold, response_format, admitted, future = self.queue.popleft()
             queue_s = time.monotonic() - admitted
             try:
                 ttl = self.config["cold_request_deadline_s" if cold else "request_deadline_s"]
@@ -140,7 +142,7 @@ class BoundedInference:
                 remaining_config = dict(self.config)
                 key = "cold_service_timeout_s" if cold else "service_timeout_s"
                 remaining_config[key] = min(self.config[key], ttl - queue_s)
-                result = self.transport(remaining_config, self.model, messages, seed, cold)
+                result = self.transport(remaining_config, self.model, messages, seed, cold, response_format)
                 result.update(queue_s=queue_s, response_s=time.monotonic() - admitted)
                 if result["response_s"] > ttl:
                     raise TimeoutError("request deadline exceeded")

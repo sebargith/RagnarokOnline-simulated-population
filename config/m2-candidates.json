@@ -5,7 +5,7 @@
     {"name": "qwen3.5:4b", "digest": "d8b0f5e9760cd1682034f292d7ef72ec46f432149be0df7574bf2d6e92e38c04"},
     {"name": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K", "digest": "77beda99ef49a70c129557ba3d6a35fc8cb829fce36cfda6f9ea60bb5221ee6f"}
   ],
-  "options": {"num_ctx": 2048, "num_predict": 160, "temperature": 0.7, "top_p": 0.8, "top_k": 20, "repeat_penalty": 1.05},
+  "options": {"num_ctx": 2048, "num_predict": 160, "temperature": 0.7, "top_p": 0.8, "top_k": 20, "min_p": 0.0, "repeat_penalty": 1.05, "presence_penalty": 0.0, "frequency_penalty": 0.0},
   "think": false,
   "keep_alive": "5m",
   "concurrency": 1,

@@ -33,7 +33,7 @@ class M2BoundaryTests(unittest.TestCase):
     def test_fifo_capacity_identity_isolation_and_ownership_release(self):
         release, started = threading.Event(), threading.Event()
         seen = []
-        def transport(config, model, messages, seed, cold):
+        def transport(config, model, messages, seed, cold, response_format):
             seen.append(messages[0]["content"])
             started.set()
             release.wait(2)

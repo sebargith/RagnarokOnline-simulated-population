@@ -200,6 +200,7 @@ def summarize(rows):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", default="config/m2-candidates.json")
+    parser.add_argument("--limits", default="config/m2-limits.json")
     parser.add_argument("--models", nargs="+", type=int, choices=(0, 1), default=[0, 1])
     parser.add_argument("--profiles", nargs="+", type=int, choices=(1, 3, 5), default=[1, 3, 5])
     parser.add_argument("--repeats", type=int, default=3)
@@ -221,10 +222,11 @@ def main():
         raise RuntimeError("benchmark requires no preloaded model; preserve other users' runners")
     tags = api(endpoint, "/api/tags")["models"]
     metadata = {"args": vars(args), "config": config, "version": version, "models": [],
+                "limits": json.loads((ROOT / args.limits).read_text()),
                 "started_utc": datetime.now(timezone.utc).isoformat(),
                 "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
                 "source_hashes": {path: digest(ROOT/path) for path in (
-                    "inference/m2.py", "scripts/bench_m2.py", "fixtures/m2-scenarios.json", args.config)},
+                    "inference/m2.py", "scripts/bench_m2.py", "fixtures/m2-scenarios.json", args.config, args.limits)},
                 "python": sys.version}
     for index in args.models:
         model = config["models"][index]
@@ -267,14 +269,14 @@ def main():
                                     history = histories[session] if case["kind"] == "conversation" else []
                                     messages = [{"role": "system", "content": system}] + history + [{"role": "user", "content": user}]
                                     cold = temperature == "cold" and turn == 0 and session == 0
-                                    future = scheduler.submit(str(session), messages, 42+repeat, cold)
+                                    future = scheduler.submit(str(session), messages, 42+repeat, cold, case.get("format"))
                                     pending.append((session, identity, user, messages, cold, future))
                                 for session, identity, user, messages, cold, future in pending:
                                     response = future.result(timeout=config["cold_request_deadline_s"] + 2)
                                     row = {"phase": phase, "model_index": index, "sessions": sessions,
                                            "profile": temperature, "repeat": repeat, "session": session,
                                            "case": case["id"], "cold_request": cold,
-                                           "messages": messages, "seed": 42+repeat, **response}
+                                           "messages": messages, "format": case.get("format"), "seed": 42+repeat, **response}
                                     if "error" not in response:
                                         row["score"] = score(case, identity, response["content"])
                                         row["foreign_markers"] = [other["keepsake"] for other in fixtures["identities"]
