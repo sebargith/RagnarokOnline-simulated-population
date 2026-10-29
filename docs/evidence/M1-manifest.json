@@ -1,0 +1,29 @@
+{
+  "rathena": "d4b8e7b8f16061cc2496d377ac8f777ce72a4f39",
+  "openkore": "e0b04ee7090ff0bc9ab0fa6b876756c4b9004770",
+  "sha256": {
+    "vendor/downloads/mariadb.zip": "398ea30e5036010bbebe01d2b1804280424dcc2626e36d8e95155c04d25a0490",
+    "vendor/downloads/strawberry.zip": "d9c5711d12573a0f6d977792caa58364b1d46217521ae5c25cf5cc378a7c23c0",
+    "vendor/rathena/login-server.exe": "89fe8568d9b5f8e62e7f03966d84a15dad9a6f98bdd0f21d3d820c4503d15a62",
+    "vendor/rathena/char-server.exe": "ea88c78170bb746b6956e5013fa96117a28bf3eb2d2d180da87d1adfee59c1ed",
+    "vendor/rathena/map-server.exe": "d84f373af940db4f1e7ebbe8a7511f77e7889ae752221e2b7d0e328f19ede009",
+    "vendor/rathena/libmysql.dll": "543b10adcc1b73cfd092042c8c5775b345ccb04dc3bdff4fc78020a981553c96",
+    "vendor/openkore/src/auto/XSTools/XSTools.dll": "f38e0bc237fc53b8d9c025e542bb46b14f1b29bd91fc9d35dc9b7294bedd1ecd",
+    "vendor/rathena/src/custom/defines_pre.hpp": "95ddc31579c559861b11a37d4eeb94d5841d7de963fc82af29705cf96bcaca8e",
+    "vendor/rathena/src/custom/defines_post.hpp": "833d96e7ab041b66868d8363b9d573ed32f25597643b93504352c493eb73bd33",
+    "runtime/openkore/agent/servers.txt": "df8cd34a0fdfd84f98005d0ab84a2141959e7caf6231fd6375f80f4662c887a8",
+    "runtime/openkore/agent/config.txt": "d27f48ceb78503ab9a0a0a8c644785390a1a90273c2963cd9c0e125cdfb64861",
+    "runtime/openkore/agent/timeouts.txt": "5e05c3bc99957e18024ac49b3b63d95fd9d946ebf0a6f615db7a8c3118ae41d3",
+    "bridge/openkore/m1_bridge.pl": "8790de722a2c8cde3b26fe535308f777362543653b37000ef811d4609e23c683",
+    "bridge/lib/Interface/M1Headless.pm": "a6dfdf0624dfdd50492dd31eb3a2f667d702072c9c7376762f352f3bbef50d2e",
+    "bridge/client.py": "fe4a57c90b5c46b68bd0b6481bfab8c38f4a75275d994127a712298a2382ec7d",
+    "scripts/m1.py": "b2ac4ff83a94cc59bf0a5369d85507845c686e34176e3af69521ecbd6cf7cd51",
+    "scripts/accept_m1.py": "bcba70737157b80b7737ce475eee162f752f30ee4f31536504af0b84eb0ffbbe",
+    "scripts/check_bridge_faults.py": "15de6627ea6d60f9f08e6c2a595fc049852750dd2074c10fca194265a5164367"
+  },
+  "ten_minute_trial": {
+    "run": "20261029T162200Z",
+    "bridge_sha256": "ec029fab9fd993b03f89dc87f050c29ee7a8c25b4c7b1f68b2f26c8dcb2776f3",
+    "continuous_seconds": 600.031
+  }
+}

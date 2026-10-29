@@ -2,21 +2,56 @@
 
 A local-first project for persistent, socially believable AI players on a classic/pre-Renewal Ragnarok Online private server. The first target is one autonomous player with grounded conversation and memory across restarts, followed by three to five distinct players.
 
-**Status:** M0 environment audit is complete; its setup recommendation awaits user acceptance for M1. Game integration, orchestration, inference benchmarks, and automated tests have not been implemented.
+**Status:** M1 passed: native Windows server/client bridge, a ten-minute connection/routine, confirmed movement/chat, and failure/reconnect checks. See [actual M1 results](docs/evidence/M1-server-client-bridge.md). Local inference and the persistent social agent remain later milestones.
 
 ## Start here
 
-Open the existing **Ragnarok Agents** local project in Codex, rooted at `D:\Ragnarok Agents`. Review the [M0 findings and proposed M1 procedure](docs/evidence/M0-environment.md), then use **02 - Server and client bridge** in [the Codex workflow](docs/CODEX_WORKFLOW.md) when accepting that setup.
+Open the existing **Ragnarok Agents** local project in Codex, rooted at `D:\Ragnarok Agents`. Read the [current state](docs/CURRENT_STATE.md), [bridge contract and troubleshooting](docs/BRIDGE.md), and [milestone assignments](docs/CODEX_WORKFLOW.md).
 
 - [General development rules](AGENTS.md)
-- [Provisional architecture](docs/ARCHITECTURE.md)
+- [Architecture and remaining design](docs/ARCHITECTURE.md)
 - [Milestones and acceptance criteria](docs/ROADMAP.md)
 - [Verified current state and next action](docs/CURRENT_STATE.md)
 
 ## Setup and operation
 
-No installation, run, or application-test commands have been validated yet. M0 records inspection commands and an unexecuted M1 procedure; M1 adds verified server/client setup and troubleshooting; M2 adds inference commands; M3 adds the agent runner and relevant tests. Record the working directory and shell for every command, especially across Windows and WSL.
+Use PowerShell 7 at `D:\Ragnarok Agents`. Python 3.11.9, VS 2019 Build Tools/MSVC v142 and SDK 10.0.19041.0 are reused in place. [Version pins](config/versions.json) include the exact rAthena/OpenKore commits, portable archive SHA-256 values, protocol `20130807` and 144-byte character blocks.
 
-The recommended M1 layout uses the existing WSL2 Ubuntu 22.04 environment for pre-Renewal rAthena, MariaDB, one headless OpenKore client, and Python. Candidate source revisions, protocol date, missing packages, storage locations, and compatibility gates are in the M0 evidence. Installed Windows Ollama models may be reused in M2; no inference runtime or model download is needed for M1. This combination has not been built or connected yet.
+One-time setup for a new workspace (initialization refuses existing database data):
 
-Keep runtime data in ignored locations; keep scripts, configuration templates without secrets, compact experiment results, and version pins in Git. See [.gitignore](.gitignore).
+```powershell
+Set-Location 'D:\Ragnarok Agents'
+py -3.11 -m venv .venv
+& .\.venv\Scripts\python.exe scripts/m1.py acquire
+& .\.venv\Scripts\python.exe scripts/m1.py build
+& .\.venv\Scripts\python.exe scripts/m1.py configure
+& .\.venv\Scripts\python.exe scripts/m1.py initialize
+```
+
+`acquire` checks 8 GiB free space, pins source revisions, verifies both binary ZIP hashes, and extracts portable tools under `vendor/`. Native compilation uses two build workers. `configure` restores the local test profiles and reuses generated credentials. Do not run initialization again on this prepared workspace.
+
+Start/observe/stop the existing setup:
+
+```powershell
+& .\.venv\Scripts\python.exe scripts/m1.py start
+& .\.venv\Scripts\python.exe scripts/m1.py client agent
+& .\.venv\Scripts\python.exe scripts/m1.py client peer
+& .\.venv\Scripts\python.exe scripts/observe.py agent --seconds 5
+& .\.venv\Scripts\python.exe scripts/m1.py status
+& .\.venv\Scripts\python.exe scripts/m1.py stop
+```
+
+The peer is a temporary headless test client for independent movement/chat observation. It can be omitted outside verification. All six listeners bind to `127.0.0.1`: database `3306`, login `6900`, character `6121`, map `5121`, agent bridge `8765`, peer bridge `8766`. No graphical client or game asset download is required for this proof.
+
+Run unit checks, then the live acceptance harness with both clients started:
+
+```powershell
+& .\.venv\Scripts\python.exe -m unittest discover -s tests -v
+& .\.venv\Scripts\python.exe scripts/accept_m1.py --seconds 600
+```
+
+The live check includes a ten-minute connection/routine, bidirectional chat, invalid/duplicate requests, protocol failures, and an actual map-server shutdown/restart. It writes bounded raw observations and actual results under `runtime/evidence/<UTC-run-id>/`. `--seconds 5` is a development smoke run and does not satisfy M1's duration requirement.
+
+External sources/builds/portable tools are in `vendor/`; mutable databases, credentials, configuration, logs and evidence are in `runtime/`; Python is in `.venv/`. Keep these ignored directories out of Git. M1 leaves existing Ollama/model stores in place and uses no WSL/Docker or inference runtime.
+
+See [BRIDGE](docs/BRIDGE.md) for schemas, confirmation limits, reconnect budgets and known setup fixes. The [M0 audit](docs/evidence/M0-environment.md) is historical environment evidence; M1 records actual implementation results separately.

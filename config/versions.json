@@ -1,0 +1,9 @@
+{
+  "rathena": {"url": "https://github.com/rathena/rathena.git", "commit": "d4b8e7b8f16061cc2496d377ac8f777ce72a4f39"},
+  "openkore": {"url": "https://github.com/OpenKore/openkore.git", "commit": "e0b04ee7090ff0bc9ab0fa6b876756c4b9004770"},
+  "mariadb": {"url": "https://archive.mariadb.org/mariadb-10.11.19/winx64-packages/mariadb-10.11.19-winx64.zip", "sha256": "398ea30e5036010bbebe01d2b1804280424dcc2626e36d8e95155c04d25a0490"},
+  "strawberry": {"url": "https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-32bit-portable.zip", "sha256": "d9c5711d12573a0f6d977792caa58364b1d46217521ae5c25cf5cc378a7c23c0"},
+  "python": "3.11.9", "packetver": 20130807,
+  "server_type": "kRO_RagexeRE_2013_08_07a", "char_block_size": 144,
+  "msvc_toolset": "v142", "windows_sdk": "10.0.19041.0"
+}

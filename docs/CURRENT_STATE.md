@@ -4,26 +4,21 @@ Updated: 2026-10-29 (America/Santiago).
 
 ## Verified
 
-- M0 audit is complete. [Environment evidence](evidence/M0-environment.md) records commands, versions, bounded asset checks, download estimates, limitations, and the proposed M1 procedure.
-- Windows 11 / WSL2 Ubuntu 22.04.4 work. Ryzen 9 5900HX, 31.86 GiB system RAM, and RTX 3080 Laptop with 16 GiB VRAM were verified; the NVIDIA GPU query also works inside WSL. CUDA computation was not tested.
-- WSL already has GCC/G++, Make, Perl 5.34, Python 3.10.12 with usable venv support, and zlib headers. MariaDB and the selected database/readline/curl development packages are missing. The read-only package simulation resolved successfully.
-- C: had 175.46 GiB free; D: had 44.64 GiB free. Ubuntu's VHD is backed by C:. Its virtual free capacity is not additional physical storage.
-- Windows Ollama 0.40.12 responds and lists existing models; none was loaded by this audit. No rAthena/OpenKore installation was found in the bounded locations inspected. A graphical RO client was not identified.
-- The initial repository contained seven untracked setup files and no commits. The remote advertised no branch heads. Git author identity is configured; no global settings were changed.
-- Setup review removed a stale reference to an absent preparation kit and added local database/log ignore rules. Validation passed: 17 local Markdown links, balanced fences across seven Markdown files, 18 ignore-rule cases, and staged whitespace/full-diff review across all eight setup/evidence files. There is no application test runner.
-- No dependencies were installed, models downloaded, game services started, or M1 application code implemented during M0. No push was performed.
+- **M1 passed.** [Actual results](evidence/M1-server-client-bridge.md), [tested hashes](evidence/M1-manifest.json), [commands](../README.md) and [bridge contract/troubleshooting](BRIDGE.md) carry the evidence and operating details. [M0](evidence/M0-environment.md) remains the historical environment audit.
+- Native Windows rAthena `d4b8e7b8f16061cc2496d377ac8f777ce72a4f39`, pre-Renewal/protocol `20130807`, Release x64/v142/SDK 10.0.19041.0; portable MariaDB 10.11.19 x64; OpenKore `e0b04ee7090ff0bc9ab0fa6b876756c4b9004770` with Strawberry Perl 5.32.1.1 x86 and built matching XSTools; Python 3.11.9 x64. Both binary archives matched publisher SHA-256 values. The project path with spaces works without an alias.
+- Duration run `20261029T162200Z` passed **600.031 s** continuously connected, ten movement round trips, maximum snapshot gap **1.033 s**, bidirectional chat, duplicate suppression, invalid/protocol rejection, and a real map-server shutdown/reconnect. The final reconnect/chat check took **14.093 s**.
+- A final buffered-frame correction passed a targeted five-frame/cache-capacity regression. A subsequent complete restart and five-second live scenario passed on the final source (`20261029T163521Z`, 5.015 s, reconnect/chat 27.281 s). Seven Python boundary tests, compile checks and Perl syntax checks passed. The ten-minute run predates the framing correction; hashes distinguish them.
+- Sources/portable tools/builds are in ignored `vendor/`; real credentials, SQL data, profiles, logs and raw traces in ignored `runtime/`; Python in `.venv/`. File-byte samples total about 2.57 GiB. Existing system tools and Ollama/models were preserved. No WSL/Docker, service/global PATH change, new model or push was used.
+- All six game/database/bridge listeners were verified on `127.0.0.1`. A during-trial working-set sample across the six native processes totaled 635.62 MiB; it is not a peak or inference benchmark. Project test processes are stopped at handoff.
 
-## Recommendation awaiting acceptance
+## Boundaries and remaining limits
 
-Use the existing Ubuntu distro for rAthena + MariaDB + one headless OpenKore client + Python. Keep external builds/runtime data under `/home/seba57/ragnarok-agents`; keep this Git checkout at `D:\Ragnarok Agents`. Candidate protocol is `20130807`, with exact upstream source revisions recorded in M0 evidence. Source inspection supports trying this combination; runtime compatibility is unproven.
-
-## Blockers and limits
-
-- M1 needs the documented packages and external source checkouts. Package candidates must be rechecked after refreshing apt metadata.
-- rAthena/OpenKore build, packet decoding, maps, observations/actions, 10-minute connection, chat, and reconnect/failure checks have not run. No external bridge exists yet.
-- A Windows graphical client adds an asset/version decision if requested; the proposed M1 uses OpenKore as its client and a temporary test peer for chat verification.
-- Model fit, social quality, throughput, and the Windows Ollama-to-WSL boundary remain M2 work. No model was selected.
+- M1 exposes only adjacent walkable-cell movement and ordinary printable public chat. One in-flight action, deadlines, game epochs, 128 retained request IDs, bounded nonblocking buffers, per-client tokens and finite reconnect budgets are implemented. Sending a packet is only `accepted`; matching server acknowledgment/echo is `completed`; timeout/disconnect is `unknown`. No automatic action resend exists.
+- Snapshot positions can be OpenKore estimates; movement acknowledgment is not proof of arrival. Independent peer perception verifies this scenario. Durable reconciliation of uncertain actions remains M3 work.
+- Stock pre-Renewal Prontera was tested; exact episode, graphical assets, combat/global routing, social behavior and long-duration operation are unverified. Unsupported modern server features disable themselves with warnings. Retry exhaustion, deliberately lost acknowledgments and output-buffer saturation were not separately fault-injected.
+- The initial failed DB bootstrap directory is preserved at `runtime/mariadb/data-initialization-attempt-1`. Active data is `runtime/mariadb/data`; never reinitialize or remove it as a routine troubleshooting step.
+- M0's pre-existing uncommitted changes to `docs/CODEX_WORKFLOW.md` and `docs/evidence/M0-environment.md` remain outside the M1 commit. M1's local commit is discoverable in Git history; nothing was pushed.
 
 ## Next action
 
-Review the M0 recommendation, then start **02 - Server and client bridge** from [CODEX_WORKFLOW](CODEX_WORKFLOW.md) to accept it or state an adjustment. The first M1 step is to recheck disk space/package candidates and prepare the documented WSL dependencies and pinned sources. M1 has not started.
+When the user starts **03 - Local inference benchmark**, execute M2 using the proven native M1 runtime and existing Windows Ollama/model inventory. Recheck available RAM/VRAM and the running Ollama model-store configuration first. No M2 benchmark or model choice has been started or accepted here.
