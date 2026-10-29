@@ -56,6 +56,7 @@ Portable MariaDB 10.11.19 x64 runs as an explicitly started process. rAthena bui
 - Benchmark a small shortlist of local models against realistic prompts. Qwen-family and 27B-class candidates may be considered, but neither family nor size is a requirement. Include a smaller viable baseline.
 - A model loading successfully is insufficient evidence. Measure prompt processing, end-to-end latency, queueing, memory, and quality under one, three, and five logical sessions. Shared weights do not eliminate context-memory costs.
 - Add only minimal identity and memory to the first conversational slice. Expand relationships and goals after restart continuity works.
+- Expand from one persistent agent to three only after continuity works. The first community demonstration includes cooperative PvE and simple trade; extend the restricted bridge and deterministic controllers in measured slices, confirming combat, loot and transfers from game observations before claiming success. Five agents are a later capacity check.
 - M1 uses English test messages and stock pre-Renewal data/rates on Prontera. An exact historical episode and future conversation language remain choices before content/social customization.
 
 ## References

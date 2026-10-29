@@ -1,6 +1,6 @@
 # Roadmap
 
-Work on one milestone outcome at a time. Default order: M0 -> M1 -> M2 -> M3 -> M4. M1 and M2 can be investigated independently after M0, but sequential work is the default for this single-machine setup. Evaluation begins with the first experiment.
+Work on one milestone outcome at a time. Default order: M0 -> M1 -> M2 -> M3 -> M4 -> M5. M1 and M2 can be investigated independently after M0, but sequential work is the default for this single-machine setup. Evaluation begins with the first experiment. The first community demonstration targets cooperative PvE and simple trade on classic/pre-Renewal rules; five agents are a later scale check, not a prerequisite for that experience.
 
 For each milestone, record starting state, commands and versions, observable outcomes, relevant failures, and evidence. Use `docs/evidence/M<number>-<topic>.md` when actual findings exist; keep large raw traces outside Git. Performance targets chosen after a baseline must be fixed before the final acceptance run. A failed target calls for a recorded decision, not silent relaxation.
 
@@ -55,8 +55,17 @@ Done when:
 - Critical state/action boundaries have automated checks; the end-to-end scenario has retained evidence and human review for continuity and naturalness.
 - Measured latency and resource use meet the operating budget from M2, or the milestone remains explicitly incomplete pending an agreed adjustment.
 
-## M4 - Three to five persistent agents
+## M4 - Three-agent community with cooperative PvE and simple trade
 
-Start only after M3 passes. Introduce distinct preferences and schedules, agent-scoped relationships, and interactions over a one-hour trial, followed by longer runs as evidence warrants.
+Start only after M3 passes. Build in verified slices: three isolated identities and conversations; the smallest deterministic navigation/combat/loot actions needed for a controlled PvE encounter; then a restricted two-party trade. Keep model output away from packet-level control and recheck live game state before each consequential action.
 
-Done when three agents pass isolation, persistence, load, conversation-turn, and reconnect scenarios without runaway chat or unbounded memory/queues. Then repeat with five if the resource budget permits. Include a test in which only one agent learns a fact; other agents may learn it only through a recorded information path. Use human review and behavior metrics together before scaling further.
+Done when:
+
+- Three agents retain distinct identities, preferences, schedules, relationships and memories across restart. They pass isolation, load, conversation-turn and reconnect checks without runaway chat or unbounded memory/queues. Only one agent initially learns a test fact; the others learn it only through a recorded information path.
+- A controlled solo PvE check establishes the new gameplay actions before two agents coordinate around a shared encounter. The combined scenario records who chose the goal, who moved/acted, server-confirmed combat and loot outcomes, and how failures or stale state were handled. Do not count coincidental proximity as cooperation.
+- A simple trade between two project agents records agreed offers and both sides' confirmed item/Zeny changes. Unknown outcomes after timeout or disconnect are reconciled before retry; no model-generated statement counts as a completed transfer.
+- A one-hour three-agent trial includes conversation, cooperative PvE and trade. Retain bounded evidence and obtain human review of continuity, believable interaction and social quality alongside behavior metrics. If the gameplay bridge cannot support these actions safely, record the blocker and revise the smallest interface before claiming M4.
+
+## M5 - Five-agent scale check
+
+Start only after M4 passes and the M2/M4 resource evidence supports it. Repeat isolation, persistence, cooperative gameplay, trade, reconnect and social-quality checks with five agents; run longer trials only when the one-hour baseline is stable. If capacity or quality falls below the fixed targets, keep the validated three-agent community and report the limit rather than weakening acceptance criteria silently.
