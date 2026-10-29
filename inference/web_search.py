@@ -30,7 +30,10 @@ def validate_query(query: str, *, private_terms=()) -> str:
 def _public_url(value: object) -> str | None:
     if not isinstance(value, str) or len(value) > 500:
         return None
-    parsed = urlsplit(value)
+    try:
+        parsed = urlsplit(value)
+    except ValueError:
+        return None
     if parsed.scheme not in ("https", "http") or not parsed.hostname:
         return None
     host = parsed.hostname.casefold()
@@ -71,7 +74,7 @@ def search_public_web(query: str, config: dict, *, private_terms=(), client_fact
         raise SearchUnavailable("public search unavailable") from exc
     results = []
     seen = set()
-    for item in raw:
+    for item in raw or ():
         if not isinstance(item, dict):
             continue
         url = _public_url(item.get("href"))
