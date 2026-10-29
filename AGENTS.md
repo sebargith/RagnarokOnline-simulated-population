@@ -17,7 +17,7 @@ Build a persistent community of believable AI players on a classic/pre-Renewal R
 - Prefer a small working slice, established interfaces, and the simplest maintainable solution. Do not add distributed infrastructure, reinforcement learning, or a generic agent framework without demonstrated need.
 - For substantial work, state a short plan and observable acceptance criteria. Proceed with reversible decisions inside the authorized scope. Ask only when missing information or a material change in scope, cost, compatibility, data, or deployment requires a user decision. Existing authorization persists.
 - A milestone plan is a guide, not automatic permission to start every later milestone. Complete the requested outcome before expanding scope.
-- Commit when authorized by the task or a standing user instruction; do not repeatedly ask for the same authorization. Publishing, deployment, destructive data operations, and shared-history rewrites need applicable authorization. Use `codex/` for new branches.
+- The user's standing instruction authorizes commits and pushes to this project's GitHub remote. Make small, descriptive commits at verified steps and push them regularly; a commit is not required after every prompt. Deployment, destructive data operations, and shared-history rewrites still need applicable authorization. Use `codex/` for new branches.
 - Pin versions and record reproducible commands once validated. Keep credentials, model weights, local databases, and raw logs out of Git.
 
 ## Context and usage
@@ -32,7 +32,7 @@ Build a persistent community of believable AI players on a classic/pre-Renewal R
 
 - Choose checks proportional to changed behavior and failure risk. Test types are options, not a mandatory checklist. Use regression tests for meaningful bugs and repeatable scenarios plus human review for social quality.
 - Record commands actually run, results, and limitations. Never claim an unexecuted test passed. Review the final diff, including new files, before completion.
-- There is no application or test runner yet. For documentation changes, check internal links, factual consistency, and whitespace. Add real setup/run/test commands to README when they exist; do not invent them.
+- For documentation changes, check internal links, factual consistency, and whitespace. Keep only actually verified setup/run/test commands in README; do not invent them.
 - At a meaningful handoff, update CURRENT_STATE with verified status, evidence paths, blockers, and one next action. Keep reports concise: outcome, relevant files, validation, and remaining limitations.
 
 ## Read when relevant
