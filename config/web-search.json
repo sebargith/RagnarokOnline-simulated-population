@@ -1,0 +1,9 @@
+{
+  "provider": "ddgs==9.16.1",
+  "backend": "duckduckgo",
+  "timeout_s": 8,
+  "max_results": 3,
+  "max_title_chars": 120,
+  "max_snippet_chars": 300,
+  "max_searches_per_turn": 1
+}
