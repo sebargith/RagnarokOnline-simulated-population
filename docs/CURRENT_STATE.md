@@ -4,6 +4,15 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Verified
 
+- **M4 functional prototype in progress**, clean branch `codex/m4-functional`
+  at `D:/Ragnarok Agents/m4-worktree`, from exact handoff `42bddcc`.
+  Three new project characters preserve M1 characters and all prior WIP.
+  Shared bounded inference/private identity stores, solo PvE, cooperative
+  development encounter and a fully confirmed one-Jellopy/ten-Zeny trade work.
+  Fresh client inventories matched read-only server persistence on both sides.
+  40 tests and Perl syntax passed. Combined/fault proof remains pending;
+  see [M4 evidence](evidence/M4-prototype.md). No social-quality acceptance.
+
 - **M3 functional baseline complete; naturalness deferred by user direction.**
   On 2026-10-30 the user prioritized a working end-to-end prototype over dialogue
   polish. Committed baseline **ff635f5** on `codex/m3-persistent` is sufficient

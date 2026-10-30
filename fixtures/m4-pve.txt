@@ -1,0 +1,18 @@
+// Local functional fixture: one stock Poring and one guaranteed server reward.
+// Only project test characters are placed nearby; no player gets GM authority.
+-	script	M4Fixture	-1,{
+OnInit:
+OnSpawn:
+	monster "prontera",154,180,"M4 Poring",1002,1,"M4Fixture::OnKill";
+	setunitdata $@mobid[0],UMOB_MODE,MD_CANATTACK;
+	end;
+OnKill:
+	makeitem 909,1,"prontera",154,180;
+	debugmes "M4 fixture Poring killed; guaranteed Jellopy reward at 154,180";
+	initnpctimer;
+	end;
+OnTimer15000:
+	stopnpctimer;
+	donpcevent "M4Fixture::OnSpawn";
+	end;
+}

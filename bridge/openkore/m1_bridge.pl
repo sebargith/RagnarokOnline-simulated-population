@@ -6,7 +6,8 @@ use IO::Socket::INET;
 use IO::Select;
 use JSON::PP;
 use Time::HiRes qw(time);
-use Globals qw($net $char $field $messageSender $playersList %config $quit $conState_tries);
+use Globals qw($net $char $field $messageSender $playersList $monstersList $itemsList $accountID %currentDeal %incomingDeal %outgoingDeal %config $quit $conState_tries);
+use Misc ();
 use Plugins;
 use Network;
 
@@ -14,6 +15,7 @@ my ($server, $client, $cfg, $hooks, $pending);
 my ($input, $output, $authorized, $auth_time) = ('', '', 0, 0);
 my ($seq, $epoch, $in_game, $last_snapshot, $last_action) = (0, 0, 0, 0, 0);
 my %seen;
+my ($trade_offered, $trade_used) = (0, 0);
 my ($attempts, $recovery_deadline, $stopping) = (0, 0, 0);
 my $json = JSON::PP->new->utf8->canonical;
 my $boot = sprintf('%x-%x-%x', time * 1000, $$, rand(2**30));
@@ -23,6 +25,11 @@ $hooks = Plugins::addHooks(
     ['start3', \&start], ['mainLoop_pre', \&tick],
     ['packet/character_moves', \&moved],
     ['packet_selfChat', \&self_chat], ['packet_pubMsg', \&public_chat],
+    ['packet_attack', \&combat], ['monster_disappeared', \&monster_gone],
+    ['packet/inventory_item_added', \&inventory_added],
+    ['engaged_deal', \&trade_engaged], ['incoming_deal', \&trade_incoming],
+    ['packet/deal_add_you', \&trade_added], ['packet/deal_finalize', \&trade_locked],
+    ['complete_deal', \&trade_complete], ['cancelled_deal', \&trade_cancelled],
     ['Network::serverConnect/master', \&reconnecting], ['checkConnection', \&check_connection],
 );
 
@@ -75,6 +82,13 @@ sub snapshot {
         $s->{position} = {x => 0 + $char->{pos}{x}, y => 0 + $char->{pos}{y}};
         $s->{destination} = {x => 0 + $char->{pos_to}{x}, y => 0 + $char->{pos_to}{y}};
         $s->{hp} = 0 + ($char->{hp} // 0); $s->{hp_max} = 0 + ($char->{hp_max} // 0);
+        $s->{zeny} = 0 + ($char->{zeny} // 0);
+        my $own_items = $currentDeal{you} // {};
+        my $other_items = $currentDeal{other} // {};
+        $s->{deal} = {name => $currentDeal{name} // '', incoming => $incomingDeal{name} // '',
+            you_zeny => 0 + ($currentDeal{you_zeny} // 0), other_zeny => 0 + ($currentDeal{other_zeny} // 0),
+            you_item => 0 + (($own_items->{909} // {})->{amount} // 0), other_item => 0 + (($other_items->{909} // {})->{amount} // 0),
+            you_locked => $currentDeal{you_finalize} ? 1 : 0, other_locked => $currentDeal{other_finalize} ? 1 : 0};
         $s->{inventory_ready} = $char->inventory->isReady ? 1 : 0;
         $s->{field} = {width => $field->width, height => $field->height};
         my @inventory = map {{name => $_->{name}, name_id => 0 + $_->{nameID}, amount => 0 + $_->{amount}}}
@@ -83,6 +97,12 @@ sub snapshot {
         my @players = map {{name => $_->{name} // '', id => unpack('H*', $_->{ID}),
             x => 0 + $_->{pos_to}{x}, y => 0 + $_->{pos_to}{y}}} @{$playersList->getItems};
         $s->{players} = [@players[0 .. ($#players > 31 ? 31 : $#players)]];
+        my @monsters = map {{id => unpack('H*', $_->{ID}), name => $_->{name}, name_id => 0 + $_->{nameID},
+            x => 0 + $_->{pos_to}{x}, y => 0 + $_->{pos_to}{y}}} @{$monstersList->getItems};
+        $s->{monsters} = [@monsters[0 .. ($#monsters > 15 ? 15 : $#monsters)]];
+        my @items = map {{id => unpack('H*', $_->{ID}), name_id => 0 + $_->{nameID}, amount => 0 + $_->{amount},
+            x => 0 + $_->{pos}{x}, y => 0 + $_->{pos}{y}}} @{$itemsList->getItems};
+        $s->{ground_items} = [@items[0 .. ($#items > 15 ? 15 : $#items)]];
     }
     emit('snapshot', $s);
 }
@@ -146,6 +166,77 @@ sub request {
         }
         $pending = {id => $id, action => $a, deadline => $r->{deadline_ms} / 1000};
         $messageSender->sendChat($a->{text});
+    } elsif ($a->{type} eq 'attack' || $a->{type} eq 'take') {
+        unless ($cfg->{m4_fixture} && join(',', sort keys %$a) eq 'target,type' &&
+            defined($a->{target}) && !ref($a->{target}) && $a->{target} =~ /^[a-f0-9]{8}$/ &&
+            $field->baseName eq 'prontera' && $char->{hp} > 0) {
+            result($id, 'rejected', 'invalid_pve'); return;
+        }
+        my $target = ($a->{type} eq 'attack' ? $monstersList : $itemsList)->getByID(pack('H*', $a->{target}));
+        my $pos = $target ? ($a->{type} eq 'attack' ? $target->{pos_to} : $target->{pos}) : undef;
+        unless ($target && $pos && abs($pos->{x} - $char->{pos_to}{x}) <= 1 &&
+            abs($pos->{y} - $char->{pos_to}{y}) <= 1 &&
+            ($a->{type} eq 'attack' ? ($target->{nameID} == 1002 && !$target->{dead}) : $target->{nameID} == 909)) {
+            result($id, 'rejected', 'target_not_visible_nearby_or_allowed'); return;
+        }
+        $pending = {id => $id, action => $a, deadline => $r->{deadline_ms}/1000};
+        if ($a->{type} eq 'attack') { $messageSender->sendAction($target->{ID}, 0) }
+        else { $messageSender->sendTake($target->{ID}) }
+    } elsif ($a->{type} =~ /^trade_(request|accept|offer|lock|commit)$/) {
+        unless ($cfg->{m4_fixture} && $cfg->{trade_role} && join(',', sort keys %$a) eq 'type' &&
+            $field->baseName eq 'prontera' && $char->{hp} > 0 && $char->inventory->isReady) {
+            result($id, 'rejected', 'invalid_trade'); return;
+        }
+        my ($partner) = grep { ($_->{name} // '') eq $cfg->{trade_peer} } @{$playersList->getItems};
+        unless ($partner && abs($partner->{pos_to}{x}-$char->{pos_to}{x}) <= 2 && abs($partner->{pos_to}{y}-$char->{pos_to}{y}) <= 2) {
+            result($id, 'rejected', 'trade_peer_not_nearby'); return;
+        }
+        my $type = $a->{type};
+        if ($type eq 'trade_request') {
+            unless ($cfg->{trade_role} eq 'seller' && !$trade_used && !%currentDeal && !%incomingDeal && !%outgoingDeal) {
+                result($id, 'rejected', 'trade_unavailable'); return;
+            }
+            $pending = {id => $id, action => $a, deadline => $r->{deadline_ms}/1000};
+            $trade_used = 1;
+            Misc::deal($partner);
+        } elsif ($type eq 'trade_accept') {
+            unless ($cfg->{trade_role} eq 'buyer' && !$trade_used && ($incomingDeal{name} // '') eq $cfg->{trade_peer} && !%currentDeal) {
+                result($id, 'rejected', 'unexpected_incoming_trade'); return;
+            }
+            $pending = {id => $id, action => $a, deadline => $r->{deadline_ms}/1000};
+            $trade_used = 1;
+            $messageSender->sendDealReply(3);
+        } else {
+            unless (($currentDeal{name} // '') eq $cfg->{trade_peer}) {
+                result($id, 'rejected', 'wrong_trade_peer'); return;
+            }
+            if ($type eq 'trade_offer') {
+                if ($trade_offered || $currentDeal{you_finalize}) { result($id, 'rejected', 'offer_already_sent_or_locked'); return }
+                my ($item) = grep { $_->{nameID} == 909 && $_->{amount} >= 1 && !$_->{equipped} } @{$char->inventory->getItems};
+                unless ($cfg->{trade_role} eq 'seller' ? $item : $char->{zeny} >= 10) {
+                    result($id, 'rejected', 'insufficient_trade_assets'); return;
+                }
+                $pending = {id => $id, action => $a, deadline => $r->{deadline_ms}/1000};
+                $trade_offered = 1;
+                if ($cfg->{trade_role} eq 'seller') { Misc::dealAddItem($item, 1) }
+                else {
+                    $currentDeal{you_zeny} = 10;
+                    unless (trade_matches()) { undef $pending; result($id, 'rejected', 'buyer_offer_mismatch'); return }
+                    # Legacy protocol acknowledges Zeny only to the OTHER side.
+                    # Lock after the fixed offer; our lock ack confirms acceptance.
+                    $messageSender->sendDealAddItem(pack('v',0), 10);
+                    $messageSender->sendDealFinalize();
+                }
+            } else {
+                unless (trade_matches() && $trade_offered && !$currentDeal{final} &&
+                    ($type eq 'trade_lock' ? !$currentDeal{you_finalize} : ($currentDeal{you_finalize} && $currentDeal{other_finalize}))) {
+                    result($id, 'rejected', 'trade_offer_or_lock_mismatch'); return;
+                }
+                $pending = {id => $id, action => $a, deadline => $r->{deadline_ms}/1000};
+                if ($type eq 'trade_lock') { $messageSender->sendDealFinalize() }
+                else { $currentDeal{final} = 1; $messageSender->sendDealTrade() }
+            }
+        }
     } else { result($id, 'rejected', 'action_not_allowed'); return }
     $last_action = time;
     result($id, 'accepted', 'packet_sent');
@@ -174,6 +265,81 @@ sub self_chat {
 sub public_chat {
     my (undef, $args) = @_;
     emit('chat', {speaker => $args->{pubMsgUser}, text => $args->{pubMsg}, self => 0});
+}
+
+sub combat {
+    my (undef, $args) = @_;
+    my $data = {source => unpack('H*', $args->{sourceID}), target => unpack('H*', $args->{targetID}),
+        damage => 0 + $args->{dmg}, self => $args->{sourceID} eq $accountID ? 1 : 0};
+    emit('combat', $data);
+    if ($pending && $pending->{action}{type} eq 'attack' && $data->{self} && $data->{target} eq $pending->{action}{target}) {
+        finish('completed', 'server_attack', $data);
+    }
+}
+
+sub monster_gone {
+    my (undef, $args) = @_;
+    my $m = $args->{monster};
+    emit('monster_departure', {target => unpack('H*', $m->{ID}), dead => $m->{dead} ? 1 : 0, name_id => 0 + $m->{nameID}});
+}
+
+sub inventory_added {
+    my (undef, $args) = @_;
+    return if $args->{fail};
+    my $data = {name_id => 0 + $args->{nameID}, amount => 0 + $args->{amount}};
+    emit('inventory_added', $data);
+    if ($pending && $pending->{action}{type} eq 'take' && $data->{name_id} == 909 && $data->{amount} > 0) {
+        finish('completed', 'server_inventory_add', $data);
+    }
+}
+
+sub trade_matches {
+    my $seller = $cfg->{trade_role} eq 'seller';
+    return 0 unless ($currentDeal{name} // '') eq $cfg->{trade_peer};
+    my $own = $currentDeal{you} // {};
+    my $other = $currentDeal{other} // {};
+    return 0 if grep { $_ != 909 && ($own->{$_}{amount} // 0) > 0 } keys %$own;
+    return 0 if grep { $_ != 909 && ($other->{$_}{amount} // 0) > 0 } keys %$other;
+    return ($own->{909}{amount} // 0) == ($seller ? 1 : 0) &&
+        ($other->{909}{amount} // 0) == ($seller ? 0 : 1) &&
+        ($currentDeal{you_zeny} // 0) == ($seller ? 0 : 10) &&
+        ($currentDeal{other_zeny} // 0) == ($seller ? 10 : 0);
+}
+
+sub trade_incoming {
+    my (undef, $args) = @_;
+    emit('trade', {phase => 'incoming', name => $args->{name}});
+}
+sub trade_engaged {
+    my (undef, $args) = @_;
+    emit('trade', {phase => 'engaged', name => $args->{name}});
+    if ($pending && $pending->{action}{type} =~ /^trade_(request|accept)$/ && $args->{name} eq $cfg->{trade_peer}) {
+        finish('completed', 'server_trade_engaged', {name => $args->{name}});
+    }
+}
+sub trade_added {
+    my (undef, $args) = @_;
+    return unless $pending && $pending->{action}{type} eq 'trade_offer';
+    if ($args->{fail}) { finish('rejected', 'server_offer_rejected'); return }
+    my $index = unpack('v', $args->{ID});
+    if ($cfg->{trade_role} eq 'seller' ? ($index > 0 && $args->{item} && $args->{item}{nameID} == 909) : $index == 0) {
+        finish('completed', 'server_offer_ack', {role => $cfg->{trade_role}});
+    }
+}
+sub trade_locked {
+    my (undef, $args) = @_;
+    emit('trade', {phase => 'locked', side => $args->{type} == 1 ? 'other' : 'self'});
+    if ($pending && ($pending->{action}{type} eq 'trade_lock' || ($pending->{action}{type} eq 'trade_offer' && $cfg->{trade_role} eq 'buyer')) && $args->{type} == 0) {
+        finish('completed', 'server_trade_locked');
+    }
+}
+sub trade_complete {
+    emit('trade', {phase => 'complete'});
+    if ($pending && $pending->{action}{type} eq 'trade_commit') { finish('completed', 'server_trade_complete') }
+}
+sub trade_cancelled {
+    emit('trade', {phase => 'cancelled'});
+    if ($pending && $pending->{action}{type} =~ /^trade_/) { finish('unknown', 'server_trade_cancelled_reconcile_inventory') }
 }
 
 sub tick {

@@ -21,7 +21,7 @@ class Community:
         web = json.loads((root/'config/web-search.json').read_text())
         self.service = service or BoundedInference(operating, operating['model'])
         self.bridges, self.memories, self.dialogues = bridges, {}, {}
-        self.outbox = {}
+        self.last_observation = {}
         for who, profile in self.identities.items():
             memory = Memory(state/(who+'.sqlite'), who)
             self.memories[who] = memory
@@ -31,7 +31,10 @@ class Community:
         if event['agent_id'] != who:
             raise ValueError('Cross-identity observation')
         memory = self.memories[who]
-        if event['kind'] == 'chat' and not event['data'].get('self'):
+        if event['kind'] == 'snapshot' and event['data']['connected'] and event['time_ms']-self.last_observation.get(who, 0) >= 30000:
+            memory.record(event['id'], 'observation', {'map': event['data']['map'], 'name': event['data']['name'], 'source': event['id']})
+            self.last_observation[who] = event['time_ms']
+        elif event['kind'] == 'chat' and not event['data'].get('self'):
             data = event['data']
             memory.record(event['id'], 'reported_claim', {'speaker': data['speaker'], 'text': data['text'][:240], 'source': event['id']})
             prefix = 'M4:'+who+':'

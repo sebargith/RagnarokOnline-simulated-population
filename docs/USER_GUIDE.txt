@@ -43,7 +43,7 @@ WHERE WE ARE
          naturalness/social acceptance to prioritize a working prototype;
          those quality findings are not a pass.
 
-  [NEXT] M4 - Functional prototype in verified slices.
+  [IN PROGRESS] M4 - Functional prototype in verified slices.
          Three isolated persistent identities, controlled solo PvE,
          actual cooperation, then restricted server-confirmed trade.
          Richer social quality and one-hour stabilization follow the
