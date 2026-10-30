@@ -29,7 +29,9 @@ WHERE WE ARE
          A standalone 9B turn can request one public search and receive
          short source-linked results. This is not connected to game play.
 
-  [NEXT] M3 - One persistent agent with optional public web search.
+  [STARTED] M3 - One persistent agent with optional public web search.
+         Persistence foundation has two passing restart/isolation tests on
+         codex/m3-persistent. Gameplay integration and live trial remain pending.
          Identity, grounded dialogue, routine gameplay, memory across
          restart, search-source separation and reliable fallback.
 
