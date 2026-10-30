@@ -4,6 +4,14 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Verified
 
+- **Coordinator review, 2026-10-30:** the controlled M4 functional prototype
+  is accepted for its demonstrated scope. All five exported run summaries
+  match raw evidence (excluding the documented resource-array projection),
+  their raw file hashes match, and the final-repeat source manifest matches
+  the current implementation. Interrupted recovery confirms a completed
+  transfer with no new transfer attempted. No gameplay or benchmark rerun was
+  needed for this read-only review. This does not establish continuous operation.
+
 - **M4 functional prototype demonstrated**, clean branch `codex/m4-functional`
   at `D:/Ragnarok Agents/m4-worktree`, from exact handoff `42bddcc`.
   Three new project characters preserve M1 characters and all prior WIP.
@@ -98,7 +106,10 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Next action
 
-Coordinator: review the M4 functional evidence and implementation branch before
-planning the deferred social-quality and one-hour stabilization work. Full M4
-acceptance remains open. M4 test clients/server are left running; the controller
-has exited. All M2/M3 WIP remains in its original checkout. Do not start M5.
+Use README's verified run/observe commands to demonstrate the controlled
+prototype. The next functional implementation priority is a continuously
+running three-agent controller that the user can interact with, building on
+the existing combat/trade routines. It is not implemented yet. Naturalness
+and one-hour stabilization remain deferred; full M4 acceptance remains open.
+M4 test clients/server are left running; the scenario controller has exited.
+All M2/M3 WIP remains in its original checkout. Do not start M5.
