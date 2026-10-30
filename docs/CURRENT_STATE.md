@@ -4,6 +4,48 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Verified
 
+- **Chat 06: continuous M4 fixture runtime implemented**, branch
+  `codex/m4-continuous`, worktree `D:/Ragnarok Agents/m4-continuous`, from
+  reviewed `a523dbf`. Runtime commits `3cb8e39` and `575b1d8`; M2/M3 WIP stays
+  in its original checkouts. One controller repeatedly runs solo/cooperative
+  Poring hunts and loot, fixed affordable trade, Mira's patrol and bounded
+  addressed dialogue. Start/stop/status/observe/manual public chat are in
+  [README](../README.md#continuous-three-agent-runtime-m4-continuation-chat-06).
+  Observation/interaction are headless; no graphical player client/assets or
+  separate human account were supplied or verified.
+- Final-source run `d3ac8c2d253c40538091ba020f360683` completed three
+  hunt/loot cycles in **51.938 s**, delivered the selected 9B's reply while
+  routine activity continued, and stopped with an unresolved transfer.
+  Restart `590e0797b6a04495b28b2c72981b722b` reconciled it as **not_applied**
+  from fresh client inventories and read-only server persistence, with
+  **new_transfer_attempted: false**. It continued two cycles and Mira recalled
+  the perceived public marker "ambercone" in a delivered reply. Identities
+  and separately stored public-chat records survived; no memory was copied
+  between identities. Both controllers stopped cleanly.
+- **47 tests pass**, including 1,500 serial-window admissions without replay
+  after eviction, 1,100 durable-journal actions, unknown-send protection,
+  unaffordable-trade skip, stale-reply/target-readiness checks and byte-bounded
+  rotation. Python compile and Perl syntax checks passed. The live event log
+  actually rotated below its 1 MiB segment ceiling. The new live directory
+  caps logs at four segments, with bounded status/results/queues and capped
+  private memories; shared native-service logs remain outside this policy.
+  [Continuous evidence](evidence/M4-continuous.md) records source/raw hashes,
+  exact commands, outage/restart results and remaining limits.
+- A development run with Ollama unavailable completed seven cycles and two
+  confirmed trades while delivering fallback chat. The shell's old model-store
+  path pointed to an empty store; the installed service was started with the
+  existing user store `D:/Local_AI/Models/Ollama`, without a global setting
+  change/download. The selected 9B digest matches its pin. The 30-second circuit
+  cooldown permits new turns; it never retries the old prompt. No benchmark,
+  social-quality review, one-hour stabilization or M5 was performed.
+- Final-source legacy trade/observe modes also passed: Alden **16 Jellopy /
+  170 Zeny -> 15 / 180**, Bram **7 / 30 -> 8 / 20**, independently checked
+  after full login. The local SearXNG endpoint is currently unavailable:
+  the Docker Linux backend was stopped and one startup attempt did not restore
+  it. The web mode recorded `SearchUnavailable` and delivered its bounded
+  fallback. No container
+  was created/reconfigured; prior successful web evidence remains historical.
+
 - **Coordinator review, 2026-10-30:** the controlled M4 functional prototype
   is accepted for its demonstrated scope. All five exported run summaries
   match raw evidence (excluding the documented resource-array projection),
@@ -106,10 +148,10 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Next action
 
-Use README's verified run/observe commands to demonstrate the controlled
-prototype. The next functional implementation priority is a continuously
-running three-agent controller that the user can interact with, building on
-the existing combat/trade routines. It is not implemented yet. Naturalness
-and one-hour stabilization remain deferred; full M4 acceptance remains open.
-M4 test clients/server are left running; the scenario controller has exited.
-All M2/M3 WIP remains in its original checkout. Do not start M5.
+Use README's continuous-runtime start/observe/say/status/stop commands from
+`D:/Ragnarok Agents/m4-continuous`, then return the continuous evidence to the
+coordinator for review. The controller is stopped at handoff; native services
+and three test clients remain available. Unresolved transfers must be reconciled,
+never bypassed by deleting state. Naturalness and one-hour stabilization remain
+deferred; full M4 acceptance stays open. All M2/M3 WIP remains in its original
+checkout. Do not start M5.

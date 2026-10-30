@@ -2,7 +2,7 @@
 
 A local-first project for persistent, socially believable AI players on a classic/pre-Renewal Ragnarok Online private server. The first target is one autonomous player with grounded conversation and memory across restarts, followed by three to five distinct players.
 
-**Status:** the M4 functional prototype is demonstrated: three persistent identities, bounded local 9B conversation, controlled solo/cooperative PvE, loot and reconciled item/Zeny trade. Human social quality and the one-hour M4 trial remain deferred. See [M4 evidence](docs/evidence/M4-prototype.md) and [current state](docs/CURRENT_STATE.md).
+**Status:** M4 now has a continuous three-agent fixture controller with start, stop, observation and addressed conversation. Human social quality and the one-hour M4 trial remain deferred. See [continuous-runtime evidence](docs/evidence/M4-continuous.md), the [earlier scripted prototype](docs/evidence/M4-prototype.md) and [current state](docs/CURRENT_STATE.md).
 
 ## Start here
 
@@ -101,7 +101,83 @@ outage checks, failed preflights, latency/resources and remaining acceptance
 limits. [Results and hashes](docs/evidence/M3-results.json) accompany the
 retained conversation review set.
 
+## Continuous three-agent runtime (M4 continuation, Chat 06)
+
+Use PowerShell from `D:/Ragnarok Agents/m4-continuous`. The existing M4 profiles,
+local native server/database and Poring fixture must already be prepared. Start
+reuses them and restarts only the three project clients to load current bridge
+code and fresh inventories; it never resets characters, balances or memory.
+Keep other gameplay controllers stopped: all worktrees share ports and runtime.
+
+```powershell
+Set-Location 'D:/Ragnarok Agents/m4-continuous'
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/live_m4.py --runtime 'D:/Ragnarok Agents/runtime' start
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/live_m4.py --runtime 'D:/Ragnarok Agents/runtime' observe --seconds 5
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/live_m4.py --runtime 'D:/Ragnarok Agents/runtime' say --sender agent --target third --text 'Name and one preference only, very briefly?'
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/live_m4.py --runtime 'D:/Ragnarok Agents/runtime' status
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/live_m4.py --runtime 'D:/Ragnarok Agents/runtime' stop
+```
+
+`start` returns when startup status is published; wait for connected snapshots
+and a hunt/rest phase in `observe`. It runs until `stop`; `run` is the foreground
+alternative, and `--seconds N` requests a bounded development run. `stop`
+requests durable cleanup; wait for `running: false` / `phase: stopped` in
+`status` before starting again. Client/server processes stay up. A pending
+inference call can delay cleanup up to its existing 60-second cold-service
+timeout; an active client restart can take longer than a polling tick. A stale
+status age indicates an exited/hung process or a lifecycle operation, not proof
+of current connection. A second controller or direct M4 preparation fails its
+ownership lock while this controller runs.
+
+Alden alternates solo and explicitly coordinated Poring hunts with Bram,
+collects loot, and offers one Jellopy for ten Zeny every three successful hunts.
+Mira patrols two nearby cells and can converse. Unaffordable trades or missing
+goods are skipped until a later trade interval; balances are never replenished.
+Unknown transfers survive stop/restart and are reconciled before any new
+transfer. Ambiguity requires investigation; do not delete the ledger to bypass it.
+
+The clients are **headless**. `observe` reads controller status without taking
+a bridge connection. Full recent replies and snapshots are in `status`; bounded
+events are in `runtime/m4/live/events.jsonl` plus three rotated segments.
+`say` sends ordinary public chat **from the selected existing test character**;
+it is a manual headless interaction path, not a separate human account. Names:
+`agent` = M4 Alden, `peer` = M4 Bram, `third` = M4 Mira. Sender and target must
+differ. Queued input expires after 30 seconds. At most one inference turn per
+identity is admitted, with a ten-second admission interval; busy prompts can
+be skipped. From a compatible graphical player near the square, the addressed
+syntax is `M4:third:Hello` (or `agent` / `peer`). A graphical client, lawful game
+assets, matching protocol `20130807` and a separate player account are **not
+supplied or verified** by this slice. The proven interaction path is headless.
+
+Selected-model conversation needs the existing Ollama service on 11434; the
+fixed `web poring` prompt also needs existing SearXNG on 8080. If starting Ollama
+manually in this environment, the shell has a stale model-store variable. These
+commands start the installed server using the existing user-configured store
+without changing global settings; use them only when its listener is absent:
+
+```powershell
+$env:OLLAMA_MODELS = [Environment]::GetEnvironmentVariable('OLLAMA_MODELS','User')
+Start-Process -FilePath 'C:/Users/azusu/AppData/Local/Programs/Ollama/ollama.exe' -ArgumentList 'serve' -WindowStyle Hidden
+```
+
+The verified store is `D:/Local_AI/Models/Ollama`; no model download is needed.
+If inference is unavailable, gameplay continues and addressed turns receive a
+bounded fallback. After a 30-second circuit cooldown, a new turn can try again;
+old prompts and unknown game actions are never replayed. Search exports only
+the existing fixed public query, with source attribution.
+
+At this handoff Ollama/9B is available; SearXNG is offline because the existing
+Docker Linux backend did not start. `web poring` currently delivers a fallback.
+No search container was created or reconfigured.
+
+This remains the controlled Prontera fixture: local routing, a stationary
+Poring with a guaranteed Jellopy, fixed roles/offers and three novices. The short
+checks do not establish unattended long-duration reliability or full M4 acceptance.
+
 ## Three-agent functional prototype (M4)
+
+These earlier commands run finite scripted demonstrations. Stop the continuous
+controller before using them.
 
 Use PowerShell from `D:/Ragnarok Agents/m4-worktree`, with the existing native
 server/database, Ollama and SearXNG available. These commands were verified:

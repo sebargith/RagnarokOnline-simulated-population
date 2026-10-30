@@ -1,11 +1,10 @@
 # Architecture and constraints
 
-Status: M1 passed. M3 now integrates a deterministic adjacent-cell routine,
-identity-scoped SQLite records, bounded background 9B dialogue and one fixed
-public SearXNG topic. The frozen 30-minute restart/reconnect scenario completed
-after an earlier attempt stopped at its RAM gate. A subsequent dialogue-only
-search repair passed a targeted live check; milestone acceptance and human
-social-quality review remain pending. Milestone criteria belong in
+Status: M1 passed; M3's persistent functional baseline and M4's controlled
+three-agent demonstration are recorded. M4 now also has a continuous fixture
+controller with bounded request/evidence retention, asynchronous addressed
+dialogue, repeated PvE/loot/trade and stop/restart recovery. Social-quality
+acceptance and the one-hour M4 trial remain deferred. Milestone criteria belong in
 [ROADMAP](ROADMAP.md); verified evidence belongs in [CURRENT_STATE](CURRENT_STATE.md).
 
 ## Components and ownership
@@ -14,8 +13,8 @@ social-quality review remain pending. Milestone criteria belong in
 | --- | --- | --- |
 | Game server | rAthena, pre-Renewal | Authoritative world state, action outcomes, game rules |
 | Game persistence | MySQL/MariaDB | rAthena's supported game database |
-| Client/controller | Pinned native OpenKore plus project plugin | M1 implements login, scoped perception, validated adjacent movement/public chat and bounded reconnect |
-| Orchestrator | One Python M3 process | Deterministic adjacent movement, durable request intent, one background dialogue turn and one unsent reply; OS ownership lock |
+| Client/controller | Pinned native OpenKore plus project plugin | Scoped perception, validated adjacent movement/public chat, controlled M4 combat/loot/trade and bounded reconnect |
+| Orchestrator | One Python M4 process | Three fixture routines, durable intent, one background dialogue turn and pending reply per identity; shared OS ownership lock |
 | Agent persistence | Identity-scoped SQLite records | Persona, observations, reported claims, dialogue, action outcomes and commitments; bounded retention/retrieval; separate from game DB |
 | Language inference | Selected Qwen3.5 9B Q6_K on native Windows Ollama | Bounded M3 dialogue requests with identity-scoped context; no model gameplay authority |
 | Public web search | Existing local SearXNG container, JSON API on loopback | One fixed public topic in M3; at most one search per turn; snippets are external claims with URLs, not game truth |
@@ -51,6 +50,22 @@ The following persistence and inference constraints continue to apply:
 - Store raw observations separately from summaries where needed for diagnosis. Bound retrieval and retention; do not append an entire lifetime of chat to each request. Begin with simple structured retrieval before considering embeddings.
 - Define finite inference budgets, stale-request handling, and a fallback. Gameplay continues through inference outages; conversation may wait or be skipped without fabricated claims.
 - Integrate the standalone web-search turn through identity-scoped context. Never place private memory or observed game state in a query; keep web results source-labeled, short and untrusted. Search failure must not block the deterministic gameplay controller.
+
+The M4 continuation runs one persistent fixture controller in
+`agent/continuous.py`, reusing the reviewed deterministic navigation, combat,
+loot and fixed-trade primitives. Routine waits pump all three perceptions and
+bounded dialogue delivery; Mira's adjacent patrol runs in that pump. The model
+has no gameplay authority. A bounded local command/status interface lets a
+headless user interact without a second consumer on the bridge sockets.
+
+Continuous operation uses per-client monotonic request IDs plus a retained
+high-water mark rather than evicting arbitrary duplicate IDs. This removes the
+128-request lifetime stop without making evicted requests executable. Durable
+uncertain transfers remain separate from the rolling terminal action history.
+Logs rotate in a fixed shared live directory; starting a controller does not
+create an accumulating sequence of evidence directories. Existing shared
+native-service logging is preserved. The controller still uses a deliberately
+limited Prontera fixture; long-duration and social acceptance remain open.
 
 ## Hardware and environment
 

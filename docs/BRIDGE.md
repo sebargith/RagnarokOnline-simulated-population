@@ -61,7 +61,8 @@ Known setup findings:
 ## M4 controlled prototype extension
 
 M4 keeps protocol version 1 and all existing framing, deadlines, duplicate-ID,
-one-in-flight, 128-action-per-epoch, rate and reconnect bounds. The pinned plugin
+one-in-flight, rate and reconnect bounds. Legacy UUID requests retain the
+128-action-per-epoch limit; continuous monotonic requests are described below. The pinned plugin
 now permits loopback port 8767 as well as 8765/8766. Existing M1 profiles do not
 enable gameplay extensions. M4 profiles require `m4_fixture: true`; third-party
 chat and model output cannot change this configuration.
@@ -100,3 +101,38 @@ records with a 512-row target and fails closed at 1024 total rows if unresolved
 history accumulates. The transfer ledger retains 128 terminal records plus its
 unresolved entry. The SQL check is privileged scenario instrumentation, never
 an agent perception or LLM input. See [M4 evidence](evidence/M4-prototype.md).
+
+## M4 continuous request window and lifecycle
+
+Authentication now advertises `next_serial`. Continuous request IDs use
+`c_<integer>` and increase strictly for the lifetime of each client process.
+The bridge retains 128 recent serial results and a high-water mark: cached
+duplicates return their result, while evicted/lower IDs are rejected as
+`retired_request`, so eviction cannot execute an old transfer again. The
+high-water mark survives game epochs and bridge reconnects within that process;
+a new boot has a different session. UUID/demo behavior stays finite and
+unchanged. Each bridge has its own sequence; controller results and durable
+intent are scoped by identity and game session.
+
+The continuous controller writes intent before a network send and never
+resends it. After full client login, old-epoch nontrade intents are retired
+without upgrading unknown outcomes to completed. The separate transfer ledger
+still blocks every new transfer until fresh two-sided reconciliation. Terminal
+or retired intent retention targets 512 rows per identity; unresolved current
+intent blocks that identity. Trade history remains bounded by the existing
+ledger. Bridge reconnect attempts use exponential delays capped at 30 seconds;
+routine recovery/client restart delays grow from 5 to 60 seconds. Each client
+still has its own three-attempt/90-second game reconnect budget.
+
+One shared `m4.lock` covers scripted demos, continuous ownership and direct M4
+preparation. Observers and manual headless chat use bounded local control/status
+files, so they do not steal the single authenticated bridge stream. Continuous
+evidence uses four segments of at most 1 MiB each, 256 result entries, 2,048
+recent events, 32 replies and 120 resource samples. Input has eight waiting
+commands with a 30-second expiry; each identity has one pending reply, expiring
+after 20 seconds or an epoch change. Existing identity memory, inference queue,
+token/context and resource limits remain in force. Continuous clients disable
+their duplicate OpenKore file logs and discard console output; normalized
+controller events retain the observable game path. Existing shared server/DB
+logs and manually frozen verification evidence are outside this controller's
+rotation policy. See [continuous evidence](evidence/M4-continuous.md).

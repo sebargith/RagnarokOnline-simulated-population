@@ -1,0 +1,1807 @@
+{
+  "base_commit": "a523dbfa65a08ac148ae4177bd22c9a5b98dcc23",
+  "runtime_commit": "575b1d81028b2a67e4403edcbd5a08d5aabee182",
+  "branch": "codex/m4-continuous",
+  "checks": {
+    "unit_tests_passed": 47,
+    "python_compile": "passed",
+    "perl_syntax": "passed",
+    "serial_window_admissions": 1500,
+    "journal_actions": 1100
+  },
+  "continuous_runs": [
+    {
+      "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+      "elapsed_s": 180.01599999994505,
+      "event_count": 874,
+      "cycle": 7,
+      "running": false,
+      "phase": "stopped",
+      "counters": {
+        "completed": 90,
+        "unknown": 0,
+        "rejected": 0,
+        "delivered_replies": 2,
+        "reconnections": 6,
+        "trade_completed": 2
+      },
+      "unresolved_trades": [],
+      "recent_replies": [
+        {
+          "who": "agent",
+          "question": "Name and one preference only, very briefly?",
+          "session": "1a18dadb56f-b500-1c21c01c:1",
+          "started": 797335.234,
+          "external": null,
+          "topic": null,
+          "cold": true,
+          "error": "RuntimeError",
+          "text": "I don't know enough to answer that right now."
+        },
+        {
+          "who": "third",
+          "question": "Name and one preference only, very briefly?",
+          "session": "1a18daee701-c1f0-e14929f:1",
+          "started": 797421.453,
+          "external": null,
+          "topic": null,
+          "cold": true,
+          "error": "RuntimeError",
+          "text": "I don't know enough to answer that right now."
+        }
+      ],
+      "raw_directory": "D:\\Ragnarok Agents\\runtime\\evidence\\m4-continuous-development",
+      "raw_sha256": {
+        "events.jsonl": "132397e2aacc8f7403a7c3a25abe9bdaa5cf521ea77cc17a77c9535b90f42fec",
+        "manifest.json": "1f92aa47e026ab87c875e8638823d523d06e074a16885f869aab25c793336fe2",
+        "status.json": "613bbccced92109220cbc2b3525a8a949a003002c8fafd61e1d97f85ee006cfb"
+      },
+      "controller_events": [
+        {
+          "controller": "cycle_completed",
+          "time": 1793378350.506206,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "cycle": 1,
+          "result": {
+            "target": "5cb48e06",
+            "cooperative": false,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather"
+            },
+            "damage": {
+              "agent": 51
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "5cb48e06"
+              },
+              "id": "1a18dadb56f-b500-1c21c01c:21",
+              "kind": "monster_departure",
+              "session": "1a18dadb56f-b500-1c21c01c:1",
+              "source": "openkore",
+              "time_ms": 1793378347558,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_5",
+              "status": "completed"
+            },
+            "inventory_before": 1,
+            "inventory_after": 2,
+            "event_start": 23
+          }
+        },
+        {
+          "controller": "cycle_completed",
+          "time": 1793378368.724998,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "cycle": 2,
+          "result": {
+            "target": "fabe8e06",
+            "cooperative": true,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather",
+              "peer": "flank_and_strike"
+            },
+            "damage": {
+              "agent": 34,
+              "peer": 17
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "fabe8e06"
+              },
+              "id": "1a18dadb56f-b500-1c21c01c:61",
+              "kind": "monster_departure",
+              "session": "1a18dadb56f-b500-1c21c01c:1",
+              "source": "openkore",
+              "time_ms": 1793378367572,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_9",
+              "status": "completed"
+            },
+            "inventory_before": 2,
+            "inventory_after": 3,
+            "event_start": 122
+          }
+        },
+        {
+          "controller": "manual_public_chat",
+          "time": 1793378379.1203399,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "sender": "third",
+          "target": "agent",
+          "text": "Name and one preference only, very briefly?"
+        },
+        {
+          "controller": "reply_ready",
+          "time": 1793378381.2355998,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "who": "agent",
+          "reply": {
+            "question": "Name and one preference only, very briefly?",
+            "session": "1a18dadb56f-b500-1c21c01c:1",
+            "started": 797335.234,
+            "external": null,
+            "topic": null,
+            "cold": true,
+            "error": "RuntimeError",
+            "text": "I don't know enough to answer that right now."
+          }
+        },
+        {
+          "controller": "reply_submitted",
+          "time": 1793378381.2610548,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "who": "agent",
+          "request": "c_10"
+        },
+        {
+          "controller": "reply_delivered",
+          "time": 1793378381.3258736,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "who": "agent",
+          "result": {
+            "evidence": {
+              "text": "I don't know enough to answer that right now."
+            },
+            "reason": "server_chat_echo",
+            "request_id": "c_10",
+            "status": "completed"
+          }
+        },
+        {
+          "controller": "cycle_completed",
+          "time": 1793378388.248893,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "cycle": 3,
+          "result": {
+            "target": "fbbe8e06",
+            "cooperative": false,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather"
+            },
+            "damage": {
+              "agent": 51
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "fbbe8e06"
+              },
+              "id": "1a18dadb56f-b500-1c21c01c:100",
+              "kind": "monster_departure",
+              "session": "1a18dadb56f-b500-1c21c01c:1",
+              "source": "openkore",
+              "time_ms": 1793378386813,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_14",
+              "status": "completed"
+            },
+            "inventory_before": 3,
+            "inventory_after": 4,
+            "event_start": 244
+          }
+        },
+        {
+          "controller": "inference_circuit_reopened",
+          "time": 1793378413.9356961,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347"
+        },
+        {
+          "controller": "trade_result",
+          "time": 1793378417.6602042,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "result": {
+            "id": "7944ee131a6540efb501dc26bda865e9",
+            "before": {
+              "agent": {
+                "jellopy": 4,
+                "zeny": 130
+              },
+              "peer": {
+                "jellopy": 3,
+                "zeny": 70
+              }
+            },
+            "sessions": {
+              "agent": "1a18dadb56f-b500-1c21c01c:1",
+              "peer": "1a18dadbe30-e314-414ef43:1"
+            },
+            "created": 1793378391.258292,
+            "offer": "one Jellopy for ten Zeny",
+            "after": {
+              "agent": {
+                "jellopy": 3,
+                "zeny": 140
+              },
+              "peer": {
+                "jellopy": 4,
+                "zeny": 60
+              }
+            },
+            "authoritative": {
+              "agent": {
+                "jellopy": 3,
+                "zeny": 140
+              },
+              "peer": {
+                "jellopy": 4,
+                "zeny": 60
+              }
+            },
+            "reconciliation": "completed",
+            "observation_ids": {
+              "agent": "1a18daed55d-dbfc-ead5ca7:6",
+              "peer": "1a18daede31-2ac8-38c19bd8:6"
+            },
+            "commits": {
+              "agent": "c_20",
+              "peer": "c_6"
+            },
+            "completion_observations_discarded": false
+          }
+        },
+        {
+          "controller": "cycle_completed",
+          "time": 1793378430.2763598,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "cycle": 4,
+          "result": {
+            "target": "fcbe8e06",
+            "cooperative": true,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather",
+              "peer": "flank_and_strike"
+            },
+            "damage": {
+              "agent": 34,
+              "peer": 17
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "fcbe8e06"
+              },
+              "id": "1a18daed55d-dbfc-ead5ca7:30",
+              "kind": "monster_departure",
+              "session": "1a18daed55d-dbfc-ead5ca7:1",
+              "source": "openkore",
+              "time_ms": 1793378427587,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_5",
+              "status": "completed"
+            },
+            "inventory_before": 3,
+            "inventory_after": 4,
+            "event_start": 397
+          }
+        },
+        {
+          "controller": "cycle_completed",
+          "time": 1793378447.5676863,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "cycle": 5,
+          "result": {
+            "target": "fdbe8e06",
+            "cooperative": false,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather"
+            },
+            "damage": {
+              "agent": 51
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "fdbe8e06"
+              },
+              "id": "1a18daed55d-dbfc-ead5ca7:66",
+              "kind": "monster_departure",
+              "session": "1a18daed55d-dbfc-ead5ca7:1",
+              "source": "openkore",
+              "time_ms": 1793378446217,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_9",
+              "status": "completed"
+            },
+            "inventory_before": 4,
+            "inventory_after": 5,
+            "event_start": 509
+          }
+        },
+        {
+          "controller": "manual_public_chat",
+          "time": 1793378465.3883061,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "sender": "agent",
+          "target": "third",
+          "text": "Name and one preference only, very briefly?"
+        },
+        {
+          "controller": "reply_ready",
+          "time": 1793378467.515486,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "who": "third",
+          "reply": {
+            "question": "Name and one preference only, very briefly?",
+            "session": "1a18daee701-c1f0-e14929f:1",
+            "started": 797421.453,
+            "external": null,
+            "topic": null,
+            "cold": true,
+            "error": "RuntimeError",
+            "text": "I don't know enough to answer that right now."
+          }
+        },
+        {
+          "controller": "reply_submitted",
+          "time": 1793378467.519719,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "who": "third",
+          "request": "c_11"
+        },
+        {
+          "controller": "reply_delivered",
+          "time": 1793378467.5928032,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "who": "third",
+          "result": {
+            "evidence": {
+              "text": "I don't know enough to answer that right now."
+            },
+            "reason": "server_chat_echo",
+            "request_id": "c_11",
+            "status": "completed"
+          }
+        },
+        {
+          "controller": "cycle_completed",
+          "time": 1793378468.902195,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "cycle": 6,
+          "result": {
+            "target": "0ebf8e06",
+            "cooperative": true,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather",
+              "peer": "flank_and_strike"
+            },
+            "damage": {
+              "agent": 34,
+              "peer": 17
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "0ebf8e06"
+              },
+              "id": "1a18daed55d-dbfc-ead5ca7:108",
+              "kind": "monster_departure",
+              "session": "1a18daed55d-dbfc-ead5ca7:1",
+              "source": "openkore",
+              "time_ms": 1793378467299,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_14",
+              "status": "completed"
+            },
+            "inventory_before": 5,
+            "inventory_after": 6,
+            "event_start": 603
+          }
+        },
+        {
+          "controller": "trade_result",
+          "time": 1793378496.891366,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "result": {
+            "id": "98fee208ee7d49e3b95a158eade33e26",
+            "before": {
+              "agent": {
+                "jellopy": 6,
+                "zeny": 140
+              },
+              "peer": {
+                "jellopy": 4,
+                "zeny": 60
+              }
+            },
+            "sessions": {
+              "agent": "1a18daed55d-dbfc-ead5ca7:1",
+              "peer": "1a18daede31-2ac8-38c19bd8:1"
+            },
+            "created": 1793378471.7618423,
+            "offer": "one Jellopy for ten Zeny",
+            "after": {
+              "agent": {
+                "jellopy": 5,
+                "zeny": 150
+              },
+              "peer": {
+                "jellopy": 5,
+                "zeny": 50
+              }
+            },
+            "authoritative": {
+              "agent": {
+                "jellopy": 5,
+                "zeny": 150
+              },
+              "peer": {
+                "jellopy": 5,
+                "zeny": 50
+              }
+            },
+            "reconciliation": "completed",
+            "observation_ids": {
+              "agent": "1a18db00b5b-fbb8-207b8855:6",
+              "peer": "1a18db01424-e75c-239e0bd9:6"
+            },
+            "commits": {
+              "agent": "c_20",
+              "peer": "c_8"
+            },
+            "completion_observations_discarded": false
+          }
+        },
+        {
+          "controller": "inference_circuit_reopened",
+          "time": 1793378497.5383914,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347"
+        },
+        {
+          "controller": "cycle_completed",
+          "time": 1793378508.6489482,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "cycle": 7,
+          "result": {
+            "target": "0fbf8e06",
+            "cooperative": false,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather"
+            },
+            "damage": {
+              "agent": 51
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "0fbf8e06"
+              },
+              "id": "1a18db00b5b-fbb8-207b8855:27",
+              "kind": "monster_departure",
+              "session": "1a18db00b5b-fbb8-207b8855:1",
+              "source": "openkore",
+              "time_ms": 1793378505683,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_5",
+              "status": "completed"
+            },
+            "inventory_before": 5,
+            "inventory_after": 6,
+            "event_start": 781
+          }
+        },
+        {
+          "controller": "stopping",
+          "time": 1793378520.2264438,
+          "run_id": "ac20bc5b2f18462faad1a69cf4874347",
+          "cycle": 7
+        }
+      ],
+      "ram_floor_gib": 13.492935180664062,
+      "gpu_peak_mib": 1199,
+      "segments": {
+        "events.jsonl": 535806
+      },
+      "source_manifest": {
+        "agent\\community.py": "5addb9787cdbefce3ac6d00bb029ba169a469c5d55663e2d9dd00c68affc8380",
+        "agent\\continuous.py": "06f2bc2cb7f43fb5ced0ebdab510850cc4638228b454c6d0c01147addb243664",
+        "agent\\dialogue.py": "685e151530793331dcf8f6d965683801268ae707964f0b7349799586b5a89b15",
+        "agent\\live_io.py": "aadb57cb425ba8192aa534e20c73ed4a603d4f409b0c8f08b623ebfb06c11d84",
+        "agent\\memory.py": "5d1fceb26af8c66b33014ed861f202482d0e86c64273f6bd03fb302c503c1771",
+        "agent\\prototype.py": "9f56035fd1334981620dce7b1cad8a308e7cd556e9f9096254e8fa9d6cbd8c70",
+        "agent\\routine.py": "2dfaa74ebfe7e488b543f4fe7d0fb91050883d04061859d9464c4688a9de5cce",
+        "agent\\trade.py": "f3000d68f34c2e02ee0b2136c7943f5d4718d17c366b3689bc6b7dbe94cf4c77",
+        "bridge\\openkore\\m1_bridge.pl": "9f4ab0862de25a30c9793b9961c4e6b713dd56f3fb7da20ffddb1761a20a528d",
+        "inference\\m2.py": "46e5eb2957762d6a2c46f341275334b16981504359ac16cee405f0c58702224c",
+        "inference\\m2_context.py": "d26d354ec4ad10f31888f4ded3110902e2b5ab77bd4e89a71f8fb42f84cc36af",
+        "inference\\web_search.py": "b1b1381fc6afa5366b7d4b1fb092f3878732be45ee2114fda918ef35cb8577c0",
+        "inference\\web_turn.py": "df728acf9de8205a35eac44c868ed490b0fefb62eddbd028273a1d94554a4fc2",
+        "bridge\\client.py": "75a98fc428ff4fc6397fd3114676540e510a722faa3b9890d27c9ad6652035d4",
+        "scripts\\live_m4.py": "e87bc8f743253114e77597e63e9d0740ebe609a0ba06e4d0ce98c368347dc427",
+        "scripts\\prepare_m4.py": "e3b9f087b9151b73d3f561b3a1b5d8d9efb5fe05a843db3b4efc2fd57c4bfac9",
+        "config\\m4-identities.json": "aa4fd21990562a52b6b20ca955ee72ba833ae8733319be8da749d14c825bd9fd",
+        "config\\m2-operating.json": "476315fab093a4b7280c9aed98f0ca1921af1765cb0b720cb68db602ba880617",
+        "config\\web-search.json": "f10db27a007663c6ebc6be7d4efc4ded3ebdb98566a377f99c231a4d4f4f180e"
+      },
+      "source_matches_current": {
+        "agent\\community.py": true,
+        "agent\\continuous.py": false,
+        "agent\\dialogue.py": false,
+        "agent\\live_io.py": false,
+        "agent\\memory.py": true,
+        "agent\\prototype.py": false,
+        "agent\\routine.py": true,
+        "agent\\trade.py": true,
+        "bridge\\openkore\\m1_bridge.pl": false,
+        "inference\\m2.py": true,
+        "inference\\m2_context.py": true,
+        "inference\\web_search.py": true,
+        "inference\\web_turn.py": true,
+        "bridge\\client.py": true,
+        "scripts\\live_m4.py": false,
+        "scripts\\prepare_m4.py": true,
+        "config\\m4-identities.json": true,
+        "config\\m2-operating.json": true,
+        "config\\web-search.json": true
+      }
+    },
+    {
+      "run_id": "8c81246d55db4a57b3433ef4e39f80c6",
+      "elapsed_s": 180.0,
+      "event_count": 877,
+      "cycle": 7,
+      "running": false,
+      "phase": "stopped",
+      "counters": {
+        "completed": 92,
+        "unknown": 0,
+        "rejected": 0,
+        "delivered_replies": 1,
+        "reconnections": 6,
+        "trade_completed": 2
+      },
+      "unresolved_trades": [],
+      "recent_replies": [
+        {
+          "who": "third",
+          "question": "Name and one preference only, very briefly?",
+          "session": "1a18db3bf07-5494-1fa088f5:1",
+          "started": 797707.734,
+          "external": null,
+          "topic": null,
+          "cold": true,
+          "error": "RuntimeError",
+          "text": "I don't know enough to answer that right now."
+        }
+      ],
+      "raw_directory": "D:\\Ragnarok Agents\\runtime\\evidence\\m4-continuous-3cb8e39",
+      "raw_sha256": {
+        "events.jsonl": "22c0261af4e21ab4d5335ede32ccc653ee4b00b2db4dd2544d1bfa6212c3f74f",
+        "manifest.json": "256a1c9d0a84848ca7cc803629695bebf797a2aab24ee1eb2469eab534f9059a",
+        "status.json": "03111a3d6882143819febf458de9a9eb1bad12fb8fc71c306c4e6f2ad7c5a4a7"
+      },
+      "controller_events": [
+        {
+          "controller": "stopping",
+          "time": 1793378911.349476,
+          "run_id": "8c81246d55db4a57b3433ef4e39f80c6",
+          "cycle": 7
+        }
+      ],
+      "ram_floor_gib": 13.04391860961914,
+      "gpu_peak_mib": 1281,
+      "segments": {
+        "events.jsonl": 20055
+      },
+      "source_manifest": {
+        "agent\\community.py": "5addb9787cdbefce3ac6d00bb029ba169a469c5d55663e2d9dd00c68affc8380",
+        "agent\\continuous.py": "2e31f795cbbc4ac8d47d4d752a090b1b466d7665ea4b7ccdf9a00c8107d7fe2b",
+        "agent\\dialogue.py": "685e151530793331dcf8f6d965683801268ae707964f0b7349799586b5a89b15",
+        "agent\\live_io.py": "1ef4fa41bf26f48ee26ae9eac3d322826fb6083350a126cdb6af6a11a90e0c29",
+        "agent\\memory.py": "5d1fceb26af8c66b33014ed861f202482d0e86c64273f6bd03fb302c503c1771",
+        "agent\\prototype.py": "5fb91cdd455d690ab9892b1b0d722209767293507b68f463bef78fbf9c05394f",
+        "agent\\routine.py": "2dfaa74ebfe7e488b543f4fe7d0fb91050883d04061859d9464c4688a9de5cce",
+        "agent\\trade.py": "f3000d68f34c2e02ee0b2136c7943f5d4718d17c366b3689bc6b7dbe94cf4c77",
+        "bridge\\openkore\\m1_bridge.pl": "55472248175b71655c1916c16794514e7bf6ad0a0e03c9e0cd08db1c53f0d454",
+        "bridge\\lib\\M4RequestWindow.pm": "a74e8edc4ce9d659d6a5f221cf38e4561507410db779e7e6cb23417edd582311",
+        "bridge\\lib\\Interface\\M1Headless.pm": "b49c5c1f8c9a0a54e46984df4e3849109f3f4b760bd6a07bd51cdfb9bb30db66",
+        "inference\\m2.py": "46e5eb2957762d6a2c46f341275334b16981504359ac16cee405f0c58702224c",
+        "inference\\m2_context.py": "d26d354ec4ad10f31888f4ded3110902e2b5ab77bd4e89a71f8fb42f84cc36af",
+        "inference\\web_search.py": "b1b1381fc6afa5366b7d4b1fb092f3878732be45ee2114fda918ef35cb8577c0",
+        "inference\\web_turn.py": "df728acf9de8205a35eac44c868ed490b0fefb62eddbd028273a1d94554a4fc2",
+        "bridge\\client.py": "75a98fc428ff4fc6397fd3114676540e510a722faa3b9890d27c9ad6652035d4",
+        "scripts\\live_m4.py": "3832494a8d7c19863659ac553595c8fa35220fa0b9084dae326d0a566363bbf5",
+        "scripts\\prepare_m4.py": "e3b9f087b9151b73d3f561b3a1b5d8d9efb5fe05a843db3b4efc2fd57c4bfac9",
+        "scripts\\m1.py": "b22f1e16801eb22a4d0ea292ead80180345a3bf6256baf0264945efc324d27ef",
+        "scripts\\bench_m2.py": "f628dd571c14ecf9908625a0b598d9bda33205084f2ba6b5f962dca8dbeb5b9a",
+        "fixtures\\m4-pve.txt": "51be98bd63557e9075209892b4db111e1b3f1a64ed358b561f125524dd0739e4",
+        "config\\m4-identities.json": "aa4fd21990562a52b6b20ca955ee72ba833ae8733319be8da749d14c825bd9fd",
+        "config\\m2-operating.json": "476315fab093a4b7280c9aed98f0ca1921af1765cb0b720cb68db602ba880617",
+        "config\\web-search.json": "f10db27a007663c6ebc6be7d4efc4ded3ebdb98566a377f99c231a4d4f4f180e"
+      },
+      "source_matches_current": {
+        "agent\\community.py": true,
+        "agent\\continuous.py": false,
+        "agent\\dialogue.py": false,
+        "agent\\live_io.py": true,
+        "agent\\memory.py": true,
+        "agent\\prototype.py": true,
+        "agent\\routine.py": true,
+        "agent\\trade.py": true,
+        "bridge\\openkore\\m1_bridge.pl": true,
+        "bridge\\lib\\M4RequestWindow.pm": true,
+        "bridge\\lib\\Interface\\M1Headless.pm": true,
+        "inference\\m2.py": true,
+        "inference\\m2_context.py": true,
+        "inference\\web_search.py": true,
+        "inference\\web_turn.py": true,
+        "bridge\\client.py": true,
+        "scripts\\live_m4.py": true,
+        "scripts\\prepare_m4.py": true,
+        "scripts\\m1.py": true,
+        "scripts\\bench_m2.py": true,
+        "fixtures\\m4-pve.txt": true,
+        "config\\m4-identities.json": true,
+        "config\\m2-operating.json": true,
+        "config\\web-search.json": true
+      }
+    },
+    {
+      "run_id": "d3ac8c2d253c40538091ba020f360683",
+      "elapsed_s": 51.938000000081956,
+      "event_count": 319,
+      "cycle": 3,
+      "running": false,
+      "phase": "stopped",
+      "counters": {
+        "completed": 30,
+        "unknown": 0,
+        "rejected": 0,
+        "delivered_replies": 1,
+        "reconnections": 0,
+        "trade_completed": 0
+      },
+      "unresolved_trades": [
+        "1e59f721b2d0459e92c442113a6b1113"
+      ],
+      "recent_replies": [
+        {
+          "who": "third",
+          "question": "Name and one preference only, very briefly?",
+          "session": "1a18ed05f19-eb18-3ac1fc40:1",
+          "started": 816344.5,
+          "external": null,
+          "topic": null,
+          "cold": true,
+          "text": "M4 Mira prefers trading in the evening.",
+          "metrics": {
+            "ttft_s": 13.51500000001397,
+            "service_s": 13.859000000054948,
+            "queue_s": 0.0,
+            "response_s": 13.859000000054948,
+            "prompt_eval_count": 737,
+            "eval_count": 15
+          },
+          "elapsed_s": 13.905999999959022
+        }
+      ],
+      "raw_directory": "D:\\Ragnarok Agents\\runtime\\evidence\\m4-continuous-final",
+      "raw_sha256": {
+        "events.jsonl": "d9fcacb14494ed3c50b764605c3aa1949f089d91b6c9a2c5e642a1b9d66eba32",
+        "events.jsonl.1": "e226ce25521e0259e9445f3b2c49efa6485cbe429c23bfda29cf389bde462376",
+        "manifest.json": "f881107b3e21889682516fc1b8ed55f23e83e8fa78824e66605e228b70209ef1",
+        "state_before_restart.json": "1ad5a22a4fdcb7b03ae93e4ac123fe10ff2c5fce94625aa792499c3feff09d80",
+        "status.json": "0e5d28790889659551efef450aa440fe51ed0d3b97a64ed727e0f02fb317d66e",
+        "stop_observation.json": "621c4b494a6834f914365e6f74cb847a44ed6ea0b0cf38ed293316d1f7e59f9e",
+        "watch_m4_stop.py": "a98754207e85080d78d39ec9f137893e9900f61bcea6e12ad065352c2efa9be2"
+      },
+      "controller_events": [
+        {
+          "controller": "manual_public_chat",
+          "time": 1793397388.3940325,
+          "run_id": "d3ac8c2d253c40538091ba020f360683",
+          "sender": "agent",
+          "target": "third",
+          "text": "Name and one preference only, very briefly?"
+        },
+        {
+          "controller": "cycle_completed",
+          "time": 1793397394.1787825,
+          "run_id": "d3ac8c2d253c40538091ba020f360683",
+          "cycle": 1,
+          "result": {
+            "target": "5fbf8e06",
+            "cooperative": false,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather"
+            },
+            "damage": {
+              "agent": 51
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "5fbf8e06"
+              },
+              "id": "1a18ed04617-49d8-3905176e:26",
+              "kind": "monster_departure",
+              "session": "1a18ed04617-49d8-3905176e:1",
+              "source": "openkore",
+              "time_ms": 1793397393115,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_5",
+              "status": "completed"
+            },
+            "inventory_before": 11,
+            "inventory_after": 12,
+            "event_start": 20
+          }
+        },
+        {
+          "controller": "manual_public_chat",
+          "time": 1793397396.4933507,
+          "run_id": "d3ac8c2d253c40538091ba020f360683",
+          "sender": "agent",
+          "target": "third",
+          "text": "Remember my trail marker is ambercone. Reply briefly."
+        },
+        {
+          "controller": "reply_ready",
+          "time": 1793397402.3843148,
+          "run_id": "d3ac8c2d253c40538091ba020f360683",
+          "who": "third",
+          "reply": {
+            "question": "Name and one preference only, very briefly?",
+            "session": "1a18ed05f19-eb18-3ac1fc40:1",
+            "started": 816344.5,
+            "external": null,
+            "topic": null,
+            "cold": true,
+            "text": "M4 Mira prefers trading in the evening.",
+            "metrics": {
+              "ttft_s": 13.51500000001397,
+              "service_s": 13.859000000054948,
+              "queue_s": 0.0,
+              "response_s": 13.859000000054948,
+              "prompt_eval_count": 737,
+              "eval_count": 15
+            },
+            "elapsed_s": 13.905999999959022
+          }
+        },
+        {
+          "controller": "reply_submitted",
+          "time": 1793397402.3884478,
+          "run_id": "d3ac8c2d253c40538091ba020f360683",
+          "who": "third",
+          "request": "c_4"
+        },
+        {
+          "controller": "reply_delivered",
+          "time": 1793397402.440531,
+          "run_id": "d3ac8c2d253c40538091ba020f360683",
+          "who": "third",
+          "result": {
+            "evidence": {
+              "text": "M4 Mira prefers trading in the evening."
+            },
+            "reason": "server_chat_echo",
+            "request_id": "c_4",
+            "status": "completed"
+          }
+        },
+        {
+          "controller": "cycle_completed",
+          "time": 1793397414.4787946,
+          "run_id": "d3ac8c2d253c40538091ba020f360683",
+          "cycle": 2,
+          "result": {
+            "target": "56ca8e06",
+            "cooperative": true,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather",
+              "peer": "flank_and_strike"
+            },
+            "damage": {
+              "agent": 34,
+              "peer": 17
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "56ca8e06"
+              },
+              "id": "1a18ed04617-49d8-3905176e:67",
+              "kind": "monster_departure",
+              "session": "1a18ed04617-49d8-3905176e:1",
+              "source": "openkore",
+              "time_ms": 1793397413187,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_10",
+              "status": "completed"
+            },
+            "inventory_before": 12,
+            "inventory_after": 13,
+            "event_start": 136
+          }
+        },
+        {
+          "controller": "cycle_completed",
+          "time": 1793397433.9320753,
+          "run_id": "d3ac8c2d253c40538091ba020f360683",
+          "cycle": 3,
+          "result": {
+            "target": "57ca8e06",
+            "cooperative": false,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather"
+            },
+            "damage": {
+              "agent": 51
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "57ca8e06"
+              },
+              "id": "1a18ed04617-49d8-3905176e:102",
+              "kind": "monster_departure",
+              "session": "1a18ed04617-49d8-3905176e:1",
+              "source": "openkore",
+              "time_ms": 1793397432418,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_14",
+              "status": "completed"
+            },
+            "inventory_before": 13,
+            "inventory_after": 14,
+            "event_start": 251
+          }
+        },
+        {
+          "controller": "stopping",
+          "time": 1793397437.339295,
+          "run_id": "d3ac8c2d253c40538091ba020f360683",
+          "cycle": 3
+        }
+      ],
+      "ram_floor_gib": 8.612651824951172,
+      "gpu_peak_mib": 9851,
+      "segments": {
+        "events.jsonl": 206499,
+        "events.jsonl.1": 1048072
+      },
+      "source_manifest": {
+        "agent\\community.py": "5addb9787cdbefce3ac6d00bb029ba169a469c5d55663e2d9dd00c68affc8380",
+        "agent\\continuous.py": "bf31bc14fafa92ca5d4f967caf97a0bf64a4f5e6b8e756dd5cf844f67ec06fa1",
+        "agent\\dialogue.py": "9e4c37d3d31519099f0f8b53f4830fa347285e9f3aa3cf6483f7c26a37ec2a2f",
+        "agent\\live_io.py": "1ef4fa41bf26f48ee26ae9eac3d322826fb6083350a126cdb6af6a11a90e0c29",
+        "agent\\memory.py": "5d1fceb26af8c66b33014ed861f202482d0e86c64273f6bd03fb302c503c1771",
+        "agent\\prototype.py": "5fb91cdd455d690ab9892b1b0d722209767293507b68f463bef78fbf9c05394f",
+        "agent\\routine.py": "2dfaa74ebfe7e488b543f4fe7d0fb91050883d04061859d9464c4688a9de5cce",
+        "agent\\trade.py": "f3000d68f34c2e02ee0b2136c7943f5d4718d17c366b3689bc6b7dbe94cf4c77",
+        "bridge\\openkore\\m1_bridge.pl": "55472248175b71655c1916c16794514e7bf6ad0a0e03c9e0cd08db1c53f0d454",
+        "bridge\\lib\\M4RequestWindow.pm": "a74e8edc4ce9d659d6a5f221cf38e4561507410db779e7e6cb23417edd582311",
+        "bridge\\lib\\Interface\\M1Headless.pm": "b49c5c1f8c9a0a54e46984df4e3849109f3f4b760bd6a07bd51cdfb9bb30db66",
+        "inference\\m2.py": "46e5eb2957762d6a2c46f341275334b16981504359ac16cee405f0c58702224c",
+        "inference\\m2_context.py": "d26d354ec4ad10f31888f4ded3110902e2b5ab77bd4e89a71f8fb42f84cc36af",
+        "inference\\web_search.py": "b1b1381fc6afa5366b7d4b1fb092f3878732be45ee2114fda918ef35cb8577c0",
+        "inference\\web_turn.py": "df728acf9de8205a35eac44c868ed490b0fefb62eddbd028273a1d94554a4fc2",
+        "bridge\\client.py": "75a98fc428ff4fc6397fd3114676540e510a722faa3b9890d27c9ad6652035d4",
+        "scripts\\live_m4.py": "3832494a8d7c19863659ac553595c8fa35220fa0b9084dae326d0a566363bbf5",
+        "scripts\\prepare_m4.py": "e3b9f087b9151b73d3f561b3a1b5d8d9efb5fe05a843db3b4efc2fd57c4bfac9",
+        "scripts\\m1.py": "b22f1e16801eb22a4d0ea292ead80180345a3bf6256baf0264945efc324d27ef",
+        "scripts\\bench_m2.py": "f628dd571c14ecf9908625a0b598d9bda33205084f2ba6b5f962dca8dbeb5b9a",
+        "fixtures\\m4-pve.txt": "51be98bd63557e9075209892b4db111e1b3f1a64ed358b561f125524dd0739e4",
+        "config\\m4-identities.json": "aa4fd21990562a52b6b20ca955ee72ba833ae8733319be8da749d14c825bd9fd",
+        "config\\m2-operating.json": "476315fab093a4b7280c9aed98f0ca1921af1765cb0b720cb68db602ba880617",
+        "config\\web-search.json": "f10db27a007663c6ebc6be7d4efc4ded3ebdb98566a377f99c231a4d4f4f180e"
+      },
+      "source_matches_current": {
+        "agent\\community.py": true,
+        "agent\\continuous.py": true,
+        "agent\\dialogue.py": true,
+        "agent\\live_io.py": true,
+        "agent\\memory.py": true,
+        "agent\\prototype.py": true,
+        "agent\\routine.py": true,
+        "agent\\trade.py": true,
+        "bridge\\openkore\\m1_bridge.pl": true,
+        "bridge\\lib\\M4RequestWindow.pm": true,
+        "bridge\\lib\\Interface\\M1Headless.pm": true,
+        "inference\\m2.py": true,
+        "inference\\m2_context.py": true,
+        "inference\\web_search.py": true,
+        "inference\\web_turn.py": true,
+        "bridge\\client.py": true,
+        "scripts\\live_m4.py": true,
+        "scripts\\prepare_m4.py": true,
+        "scripts\\m1.py": true,
+        "scripts\\bench_m2.py": true,
+        "fixtures\\m4-pve.txt": true,
+        "config\\m4-identities.json": true,
+        "config\\m2-operating.json": true,
+        "config\\web-search.json": true
+      }
+    },
+    {
+      "run_id": "590e0797b6a04495b28b2c72981b722b",
+      "elapsed_s": 51.81200000003446,
+      "event_count": 212,
+      "cycle": 2,
+      "running": false,
+      "phase": "stopped",
+      "counters": {
+        "completed": 18,
+        "unknown": 0,
+        "rejected": 0,
+        "delivered_replies": 1,
+        "reconnections": 3,
+        "trade_completed": 0
+      },
+      "unresolved_trades": [],
+      "recent_replies": [
+        {
+          "who": "third",
+          "question": "What trail marker did I mention?",
+          "session": "1a18ed2b992-47d4-2bcf9c12:1",
+          "started": 816500.062,
+          "external": null,
+          "topic": null,
+          "cold": true,
+          "text": "You mentioned your trail marker is an ambercone.",
+          "metrics": {
+            "ttft_s": 0.640999999945052,
+            "service_s": 1.015999999945052,
+            "queue_s": 0.0,
+            "response_s": 1.015999999945052,
+            "prompt_eval_count": 741,
+            "eval_count": 16
+          },
+          "elapsed_s": 1.077999999979511
+        }
+      ],
+      "raw_directory": "D:\\Ragnarok Agents\\runtime\\evidence\\m4-continuous-restart",
+      "raw_sha256": {
+        "events.jsonl": "c96d2d6dc3ab926aa43e8b1c004ce6f116b5bb6290a01be7548b86ce73b11312",
+        "events.jsonl.1": "e226ce25521e0259e9445f3b2c49efa6485cbe429c23bfda29cf389bde462376",
+        "manifest.json": "f881107b3e21889682516fc1b8ed55f23e83e8fa78824e66605e228b70209ef1",
+        "state_after_restart.json": "62cc41f6b16d640cc56ea1f26cabe356a4e87ff761c11b7af39ad8255fd01abc",
+        "status.json": "55faf3cd0d73cd6664727f6c840cf0fdde2b52b22f511615d9521ca83b8a2abc",
+        "watch_m4_restart.py": "9caed86aa8bb2731e437e585789168d88f43dd977a801784457e45830da80016"
+      },
+      "controller_events": [
+        {
+          "controller": "trade_result",
+          "time": 1793397542.5437317,
+          "run_id": "590e0797b6a04495b28b2c72981b722b",
+          "result": {
+            "recovered_only": [
+              {
+                "before": {
+                  "agent": {
+                    "jellopy": 14,
+                    "zeny": 170
+                  },
+                  "peer": {
+                    "jellopy": 7,
+                    "zeny": 30
+                  }
+                },
+                "sessions": {
+                  "agent": "1a18ed04617-49d8-3905176e:1",
+                  "peer": "1a18ed05415-c328-3cf4b1b1:1"
+                },
+                "created": 1793397436.8680863,
+                "offer": "one Jellopy for ten Zeny",
+                "after": {
+                  "agent": {
+                    "jellopy": 14,
+                    "zeny": 170
+                  },
+                  "peer": {
+                    "jellopy": 7,
+                    "zeny": 30
+                  }
+                },
+                "authoritative": {
+                  "agent": {
+                    "jellopy": 14,
+                    "zeny": 170
+                  },
+                  "peer": {
+                    "jellopy": 7,
+                    "zeny": 30
+                  }
+                },
+                "reconciliation": "not_applied",
+                "observation_ids": {
+                  "agent": "1a18ed2a7d1-38a0-7c5f1b5:6",
+                  "peer": "1a18ed2b0cb-3e88-1f5a70aa:6"
+                }
+              }
+            ],
+            "new_transfer_attempted": false
+          }
+        },
+        {
+          "controller": "manual_public_chat",
+          "time": 1793397543.969045,
+          "run_id": "590e0797b6a04495b28b2c72981b722b",
+          "sender": "agent",
+          "target": "third",
+          "text": "What trail marker did I mention?"
+        },
+        {
+          "controller": "reply_ready",
+          "time": 1793397545.118049,
+          "run_id": "590e0797b6a04495b28b2c72981b722b",
+          "who": "third",
+          "reply": {
+            "question": "What trail marker did I mention?",
+            "session": "1a18ed2b992-47d4-2bcf9c12:1",
+            "started": 816500.062,
+            "external": null,
+            "topic": null,
+            "cold": true,
+            "text": "You mentioned your trail marker is an ambercone.",
+            "metrics": {
+              "ttft_s": 0.640999999945052,
+              "service_s": 1.015999999945052,
+              "queue_s": 0.0,
+              "response_s": 1.015999999945052,
+              "prompt_eval_count": 741,
+              "eval_count": 16
+            },
+            "elapsed_s": 1.077999999979511
+          }
+        },
+        {
+          "controller": "reply_submitted",
+          "time": 1793397545.1217947,
+          "run_id": "590e0797b6a04495b28b2c72981b722b",
+          "who": "third",
+          "request": "c_2"
+        },
+        {
+          "controller": "reply_delivered",
+          "time": 1793397545.2141287,
+          "run_id": "590e0797b6a04495b28b2c72981b722b",
+          "who": "third",
+          "result": {
+            "evidence": {
+              "text": "You mentioned your trail marker is an ambercone."
+            },
+            "reason": "server_chat_echo",
+            "request_id": "c_2",
+            "status": "completed"
+          }
+        },
+        {
+          "controller": "cycle_completed",
+          "time": 1793397549.014582,
+          "run_id": "590e0797b6a04495b28b2c72981b722b",
+          "cycle": 1,
+          "result": {
+            "target": "58ca8e06",
+            "cooperative": false,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather"
+            },
+            "damage": {
+              "agent": 51
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "58ca8e06"
+              },
+              "id": "1a18ed2a7d1-38a0-7c5f1b5:27",
+              "kind": "monster_departure",
+              "session": "1a18ed2a7d1-38a0-7c5f1b5:1",
+              "source": "openkore",
+              "time_ms": 1793397547314,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_5",
+              "status": "completed"
+            },
+            "inventory_before": 14,
+            "inventory_after": 15,
+            "event_start": 42
+          }
+        },
+        {
+          "controller": "cycle_completed",
+          "time": 1793397569.2881293,
+          "run_id": "590e0797b6a04495b28b2c72981b722b",
+          "cycle": 2,
+          "result": {
+            "target": "69ca8e06",
+            "cooperative": true,
+            "goal_chosen_by": "agent",
+            "roles": {
+              "agent": "lead_and_gather",
+              "peer": "flank_and_strike"
+            },
+            "damage": {
+              "agent": 34,
+              "peer": 17
+            },
+            "death": {
+              "agent_id": "agent",
+              "data": {
+                "dead": 1,
+                "name_id": 1002,
+                "target": "69ca8e06"
+              },
+              "id": "1a18ed2a7d1-38a0-7c5f1b5:64",
+              "kind": "monster_departure",
+              "session": "1a18ed2a7d1-38a0-7c5f1b5:1",
+              "source": "openkore",
+              "time_ms": 1793397568063,
+              "v": 1
+            },
+            "loot": {
+              "evidence": {
+                "amount": 1,
+                "name_id": 909
+              },
+              "reason": "server_inventory_add",
+              "request_id": "c_9",
+              "status": "completed"
+            },
+            "inventory_before": 15,
+            "inventory_after": 16,
+            "event_start": 157
+          }
+        },
+        {
+          "controller": "stopping",
+          "time": 1793397569.9180775,
+          "run_id": "590e0797b6a04495b28b2c72981b722b",
+          "cycle": 2
+        }
+      ],
+      "ram_floor_gib": 7.92108154296875,
+      "gpu_peak_mib": 9703,
+      "segments": {
+        "events.jsonl": 330087,
+        "events.jsonl.1": 1048072
+      },
+      "source_manifest": {
+        "agent\\community.py": "5addb9787cdbefce3ac6d00bb029ba169a469c5d55663e2d9dd00c68affc8380",
+        "agent\\continuous.py": "bf31bc14fafa92ca5d4f967caf97a0bf64a4f5e6b8e756dd5cf844f67ec06fa1",
+        "agent\\dialogue.py": "9e4c37d3d31519099f0f8b53f4830fa347285e9f3aa3cf6483f7c26a37ec2a2f",
+        "agent\\live_io.py": "1ef4fa41bf26f48ee26ae9eac3d322826fb6083350a126cdb6af6a11a90e0c29",
+        "agent\\memory.py": "5d1fceb26af8c66b33014ed861f202482d0e86c64273f6bd03fb302c503c1771",
+        "agent\\prototype.py": "5fb91cdd455d690ab9892b1b0d722209767293507b68f463bef78fbf9c05394f",
+        "agent\\routine.py": "2dfaa74ebfe7e488b543f4fe7d0fb91050883d04061859d9464c4688a9de5cce",
+        "agent\\trade.py": "f3000d68f34c2e02ee0b2136c7943f5d4718d17c366b3689bc6b7dbe94cf4c77",
+        "bridge\\openkore\\m1_bridge.pl": "55472248175b71655c1916c16794514e7bf6ad0a0e03c9e0cd08db1c53f0d454",
+        "bridge\\lib\\M4RequestWindow.pm": "a74e8edc4ce9d659d6a5f221cf38e4561507410db779e7e6cb23417edd582311",
+        "bridge\\lib\\Interface\\M1Headless.pm": "b49c5c1f8c9a0a54e46984df4e3849109f3f4b760bd6a07bd51cdfb9bb30db66",
+        "inference\\m2.py": "46e5eb2957762d6a2c46f341275334b16981504359ac16cee405f0c58702224c",
+        "inference\\m2_context.py": "d26d354ec4ad10f31888f4ded3110902e2b5ab77bd4e89a71f8fb42f84cc36af",
+        "inference\\web_search.py": "b1b1381fc6afa5366b7d4b1fb092f3878732be45ee2114fda918ef35cb8577c0",
+        "inference\\web_turn.py": "df728acf9de8205a35eac44c868ed490b0fefb62eddbd028273a1d94554a4fc2",
+        "bridge\\client.py": "75a98fc428ff4fc6397fd3114676540e510a722faa3b9890d27c9ad6652035d4",
+        "scripts\\live_m4.py": "3832494a8d7c19863659ac553595c8fa35220fa0b9084dae326d0a566363bbf5",
+        "scripts\\prepare_m4.py": "e3b9f087b9151b73d3f561b3a1b5d8d9efb5fe05a843db3b4efc2fd57c4bfac9",
+        "scripts\\m1.py": "b22f1e16801eb22a4d0ea292ead80180345a3bf6256baf0264945efc324d27ef",
+        "scripts\\bench_m2.py": "f628dd571c14ecf9908625a0b598d9bda33205084f2ba6b5f962dca8dbeb5b9a",
+        "fixtures\\m4-pve.txt": "51be98bd63557e9075209892b4db111e1b3f1a64ed358b561f125524dd0739e4",
+        "config\\m4-identities.json": "aa4fd21990562a52b6b20ca955ee72ba833ae8733319be8da749d14c825bd9fd",
+        "config\\m2-operating.json": "476315fab093a4b7280c9aed98f0ca1921af1765cb0b720cb68db602ba880617",
+        "config\\web-search.json": "f10db27a007663c6ebc6be7d4efc4ded3ebdb98566a377f99c231a4d4f4f180e"
+      },
+      "source_matches_current": {
+        "agent\\community.py": true,
+        "agent\\continuous.py": true,
+        "agent\\dialogue.py": true,
+        "agent\\live_io.py": true,
+        "agent\\memory.py": true,
+        "agent\\prototype.py": true,
+        "agent\\routine.py": true,
+        "agent\\trade.py": true,
+        "bridge\\openkore\\m1_bridge.pl": true,
+        "bridge\\lib\\M4RequestWindow.pm": true,
+        "bridge\\lib\\Interface\\M1Headless.pm": true,
+        "inference\\m2.py": true,
+        "inference\\m2_context.py": true,
+        "inference\\web_search.py": true,
+        "inference\\web_turn.py": true,
+        "bridge\\client.py": true,
+        "scripts\\live_m4.py": true,
+        "scripts\\prepare_m4.py": true,
+        "scripts\\m1.py": true,
+        "scripts\\bench_m2.py": true,
+        "fixtures\\m4-pve.txt": true,
+        "config\\m4-identities.json": true,
+        "config\\m2-operating.json": true,
+        "config\\web-search.json": true
+      }
+    }
+  ],
+  "legacy_runs": [
+    {
+      "raw_directory": "D:\\Ragnarok Agents\\runtime\\evidence\\m4-20261030T220001Z",
+      "summary": {
+        "mode": "trade",
+        "trade_fault": null,
+        "functional_complete": false,
+        "trade": {
+          "id": "543d31b4614d46b582254f6486c02c5f",
+          "before": {
+            "agent": {
+              "jellopy": 16,
+              "zeny": 170
+            },
+            "peer": {
+              "jellopy": 7,
+              "zeny": 30
+            }
+          },
+          "sessions": {
+            "agent": "1a18ed2a7d1-38a0-7c5f1b5:1",
+            "peer": "1a18ed2b0cb-3e88-1f5a70aa:1"
+          },
+          "created": 1793397605.2057037,
+          "offer": "one Jellopy for ten Zeny",
+          "after": {
+            "agent": {
+              "jellopy": 15,
+              "zeny": 180
+            },
+            "peer": {
+              "jellopy": 8,
+              "zeny": 20
+            }
+          },
+          "authoritative": {
+            "agent": {
+              "jellopy": 15,
+              "zeny": 180
+            },
+            "peer": {
+              "jellopy": 8,
+              "zeny": 20
+            }
+          },
+          "reconciliation": "completed",
+          "observation_ids": {
+            "agent": "1a18ed40655-fa68-8598a5e:6",
+            "peer": "1a18ed40f27-96cc-3643dd9b:6"
+          },
+          "commits": {
+            "agent": "6049511392d34223a31a45c37b468dbe",
+            "peer": "b2cfa1bf80fc4e28b3b81c8cc67412d4"
+          },
+          "completion_observations_discarded": false
+        },
+        "elapsed_s": 30.10999999998603,
+        "resources": [
+          {
+            "elapsed_s": 0.01600000006146729,
+            "ram_total": 34204610560,
+            "ram_available": 10758774784,
+            "ram_used": 23445835776,
+            "ollama": {
+              "ws": 3645079552,
+              "private": 13153116160,
+              "pids": [
+                500,
+                65040,
+                65256,
+                28728
+              ]
+            },
+            "m1": {
+              "ws": 0,
+              "private": 0,
+              "pids": []
+            },
+            "gpu_used_mib": 9690
+          },
+          {
+            "elapsed_s": 5.047000000020489,
+            "ram_total": 34204610560,
+            "ram_available": 11166871552,
+            "ram_used": 23037739008,
+            "ollama": {
+              "ws": 3232636928,
+              "private": 12709199872,
+              "pids": [
+                500,
+                65040,
+                65256
+              ]
+            },
+            "m1": {
+              "ws": 0,
+              "private": 0,
+              "pids": []
+            },
+            "gpu_used_mib": 9654
+          },
+          {
+            "elapsed_s": 26.40700000000652,
+            "ram_total": 34204610560,
+            "ram_available": 12589391872,
+            "ram_used": 21615218688,
+            "ollama": {
+              "ws": 1949786112,
+              "private": 11423846400,
+              "pids": [
+                500,
+                65040,
+                65256
+              ]
+            },
+            "m1": {
+              "ws": 0,
+              "private": 0,
+              "pids": []
+            },
+            "gpu_used_mib": 9663
+          }
+        ],
+        "event_count": 87
+      },
+      "raw_sha256": {
+        "events.jsonl": "9ff8bf1b135023d56319a87edc0c4878c11a491fe1b74a54bdf7534956d0692a",
+        "manifest.json": "646cd0870e7c2b1240dc2d888e11471789171890da7abf5d3d54678873ad3f05",
+        "summary.json": "3db0038e00a1acc3022e791402994da19c2e287d22e22c141ca08f89d627e106"
+      }
+    },
+    {
+      "raw_directory": "D:\\Ragnarok Agents\\runtime\\evidence\\m4-20261030T220032Z",
+      "summary": {
+        "mode": "observe",
+        "trade_fault": null,
+        "functional_complete": false,
+        "snapshots": {
+          "agent": {
+            "agent_id": "agent",
+            "data": {
+              "connected": 1,
+              "deal": {
+                "incoming": "",
+                "name": "",
+                "other_item": 0,
+                "other_locked": 0,
+                "other_zeny": 0,
+                "you_item": 0,
+                "you_locked": 0,
+                "you_zeny": 0
+              },
+              "destination": {
+                "x": 154,
+                "y": 179
+              },
+              "field": {
+                "height": 392,
+                "width": 312
+              },
+              "ground_items": [],
+              "hp": 94,
+              "hp_max": 94,
+              "inventory": [
+                {
+                  "amount": 15,
+                  "name": "\uc824\ub85c\ud53c",
+                  "name_id": 909
+                }
+              ],
+              "inventory_ready": 1,
+              "map": "prontera",
+              "monsters": [
+                {
+                  "id": "6aca8e06",
+                  "name": "M4 Poring",
+                  "name_id": 1002,
+                  "x": 154,
+                  "y": 180
+                }
+              ],
+              "name": "M4 Alden",
+              "players": [
+                {
+                  "id": "8b841e00",
+                  "name": "M4 Bram",
+                  "x": 153,
+                  "y": 180
+                },
+                {
+                  "id": "8c841e00",
+                  "name": "M4 Mira",
+                  "x": 152,
+                  "y": 180
+                }
+              ],
+              "position": {
+                "x": 154,
+                "y": 179
+              },
+              "zeny": 180
+            },
+            "id": "1a18ed40655-fa68-8598a5e:13",
+            "kind": "snapshot",
+            "session": "1a18ed40655-fa68-8598a5e:1",
+            "source": "openkore",
+            "time_ms": 1793397636592,
+            "v": 1
+          },
+          "peer": {
+            "agent_id": "peer",
+            "data": {
+              "connected": 1,
+              "deal": {
+                "incoming": "",
+                "name": "",
+                "other_item": 0,
+                "other_locked": 0,
+                "other_zeny": 0,
+                "you_item": 0,
+                "you_locked": 0,
+                "you_zeny": 0
+              },
+              "destination": {
+                "x": 153,
+                "y": 180
+              },
+              "field": {
+                "height": 392,
+                "width": 312
+              },
+              "ground_items": [],
+              "hp": 94,
+              "hp_max": 94,
+              "inventory": [
+                {
+                  "amount": 8,
+                  "name": "\uc824\ub85c\ud53c",
+                  "name_id": 909
+                }
+              ],
+              "inventory_ready": 1,
+              "map": "prontera",
+              "monsters": [
+                {
+                  "id": "6aca8e06",
+                  "name": "M4 Poring",
+                  "name_id": 1002,
+                  "x": 154,
+                  "y": 180
+                }
+              ],
+              "name": "M4 Bram",
+              "players": [
+                {
+                  "id": "8a841e00",
+                  "name": "M4 Alden",
+                  "x": 154,
+                  "y": 179
+                },
+                {
+                  "id": "8c841e00",
+                  "name": "M4 Mira",
+                  "x": 152,
+                  "y": 180
+                }
+              ],
+              "position": {
+                "x": 153,
+                "y": 180
+              },
+              "zeny": 20
+            },
+            "id": "1a18ed40f27-96cc-3643dd9b:13",
+            "kind": "snapshot",
+            "session": "1a18ed40f27-96cc-3643dd9b:1",
+            "source": "openkore",
+            "time_ms": 1793397636561,
+            "v": 1
+          },
+          "third": {
+            "agent_id": "third",
+            "data": {
+              "connected": 1,
+              "deal": {
+                "incoming": "",
+                "name": "",
+                "other_item": 0,
+                "other_locked": 0,
+                "other_zeny": 0,
+                "you_item": 0,
+                "you_locked": 0,
+                "you_zeny": 0
+              },
+              "destination": {
+                "x": 152,
+                "y": 180
+              },
+              "field": {
+                "height": 392,
+                "width": 312
+              },
+              "ground_items": [],
+              "hp": 94,
+              "hp_max": 94,
+              "inventory": [],
+              "inventory_ready": 1,
+              "map": "prontera",
+              "monsters": [
+                {
+                  "id": "6aca8e06",
+                  "name": "M4 Poring",
+                  "name_id": 1002,
+                  "x": 154,
+                  "y": 180
+                }
+              ],
+              "name": "M4 Mira",
+              "players": [
+                {
+                  "id": "8b841e00",
+                  "name": "M4 Bram",
+                  "x": 153,
+                  "y": 180
+                },
+                {
+                  "id": "8a841e00",
+                  "name": "M4 Alden",
+                  "x": 154,
+                  "y": 179
+                }
+              ],
+              "position": {
+                "x": 152,
+                "y": 180
+              },
+              "zeny": 100
+            },
+            "id": "1a18ed417d4-ec30-ba91d50:15",
+            "kind": "snapshot",
+            "session": "1a18ed417d4-ec30-ba91d50:1",
+            "source": "openkore",
+            "time_ms": 1793397636592,
+            "v": 1
+          }
+        },
+        "elapsed_s": 4.75,
+        "resources": [
+          {
+            "elapsed_s": 0.015000000013969839,
+            "ram_total": 34204610560,
+            "ram_available": 12585832448,
+            "ram_used": 21618778112,
+            "ollama": {
+              "ws": 1949786112,
+              "private": 11423846400,
+              "pids": [
+                500,
+                65040,
+                65256
+              ]
+            },
+            "m1": {
+              "ws": 0,
+              "private": 0,
+              "pids": []
+            },
+            "gpu_used_mib": 9706
+          }
+        ],
+        "event_count": 21
+      },
+      "raw_sha256": {
+        "events.jsonl": "82b6bcd4395dc5d1bb705ed62cf6ff167279fc78c480f3561b5b2425569d802b",
+        "manifest.json": "646cd0870e7c2b1240dc2d888e11471789171890da7abf5d3d54678873ad3f05",
+        "summary.json": "796a38615b1d2745e2c3df0f0a26c9a3b5cd2ff52d03964b83973ee15a102f08"
+      }
+    },
+    {
+      "raw_directory": "D:\\Ragnarok Agents\\runtime\\evidence\\m4-20261030T220037Z",
+      "summary": {
+        "mode": "web",
+        "trade_fault": null,
+        "functional_complete": false,
+        "web": {
+          "who": "third",
+          "question": "web poring",
+          "session": "1a18ed417d4-ec30-ba91d50:1",
+          "started": 816596.5,
+          "external": null,
+          "topic": "poring",
+          "error": "SearchUnavailable",
+          "detail": "public search unavailable",
+          "text": "I don't know enough to answer that right now."
+        },
+        "elapsed_s": 5.282000000006519,
+        "resources": [
+          {
+            "elapsed_s": 0.03200000000651926,
+            "ram_total": 34204610560,
+            "ram_available": 12500881408,
+            "ram_used": 21703729152,
+            "ollama": {
+              "ws": 1960738816,
+              "private": 11460067328,
+              "pids": [
+                500,
+                65040,
+                65256,
+                46828
+              ]
+            },
+            "m1": {
+              "ws": 0,
+              "private": 0,
+              "pids": []
+            },
+            "gpu_used_mib": 9891
+          },
+          {
+            "elapsed_s": 5.063000000081956,
+            "ram_total": 34204610560,
+            "ram_available": 12508987392,
+            "ram_used": 21695623168,
+            "ollama": {
+              "ws": 1949982720,
+              "private": 11423911936,
+              "pids": [
+                500,
+                65040,
+                65256
+              ]
+            },
+            "m1": {
+              "ws": 0,
+              "private": 0,
+              "pids": []
+            },
+            "gpu_used_mib": 9626
+          }
+        ],
+        "event_count": 34
+      },
+      "raw_sha256": {
+        "events.jsonl": "5c81fe620240e9854e312e2057332d729fa9eb307340b04e53f9d230f00f73c4",
+        "manifest.json": "646cd0870e7c2b1240dc2d888e11471789171890da7abf5d3d54678873ad3f05",
+        "summary.json": "4c2458235e9ed0f7f29adceb284435252fb4974584ec7a34d639249d14585048"
+      }
+    }
+  ],
+  "handoff": {
+    "controller": "stopped",
+    "native_services_and_test_clients": "available",
+    "selected_model_digest_verified": true,
+    "searxng": "unavailable; existing Docker Linux backend did not remain running",
+    "graphical_client_verified": false,
+    "one_hour_trial": "deferred",
+    "social_quality": "deferred",
+    "M5": "not started"
+  }
+}

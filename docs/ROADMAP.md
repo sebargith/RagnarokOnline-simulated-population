@@ -78,6 +78,14 @@ each consequential action. Demonstrate the end-to-end prototype before richer
 social polish or a one-hour stabilization trial. Neither is a prerequisite
 to implementing these slices.
 
+Chat 06 adds the continuous-runtime slice within M4: one owner for Alden,
+Bram and Mira, repeated bounded fixture gameplay, addressed player-chat replies
+while inference is pending, start/stop/observation controls, bounded request and
+evidence retention, reconnect backoff, and restart reconciliation without
+transfer replay. Its short checks and remaining limits are recorded in
+[continuous evidence](evidence/M4-continuous.md). It does not replace the deferred
+social-quality review or one-hour trial below, and does not authorize M5.
+
 Full M4 acceptance, after the functional prototype:
 
 - Three agents retain distinct identities, preferences, schedules, relationships and memories across restart. They pass isolation, load, conversation-turn and reconnect checks without runaway chat or unbounded memory/queues. Only one agent initially learns a test fact; the others learn it only through a recorded information path.

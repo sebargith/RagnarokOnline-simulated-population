@@ -43,15 +43,21 @@ WHERE WE ARE
          naturalness/social acceptance to prioritize a working prototype;
          those quality findings are not a pass.
 
-  [FUNCTIONAL PROTOTYPE] M4 - End-to-end demonstration complete.
-         Coordinator reviewed the evidence and accepted this controlled scope.
+  [CONTINUOUS FIXTURE] M4 - Functional runtime; full acceptance still open.
+         Coordinator accepted the earlier controlled demonstration; the
+         continuous-runtime evidence is ready for coordinator review.
          Three isolated persistent identities, bounded 9B conversation,
          solo kill/loot, explicit two-agent goal/roles and confirmed damage,
          then a fixed item/Zeny trade confirmed on both sides after reconnect.
          A new process reconciled a deliberately interrupted transfer without
-         replay. Local SearXNG attribution also works. Forty tests pass.
+         replay. Earlier SearXNG attribution passed; its Docker backend is
+         currently unavailable and web replies use a fallback. The earlier demo had
+         forty passing tests. Chat 06 adds a continuous controller with bounded
+         retention, repeated gameplay and addressed chat, plus user start,
+         stop and observation commands. Forty-seven tests now pass.
          Richer social quality and the one-hour trial remain deferred;
-         full M4 acceptance is still open. Evidence: docs/evidence/M4-prototype.md.
+         full M4 acceptance is still open. Evidence: docs/evidence/M4-prototype.md
+         and docs/evidence/M4-continuous.md.
 
   [OPTIONAL] M5 - Five-agent scale check, after M4 passes.
 
@@ -69,12 +75,13 @@ YOUR NEXT MOVE
    M3 polish files remain untouched in D:\Ragnarok Agents\m3-worktree; the
    M2 WIP remains in its original checkout. Only M4 test clients now run on
    bridge ports 8765..8767. Existing M1 characters and profiles are preserved.
-3. Coordinator review is complete: exported summaries/raw hashes and the
-   final-repeat source manifest were checked. README has verified run/observe
-   commands for demonstrating the prototype. The next functional priority is
-   keeping three agents running so you can interact with them, using the
-   existing combat/trade routines. That continuous controller is still pending.
-   Naturalness and one-hour stabilization remain deferred. Do not start M5.
+3. Chat 06 continues M4 on codex/m4-continuous in
+   D:\Ragnarok Agents\m4-continuous, from reviewed commit a523dbf. Use README's
+   continuous-runtime start/observe/say/status/stop commands. Interaction is
+   verified through headless public chat from an existing test character;
+   a graphical player client/assets/account are not provided by this slice.
+   Return the continuous evidence to the coordinator for review. Naturalness
+   and one-hour stabilization remain deferred. Do not start M5.
 
 HOW TO USE THE CHATS
 --------------------
@@ -174,7 +181,26 @@ off to the coordinator. Do not call deferred quality passed, claim
 cooperation from coincidental proximity, or start M5.
 END PROMPT
 
-PROMPT FOR CHAT 06 - FIVE-AGENT SCALE CHECK (M5)
+ARCHIVED PROMPT FOR CHAT 06 - CONTINUOUS THREE-AGENT RUNTIME (M4)
+---------------------------------------------------------------
+The implementation and short evidence are recorded in docs/evidence/M4-continuous.md.
+
+BEGIN PROMPT
+Continue M4 from reviewed a523dbf in a clean codex/ worktree. Turn the
+short controlled demo into one continuously running three-agent fixture,
+with understandable start/stop/observe/interaction commands. Preserve
+private memories, unknown transfers, databases, balances and other WIP.
+Solve request-cache/journal capacity, retention, bounded queues, ownership,
+reconnect/backoff and asynchronous addressed dialogue. Use the selected
+local 9B and existing SearXNG; do not compare models or build M5.
+Prove repeated cycles, delivered addressed chat during activity, clean
+stop/restart, bounded outage behavior and no replayed transfer. Record
+final-source commands/hashes and honest headless/fixture limits. Social
+polish and one-hour stabilization remain deferred. Commit/push verified
+slices and hand the working run path back to the coordinator.
+END PROMPT
+
+PROMPT FOR CHAT 07 - FIVE-AGENT SCALE CHECK (M5, DEFERRED)
 ------------------------------------------------
 Use only if M4 passes and resource measurements support five agents.
 
