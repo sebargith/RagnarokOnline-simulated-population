@@ -4,6 +4,15 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Verified
 
+- **Coordinator review of Chat 06, 2026-10-30:** accepted the continuous
+  fixture runtime for its demonstrated functional scope. All seven frozen
+  evidence sets' raw hashes match; both final-source continuous manifests
+  match the current implementation. Reviewed repeated cycles, addressed reply
+  delivery during gameplay, stop/restart memory continuity and uncertain-trade
+  recovery without replay. No additional gameplay or benchmark run was needed
+  for this review. Graphical player access, current successful web search and
+  long-duration stability are not established by these checks.
+
 - **Chat 06: continuous M4 fixture runtime implemented**, branch
   `codex/m4-continuous`, worktree `D:/Ragnarok Agents/m4-continuous`, from
   reviewed `a523dbf`. Runtime commits `3cb8e39` and `575b1d8`; M2/M3 WIP stays
@@ -149,8 +158,11 @@ Updated: 2026-10-30 (America/Santiago).
 ## Next action
 
 Use README's continuous-runtime start/observe/say/status/stop commands from
-`D:/Ragnarok Agents/m4-continuous`, then return the continuous evidence to the
-coordinator for review. The controller is stopped at handoff; native services
+`D:/Ragnarok Agents/m4-continuous` for a first hands-on headless session;
+coordinator evidence review is complete. A graphical session first requires
+a compatible existing client/assets and a separate player account. SearXNG's
+offline Docker backend remains a separate outstanding service issue.
+The controller is stopped at handoff; native services
 and three test clients remain available. Unresolved transfers must be reconciled,
 never bypassed by deleting state. Naturalness and one-hour stabilization remain
 deferred; full M4 acceptance stays open. All M2/M3 WIP remains in its original
