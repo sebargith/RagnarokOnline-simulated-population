@@ -4,13 +4,21 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Verified
 
+- **Graphical startup configured and observed.** Local connection override,
+  `Play-Local.cmd`, ordinary `roplayer` account and `Visitor` character are
+  prepared. The actual client rendered the local-server selection screen.
+  Credentials stay in ignored `runtime/player-client/PLAYER_ACCOUNT.txt`.
+  User sign-in and graphical map entry remain pending; see the
+  [client evidence](evidence/PLAYER-client-downloads.md). The continuous
+  controller was started for this session; check live status before use.
+
 - **Graphical client assets downloaded, not yet connected.** Matching dated
   EXEs, GRFs and supporting files are staged at
   `D:/Ragnarok Agents/runtime/player-client`. Archive/source hashes, PE32
   headers, direct DLL availability and Prontera map entries were checked.
-  No downloaded program was executed. [Download evidence](evidence/PLAYER-client-downloads.md).
-  Next: verify/configure client patches and loopback endpoint, create a separate
-  player account and test graphical login. Headless operation remains available.
+  The initial download checks did not execute programs; graphical startup was
+  subsequently observed as recorded above. [Download evidence](evidence/PLAYER-client-downloads.md).
+  Successful graphical login/map entry remains unverified.
 
 - **Coordinator review of Chat 06, 2026-10-30:** accepted the continuous
   fixture runtime for its demonstrated functional scope. All seven frozen
@@ -165,13 +173,13 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Next action
 
-Use README's continuous-runtime start/observe/say/status/stop commands from
-`D:/Ragnarok Agents/m4-continuous` for a first hands-on headless session;
-coordinator evidence review is complete. A graphical session first requires
-a compatible existing client/assets and a separate player account. SearXNG's
-offline Docker backend remains a separate outstanding service issue.
-The controller is stopped at handoff; native services
-and three test clients remain available. Unresolved transfers must be reconciled,
+User: sign in at the graphical local-server screen with credentials in
+`runtime/player-client/PLAYER_ACCOUNT.txt` and select `Visitor`; then verify
+Prontera rendering and the nearby agents. `Play-Local.cmd` relaunches the client.
+The continuous controller was started and its fresh status showed `solo_hunt`,
+two cycles, no reported error. Use README's status/stop commands to manage it.
+SearXNG's offline Docker backend remains a separate outstanding service issue.
+Unresolved transfers must be reconciled,
 never bypassed by deleting state. Naturalness and one-hour stabilization remain
 deferred; full M4 acceptance stays open. All M2/M3 WIP remains in its original
 checkout. Do not start M5.

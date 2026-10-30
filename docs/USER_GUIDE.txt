@@ -83,7 +83,10 @@ YOUR NEXT MOVE
    Coordinator review is complete. Next, try the headless controls; graphical
    client files have now been downloaded to
    D:\Ragnarok Agents\runtime\player-client. Static checks passed; connection
-   configuration, a separate player account and graphical login are pending.
+   configuration and a separate player account are now ready. Launch
+   Play-Local.cmd there, select Ragnarok Agents Local, sign in with the local
+   PLAYER_ACCOUNT.txt credentials and select Visitor. Server selection was
+   observed; successful graphical login/map rendering still need verification.
    SearXNG's offline Docker backend still needs restoration for live search.
    Naturalness and one-hour stabilization remain deferred. Do not start M5.
 

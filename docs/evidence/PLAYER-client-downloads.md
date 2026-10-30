@@ -4,7 +4,9 @@ Downloaded 2026-10-30 using the user's supplied GitHub and MediaFire folders.
 Active files: `D:/Ragnarok Agents/runtime/player-client` (ignored by Git).
 Original downloads, public folder metadata, extracted supporting files and
 NEMO are retained in `runtime/player-client-downloads` in the primary workspace.
-No downloaded executable, installer, server or driver was executed.
+The initial download verification did not execute downloaded programs.
+Subsequent client/OpenSetup launches are recorded separately below; no bundled
+historical server, installer or driver was run.
 
 ## Verified
 
@@ -41,10 +43,37 @@ GRF hashes/sizes, direct DLL imports and `graphical_login_verified: false`.
 Source-provided hashes establish download integrity, not publisher authenticity.
 The redundant DepositFiles alternative and unrelated dated clients were not needed.
 
+## Local configuration and graphical startup
+
+Configured 2026-10-30 using retained local helper
+`runtime/player-client-downloads/configure-local-player.py` (primary workspace).
+An additional `local.grf` overrides only `data/clientinfo.xml`; the same XML
+is supplied in the loose data folder. Endpoint: `127.0.0.1:6900`, version 45,
+English langtype 1, display `Ragnarok Agents Local`. Original GRFs/EXEs remain
+unchanged; `data.ini.downloaded` preserves the supplied GRF order.
+
+Created ordinary account `roplayer` (2000020, group 0) and novice `Visitor`
+at Prontera 152,180. Existing accounts/characters were not modified. Generated
+credentials are only in ignored `runtime/player-client/PLAYER_ACCOUNT.txt`.
+`Play-Local.cmd` launches the selected patched EXE with argument `1rag1`.
+`START_HERE.txt` contains player instructions. A launch with `-1rag1` exited;
+the corrected `1rag1` launch displayed the actual local-server selection
+screen and artwork, observed through the computer-use skill. This confirms
+basic graphics startup/configuration loading, not protocol/map compatibility.
+
+OpenSetup was opened and its Apply button used for initial graphics settings;
+the configured display was Direct3D HAL, 640x480, windowed. No system security
+setting was changed. The game remains at server selection for user sign-in.
+Computer-use guidance prohibits automating authentication dialogs; user login
+is the remaining handoff before map rendering can be checked.
+
+The existing continuous controller was started using the documented `start`
+command for the graphical session. Check its live status before assuming the
+agents remain active; no additional duration/stability claim is made.
+
 ## Next action
 
-Inspect the ready-made client's embedded connection configuration and patches,
-configure loopback login for the project's existing server, create a separate
-player account, then verify graphical login and Prontera rendering. Assets are
-staged; the package's existing configuration is not a verified project launcher.
-Game services, existing accounts and models were not modified by this download.
+User: select `Ragnarok Agents Local`, sign in using the local credential file,
+and select `Visitor`. Then verify Prontera rendering and nearby M4 characters.
+Packet-obfuscation compatibility and successful graphical map entry remain
+unverified until that step; do not infer them from server selection alone.
