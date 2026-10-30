@@ -81,7 +81,9 @@ YOUR NEXT MOVE
    verified through headless public chat from an existing test character;
    a graphical player client/assets/account are not provided by this slice.
    Coordinator review is complete. Next, try the headless controls; graphical
-   play needs a compatible existing client/assets and a separate player account.
+   client files have now been downloaded to
+   D:\Ragnarok Agents\runtime\player-client. Static checks passed; connection
+   configuration, a separate player account and graphical login are pending.
    SearXNG's offline Docker backend still needs restoration for live search.
    Naturalness and one-hour stabilization remain deferred. Do not start M5.
 

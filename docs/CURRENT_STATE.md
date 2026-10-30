@@ -4,6 +4,14 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Verified
 
+- **Graphical client assets downloaded, not yet connected.** Matching dated
+  EXEs, GRFs and supporting files are staged at
+  `D:/Ragnarok Agents/runtime/player-client`. Archive/source hashes, PE32
+  headers, direct DLL availability and Prontera map entries were checked.
+  No downloaded program was executed. [Download evidence](evidence/PLAYER-client-downloads.md).
+  Next: verify/configure client patches and loopback endpoint, create a separate
+  player account and test graphical login. Headless operation remains available.
+
 - **Coordinator review of Chat 06, 2026-10-30:** accepted the continuous
   fixture runtime for its demonstrated functional scope. All seven frozen
   evidence sets' raw hashes match; both final-source continuous manifests
