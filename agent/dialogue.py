@@ -128,7 +128,7 @@ class Dialogue:
             return output
         except Exception as error:
             self.future = None
-            output = {**self.turn, 'error': type(error).__name__, 'text': "I don't know enough to answer that right now."}
+            output = {**self.turn, 'error': type(error).__name__, 'detail': str(error)[:240], 'text': "I don't know enough to answer that right now."}
             self.metrics.append(output)
             self.metrics = self.metrics[-32:]
             return output

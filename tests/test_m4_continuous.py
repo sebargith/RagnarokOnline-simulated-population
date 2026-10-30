@@ -100,6 +100,23 @@ print "ok";
         self.assertEqual(db.execute('SELECT status,retired FROM live_intents').fetchone(), ('unknown', 0))
         db.close()
 
+    def test_stale_reply_is_discarded_and_chat_waits_for_target(self):
+        controller = Continuous.__new__(Continuous)
+        controller.suspended = False
+        controller.bridges = {who: SimpleNamespace(session='new') for who in ('agent', 'third')}
+        controller.pending_replies = {'agent': ('old', {'ready_at': time.monotonic(), 'text': 'stale'})}
+        controller.manual = deque([{'sender': 'agent', 'target': 'third', 'text': 'Hello', 'created': time.time()}])
+        controller.last_patrol = time.monotonic()
+        controller.available = lambda who: who == 'agent'
+        controller.data = lambda who: {'deal': {'name': ''}}
+        controller.send_now = lambda *args: self.fail('No chat may be sent to an unavailable target or from an old epoch')
+        notes = []
+        controller.note = lambda kind, **kwargs: notes.append(kind)
+        controller.background()
+        self.assertEqual(notes, ['reply_discarded'])
+        self.assertEqual(len(controller.manual), 1)
+        self.assertFalse(controller.pending_replies)
+
     def test_trade_skips_insufficient_perceived_funds_without_transfer(self):
         with tempfile.TemporaryDirectory() as directory:
             controller = Continuous.__new__(Continuous)

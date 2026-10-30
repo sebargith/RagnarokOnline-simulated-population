@@ -34,7 +34,7 @@ class Continuous(Prototype):
         self.phase = 'starting'
         self.last_status = self.last_patrol = self.last_commands = 0
         self.inference_retry = 0
-        self.suspended = False
+        self.suspended = True
         self.manual = deque(maxlen=8)
         self.counters = {'completed': 0, 'unknown': 0, 'rejected': 0, 'delivered_replies': 0, 'reconnections': 0, 'trade_completed': 0}
         for memory in self.community.memories.values():
@@ -145,7 +145,7 @@ class Continuous(Prototype):
                     or who == target or not isinstance(text, str) or not 1 <= len(text) <= 65
                     or any(not 32 <= ord(c) <= 126 for c in text)):
                 self.manual.popleft()
-            elif self.available(who) and not self.data(who)['deal']['name']:
+            elif self.available(who) and self.available(target) and not self.data(who)['deal']['name']:
                 self.send_now(who, {'type': 'chat', 'text': 'M4:'+target+':'+text})
                 self.manual.popleft()
                 self.note('manual_public_chat', sender=who, target=target, text=text)
@@ -213,7 +213,7 @@ class Continuous(Prototype):
                 reply = self.community.poll(who)
                 if reply:
                     self.replies.append({'who': who, **reply})
-                    self.pending_replies[who] = (bridge.session, {**reply, 'ready_at': now})
+                    self.pending_replies[who] = (reply['session'], {**reply, 'ready_at': now})
                     self.note('reply_ready', who=who, reply=reply)
             service = self.community.service
             if service.circuit.is_set():
@@ -266,6 +266,7 @@ class Continuous(Prototype):
 
     def run(self):
         self.ready()
+        self.suspended = False
         self.phase = 'recover_transfers'
         ledger = TradeLedger(self.runtime/'m4/trades.sqlite')
         try:
