@@ -31,8 +31,9 @@ WHERE WE ARE
 
   [STARTED] M3 - One persistent agent with optional public web search.
          Memory and deterministic adjacent movement on codex/m3-persistent;
-         31 boundary tests pass, plus a short live movement check. Dialogue,
-         search integration and the 30-minute trial remain pending.
+         Bounded 9B dialogue and one public-search topic are integrated;
+         36 tests pass and short live outage checks preserve movement.
+         The 30-minute restart/reconnect trial and human review remain pending.
          Identity, grounded dialogue, routine gameplay, memory across
          restart, search-source separation and reliable fallback.
 

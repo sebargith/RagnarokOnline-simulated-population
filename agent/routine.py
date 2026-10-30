@@ -55,7 +55,29 @@ class Routine:
             if time.time() > pending['expires'] and pending['status'] != 'unknown':
                 pending['status'] = 'unknown'
                 self.save()
-            # No retries across process restart. Same-epoch uncertainty fails closed.
+            if pending['action']['type'] == 'chat' and time.time() > pending['expires']+20:
+                self.memory.record(uuid.uuid4().hex, 'action', {**pending, 'status': 'unknown', 'reason': 'chat_not_replayed'})
+                self.state['pending'] = None
+                self.save()
+                self.next_at = time.monotonic()+self.interval
+                self.reason = 'abandoned_unknown_chat'
+                return
+            # Movement-only reconciliation: after its deadline and a quiet
+            # interval, two fresh stable destination observations permit a NEW
+            # goal. This never upgrades unknown to completed or replays intent.
+            if pending['action']['type'] == 'move' and time.time() > pending['expires'] + 20:
+                destination = data.get('destination')
+                marker = pending.get('reconcile')
+                if marker and marker['destination'] == destination and snapshot['time_ms'] - marker['time_ms'] >= 2000:
+                    self.memory.record(uuid.uuid4().hex, 'action', {**pending, 'status': 'unknown', 'reason': 'stable_destination_reconciled', 'observed_destination': destination})
+                    self.state['pending'] = None
+                    self.save()
+                    self.next_at = time.monotonic() + self.interval
+                    self.reason = 'reconciled_unknown_movement'
+                    return
+                if not marker or marker['destination'] != destination:
+                    pending['reconcile'] = {'destination': destination, 'time_ms': snapshot['time_ms']}
+                    self.save()
             self.reason = 'pending_' + pending['status']
             return
         if self.state['count'] >= 110:
@@ -74,6 +96,7 @@ class Routine:
         # Intent and capacity reservation reach disk before any network write.
         self.state['pending'] = {'id': request_id, 'status': 'unknown', 'action': action, 'expires': time.time()+6}
         self.state['count'] += 1
+        self.state['last_send'] = time.time()
         self.state['direction'] *= -1
         self.save()
         self.next_at = time.monotonic() + self.interval
@@ -82,3 +105,21 @@ class Routine:
             self.reason = 'submitted_unconfirmed'
         except (OSError, RuntimeError):
             self.reason = 'send_unknown'
+
+    def chat(self, text):
+        if self.state['pending'] or self.state['count'] >= 110 or time.time()-self.state.get('last_send', 0) < 1.1:
+            raise RuntimeError('Action unavailable')
+        if not isinstance(text, str) or not 1 <= len(text) <= 80 or any(not 32 <= ord(c) <= 126 for c in text) or text[0] in '@#/;':
+            raise ValueError('Invalid chat')
+        snapshot = self.bridge.latest
+        if not snapshot or snapshot['session'] != self.state['session'] or not 0 <= time.time()*1000-snapshot['time_ms'] <= 2500 or not snapshot['data']['connected']:
+            raise RuntimeError('Fresh connected snapshot required')
+        request_id = uuid.uuid4().hex
+        action = {'type': 'chat', 'text': text}
+        self.state['pending'] = {'id': request_id, 'status': 'unknown', 'action': action, 'expires': time.time()+6}
+        self.state['count'] += 1
+        self.state['last_send'] = time.time()
+        self.save()
+        self.next_at = max(self.next_at, time.monotonic()+2)
+        self.bridge.proposal(action, request_id=request_id, session=snapshot['session'])
+        return request_id

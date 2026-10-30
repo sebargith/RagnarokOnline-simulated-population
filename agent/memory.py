@@ -35,10 +35,14 @@ class Memory:
             self.db.execute(f"DELETE FROM records WHERE owner=? AND kind {comparison} 'commitment' AND seq NOT IN (SELECT seq FROM records WHERE owner=? AND kind {comparison} 'commitment' ORDER BY seq DESC LIMIT ?)", (self.identity, self.identity, cap))
         self.db.commit()
 
-    def retrieve(self, limit=8):
+    def retrieve(self, limit=8, kinds=None):
         if not 1 <= limit <= 16:
             raise ValueError("Retrieval limit")
-        rows = self.db.execute("SELECT kind,body FROM records WHERE owner=? ORDER BY (kind='commitment') DESC, seq DESC LIMIT ?", (self.identity, limit)).fetchall()
+        kinds = list(KINDS if kinds is None else kinds)
+        if not kinds or any(kind not in KINDS for kind in kinds):
+            raise ValueError('Invalid retrieval categories')
+        placeholders = ','.join('?' for _ in kinds)
+        rows = self.db.execute(f"SELECT kind,body FROM records WHERE owner=? AND kind IN ({placeholders}) ORDER BY (kind='commitment') DESC, seq DESC LIMIT ?", (self.identity, *kinds, limit)).fetchall()
         result, size = [], 0
         for kind, body in rows:
             if size + len(body) > 2400:

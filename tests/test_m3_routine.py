@@ -1,6 +1,7 @@
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 from agent.memory import Memory
 from agent.routine import Routine
@@ -17,6 +18,25 @@ class FakeBridge:
 
 
 class RoutineTests(unittest.TestCase):
+    def test_uncertain_movement_reconciles_without_becoming_completed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            memory = Memory(Path(directory)/'state.sqlite', 'agent')
+            bridge = FakeBridge()
+            routine = Routine(memory, bridge)
+            routine.next_at = 0
+            routine.tick()
+            routine.state['pending']['expires'] = time.time()-25
+            routine.tick()
+            base = time.time()
+            bridge.latest['time_ms'] = (base+3)*1000
+            with patch('agent.routine.time.time', return_value=base+3):
+                routine.tick()
+            self.assertIsNone(routine.state['pending'])
+            self.assertEqual(len(bridge.sent), 1)
+            self.assertFalse(any(r['data'].get('status') == 'completed' for r in memory.retrieve()))
+            self.assertEqual(routine.reason, 'reconciled_unknown_movement')
+            memory.close()
+
     def test_send_failure_stays_unknown_and_capacity_survives_restart(self):
         with tempfile.TemporaryDirectory() as directory:
             memory = Memory(Path(directory)/'state.sqlite', 'agent')

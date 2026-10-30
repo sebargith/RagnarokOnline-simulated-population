@@ -73,3 +73,52 @@ counter increased from 3 to 4 and direction continued from -1 to +1, without
 replaying earlier requests. Raw output: `runtime/evidence/m3-routine/restart.txt`.
 Both live runs ended with no pending action. The fake-bridge regression, rather
 than this live run, covers a restart with an unresolved accepted action.
+
+## Dialogue and recovery integration
+
+The next slice adds `agent/dialogue.py`, the `--dialogue` runner mode and
+`scripts/accept_m3.py`. One identity has one outstanding background turn and
+one bounded unsent reply; player test chat must start with `M3:`. Admission is
+at most once per ten seconds. Model JSON permits only an 80-character printable
+chat response, with command prefixes denied. The selected M2 streaming service
+retains its 2,048 context/160 output token limits, finite deadlines, single
+worker and zero retries. Gameplay polling never waits for inference or search.
+
+Retrieval filters record categories before applying the record/character cap.
+Commitment questions retrieve commitments; map questions retrieve observations;
+web answers receive only a single external snippet and no private records.
+Search supports only `M3: web poring`: one controller-owned literal query,
+`Ragnarok Online classic Poring monster`. The worker receives neither player
+chat nor memory. Replies name the supplied source hostname; retained dialogue
+records include its exact URL. This is intentionally not arbitrary web search.
+
+A commitment request records an intention. The deterministic acknowledgment
+becomes a spoken commitment only after its matching server chat echo. Unknown
+movement can resume toward a new goal after its deadline, a quiet interval and
+two stable fresh destination observations, without marking the old action
+completed or replaying it. Unknown chat is abandoned without retransmission.
+The runner uses an OS file lock and a three-attempt stream reconnect budget.
+
+Development preflights retained under the original workspace's ignored
+`runtime/evidence/`:
+
+- `m3-20261030T003326Z`: found unrelated commitment context contaminating map
+  and web answers. This is a failed grounding preflight, not acceptance.
+- `m3-20261030T003549Z`: narrowed retrieval produced grounded restart recall
+  and a Poring web answer, but some replies were dropped during pending-action
+  reconciliation. A one-reply outbox and shared send spacing address delivery.
+- `m3-20261030T003834Z`: explicit refused inference endpoint before restart and
+  refused search endpoint after restart produced fallback dialogue; movement
+  acknowledgments continued. Post-restart maximum snapshot gap was 1.032 s,
+  zero disconnected snapshots. The scripted fault endpoints affect only these
+  child processes, not global Ollama/SearXNG settings. One map reply was dropped
+  while the bounded outbox was occupied; it remains a development limitation.
+
+All **36 automated tests passed in 3.794 s**, outside the sandbox, and compile
+checks passed. Tests include pending/failed inference with continuing routine
+actions, invalid output, stale dialogue, private-query exclusion, same-epoch
+movement reconciliation and unknown outcomes across restart. Installed Ollama
+0.40.12 and the selected 9B digest were rechecked against operating config.
+
+The 30-minute scenario and final-source reconnect proof are still pending at
+this commit. No human continuity/naturalness acceptance is claimed.
