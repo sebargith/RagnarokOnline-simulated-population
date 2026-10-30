@@ -6,9 +6,12 @@ Updated: 2026-10-29 (America/Santiago).
 
 - **M3 started; persistence foundation only.** Clean branch `codex/m3-persistent`
   in `D:\Ragnarok Agents\m3-worktree` excludes the three unfinished M2 files.
-  Two new memory tests pass for restart, isolation, provenance and bounded
-  retention. [Evidence](evidence/M3-persistence.md). Bridge/inference/search
-  integration, the 30-minute run and human review remain pending.
+  Memory and deterministic M1 movement controller are implemented. The full
+  31-test suite passes outside the sandbox (socketpair stalls inside it).
+  Corrected 45-second movement run passed with two server acknowledgments.
+  [Evidence](evidence/M3-persistence.md). Inference/search integration,
+  same-epoch uncertainty reconciliation, the 30-minute run and human review
+  remain pending.
 
 - **User direction changed on 2026-10-29:** stop model evaluation and use Qwen3.5 9B Q6_K for implementation. Original and failed grounding retests remain evidence, not quality acceptance. M3 must still review naturalness and unsupported claims. [M2 repair record](evidence/M2-inference.md).
 - **Local web search slice works:** `scripts/ask_9b.py` completed a live 9B tool-call turn through the existing SearXNG JSON service on `127.0.0.1:8080`, with three source-linked snippets and no API key. The standalone turn has no bridge, persistence or gameplay action. [Configuration](../config/web-search.json) and [entry point](../README.md#local-9b-web-search-slice).
@@ -38,7 +41,6 @@ Updated: 2026-10-29 (America/Santiago).
 ## Next action
 
 Continue M3 on `codex/m3-persistent` in `D:\Ragnarok Agents\m3-worktree`.
-Connect the tested memory store to a deterministic adjacent-cell controller,
-including durable uncertain-action reconciliation and bridge capacity across
-restart. Then integrate bounded 9B dialogue and source-labeled public search,
-and retain the 30-minute scenario for human review before M4.
+Add explicit same-epoch uncertain-movement reconciliation and bounded 9B
+dialogue to the verified controller. Then integrate source-labeled public
+search and retain the 30-minute scenario for human review before M4.
