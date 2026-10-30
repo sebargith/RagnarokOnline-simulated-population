@@ -66,7 +66,8 @@ class TradeLedger:
         body = json.loads(row[0])
         for who in ('agent', 'peer'):
             snapshot = fresh_snapshots[who]
-            if snapshot['session'] == body['sessions'][who] or not snapshot['data'].get('inventory_ready') or not snapshot['data'].get('connected') or snapshot['data']['deal']['name']:
+            if (not 0 <= time.time()*1000-snapshot['time_ms'] <= 2500 or snapshot['session'] == body['sessions'][who]
+                or not snapshot['data'].get('inventory_ready') or not snapshot['data'].get('connected') or snapshot['data']['deal']['name']):
                 raise ValueError('Fresh full-login inventory on both sides required')
         after = {who: balances(s['data']) for who, s in fresh_snapshots.items()}
         if after != authoritative:

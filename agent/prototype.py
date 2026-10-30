@@ -32,6 +32,8 @@ class Prototype:
     def pump(self, seconds=.1):
         end = time.monotonic()+seconds
         while time.monotonic() < end:
+            if time.monotonic()-self.started > 600:
+                raise RuntimeError('Prototype wall-time budget exhausted')
             for who, bridge in self.bridges.items():
                 for event in bridge.poll(.01):
                     self.event_count += 1
@@ -141,6 +143,14 @@ class Prototype:
             self.chat(reply['who'], reply['text'])
         return {'replies': replies, 'inference_pending_before_independent_movement': pending_during_movement}
 
+    def web(self):
+        start = len(self.replies)
+        self.chat('agent', 'M4:third:web poring')
+        self.wait(lambda: len(self.replies) > start, 105)
+        reply = self.replies[-1]
+        self.chat('third', reply['text'])
+        return reply
+
     def isolation(self):
         note = 'blue-pebble-'+uuid.uuid4().hex[:8]
         memory = self.community.memories['agent']
@@ -225,6 +235,10 @@ class Prototype:
                 self.action('agent', {'type': 'trade_lock'})
                 self.wait(lambda: all(self.data(who)['deal']['other_locked'] for who in ('agent', 'peer')), 3)
                 commits = {who: self.submit(who, {'type': 'trade_commit'}) for who in ('agent', 'peer')}
+                if fault == 'after_commit_exit':
+                    # A real process exit leaves the durable transfer unknown.
+                    # The next process may reconcile it, never replay it.
+                    raise SystemExit('Deliberate exit after final trade packets; run trade mode to reconcile.')
                 if fault != 'after_commit':
                     for who, request in commits.items():
                         self.await_result(who, request, {'type': 'trade_commit'})

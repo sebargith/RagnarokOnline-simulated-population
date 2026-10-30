@@ -1,6 +1,7 @@
 from pathlib import Path
 import tempfile
 import unittest
+import time
 
 from agent.trade import TradeLedger, reconcile
 
@@ -11,7 +12,7 @@ class TradeTests(unittest.TestCase):
 
     def snapshot(self, who, session='new', ready=True):
         balance = self.after[who]
-        return {'id': who+'-fresh', 'session': session, 'data': {'connected': True, 'inventory_ready': ready,
+        return {'id': who+'-fresh', 'session': session, 'time_ms': int(time.time()*1000), 'data': {'connected': True, 'inventory_ready': ready,
             'inventory': [{'name_id': 909, 'amount': balance['jellopy']}], 'zeny': balance['zeny'], 'deal': {'name': ''}}}
 
     def test_both_sides_required_and_partial_changes_ambiguous(self):
@@ -34,6 +35,10 @@ class TradeTests(unittest.TestCase):
                 ledger.finish(key, {'agent': self.snapshot('agent'), 'peer': self.snapshot('peer', ready=False)}, self.after)
             with self.assertRaises(ValueError):
                 ledger.finish(key, {who: self.snapshot(who) for who in ('agent', 'peer')}, self.before)
+            stale = self.snapshot('peer')
+            stale['time_ms'] -= 3000
+            with self.assertRaises(ValueError):
+                ledger.finish(key, {'agent': self.snapshot('agent'), 'peer': stale}, self.after)
             result = ledger.finish(key, {who: self.snapshot(who) for who in ('agent', 'peer')}, self.after)
             self.assertEqual(result['reconciliation'], 'completed')
             self.assertEqual(ledger.unresolved(), [])
