@@ -4,8 +4,12 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Verified
 
-- **M3 duration scenario completed; acceptance remains open.** Branch
-  `codex/m3-persistent`, clean implementation worktree `D:\Ragnarok Agents\m3-worktree`.
+- **M3 functional baseline complete; naturalness deferred by user direction.**
+  On 2026-10-30 the user prioritized a working end-to-end prototype over dialogue
+  polish. Committed baseline **ff635f5** on `codex/m3-persistent` is sufficient
+  to begin the M4 functional prototype; social quality is **deferred, not passed**.
+  Worktree: `D:\Ragnarok Agents\m3-worktree`; its three polish WIP files listed
+  below are excluded from the handoff and must not enter the M4 starting state.
   Frozen code `beb18a7` ran **1800.657 s**, with **88 confirmed movement
   acknowledgments and seven peer-received chat replies**, one orchestrator
   restart and one map-server restart/reconnection. Both patrol cells were
@@ -33,8 +37,15 @@ Updated: 2026-10-30 (America/Santiago).
   live check selected a PC/pre-Renewal source, delivered a useful attributed
   summary and continued movement; its raw run is `m3-web-20261030T012548Z`.
   The 30-minute run predates this dialogue-only repair; controller/persistence
-  sources are unchanged. **Human naturalness/continuity review is pending.
-  M4 is not started.**
+  sources are unchanged. Coordinator review found robotic phrasing and weak
+  web-answer utility; these findings remain recorded. **Naturalness/social
+  acceptance is deferred by the user, not passed. M4 is not implemented here.**
+
+- **Preserved, uncommitted polish WIP:** `agent/dialogue.py`,
+  `scripts/run_m3.py`, `tests/test_m3_dialogue.py`. Work stopped without further
+  dialogue retests. These changes are unfinished and outside `ff635f5`; do not
+  infer that the committed baseline's 37 passing tests verify this WIP. The
+  three unrelated M2 repair files remain in the coordinator checkout as before.
 
 - **User direction changed on 2026-10-29:** stop model evaluation and use Qwen3.5 9B Q6_K for implementation. Original and failed grounding retests remain evidence, not quality acceptance. M3 must still review naturalness and unsupported claims. [M2 repair record](evidence/M2-inference.md).
 - **Local web search slice works:** `scripts/ask_9b.py` completed a live 9B tool-call turn through the existing SearXNG JSON service on `127.0.0.1:8080`, with three source-linked snippets and no API key. The standalone turn has no bridge, persistence or gameplay action. [Configuration](../config/web-search.json) and [entry point](../README.md#local-9b-web-search-slice).
@@ -63,9 +74,11 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Next action
 
-Continue M3 on `codex/m3-persistent` in `D:\Ragnarok Agents\m3-worktree`.
-Review the seven duration replies and the targeted repaired-search reply with
-the coordinator/user. Obtain human continuity/naturalness acceptance before
-accepting M3 or starting M4. No additional duration run is claimed for the
-dialogue-only repair. Keep longer operation, general search relevance and
-transfer reconciliation outside the demonstrated scope.
+Coordinator: create Chat 05 for the M4 functional prototype from the committed
+docs-only handoff on `codex/m3-persistent` (runtime baseline `ff635f5`), in a clean
+checkout/worktree that excludes all polish WIP. Implement verified slices:
+three isolated persistent identities; controlled solo PvE before demonstrated
+cooperation; then restricted server-confirmed two-party trade. Preserve action
+truth, private perception/memory and the unchanged resource limits. A richer
+social experience and one-hour stabilization are subsequent acceptance work,
+not prerequisites to implementing the end-to-end prototype. Do not start M5.

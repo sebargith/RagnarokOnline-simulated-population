@@ -6,6 +6,14 @@ On 2026-10-29 the user selected the measured Qwen3.5 9B Q6_K model and stopped f
 
 For each milestone, record starting state, commands and versions, observable outcomes, relevant failures, and evidence. Use `docs/evidence/M<number>-<topic>.md` when actual findings exist; keep large raw traces outside Git. Performance targets chosen after a baseline must be fixed before the final acceptance run. A failed target calls for a recorded decision, not silent relaxation.
 
+**Priority update, 2026-10-30:** the user wants a demonstrated end-to-end
+functional prototype first. M3's committed functional baseline (`ff635f5`)
+is sufficient to proceed to M4 implementation. Naturalness/social-quality
+acceptance is deferred, not passed; known dialogue and web-utility findings
+remain evidence. Preserve action truth, identity privacy and resource limits.
+Richer social quality and one-hour stabilization follow the functional
+prototype rather than gating its implementation.
+
 ## M0 - Environment audit and setup decision
 
 Scope: inspect the repository, relevant installed tools, Windows/WSL, GPU/VRAM, storage, Git state, and any existing server/client/model assets the user identifies. Limit research to choosing a workable initial layout.
@@ -55,14 +63,22 @@ Done when:
 - The agent can distinguish a rumor from an observed fact, lacks knowledge it was never given, and does not record a failed action as completed.
 - A bounded public web query can inform dialogue with source attribution, without exporting private identity/game context in the query or treating search snippets as game truth. Search outage leaves routine gameplay responsive.
 - Inference outage/timeout, stale proposals, invalid model output, and client reconnection have observable fallback behavior. Routine gameplay continues when inference alone fails.
-- Critical state/action boundaries have automated checks; the end-to-end scenario has retained evidence and human review for continuity and naturalness.
+- Critical state/action boundaries have automated checks and the end-to-end scenario has retained evidence. Human naturalness/social-quality acceptance is deferred by the 2026-10-30 priority update; this does not establish a quality pass.
 - No-search inference meets the M2 operating budget. Measure web-assisted turns separately under their configured tool/model deadlines; neither slow search nor search failure may pause routine gameplay. Report any budget adjustment explicitly.
 
 ## M4 - Three-agent community with cooperative PvE and simple trade
 
-Start only after M3 passes. Build in verified slices: three isolated identities and conversations; the smallest deterministic navigation/combat/loot actions needed for a controlled PvE encounter; then a restricted two-party trade. Keep model output away from packet-level control and recheck live game state before each consequential action.
+Begin the functional prototype from M3's committed functional baseline, without
+its unfinished polish WIP. Build in verified slices: three isolated persistent
+identities and controlled conversation; the smallest deterministic
+navigation/combat/loot actions needed for a controlled solo PvE encounter;
+actual cooperation between agents; then a restricted two-party trade. Keep
+model output away from packet-level control and recheck live game state before
+each consequential action. Demonstrate the end-to-end prototype before richer
+social polish or a one-hour stabilization trial. Neither is a prerequisite
+to implementing these slices.
 
-Done when:
+Full M4 acceptance, after the functional prototype:
 
 - Three agents retain distinct identities, preferences, schedules, relationships and memories across restart. They pass isolation, load, conversation-turn and reconnect checks without runaway chat or unbounded memory/queues. Only one agent initially learns a test fact; the others learn it only through a recorded information path.
 - A controlled solo PvE check establishes the new gameplay actions before two agents coordinate around a shared encounter. The combined scenario records who chose the goal, who moved/acted, server-confirmed combat and loot outcomes, and how failures or stale state were handled. Do not count coincidental proximity as cooperation.

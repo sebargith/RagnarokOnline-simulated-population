@@ -23,25 +23,31 @@ WHERE WE ARE
   [SELECTED] M2 - Local Qwen3.5 9B Q6_K.
          You stopped model comparison and selected 9B for implementation.
          Fixed technical targets passed; later probes still found
-         unsupported dialogue details. Quality review moves to M3.
+         unsupported dialogue details. Naturalness is now deferred by
+         the user's functional-prototype priority.
 
   [DONE] Web-search slice - 9B plus local SearXNG.
          A standalone 9B turn can request one public search and receive
          short source-linked results. M3 integrates one fixed public topic.
 
-  [REVIEW] M3 - Persistent agent; duration trial completed on beb18a7.
+  [FUNCTIONAL] M3 - Baseline complete at ff635f5; social quality deferred.
          1800.657 seconds, 88 confirmed movements, seven peer-received
          replies, commitment/map recall after orchestrator restart and
-         recovery after map-server restart. All 37 boundary tests pass.
+         recovery after map-server restart. Committed baseline: 37 tests pass.
          RAM/GPU and measured inference latency stayed within budget.
          Search kept private context local but selected an irrelevant
          Ragnarok M source and gave an unhelpful reply. A subsequent
          search-only repair passed a 35-second live check with a useful,
-         attributed PC source summary. Human quality review is still open.
+         attributed PC source summary. Coordinator review found robotic
+         language and weak web utility. The user explicitly deferred
+         naturalness/social acceptance to prioritize a working prototype;
+         those quality findings are not a pass.
 
-  [WAIT] M4 - Three-agent community, after M3 is accepted.
-         Distinct identities, cooperative PvE, simple trade and a
-         one-hour trial with human review.
+  [NEXT] M4 - Functional prototype in verified slices.
+         Three isolated persistent identities, controlled solo PvE,
+         actual cooperation, then restricted server-confirmed trade.
+         Richer social quality and one-hour stabilization follow the
+         end-to-end prototype; they do not gate implementation.
 
   [OPTIONAL] M5 - Five-agent scale check, after M4 passes.
 
@@ -54,12 +60,14 @@ YOUR NEXT MOVE
 1. Keep this chat, "Evaluar arquitectura de población IA", as the
    coordinator and evaluator. The selected 9B and SearXNG slice are
    recorded in docs/CURRENT_STATE.md and README.md.
-2. Continue the existing M3 implementation on codex/m3-persistent in
-   D:\Ragnarok Agents\m3-worktree. The three unfinished M2 files remain
-   untouched in the coordinator checkout.
-3. Review docs/evidence/M3-conversations.md (all seven live replies) and
-   M3-results.json, including the subsequent repaired-search reply.
-   Obtain human continuity/naturalness acceptance before M4 starts.
+2. The coordinator will create Chat 05 for M4 from the committed docs-only
+   handoff on codex/m3-persistent (runtime baseline ff635f5). Use a clean
+   checkout/worktree; exclude the preserved polish WIP: agent/dialogue.py,
+   scripts/run_m3.py and tests/test_m3_dialogue.py. They remain untouched
+   in D:\Ragnarok Agents\m3-worktree. The M2 WIP remains in its checkout.
+3. Build and demonstrate the functional prototype before social polish.
+   Retain server-confirmed results, privacy/isolation and resource checks.
+   Naturalness is deferred by user direction, not accepted automatically.
 
 HOW TO USE THE CHATS
 --------------------
@@ -134,21 +142,28 @@ END PROMPT
 
 PROMPT FOR CHAT 05 - THREE-AGENT COMMUNITY (M4)
 -----------------------------------------------
-Use only after M3 passes. Keep major verified slices in separate commits.
+Use the M3 functional baseline; naturalness is deferred by user direction.
+Keep major verified slices in separate commits.
 
 BEGIN PROMPT
-Implement M4 only. Read AGENTS.md, docs/CURRENT_STATE.md and M4 in
-docs/ROADMAP.md. Prove three isolated persistent identities and
+Implement the M4 functional prototype only. Start from the committed
+docs-only handoff on codex/m3-persistent, whose runtime baseline is
+ff635f5; do not carry the three unfinished M3 polish files into this
+checkout. Read AGENTS.md, docs/CURRENT_STATE.md and M4 in docs/ROADMAP.md.
+Prove three isolated persistent identities and
 controlled conversation. Then extend the restricted bridge and
 deterministic controllers for a solo PvE fixture, cooperative PvE with
 two agents and simple trade between project agents. Recheck game state
 before actions and reconcile unknown transfers before retrying.
 
-Run the one-hour scenario, knowledge-isolation, reconnect and resource
-checks. Record game-confirmed combat, loot and both sides of the trade.
-Prepare social excerpts for my review. Commit and push each verified
-slice, then hand off to the coordinator. Do not claim cooperation from
-coincidental proximity or start M5.
+Demonstrate an end-to-end prototype with bounded evidence and checks
+proportional to each slice, including isolation, failure/reconnect and
+unchanged resource limits. Record game-confirmed combat, loot and both
+sides of the trade. Richer naturalness/social quality and the one-hour
+stabilization trial are subsequent acceptance work, not prerequisites to
+implementing the prototype. Commit and push verified slices, then hand
+off to the coordinator. Do not call deferred quality passed, claim
+cooperation from coincidental proximity, or start M5.
 END PROMPT
 
 PROMPT FOR CHAT 06 - FIVE-AGENT SCALE CHECK (M5)
