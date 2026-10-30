@@ -1,19 +1,40 @@
 # Current state
 
-Updated: 2026-10-29 (America/Santiago).
+Updated: 2026-10-30 (America/Santiago).
 
 ## Verified
 
-- **M3 started; persistence foundation only.** Clean branch `codex/m3-persistent`
-  in `D:\Ragnarok Agents\m3-worktree` excludes the three unfinished M2 files.
-  Memory and deterministic M1 movement controller are implemented. The full
-  36-test suite passes outside the sandbox (socketpair stalls inside it).
-  Corrected 45-second movement run passed with two server acknowledgments.
-  Bounded 9B dialogue, one fixed public search topic, source separation and
-  same-epoch movement reconciliation are implemented. Short live inference
-  and search outage checks preserve routine movement.
-  [Evidence and development grounding failures](evidence/M3-persistence.md).
-  The frozen-source 30-minute run/reconnect and human review remain pending.
+- **M3 duration scenario completed; acceptance remains open.** Branch
+  `codex/m3-persistent`, clean implementation worktree `D:\Ragnarok Agents\m3-worktree`.
+  Frozen code `beb18a7` ran **1800.657 s**, with **88 confirmed movement
+  acknowledgments and seven peer-received chat replies**, one orchestrator
+  restart and one map-server restart/reconnection. Both patrol cells were
+  independently perceived by the peer. All 95 submitted actions were accepted
+  and completed; no rejected/unknown results in this duration run. Identity,
+  a spoken commitment and observed map were retrieved after restart; rumor
+  and unknown-password probes did not invent knowledge. **36 tests passed**
+  again after the run; **37 passed after the targeted search repair**.
+  [Evidence](evidence/M3-persistence.md),
+  [metrics/hashes](evidence/M3-results.json), [all replies](evidence/M3-conversations.md).
+- M3 snapshot gaps were at most **1.033 s** before and **1.031 s** after the
+  orchestrator restart; the forced map outage produced **25 disconnected
+  snapshots**, then a new game epoch and resumed movement. Sampled RAM floor
+  **6.235 GiB**, GPU peak **10,341 MiB** across 356 samples. No budget changed.
+  An earlier attempt stopped before actions at 1.736 GiB RAM; the successful
+  retry began after available RAM recovered to 7.727 GiB.
+- M3 integrates bounded 9B dialogue, identity-scoped memory, movement-specific
+  uncertainty reconciliation and one fixed public search topic. Short live
+  inference/search outages preserved movement; stale/invalid output and
+  uncertain restarts have automated checks. The final web query exported only
+  a controller-owned literal and preserved its source, but selected a Ragnarok M
+  snippet and gave an unhelpful refusal. Repair `7d875e5` now filters mobile
+  sources, permits attributed external claims and retains complete generated
+  sentences alongside explicit 80-character excerpts. A separate **35.406 s**
+  live check selected a PC/pre-Renewal source, delivered a useful attributed
+  summary and continued movement; its raw run is `m3-web-20261030T012548Z`.
+  The 30-minute run predates this dialogue-only repair; controller/persistence
+  sources are unchanged. **Human naturalness/continuity review is pending.
+  M4 is not started.**
 
 - **User direction changed on 2026-10-29:** stop model evaluation and use Qwen3.5 9B Q6_K for implementation. Original and failed grounding retests remain evidence, not quality acceptance. M3 must still review naturalness and unsupported claims. [M2 repair record](evidence/M2-inference.md).
 - **Local web search slice works:** `scripts/ask_9b.py` completed a live 9B tool-call turn through the existing SearXNG JSON service on `127.0.0.1:8080`, with three source-linked snippets and no API key. The standalone turn has no bridge, persistence or gameplay action. [Configuration](../config/web-search.json) and [entry point](../README.md#local-9b-web-search-slice).
@@ -27,15 +48,15 @@ Updated: 2026-10-29 (America/Santiago).
 - Duration run `20261029T162200Z` passed **600.031 s** continuously connected, ten movement round trips, maximum snapshot gap **1.033 s**, bidirectional chat, duplicate suppression, invalid/protocol rejection, and a real map-server shutdown/reconnect. The final reconnect/chat check took **14.093 s**.
 - A final buffered-frame correction passed a targeted five-frame/cache-capacity regression. A subsequent complete restart and five-second live scenario passed on the final source (`20261029T163521Z`, 5.015 s, reconnect/chat 27.281 s). Seven Python boundary tests, compile checks and Perl syntax checks passed. The ten-minute run predates the framing correction; hashes distinguish them.
 - Sources/portable tools/builds are in ignored `vendor/`; real credentials, SQL data, profiles, logs and raw traces in ignored `runtime/`; Python in `.venv/`. File-byte samples total about 2.57 GiB. Existing system tools and Ollama/models were preserved. M1 used no WSL/Docker, service/global PATH change, or new model.
-- All six game/database/bridge listeners were verified on `127.0.0.1`. A during-trial working-set sample across the six native processes totaled 635.62 MiB; it is not a peak or inference benchmark. Project test processes are stopped at handoff.
+- At the M1 handoff, all six game/database/bridge listeners were verified on `127.0.0.1`. A during-trial working-set sample across the six native processes totaled 635.62 MiB; it is not a peak or inference benchmark. Processes were stopped at that historical handoff; M3 leaves the server and test clients running.
 
 ## Boundaries and remaining limits
 
 - M2's human review was deferred to the M3 live scenario by user direction. In the 9B sample dialogue, some replies imply a lent potion helped without a supplied use/result event, infer a connection timeout from a walk timeout, or assume the future meeting gate is the current location. These issues are visible in [samples](evidence/M2-conversations.md); passing structured recall does not complete conversational grounding or quality review.
-- The fixed [M2 budget](../config/m2-limits.json) uses 2,048 context / 160 output tokens, thinking off, concurrency 1 / four queued / one outstanding per identity, service timeouts 20s warm / 60s first cold, overall deadlines 45s / 100s, no retry. Warm p95 targets are TTFT 1s, service 3s, queue 6s, response 8s; cold first TTFT <=15s and profile response <=20s. RAM floor 2 GiB available, total GPU ceiling 14 GiB. Only short English fixtures were measured (9B prompt maximum 289 tokens); long contexts, durable recall, live action freshness and responsive gameplay fallback remain unverified M3 work. Resource guards stop new admissions; a previously admitted burst can finish.
+- The fixed [M2 budget](../config/m2-limits.json) uses 2,048 context / 160 output tokens, thinking off, concurrency 1 / four queued / one outstanding per identity, service timeouts 20s warm / 60s first cold, overall deadlines 45s / 100s, no retry. Warm p95 targets are TTFT 1s, service 3s, queue 6s, response 8s; cold first TTFT <=15s and profile response <=20s. RAM floor 2 GiB available, total GPU ceiling 14 GiB. M3's three warm no-search samples had p95 TTFT **0.609 s**, service/response **0.891 s**, queue zero; two cold-budget turns had maximum TTFT **9.812 s** and response **10.344 s**. One web-assisted turn took **2.890 s** overall, separately measured. These few live turns are not a repeated M2 capacity benchmark. Long contexts and lifelong memory remain unverified; M3 scenario resource guards abort on a budget violation.
 - M1 exposes only adjacent walkable-cell movement and ordinary printable public chat. One in-flight action, deadlines, game epochs, 128 retained request IDs, bounded nonblocking buffers, per-client tokens and finite reconnect budgets are implemented. Sending a packet is only `accepted`; matching server acknowledgment/echo is `completed`; timeout/disconnect is `unknown`. No automatic action resend exists.
-- Snapshot positions can be OpenKore estimates; movement acknowledgment is not proof of arrival. Independent peer perception verifies this scenario. Durable reconciliation of uncertain actions remains M3 work.
-- Stock pre-Renewal Prontera was tested; exact episode, graphical assets, combat/global routing, social behavior and long-duration operation are unverified. Unsupported modern server features disable themselves with warnings. Retry exhaustion, deliberately lost acknowledgments and output-buffer saturation were not separately fault-injected.
+- Snapshot positions can be OpenKore estimates; movement acknowledgment is not proof of arrival. Independent peer perception verified both patrol cells. M3 durably preserves unknown intent; movement can resume with a new goal after quiet/stable destination observations, without marking the old request completed. Unknown chat is abandoned without replay. This does not implement trade/item reconciliation.
+- Stock pre-Renewal Prontera and a 30-minute adjacent-cell routine were tested; exact episode, graphical assets, combat/global routing, accepted social quality and longer operation remain unverified. Unsupported modern server features disable themselves with warnings. Retry exhaustion, deliberately lost game acknowledgments and output-buffer saturation were not separately live fault-injected.
 - The initial failed DB bootstrap directory is preserved at `runtime/mariadb/data-initialization-attempt-1`. Active data is `runtime/mariadb/data`; never reinitialize or remove it as a routine troubleshooting step.
 - **Evaluar arquitectura de población IA** is the main coordinator and evaluator. M2 was pushed on `codex/m2-inference`; the web-search slice is on `codex/web-search`, based on that branch. Neither is merged into main. Three unfinished M2 repair files remain uncommitted and excluded from web-search commits. The [user guide](USER_GUIDE.txt) tracks stages and starter prompts.
 - M1 game/database/bridge processes and both clients were running at the web-search handoff. Existing databases, credentials, model stores and the Ollama app were preserved.
@@ -43,6 +64,8 @@ Updated: 2026-10-29 (America/Santiago).
 ## Next action
 
 Continue M3 on `codex/m3-persistent` in `D:\Ragnarok Agents\m3-worktree`.
-Run the frozen-source 30-minute scenario with orchestrator restart and map
-reconnection; retain exact dialogue, timing/resource evidence and grounding
-limits for human review before M4.
+Review the seven duration replies and the targeted repaired-search reply with
+the coordinator/user. Obtain human continuity/naturalness acceptance before
+accepting M3 or starting M4. No additional duration run is claimed for the
+dialogue-only repair. Keep longer operation, general search relevance and
+transfer reconciliation outside the demonstrated scope.

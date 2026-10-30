@@ -2,7 +2,7 @@
 
 A local-first project for persistent, socially believable AI players on a classic/pre-Renewal Ragnarok Online private server. The first target is one autonomous player with grounded conversation and memory across restarts, followed by three to five distinct players.
 
-**Status:** M1 passed. The user selected the local Qwen3.5 9B Q6_K model after M2 measurement and stopped further model comparison. A standalone 9B turn can now call the existing local SearXNG service for public web search. Human dialogue quality remains unverified; no persistent social agent exists yet. See [current state](docs/CURRENT_STATE.md).
+**Status:** M1 passed. M3 integrates the selected local Qwen3.5 9B Q6_K model with persistent memory, adjacent movement and bounded dialogue. A 30-minute restart/reconnect trial completed, followed by a targeted public-search repair check. Human social-quality review remains open. See [current state](docs/CURRENT_STATE.md) and [live replies](docs/evidence/M3-conversations.md).
 
 ## Start here
 
@@ -77,4 +77,26 @@ With SearXNG and Ollama running, this command was verified:
 & .\.venv\Scripts\python.exe scripts/ask_9b.py 'Search the web for the iRO Wiki Prontera page and tell me its URL.'
 ```
 
-The endpoint and limits are in [web-search configuration](config/web-search.json). SearXNG needs no API key, but sends public queries to its configured internet search engines. If the local service is unavailable, the turn reports the failure. M3 must connect this tool through identity-scoped context and keep search failure from stopping routine gameplay.
+The endpoint and limits are in [web-search configuration](config/web-search.json). SearXNG needs no API key, but sends public queries to its configured internet search engines. If the local service is unavailable, the turn reports the failure. M3 separately integrates a fixed public query through a worker that receives no private context; its narrow relevance filter is not a general search-quality guarantee.
+
+## Persistent agent scenario (M3)
+
+The implementation worktree is `D:\Ragnarok Agents\m3-worktree`; shared native
+services, Python and runtime data remain in `D:\Ragnarok Agents`. With both M1
+clients, Ollama and SearXNG running, this exact command completed the recorded
+30-minute trial from the implementation worktree:
+
+```powershell
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/accept_m3.py --runtime 'D:/Ragnarok Agents/runtime' --seconds 1800 --reconnect
+```
+
+It schedules an orchestrator restart and a local map-server restart, and writes
+ignored evidence under the shared runtime directory. It requires at least
+2 GiB available RAM and no other orchestrator using that runtime. Test dialogue
+uses the `M3:` prefix; only `M3: web poring` enables the fixed public search.
+The patrol has no combat, loot, trade or global navigation.
+
+[M3 evidence](docs/evidence/M3-persistence.md) records the exact tested commit,
+outage checks, failed preflights, latency/resources and remaining acceptance
+limits. [Results and hashes](docs/evidence/M3-results.json) accompany the
+retained conversation review set.

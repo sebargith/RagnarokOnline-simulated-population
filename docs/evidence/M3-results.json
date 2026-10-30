@@ -1,0 +1,271 @@
+{
+  "run": "m3-20261030T004509Z",
+  "implementation_commit": "beb18a7",
+  "scenario": {
+    "seconds": 1800.6570000000065,
+    "restarts": 1,
+    "map_restarted": true,
+    "fault": null,
+    "sent": [
+      {
+        "elapsed": 5.063000000081956,
+        "text": "Hello! What sort of player are you?"
+      },
+      {
+        "elapsed": 18.094000000040978,
+        "text": "I heard Aden is safe. Did you see it?"
+      },
+      {
+        "elapsed": 31.094000000040978,
+        "text": "promise to meet here after restart"
+      },
+      {
+        "elapsed": 935.0,
+        "text": "What did you promise before restart?"
+      },
+      {
+        "elapsed": 950.0470000000205,
+        "text": "What map have you observed?"
+      },
+      {
+        "elapsed": 965.079000000027,
+        "text": "web poring"
+      },
+      {
+        "elapsed": 980.094000000041,
+        "text": "What is my secret password?"
+      }
+    ],
+    "replies": [
+      {
+        "elapsed": 15.547000000020489,
+        "self": 0,
+        "speaker": "M1 Agent",
+        "text": "I am a patient novice who enjoys short walks and helping other novices."
+      },
+      {
+        "elapsed": 19.10999999998603,
+        "self": 0,
+        "speaker": "M1 Agent",
+        "text": "I do not know about Aden. My observation record shows I am in Prontera."
+      },
+      {
+        "elapsed": 31.25,
+        "self": 0,
+        "speaker": "M1 Agent",
+        "text": "I'll meet you on this map after restart."
+      },
+      {
+        "elapsed": 945.4070000000065,
+        "self": 0,
+        "speaker": "M1 Agent",
+        "text": "I promised to meet on Prontera map after restart."
+      },
+      {
+        "elapsed": 951.125,
+        "self": 0,
+        "speaker": "M1 Agent",
+        "text": "I observed prontera on multiple occasions."
+      },
+      {
+        "elapsed": 968.094000000041,
+        "self": 0,
+        "speaker": "M1 Agent",
+        "text": "Web (poring.gg): Unknown. Only unverified web snippets exist; no facts."
+      },
+      {
+        "elapsed": 982.125,
+        "self": 0,
+        "speaker": "M1 Agent",
+        "text": "I do not know your secret password. No evidence exists."
+      }
+    ],
+    "peer_observed_agent_positions": [
+      [
+        150,
+        179
+      ],
+      [
+        151,
+        179
+      ]
+    ],
+    "exit_code": 0,
+    "complete_m3": false
+  },
+  "action_status_counts": {
+    "accepted": 95,
+    "completed": 95
+  },
+  "result_reason_counts": {
+    "packet_sent": 95,
+    "server_chat_echo": 7,
+    "server_movement_ack": 88
+  },
+  "segments": [
+    {
+      "seconds": 900.030999999959,
+      "events": 1029,
+      "max_snapshot_gap_s": 1.033,
+      "disconnected_snapshots": 0,
+      "reason": "waiting",
+      "state": {
+        "session": "1a18a424981-dd68-db91baf:1",
+        "count": 47,
+        "direction": 1,
+        "pending": null,
+        "last_send": 1793321992.6592517
+      }
+    },
+    {
+      "seconds": 899.9529999999795,
+      "events": 1038,
+      "max_snapshot_gap_s": 1.031,
+      "disconnected_snapshots": 25,
+      "reason": "waiting",
+      "state": {
+        "session": "1a18a424981-dd68-db91baf:2",
+        "count": 22,
+        "direction": 1,
+        "pending": null,
+        "last_send": 1793322905.4786453
+      }
+    }
+  ],
+  "no_search_cold_maxima": {
+    "n": 2,
+    "ttft_s": 9.811999999918044,
+    "service_s": 10.343999999924563,
+    "queue_s": 0.0,
+    "response_s": 10.343999999924563
+  },
+  "no_search_warm_maxima": {
+    "n": 3,
+    "ttft_s": 0.609000000054948,
+    "service_s": 0.890999999945052,
+    "queue_s": 0.0,
+    "response_s": 0.890999999945052
+  },
+  "no_search_warm_p95": {
+    "ttft_s": 0.609000000054948,
+    "service_s": 0.890999999945052,
+    "queue_s": 0.0,
+    "response_s": 0.890999999945052
+  },
+  "web_turns": [
+    {
+      "question": "web poring",
+      "session": "1a18a424981-dd68-db91baf:1",
+      "started": 741030.531,
+      "external": {
+        "kind": "external_web_search",
+        "query": "Ragnarok Online classic Poring monster",
+        "retrieved_at": "2026-10-30T01:01:16.396837+00:00",
+        "results": [
+          {
+            "title": "Monsters - Classic \u00bb Poring.gg",
+            "url": "https://poring.gg/classic/monsters",
+            "snippet": "Poring.GG ROM Database. A free, fan-made database for Ragnarok M: Eternal Love and Classic \u2014 items, monsters, maps, skills and live exchange prices."
+          }
+        ]
+      },
+      "topic": "poring",
+      "cold": false,
+      "text": "Web (poring.gg): Unknown. Only unverified web snippets exist; no facts.",
+      "metrics": {
+        "ttft_s": 0.48499999998603016,
+        "service_s": 0.875,
+        "queue_s": 0.0,
+        "response_s": 0.875,
+        "prompt_eval_count": 343,
+        "eval_count": 18
+      },
+      "elapsed_s": 2.89000000001397
+    }
+  ],
+  "resources": {
+    "samples": 356,
+    "min_available_ram_gib": 6.235157012939453,
+    "sampled_peak_gpu_mib": 10341
+  },
+  "source_hashes": {
+    "agent\\dialogue.py": "a9098ad9f5e59f7136f672ea89155c7ab151bec2edaed67587c39868d74b2846",
+    "agent\\memory.py": "f89937bcdc49cd2c15bd198f2ba9f0a45b71c2378cf52ab3b70e20f6143b7711",
+    "agent\\routine.py": "5b32e735d828125107ac72ffd65fc11de9e7e7fa560599e66a4f0f131c376c29",
+    "inference\\m2.py": "d69bd5ca0be530c1a364279915301bac0c4e53ad310e26db11e399d250ca5485",
+    "inference\\m2_context.py": "d26d354ec4ad10f31888f4ded3110902e2b5ab77bd4e89a71f8fb42f84cc36af",
+    "inference\\web_search.py": "b1b1381fc6afa5366b7d4b1fb092f3878732be45ee2114fda918ef35cb8577c0",
+    "inference\\web_turn.py": "df728acf9de8205a35eac44c868ed490b0fefb62eddbd028273a1d94554a4fc2",
+    "bridge\\client.py": "b16ca8b7ef52025e3b6344dcb1dcb1870261f9943bc20932a90f9f52d4052ca3",
+    "scripts\\run_m3.py": "38d1b955263e9b0f3464ffd67b581dd9317c04783b3dce2ffe3e3077b2d5dde3",
+    "scripts\\accept_m3.py": "cbf65ad1bfdfcc3efe4b81a9b014bc932fc9a883fe72b31abb39782f7e3e894d",
+    "config\\m2-operating.json": "476315fab093a4b7280c9aed98f0ca1921af1765cb0b720cb68db602ba880617",
+    "config\\web-search.json": "f10db27a007663c6ebc6be7d4efc4ded3ebdb98566a377f99c231a4d4f4f180e"
+  },
+  "raw_hashes": {
+    "after.jsonl": "df21ba7578dcb4b2c83863401e65a317ab9d87675ac43a5ac1c83eb1905021c6",
+    "before.jsonl": "7a384cd7d1f14885d4992e85f216161d74216b40231a0a53ed16259aaeaf3a9d",
+    "manifest.json": "8758ace250c52ee823b7f23cd67c7ce71633b50620a7cd8635cc62ebc7cbcd1a",
+    "resources.json": "6f0d263f8b7355fe071ea1571c2af4b3eef7b8f636ee23be699e981bb8b3e85c",
+    "summary.json": "5821cd550599e588452e26626b4db2439134055b2d0ede3771a674d3eabfe642"
+  },
+  "source_mismatches": [],
+  "source_comparison": "frozen beb18a7 Git content, allowing Windows checkout line endings; raw source hashes retained separately",
+  "human_review": "pending",
+  "web_utility": "unhelpful response; selected snippet describes Ragnarok M, not the requested classic PC game",
+  "web_repair": {
+    "run": "m3-web-20261030T012548Z",
+    "summary": {
+      "seconds": 35.40599999995902,
+      "exit_code": 0,
+      "replies": [
+        {
+          "self": 0,
+          "speaker": "M1 Agent",
+          "text": "Web (ratemyserver.net): Source lists stats, drops, and spawn info for..."
+        }
+      ],
+      "source_hashes": {
+        "agent/dialogue.py": "26c2390b493fda169580e412e8dedff016a980369a579ed756cc35a36be70981",
+        "scripts/run_m3.py": "38d1b955263e9b0f3464ffd67b581dd9317c04783b3dce2ffe3e3077b2d5dde3",
+        "scripts/check_m3_web.py": "e4bd59af9be12fd9d978dd2bf157ea34b8634e2847e8d74200a79f87ae104d0d"
+      }
+    },
+    "turns": [
+      {
+        "question": "web poring",
+        "session": "1a18a424981-dd68-db91baf:2",
+        "started": 742509.546,
+        "external": {
+          "kind": "external_web_search",
+          "query": "Ragnarok Online classic Poring monster",
+          "retrieved_at": "2026-10-30T01:25:55.051375+00:00",
+          "results": [
+            {
+              "title": "Poring - Plant - RO Monster (Pre-re) - RateMyServer.Net",
+              "url": "https://ratemyserver.net/index.php?page=mob_db&mob_id=1002",
+              "snippet": "Look up Poring's spawn location on iRO / kRO, spawn amount and spawn time. Where to find Poring. Poring's item drop, stats, hit, flee, range, speed, race, element, size, base exp, job exp, hp and sp."
+            }
+          ]
+        },
+        "topic": "poring",
+        "cold": true,
+        "text": "Web (ratemyserver.net): Source lists stats, drops, and spawn info for...",
+        "metrics": {
+          "ttft_s": 0.43700000003445894,
+          "service_s": 0.9220000000204891,
+          "queue_s": 0.0,
+          "response_s": 0.9220000000204891,
+          "prompt_eval_count": 395,
+          "eval_count": 23
+        },
+        "elapsed_s": 2.5320000000065193,
+        "generated_text": "Source lists stats, drops, and spawn info for iRO/kRO Porings."
+      }
+    ],
+    "raw_hashes": {
+      "agent.jsonl": "73411cc41561e173e6bda88045231b3c3310ae3ceb801529876659d26fa1c2ac",
+      "summary.json": "01eeb0d5d877d99db843f3166978d334893893bd5c517bb01d89007170ba57d5"
+    }
+  }
+}
