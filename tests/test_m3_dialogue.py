@@ -19,6 +19,31 @@ class Service:
 
 
 class DialogueTests(unittest.TestCase):
+    def test_web_selection_excludes_mobile_and_supplies_one_attributed_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            memory = Memory(Path(directory)/'memory.sqlite', 'agent')
+            memory.record('private', 'reported_claim', {'text': 'private marker'})
+            service = Service()
+            results = [{'title': 'Ragnarok M: Eternal Love Classic', 'snippet': 'Mobile stats', 'url': 'https://mobile.example/stats'}, {'title': 'Poring (Pre-re)', 'snippet': 'Poring spawn locations and stats.', 'url': 'https://classic.example/poring'}]
+            dialogue = Dialogue(memory, {}, {}, service=service, search=lambda query, config: {'kind': 'external_web_search', 'results': results})
+            dialogue.ask('web poring', 'boot:1', topic='poring')
+            dialogue.future.result(timeout=1)
+            self.assertIsNone(dialogue.poll('boot:1'))
+            prompt = service.args[1][-1]['content']
+            self.assertNotIn('private marker', prompt)
+            self.assertNotIn('Mobile stats', prompt)
+            self.assertIn('Poring spawn locations', prompt)
+            text = 'Lists spawn locations and detailed monster statistics for Poring.'
+            service.future.set_result({'content': '{"text":"'+text+'"}', 'done_reason': 'stop'})
+            reply = dialogue.poll('boot:1')
+            self.assertEqual(reply['external']['results'], results[1:])
+            self.assertIn('Web (classic.example)', reply['text'])
+            self.assertEqual(reply['generated_text'], text)
+            self.assertLessEqual(len(reply['text']), 80)
+            self.assertTrue(reply['text'].endswith('...'))
+            dialogue.close()
+            memory.close()
+
     def test_pending_or_failed_inference_does_not_block_movement(self):
         with tempfile.TemporaryDirectory() as directory:
             memory = Memory(Path(directory)/'memory.sqlite', 'agent')

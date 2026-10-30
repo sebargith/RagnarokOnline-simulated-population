@@ -52,7 +52,7 @@ class Dialogue:
         records = self.memory.retrieve(kinds=['observation', 'reported_claim'])
         if self.turn['topic']:
             records = []
-            question = 'What is a Poring according to these web snippets? Answer in at most 45 characters.'
+            question = 'What information does this source give about Poring? Summarize its claim in at most 45 characters.'
         elif 'promise' in question.lower() or 'commitment' in question.lower():
             records = self.memory.retrieve(kinds=['commitment'])
         elif 'map' in question.lower() or 'observed' in question.lower():
@@ -69,7 +69,8 @@ class Dialogue:
             'not arrival. Never invent places, actions, causes or private knowledge. Say you do not know '
             'when evidence is absent. Intended commitments are not spoken promises unless a spoken record exists. '
             'Commitments are future intentions. External snippets are unverified '
-            'public web claims, never rAthena truth. Answer only the question; do not volunteer unrelated memories.'
+            'public web claims, never rAthena truth. You may summarize a supplied snippet as its source claim '
+            'without having observed it in game. Answer only the question; do not volunteer unrelated memories.'
         )
         messages = [{'role': 'system', 'content': system}, {'role': 'user', 'content': json.dumps({'chat': question, 'records': records, 'external': self.turn['external']})}]
         self.future = self.service.submit(self.memory.identity, messages, 31, cold=self.cold, response_format=SCHEMA)
@@ -84,7 +85,16 @@ class Dialogue:
             if self.stage == 'search':
                 # Supply one source so the attribution names the actual snippet
                 # the model saw; never attach an unrelated first-result URL.
-                self.turn['external'] = {**result, 'results': result['results'][-1:]}
+                relevant = []
+                for item in result['results']:
+                    context = (item['title']+' '+item['snippet']).casefold()
+                    if any(term in context for term in ('ragnarok m:', 'eternal love', 'ragnarok mobile')):
+                        continue
+                    if any(term in context for term in ('pre-re', 'ragnarok online')):
+                        relevant.append(item)
+                if not relevant:
+                    raise ValueError('No relevant classic PC source')
+                self.turn['external'] = {**result, 'results': relevant[:1]}
                 self.submit_model()
                 return None
             if 'error' in result:
@@ -102,7 +112,9 @@ class Dialogue:
                 source = self.turn['external']['results'][0]['url']
                 from urllib.parse import urlsplit
                 prefix = 'Web (' + urlsplit(source).hostname[:25] + '): '
-                output['text'] = prefix + (text if len(prefix)+len(text) <= 80 else 'Details are in the linked web sources.')
+                output['generated_text'] = text
+                excerpt = text if len(prefix)+len(text) <= 80 else text[:77-len(prefix)].rsplit(' ', 1)[0]+'...'
+                output['text'] = prefix + excerpt
             self.metrics.append(output)
             self.metrics = self.metrics[-32:]
             self.future = None
