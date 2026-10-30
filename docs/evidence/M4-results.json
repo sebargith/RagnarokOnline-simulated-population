@@ -1,0 +1,654 @@
+{
+  "combined_tested_commit": "f6b7a67",
+  "export_commit": "41f56d5a24e6ed7882e8379d90c8da26ef658180",
+  "acceptance": "functional prototype demonstrated; social quality and one-hour trial deferred",
+  "limitations": [
+    "Controlled stationary Poring fixture and fixed trade only.",
+    "Read-only SQL verification is privileged test instrumentation, absent from player minds.",
+    "RAM/GPU sampling pauses during client lifecycle subprocesses; samples are not continuous peaks.",
+    "No one-hour trial, general routing, open-ended social acceptance or M5."
+  ],
+  "combined": {
+    "run": "m4-20261030T114811Z",
+    "summary": {
+      "mode": "all",
+      "functional_complete": true,
+      "boundaries": [
+        {
+          "who": "agent",
+          "action": {
+            "type": "attack",
+            "target": "ffffffff"
+          },
+          "reason": "target_not_visible_nearby_or_allowed",
+          "request_id": "97957dbda1a14346bd9ddcad0e1ae14e",
+          "status": "rejected"
+        },
+        {
+          "who": "agent",
+          "action": {
+            "type": "take",
+            "target": "ffffffff"
+          },
+          "reason": "target_not_visible_nearby_or_allowed",
+          "request_id": "506ec8668da74282801f01e86fec4668",
+          "status": "rejected"
+        },
+        {
+          "who": "third",
+          "action": {
+            "type": "trade_request"
+          },
+          "reason": "invalid_trade",
+          "request_id": "9dad0a6f58f64f0bb363d216860ed213",
+          "status": "rejected"
+        },
+        {
+          "who": "agent",
+          "action": {
+            "type": "trade_offer",
+            "amount": 999
+          },
+          "reason": "invalid_trade",
+          "request_id": "24804dea7ce948009b9fdb2b46ee2caa",
+          "status": "rejected"
+        },
+        {
+          "who": "agent",
+          "action": {
+            "type": "chat",
+            "text": "@item 909"
+          },
+          "reason": "invalid_chat",
+          "request_id": "4961d112dc3f400db98540d9bfd7ffbb",
+          "status": "rejected"
+        },
+        {
+          "reason": "stale_session",
+          "request_id": "184077cc5cbd4d23830c170bb96bc3a1",
+          "status": "rejected"
+        },
+        {
+          "reason": "stale_session",
+          "replay": 1,
+          "request_id": "184077cc5cbd4d23830c170bb96bc3a1",
+          "status": "rejected"
+        }
+      ],
+      "isolation": {
+        "private_note": "blue-pebble-3fe3f28b",
+        "initial_owner": "agent",
+        "learned_via": "perceived public chat",
+        "database_reopen_recall": [
+          "agent",
+          "peer",
+          "third"
+        ]
+      },
+      "conversation": {
+        "replies": [
+          {
+            "who": "agent",
+            "question": "Name and one preference only, very briefly?",
+            "session": "1a18ca25951-49d8-12a0d662:1",
+            "started": 779855.5,
+            "external": null,
+            "topic": null,
+            "cold": true,
+            "text": "M4 Alden. Prefer gathering supplies and patrolling the square in the morning.",
+            "metrics": {
+              "ttft_s": 12.01500000001397,
+              "service_s": 12.484000000054948,
+              "queue_s": 0.0,
+              "response_s": 12.484000000054948,
+              "prompt_eval_count": 686,
+              "eval_count": 23
+            },
+            "elapsed_s": 12.5
+          },
+          {
+            "who": "peer",
+            "question": "Name and one preference only, very briefly?",
+            "session": "1a18ca25970-7768-9f02de2:1",
+            "started": 779856.296,
+            "external": null,
+            "topic": null,
+            "cold": true,
+            "text": "M4 Bram. Prefer hunting in Prontera.",
+            "metrics": {
+              "ttft_s": 0.515999999945052,
+              "service_s": 0.8439999999245629,
+              "queue_s": 11.688000000081956,
+              "response_s": 12.53200000000652,
+              "prompt_eval_count": 720,
+              "eval_count": 16
+            },
+            "elapsed_s": 12.563000000081956
+          },
+          {
+            "who": "third",
+            "question": "Name and one preference only, very briefly?",
+            "session": "1a18ca2597e-63c-3045b306:1",
+            "started": 779856.562,
+            "external": null,
+            "topic": null,
+            "cold": true,
+            "text": "M4 Mira, trading.",
+            "metrics": {
+              "ttft_s": 0.5150000000139698,
+              "service_s": 0.7650000000139698,
+              "queue_s": 12.265999999945052,
+              "response_s": 13.030999999959022,
+              "prompt_eval_count": 721,
+              "eval_count": 12
+            },
+            "elapsed_s": 13.062999999965541
+          }
+        ],
+        "inference_pending_before_independent_movement": true
+      },
+      "solo": {
+        "target": "adaa8e06",
+        "cooperative": false,
+        "goal_chosen_by": "agent",
+        "roles": {
+          "agent": "lead_and_gather"
+        },
+        "damage": {
+          "agent": 51
+        },
+        "death": {
+          "agent_id": "agent",
+          "data": {
+            "dead": 1,
+            "name_id": 1002,
+            "target": "adaa8e06"
+          },
+          "id": "1a18ca25951-49d8-12a0d662:68",
+          "kind": "monster_departure",
+          "session": "1a18ca25951-49d8-12a0d662:1",
+          "source": "openkore",
+          "time_ms": 1793360918565,
+          "v": 1
+        },
+        "loot": {
+          "evidence": {
+            "amount": 1,
+            "name_id": 909
+          },
+          "reason": "server_inventory_add",
+          "request_id": "8b759e22b7ce454da36641d9026e8cec",
+          "status": "completed"
+        },
+        "inventory_before": 1,
+        "inventory_after": 2,
+        "event_start": 120
+      },
+      "cooperation": {
+        "target": "5bb48e06",
+        "cooperative": true,
+        "goal_chosen_by": "agent",
+        "roles": {
+          "agent": "lead_and_gather",
+          "peer": "flank_and_strike"
+        },
+        "damage": {
+          "agent": 34,
+          "peer": 17
+        },
+        "death": {
+          "agent_id": "agent",
+          "data": {
+            "dead": 1,
+            "name_id": 1002,
+            "target": "5bb48e06"
+          },
+          "id": "1a18ca25951-49d8-12a0d662:109",
+          "kind": "monster_departure",
+          "session": "1a18ca25951-49d8-12a0d662:1",
+          "source": "openkore",
+          "time_ms": 1793360939092,
+          "v": 1
+        },
+        "loot": {
+          "evidence": {
+            "amount": 1,
+            "name_id": 909
+          },
+          "reason": "server_inventory_add",
+          "request_id": "9584f89a8e874958b26749805bc6db0f",
+          "status": "completed"
+        },
+        "inventory_before": 2,
+        "inventory_after": 3,
+        "event_start": 213
+      },
+      "trade": {
+        "id": "0662503221f04488885d3464360bdefa",
+        "before": {
+          "agent": {
+            "jellopy": 3,
+            "zeny": 110
+          },
+          "peer": {
+            "jellopy": 1,
+            "zeny": 90
+          }
+        },
+        "sessions": {
+          "agent": "1a18ca25951-49d8-12a0d662:1",
+          "peer": "1a18ca25970-7768-9f02de2:1"
+        },
+        "created": 1793360943.616309,
+        "offer": "one Jellopy for ten Zeny",
+        "after": {
+          "agent": {
+            "jellopy": 2,
+            "zeny": 120
+          },
+          "peer": {
+            "jellopy": 2,
+            "zeny": 80
+          }
+        },
+        "authoritative": {
+          "agent": {
+            "jellopy": 2,
+            "zeny": 120
+          },
+          "peer": {
+            "jellopy": 2,
+            "zeny": 80
+          }
+        },
+        "reconciliation": "completed",
+        "observation_ids": {
+          "agent": "1a18ca49b6d-fa98-ca35195:8",
+          "peer": "1a18ca49b6e-b40-2a90d87c:8"
+        },
+        "commits": {
+          "agent": "6acec3060025400e86d197bd6047d373",
+          "peer": "d0e0c06331474feca41e5aa035fef879"
+        },
+        "completion_observations_discarded": false
+      },
+      "event_count": 353
+    },
+    "resource_samples": 13,
+    "min_available_ram_gib": 2.699169158935547,
+    "peak_gpu_used_mib": 9827,
+    "max_resource_sample_gap_s": 15.327999999979511,
+    "max_snapshot_gap_within_epoch_s": 1.031,
+    "events_by_kind": {
+      "ready": 6,
+      "snapshot": 192,
+      "action_result": 65,
+      "chat": 33,
+      "movement_ack": 3,
+      "combat": 30,
+      "monster_departure": 9,
+      "inventory_added": 3,
+      "trade": 9,
+      "connection": 3
+    },
+    "completed_trade_results_consumed": 2,
+    "hashes": {
+      "summary.json": "0a52b1a4925dc9d0bc8c3062b97549a44542b1e48c1d50f429d8c06d4e9f384e",
+      "events.jsonl": "d3f1ef05cb656d97ab95478d8145b88defa31b6145e1ef8c211a12005762da12",
+      "manifest.json": "89d5757490733badacdb45513e8c7bf1028700723067e70873229793f29818ca"
+    },
+    "source_manifest": {
+      "agent\\community.py": "f0e91ee3f94e80d94de5f8f329c725bf6c44fdeda8ebbca02327b02772ecdbb3",
+      "agent\\dialogue.py": "2c22b36c98913be0f61fa870d56ae3f27b03e75dec6c67295be86b781c079e62",
+      "agent\\memory.py": "5d1fceb26af8c66b33014ed861f202482d0e86c64273f6bd03fb302c503c1771",
+      "agent\\prototype.py": "df4fddcb4721b2810d9c7ff52b7e8638bbe8ed821829238f749da5d15a5afbab",
+      "agent\\routine.py": "2dfaa74ebfe7e488b543f4fe7d0fb91050883d04061859d9464c4688a9de5cce",
+      "agent\\trade.py": "f5b12ed1625c49a97901c6c07192914a8445a02ec842eb81b6fd4a570db9e0a4",
+      "bridge\\openkore\\m1_bridge.pl": "9c31cd460c8a0bbf780876e1c94e6b9c86db53d7cfde1fedc80e7575e1cbac3e",
+      "scripts\\run_m4.py": "98f3d84eb5fd79a5a2f079f0d0b641743de971d3d85cd8e55dca01ba9feb554f",
+      "scripts\\prepare_m4.py": "1b5b3153a3a42298696162eb430ac714c42de6c1f46e1f211d5b7325d45a2f14",
+      "fixtures\\m4-pve.txt": "13d3c34c34313e98f6a97fef899982de9dd7de1d5d3236a590dfb4c3a20aa180",
+      "config\\m4-identities.json": "8a79c12c2d7a1a73ecbea9eb5f35d097938b097032e5b8e5789ddeedf896e875",
+      "config\\m2-operating.json": "476315fab093a4b7280c9aed98f0ca1921af1765cb0b720cb68db602ba880617"
+    }
+  },
+  "interrupted": {
+    "run": "m4-20261030T115000Z",
+    "summary": {
+      "mode": "trade",
+      "trade_fault": "after_commit_exit",
+      "functional_complete": false,
+      "error": "Deliberate exit after final trade packets; run trade mode to reconcile.",
+      "elapsed_s": 8.625,
+      "event_count": 61
+    },
+    "resource_samples": 2,
+    "min_available_ram_gib": 3.0562057495117188,
+    "peak_gpu_used_mib": 9739,
+    "max_resource_sample_gap_s": 5.016000000061467,
+    "max_snapshot_gap_within_epoch_s": 1.031,
+    "events_by_kind": {
+      "ready": 3,
+      "snapshot": 30,
+      "chat": 6,
+      "action_result": 15,
+      "trade": 7
+    },
+    "completed_trade_results_consumed": 0,
+    "hashes": {
+      "summary.json": "a20fffd4145a60db382519e766b99bce9150a8b4e23856502fb97db5779eac24",
+      "events.jsonl": "e84061a8f6bacb538c949ee9f88f76cb933adb9d5f16fde9d84c3249331c12fa",
+      "manifest.json": "67e60e4e4aee3704fae3b1a4a37c2d84cc2df85f107673851e03c88b40a3266b"
+    },
+    "source_manifest": {
+      "agent\\community.py": "f0e91ee3f94e80d94de5f8f329c725bf6c44fdeda8ebbca02327b02772ecdbb3",
+      "agent\\dialogue.py": "2c22b36c98913be0f61fa870d56ae3f27b03e75dec6c67295be86b781c079e62",
+      "agent\\memory.py": "5d1fceb26af8c66b33014ed861f202482d0e86c64273f6bd03fb302c503c1771",
+      "agent\\prototype.py": "5ff627f6eb945e45322f5498a60c0429700651603579883f37786c7f77093cda",
+      "agent\\routine.py": "2dfaa74ebfe7e488b543f4fe7d0fb91050883d04061859d9464c4688a9de5cce",
+      "agent\\trade.py": "7a44401eb014096bd03862cfd8b62bae2e3805b1f66b84b809a518a884ca12bf",
+      "inference\\m2.py": "d69bd5ca0be530c1a364279915301bac0c4e53ad310e26db11e399d250ca5485",
+      "inference\\m2_context.py": "d26d354ec4ad10f31888f4ded3110902e2b5ab77bd4e89a71f8fb42f84cc36af",
+      "inference\\web_search.py": "b1b1381fc6afa5366b7d4b1fb092f3878732be45ee2114fda918ef35cb8577c0",
+      "inference\\web_turn.py": "df728acf9de8205a35eac44c868ed490b0fefb62eddbd028273a1d94554a4fc2",
+      "bridge\\openkore\\m1_bridge.pl": "9c31cd460c8a0bbf780876e1c94e6b9c86db53d7cfde1fedc80e7575e1cbac3e",
+      "bridge\\client.py": "b16ca8b7ef52025e3b6344dcb1dcb1870261f9943bc20932a90f9f52d4052ca3",
+      "scripts\\run_m4.py": "b499f1d4deda6e6cef8fa0b4dcb41144d7064b4626d60c3419fa8e652d02c0dc",
+      "scripts\\prepare_m4.py": "1b5b3153a3a42298696162eb430ac714c42de6c1f46e1f211d5b7325d45a2f14",
+      "scripts\\m1.py": "b22f1e16801eb22a4d0ea292ead80180345a3bf6256baf0264945efc324d27ef",
+      "scripts\\bench_m2.py": "f628dd571c14ecf9908625a0b598d9bda33205084f2ba6b5f962dca8dbeb5b9a",
+      "fixtures\\m4-pve.txt": "13d3c34c34313e98f6a97fef899982de9dd7de1d5d3236a590dfb4c3a20aa180",
+      "config\\m4-identities.json": "8a79c12c2d7a1a73ecbea9eb5f35d097938b097032e5b8e5789ddeedf896e875",
+      "config\\m2-operating.json": "476315fab093a4b7280c9aed98f0ca1921af1765cb0b720cb68db602ba880617",
+      "config\\web-search.json": "f10db27a007663c6ebc6be7d4efc4ded3ebdb98566a377f99c231a4d4f4f180e"
+    }
+  },
+  "recovery": {
+    "run": "m4-20261030T115034Z",
+    "summary": {
+      "mode": "trade",
+      "trade_fault": null,
+      "functional_complete": false,
+      "trade": {
+        "recovered_only": [
+          {
+            "before": {
+              "agent": {
+                "jellopy": 2,
+                "zeny": 120
+              },
+              "peer": {
+                "jellopy": 2,
+                "zeny": 80
+              }
+            },
+            "sessions": {
+              "agent": "1a18ca49b6d-fa98-ca35195:1",
+              "peer": "1a18ca49b6e-b40-2a90d87c:1"
+            },
+            "created": 1793361004.150142,
+            "offer": "one Jellopy for ten Zeny",
+            "after": {
+              "agent": {
+                "jellopy": 1,
+                "zeny": 130
+              },
+              "peer": {
+                "jellopy": 3,
+                "zeny": 70
+              }
+            },
+            "authoritative": {
+              "agent": {
+                "jellopy": 1,
+                "zeny": 130
+              },
+              "peer": {
+                "jellopy": 3,
+                "zeny": 70
+              }
+            },
+            "reconciliation": "completed",
+            "observation_ids": {
+              "agent": "1a18ca5f1aa-3b78-622997f:8",
+              "peer": "1a18ca5f1ac-aacc-9bf0c0d:8"
+            }
+          }
+        ],
+        "new_transfer_attempted": false
+      },
+      "elapsed_s": 19.04599999997299,
+      "event_count": 39
+    },
+    "resource_samples": 2,
+    "min_available_ram_gib": 3.2238388061523438,
+    "peak_gpu_used_mib": 9720,
+    "max_resource_sample_gap_s": 14.890999999945052,
+    "max_snapshot_gap_within_epoch_s": 1.029,
+    "events_by_kind": {
+      "ready": 6,
+      "snapshot": 30,
+      "connection": 3
+    },
+    "completed_trade_results_consumed": 0,
+    "hashes": {
+      "summary.json": "88798f280283cd3560058ba45a5349506148cffb0d9b4e3b9178c62f8219b0cc",
+      "events.jsonl": "867f9779d95217d2a26e1447aa002723da6fcd73dbad0de4d0180f9271f999d0",
+      "manifest.json": "67e60e4e4aee3704fae3b1a4a37c2d84cc2df85f107673851e03c88b40a3266b"
+    },
+    "source_manifest": {
+      "agent\\community.py": "f0e91ee3f94e80d94de5f8f329c725bf6c44fdeda8ebbca02327b02772ecdbb3",
+      "agent\\dialogue.py": "2c22b36c98913be0f61fa870d56ae3f27b03e75dec6c67295be86b781c079e62",
+      "agent\\memory.py": "5d1fceb26af8c66b33014ed861f202482d0e86c64273f6bd03fb302c503c1771",
+      "agent\\prototype.py": "5ff627f6eb945e45322f5498a60c0429700651603579883f37786c7f77093cda",
+      "agent\\routine.py": "2dfaa74ebfe7e488b543f4fe7d0fb91050883d04061859d9464c4688a9de5cce",
+      "agent\\trade.py": "7a44401eb014096bd03862cfd8b62bae2e3805b1f66b84b809a518a884ca12bf",
+      "inference\\m2.py": "d69bd5ca0be530c1a364279915301bac0c4e53ad310e26db11e399d250ca5485",
+      "inference\\m2_context.py": "d26d354ec4ad10f31888f4ded3110902e2b5ab77bd4e89a71f8fb42f84cc36af",
+      "inference\\web_search.py": "b1b1381fc6afa5366b7d4b1fb092f3878732be45ee2114fda918ef35cb8577c0",
+      "inference\\web_turn.py": "df728acf9de8205a35eac44c868ed490b0fefb62eddbd028273a1d94554a4fc2",
+      "bridge\\openkore\\m1_bridge.pl": "9c31cd460c8a0bbf780876e1c94e6b9c86db53d7cfde1fedc80e7575e1cbac3e",
+      "bridge\\client.py": "b16ca8b7ef52025e3b6344dcb1dcb1870261f9943bc20932a90f9f52d4052ca3",
+      "scripts\\run_m4.py": "b499f1d4deda6e6cef8fa0b4dcb41144d7064b4626d60c3419fa8e652d02c0dc",
+      "scripts\\prepare_m4.py": "1b5b3153a3a42298696162eb430ac714c42de6c1f46e1f211d5b7325d45a2f14",
+      "scripts\\m1.py": "b22f1e16801eb22a4d0ea292ead80180345a3bf6256baf0264945efc324d27ef",
+      "scripts\\bench_m2.py": "f628dd571c14ecf9908625a0b598d9bda33205084f2ba6b5f962dca8dbeb5b9a",
+      "fixtures\\m4-pve.txt": "13d3c34c34313e98f6a97fef899982de9dd7de1d5d3236a590dfb4c3a20aa180",
+      "config\\m4-identities.json": "8a79c12c2d7a1a73ecbea9eb5f35d097938b097032e5b8e5789ddeedf896e875",
+      "config\\m2-operating.json": "476315fab093a4b7280c9aed98f0ca1921af1765cb0b720cb68db602ba880617",
+      "config\\web-search.json": "f10db27a007663c6ebc6be7d4efc4ded3ebdb98566a377f99c231a4d4f4f180e"
+    }
+  },
+  "web": {
+    "run": "m4-20261030T115058Z",
+    "summary": {
+      "mode": "web",
+      "trade_fault": null,
+      "functional_complete": false,
+      "web": {
+        "who": "third",
+        "question": "web poring",
+        "session": "1a18ca5f1ba-7948-31d57452:1",
+        "started": 780017.843,
+        "external": {
+          "kind": "external_web_search",
+          "query": "Ragnarok Online classic Poring monster",
+          "retrieved_at": "2026-10-30T11:51:04.570418+00:00",
+          "results": [
+            {
+              "title": "Poring - Plant - RO Monster (Pre-re) - RateMyServer.Net",
+              "url": "https://ratemyserver.net/index.php?page=mob_db&mob_id=1002",
+              "snippet": "Look up Poring's spawn location on iRO / kRO, spawn amount and spawn time. Where to find Poring. Poring's item drop, stats, hit, flee, range, speed, race, element, size, base exp, job exp, hp and sp."
+            }
+          ]
+        },
+        "topic": "poring",
+        "cold": true,
+        "text": "Web (ratemyserver.net): Source claims Porings have spawn locations and stats...",
+        "metrics": {
+          "ttft_s": 0.5940000000409782,
+          "service_s": 1.0160000000614673,
+          "queue_s": 0.0,
+          "response_s": 1.0160000000614673,
+          "prompt_eval_count": 409,
+          "eval_count": 21
+        },
+        "elapsed_s": 3.797000000020489,
+        "generated_text": "Source claims Porings have spawn locations and stats on iRO/kRO."
+      },
+      "elapsed_s": 6.968999999924563,
+      "event_count": 37
+    },
+    "resource_samples": 2,
+    "min_available_ram_gib": 3.2543792724609375,
+    "peak_gpu_used_mib": 9704,
+    "max_resource_sample_gap_s": 5.031000000075437,
+    "max_snapshot_gap_within_epoch_s": 1.031,
+    "events_by_kind": {
+      "ready": 3,
+      "snapshot": 24,
+      "action_result": 4,
+      "chat": 6
+    },
+    "completed_trade_results_consumed": 0,
+    "hashes": {
+      "summary.json": "4421136121f770fc661f9dbc14d15bf659661f77c7719353d80879000e93c15c",
+      "events.jsonl": "d2b3547bdf8c07ef57ec5e76164abb3a0f47b6a467b1e483ff738da4eaeab69b",
+      "manifest.json": "67e60e4e4aee3704fae3b1a4a37c2d84cc2df85f107673851e03c88b40a3266b"
+    },
+    "source_manifest": {
+      "agent\\community.py": "f0e91ee3f94e80d94de5f8f329c725bf6c44fdeda8ebbca02327b02772ecdbb3",
+      "agent\\dialogue.py": "2c22b36c98913be0f61fa870d56ae3f27b03e75dec6c67295be86b781c079e62",
+      "agent\\memory.py": "5d1fceb26af8c66b33014ed861f202482d0e86c64273f6bd03fb302c503c1771",
+      "agent\\prototype.py": "5ff627f6eb945e45322f5498a60c0429700651603579883f37786c7f77093cda",
+      "agent\\routine.py": "2dfaa74ebfe7e488b543f4fe7d0fb91050883d04061859d9464c4688a9de5cce",
+      "agent\\trade.py": "7a44401eb014096bd03862cfd8b62bae2e3805b1f66b84b809a518a884ca12bf",
+      "inference\\m2.py": "d69bd5ca0be530c1a364279915301bac0c4e53ad310e26db11e399d250ca5485",
+      "inference\\m2_context.py": "d26d354ec4ad10f31888f4ded3110902e2b5ab77bd4e89a71f8fb42f84cc36af",
+      "inference\\web_search.py": "b1b1381fc6afa5366b7d4b1fb092f3878732be45ee2114fda918ef35cb8577c0",
+      "inference\\web_turn.py": "df728acf9de8205a35eac44c868ed490b0fefb62eddbd028273a1d94554a4fc2",
+      "bridge\\openkore\\m1_bridge.pl": "9c31cd460c8a0bbf780876e1c94e6b9c86db53d7cfde1fedc80e7575e1cbac3e",
+      "bridge\\client.py": "b16ca8b7ef52025e3b6344dcb1dcb1870261f9943bc20932a90f9f52d4052ca3",
+      "scripts\\run_m4.py": "b499f1d4deda6e6cef8fa0b4dcb41144d7064b4626d60c3419fa8e652d02c0dc",
+      "scripts\\prepare_m4.py": "1b5b3153a3a42298696162eb430ac714c42de6c1f46e1f211d5b7325d45a2f14",
+      "scripts\\m1.py": "b22f1e16801eb22a4d0ea292ead80180345a3bf6256baf0264945efc324d27ef",
+      "scripts\\bench_m2.py": "f628dd571c14ecf9908625a0b598d9bda33205084f2ba6b5f962dca8dbeb5b9a",
+      "fixtures\\m4-pve.txt": "13d3c34c34313e98f6a97fef899982de9dd7de1d5d3236a590dfb4c3a20aa180",
+      "config\\m4-identities.json": "8a79c12c2d7a1a73ecbea9eb5f35d097938b097032e5b8e5789ddeedf896e875",
+      "config\\m2-operating.json": "476315fab093a4b7280c9aed98f0ca1921af1765cb0b720cb68db602ba880617",
+      "config\\web-search.json": "f10db27a007663c6ebc6be7d4efc4ded3ebdb98566a377f99c231a4d4f4f180e"
+    }
+  },
+  "repeat_conversation": {
+    "run": "m4-20261030T115414Z",
+    "summary": {
+      "mode": "conversation",
+      "trade_fault": null,
+      "functional_complete": false,
+      "conversation": {
+        "replies": [
+          {
+            "who": "agent",
+            "question": "Name and one preference only, very briefly?",
+            "session": "1a18ca5f1aa-3b78-622997f:1",
+            "started": 780213.14,
+            "external": null,
+            "topic": null,
+            "cold": true,
+            "text": "M4 Alden. Prefer gathering supplies and patrolling the square in the morning.",
+            "metrics": {
+              "ttft_s": 0.640999999945052,
+              "service_s": 1.0940000000409782,
+              "queue_s": 0.0,
+              "response_s": 1.0940000000409782,
+              "prompt_eval_count": 697,
+              "eval_count": 23
+            },
+            "elapsed_s": 1.1099999999860302
+          },
+          {
+            "who": "peer",
+            "question": "Name and one preference only, very briefly?",
+            "session": "1a18ca5f1ac-aacc-9bf0c0d:1",
+            "started": 780213.375,
+            "external": null,
+            "topic": null,
+            "cold": true,
+            "text": "M4 Bram; prefer hunting Porings in Prontera afternoon.",
+            "metrics": {
+              "ttft_s": 0.4219999999040738,
+              "service_s": 0.7969999999040738,
+              "queue_s": 0.859000000054948,
+              "response_s": 1.6559999999590218,
+              "prompt_eval_count": 695,
+              "eval_count": 19
+            },
+            "elapsed_s": 1.6709999999729916
+          },
+          {
+            "who": "third",
+            "question": "Name and one preference only, very briefly?",
+            "session": "1a18ca5f1ba-7948-31d57452:1",
+            "started": 780213.625,
+            "external": null,
+            "topic": null,
+            "cold": true,
+            "text": "M4 Mira. I prefer trading.",
+            "metrics": {
+              "ttft_s": 0.4690000000409782,
+              "service_s": 0.734000000054948,
+              "queue_s": 1.4059999999590218,
+              "response_s": 2.14000000001397,
+              "prompt_eval_count": 728,
+              "eval_count": 14
+            },
+            "elapsed_s": 2.155999999959022
+          }
+        ],
+        "inference_pending_before_independent_movement": true
+      },
+      "elapsed_s": 6.609000000054948,
+      "event_count": 60
+    },
+    "resource_samples": 2,
+    "min_available_ram_gib": 6.365814208984375,
+    "peak_gpu_used_mib": 9277,
+    "max_resource_sample_gap_s": 5.0,
+    "max_snapshot_gap_within_epoch_s": 1.028,
+    "events_by_kind": {
+      "ready": 3,
+      "snapshot": 24,
+      "action_result": 14,
+      "chat": 18,
+      "movement_ack": 1
+    },
+    "completed_trade_results_consumed": 0,
+    "hashes": {
+      "summary.json": "f748967e0993a8188ada93a06f9f30f9459bafd506c8108488daddcd98a5200c",
+      "events.jsonl": "c4b3b6385fab7e98ee2a51402447e8f9dbb90863a75aeb00fe6ef6e92c425c25",
+      "manifest.json": "6263998859cee32191108b0af80078d2ef98031e38fe594ce90d0339faf19b7a"
+    },
+    "source_manifest": {
+      "agent\\community.py": "f0e91ee3f94e80d94de5f8f329c725bf6c44fdeda8ebbca02327b02772ecdbb3",
+      "agent\\dialogue.py": "2c22b36c98913be0f61fa870d56ae3f27b03e75dec6c67295be86b781c079e62",
+      "agent\\memory.py": "5d1fceb26af8c66b33014ed861f202482d0e86c64273f6bd03fb302c503c1771",
+      "agent\\prototype.py": "91f6398fb7f60c9c78de3a0d794e51e206a516d3b8369eadfafb513765ea633a",
+      "agent\\routine.py": "2dfaa74ebfe7e488b543f4fe7d0fb91050883d04061859d9464c4688a9de5cce",
+      "agent\\trade.py": "7a44401eb014096bd03862cfd8b62bae2e3805b1f66b84b809a518a884ca12bf",
+      "inference\\m2.py": "d69bd5ca0be530c1a364279915301bac0c4e53ad310e26db11e399d250ca5485",
+      "inference\\m2_context.py": "d26d354ec4ad10f31888f4ded3110902e2b5ab77bd4e89a71f8fb42f84cc36af",
+      "inference\\web_search.py": "b1b1381fc6afa5366b7d4b1fb092f3878732be45ee2114fda918ef35cb8577c0",
+      "inference\\web_turn.py": "df728acf9de8205a35eac44c868ed490b0fefb62eddbd028273a1d94554a4fc2",
+      "bridge\\openkore\\m1_bridge.pl": "9c31cd460c8a0bbf780876e1c94e6b9c86db53d7cfde1fedc80e7575e1cbac3e",
+      "bridge\\client.py": "b16ca8b7ef52025e3b6344dcb1dcb1870261f9943bc20932a90f9f52d4052ca3",
+      "scripts\\run_m4.py": "b499f1d4deda6e6cef8fa0b4dcb41144d7064b4626d60c3419fa8e652d02c0dc",
+      "scripts\\prepare_m4.py": "1b5b3153a3a42298696162eb430ac714c42de6c1f46e1f211d5b7325d45a2f14",
+      "scripts\\m1.py": "b22f1e16801eb22a4d0ea292ead80180345a3bf6256baf0264945efc324d27ef",
+      "scripts\\bench_m2.py": "f628dd571c14ecf9908625a0b598d9bda33205084f2ba6b5f962dca8dbeb5b9a",
+      "fixtures\\m4-pve.txt": "13d3c34c34313e98f6a97fef899982de9dd7de1d5d3236a590dfb4c3a20aa180",
+      "config\\m4-identities.json": "8a79c12c2d7a1a73ecbea9eb5f35d097938b097032e5b8e5789ddeedf896e875",
+      "config\\m2-operating.json": "476315fab093a4b7280c9aed98f0ca1921af1765cb0b720cb68db602ba880617",
+      "config\\web-search.json": "f10db27a007663c6ebc6be7d4efc4ded3ebdb98566a377f99c231a4d4f4f180e"
+    }
+  }
+}

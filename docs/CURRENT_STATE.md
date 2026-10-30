@@ -4,14 +4,29 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Verified
 
-- **M4 functional prototype in progress**, clean branch `codex/m4-functional`
+- **M4 functional prototype demonstrated**, clean branch `codex/m4-functional`
   at `D:/Ragnarok Agents/m4-worktree`, from exact handoff `42bddcc`.
   Three new project characters preserve M1 characters and all prior WIP.
-  Shared bounded inference/private identity stores, solo PvE, cooperative
-  development encounter and a fully confirmed one-Jellopy/ten-Zeny trade work.
-  Fresh client inventories matched read-only server persistence on both sides.
-  40 tests and Perl syntax passed. Combined/fault proof remains pending;
-  see [M4 evidence](evidence/M4-prototype.md). No social-quality acceptance.
+  Runtime implementation commits: `a5bff27`, `f6b7a67`, `1c0b159`, `41f56d5`.
+  Combined run `m4-20261030T114811Z` at `f6b7a67`
+  recorded 353 events over about 71 seconds: three valid selected-9B replies,
+  movement during pending inference, private-note isolation and perceived-chat
+  learning with database reopen recall, solo 51 damage/loot, cooperative
+  Alden 34 + Bram 17 damage to a fresh shared Poring/loot, and fixed trade.
+  Alden Jellopy 3 -> 2 / Zeny 110 -> 120; Bram 1 -> 2 / 90 -> 80. Both fresh
+  client inventories matched read-only server persistence after reconnect.
+  Deliberate process exit `m4-20261030T115000Z` consumed zero completion
+  observations; new-process recovery `m4-20261030T115034Z` confirmed exactly
+  one transfer with **no new transfer attempted** (Alden 2/120 -> 1/130;
+  Bram 2/80 -> 3/70). A separate local SearXNG check attributed a PC/pre-re
+  source in 3.797 seconds. 40 tests, Python compile and Perl syntax passed.
+  Sampled combined RAM floor **2.699 GiB**, GPU peak **9,827 MiB**; within-epoch
+  snapshot gap <=1.031 seconds. Lifecycle subprocesses pause resource sampling;
+  these are sampled values, not continuous peaks. No limits were changed.
+  [M4 evidence](evidence/M4-prototype.md), [results/hashes](evidence/M4-results.json),
+  [run/observe commands](../README.md#three-agent-functional-prototype-m4).
+  This is a bounded controlled fixture, not an unattended population service.
+  **Social-quality acceptance and one-hour stabilization remain deferred.**
 
 - **M3 functional baseline complete; naturalness deferred by user direction.**
   On 2026-10-30 the user prioritized a working end-to-end prototype over dialogue
@@ -48,7 +63,7 @@ Updated: 2026-10-30 (America/Santiago).
   The 30-minute run predates this dialogue-only repair; controller/persistence
   sources are unchanged. Coordinator review found robotic phrasing and weak
   web-answer utility; these findings remain recorded. **Naturalness/social
-  acceptance is deferred by the user, not passed. M4 is not implemented here.**
+  acceptance is deferred by the user, not passed. That M3 handoff did not implement M4.**
 
 - **Preserved, uncommitted polish WIP:** `agent/dialogue.py`,
   `scripts/run_m3.py`, `tests/test_m3_dialogue.py`. Work stopped without further
@@ -83,11 +98,7 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Next action
 
-Coordinator: create Chat 05 for the M4 functional prototype from the committed
-docs-only handoff on `codex/m3-persistent` (runtime baseline `ff635f5`), in a clean
-checkout/worktree that excludes all polish WIP. Implement verified slices:
-three isolated persistent identities; controlled solo PvE before demonstrated
-cooperation; then restricted server-confirmed two-party trade. Preserve action
-truth, private perception/memory and the unchanged resource limits. A richer
-social experience and one-hour stabilization are subsequent acceptance work,
-not prerequisites to implementing the end-to-end prototype. Do not start M5.
+Coordinator: review the M4 functional evidence and implementation branch before
+planning the deferred social-quality and one-hour stabilization work. Full M4
+acceptance remains open. M4 test clients/server are left running; the controller
+has exited. All M2/M3 WIP remains in its original checkout. Do not start M5.

@@ -1,6 +1,6 @@
 # M1 bridge and local operation
 
-The tracked implementation is one OpenKore plugin, a headless output adapter, a Python stream client, native setup/lifecycle tooling, and a live acceptance harness. It has no inference, agent memory, combat controller, or social system.
+The M1 baseline described below is one OpenKore plugin, a headless output adapter, a Python stream client, native setup/lifecycle tooling, and a live acceptance harness. M3 adds inference/memory; the M4 controlled gameplay extension is documented at the end of this file.
 
 ## Protocol and truth
 
@@ -57,3 +57,46 @@ Known setup findings:
 - Use 144-byte character blocks, disable the server's optional login PIN prompt for these local fixtures, and keep game/inter-server passwords below their native 24-byte buffer size. Generated passwords are 20 ASCII bytes.
 - The stock Windows console interface needs real screen/input handles. `Interface::M1Headless` writes logs, keeps the normal gameplay loop, and fails explicitly if configuration requires user input.
 - Portal compilation is disabled for this adjacent-cell fixture. No global route correctness or historical episode match is established. Modern stock server features unsupported by protocol `20130807` report warnings and disable themselves.
+
+## M4 controlled prototype extension
+
+M4 keeps protocol version 1 and all existing framing, deadlines, duplicate-ID,
+one-in-flight, 128-action-per-epoch, rate and reconnect bounds. The pinned plugin
+now permits loopback port 8767 as well as 8765/8766. Existing M1 profiles do not
+enable gameplay extensions. M4 profiles require `m4_fixture: true`; third-party
+chat and model output cannot change this configuration.
+
+Snapshots additionally carry Zeny, at most 16 perceived monsters/ground items,
+and current trade offers/locks. Actor IDs are eight lowercase hexadecimal
+characters from the local perceived actor list. `attack` and `take` accept only
+`type,target`, only in Prontera while alive: a visible adjacent Poring (1002)
+for one attack, or adjacent Jellopy (909) for pickup. The plugin rechecks current
+actors, distance and state immediately before sending. Movement remains one
+walkable adjacent cell at a time. Server corrections can supersede a movement
+acknowledgment; controllers wait for fresh snapshots and avoid occupied cells.
+
+`combat` packets carry source, target, damage and whether the source is self;
+`monster_departure` explicitly distinguishes death from disappearance.
+`inventory_added` carries the received item/amount. Attack completion means a
+matching server attack packet, not a kill. Pickup completion means a matching
+server inventory-add packet; the scenario also requires an inventory increase.
+
+Fixed trade actions accept only `type`: `trade_request`, `trade_accept`,
+`trade_offer`, `trade_lock`, `trade_commit`. The configured seller is Alden,
+buyer Bram; Mira has no trade role. Both must be visibly nearby, with the
+expected partner. Only one Jellopy for ten Zeny is supported; extra fields are
+rejected. Offers and locks must match exactly, with no additional items, before
+final commitment. One trade may begin per plugin epoch. On this legacy protocol
+the buyer's Zeny offer sends a lock as well, so server acknowledgment can be
+observed without guessing from a local value. Stage completion never establishes
+settled ownership. Both completion packets plus fresh inventories and a
+read-only post-logout rAthena persistence check establish a confirmed transfer.
+
+The private controller ledger records unknown intent before sending. Unknown
+or ambiguous transfers block new transfers across orchestrator/client restarts;
+recovery reconciles before allowing a later explicitly requested new transfer.
+There is no automatic packet replay. Per-player intent history retains terminal
+records with a 512-row target and fails closed at 1024 total rows if unresolved
+history accumulates. The transfer ledger retains 128 terminal records plus its
+unresolved entry. The SQL check is privileged scenario instrumentation, never
+an agent perception or LLM input. See [M4 evidence](evidence/M4-prototype.md).

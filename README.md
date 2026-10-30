@@ -2,7 +2,7 @@
 
 A local-first project for persistent, socially believable AI players on a classic/pre-Renewal Ragnarok Online private server. The first target is one autonomous player with grounded conversation and memory across restarts, followed by three to five distinct players.
 
-**Status:** M1 passed. M3 integrates the selected local Qwen3.5 9B Q6_K model with persistent memory, adjacent movement and bounded dialogue. A 30-minute restart/reconnect trial completed, followed by a targeted public-search repair check. Human social-quality review remains open. See [current state](docs/CURRENT_STATE.md) and [live replies](docs/evidence/M3-conversations.md).
+**Status:** the M4 functional prototype is demonstrated: three persistent identities, bounded local 9B conversation, controlled solo/cooperative PvE, loot and reconciled item/Zeny trade. Human social quality and the one-hour M4 trial remain deferred. See [M4 evidence](docs/evidence/M4-prototype.md) and [current state](docs/CURRENT_STATE.md).
 
 ## Start here
 
@@ -69,7 +69,7 @@ This runs 540 short fixture requests plus 18 warm-up requests and prints its ign
 
 ## Local 9B web search slice
 
-The existing self-hosted SearXNG container serves JSON search on `127.0.0.1:8080`. The model uses Ollama's local tool-call API; Python validates one search request, queries SearXNG, and returns at most three short, source-linked snippets. Search results are external claims and never establish game actions or rAthena state. This standalone turn is not yet connected to the game agent.
+The existing self-hosted SearXNG container serves JSON search on `127.0.0.1:8080`. The model uses Ollama's local tool-call API; Python validates one search request, queries SearXNG, and returns at most three short, source-linked snippets. Search results are external claims and never establish game actions or rAthena state. This standalone command does not connect to the game; M3/M4 separately integrate a fixed public topic.
 
 With SearXNG and Ollama running, this command was verified:
 
@@ -100,3 +100,52 @@ The patrol has no combat, loot, trade or global navigation.
 outage checks, failed preflights, latency/resources and remaining acceptance
 limits. [Results and hashes](docs/evidence/M3-results.json) accompany the
 retained conversation review set.
+
+## Three-agent functional prototype (M4)
+
+Use PowerShell from `D:/Ragnarok Agents/m4-worktree`, with the existing native
+server/database, Ollama and SearXNG available. These commands were verified:
+
+```powershell
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/prepare_m4.py --runtime 'D:/Ragnarok Agents/runtime' --start
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/run_m4.py --runtime 'D:/Ragnarok Agents/runtime' --mode all
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/run_m4.py --runtime 'D:/Ragnarok Agents/runtime' --mode web
+```
+
+Preparation adds three ordinary test novices and a local stationary Poring
+fixture, then restarts the project map server and clients. It preserves existing
+characters, balances, databases, profiles and M3 memory. The fixture gives a
+labeled guaranteed Jellopy reward alongside normal drops. Alden leads/gathers,
+Bram flanks/strikes, and Mira converses. The fixed trade exchanges one earned
+Jellopy for ten Zeny; repeated demonstrations consume the buyer's existing
+Zeny. Nothing replenishes balances automatically.
+
+Watch the terminal for per-action server results; each run prints its evidence
+directory and a final JSON summary. A successful combined run reports
+`functional_complete: true`. The clients are headless, so observation is through
+these normalized events and retained evidence. For snapshots only:
+
+```powershell
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/run_m4.py --runtime 'D:/Ragnarok Agents/runtime' --mode observe --seconds 2
+```
+
+Run only one controller/observer at a time: each bridge allows one authenticated
+consumer. Directed `M4:agent:`, `M4:peer:` and `M4:third:` prompts admit a bounded
+reply; ordinary replies never start another turn. Only `web poring` selects the
+fixed public query. The runner ends after its scenario; it is not a persistent
+unattended population service. Server/client processes remain available.
+
+This fault command deliberately exits with code 1 after final trade packets.
+The following command reconciles the unknown transfer from fresh client
+inventories plus read-only server persistence, without starting a new transfer:
+
+```powershell
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/run_m4.py --runtime 'D:/Ragnarok Agents/runtime' --mode trade --trade-fault after_commit_exit
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/run_m4.py --runtime 'D:/Ragnarok Agents/runtime' --mode trade
+```
+
+The current project clients occupy loopback bridges 8765, 8766 and 8767. M1
+profiles and characters remain preserved; M4 preparation replaces their client
+processes on the first two ports. Unknown/ambiguous transfers block later
+transfers until reconciled. This controlled prototype does not establish full
+M4 social acceptance, general navigation or the one-hour stabilization target.
