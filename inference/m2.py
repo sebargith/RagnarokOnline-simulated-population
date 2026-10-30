@@ -157,6 +157,14 @@ class BoundedInference:
                 future.set_result({"error": type(error).__name__ + ": " + str(error),
                                    "queue_s": queue_s, "response_s": time.monotonic() - admitted})
 
+    def recover_idle_circuit(self):
+        """Caller supplies the cooldown. Never reset while work is outstanding."""
+        with self.condition:
+            if self.closed or self.identities or self.queue:
+                return False
+            self.circuit.clear()
+            return True
+
     def close(self):
         with self.condition:
             self.closed = True

@@ -10,11 +10,13 @@ use Globals qw($net $char $field $messageSender $playersList $monstersList $item
 use Misc ();
 use Plugins;
 use Network;
+use M4RequestWindow;
 
 my ($server, $client, $cfg, $hooks, $pending);
 my ($input, $output, $authorized, $auth_time) = ('', '', 0, 0);
 my ($seq, $epoch, $in_game, $last_snapshot, $last_action) = (0, 0, 0, 0, 0);
 my %seen;
+my $serial_window = M4RequestWindow->new(128);
 my ($trade_offered, $trade_used) = (0, 0);
 my ($attempts, $recovery_deadline, $stopping) = (0, 0, 0);
 my $json = JSON::PP->new->utf8->canonical;
@@ -112,6 +114,7 @@ sub result {
     my $r = {request_id => $id, status => $status, reason => $reason};
     $r->{evidence} = $evidence if $evidence;
     $seen{$id} = $r if exists $seen{$id};
+    $serial_window->finish($id, $r);
     emit('action_result', $r);
 }
 
@@ -129,10 +132,18 @@ sub request {
     unless (defined($id) && !ref($id) && $id =~ /^[A-Za-z0-9_-]{1,64}$/) {
         emit('protocol_error', {reason => 'invalid_request_id'}); return;
     }
-    if (exists $seen{$id}) { emit('action_result', {%{$seen{$id}}, replay => 1}); return }
-    # Retain IDs for this game session; refuse further actions at capacity, never evict.
-    if (keys(%seen) >= 128) { result($id, 'rejected', 'session_action_limit'); return }
-    $seen{$id} = {};
+    if ($id =~ /^c_(\d{1,15})$/) {
+        my ($state, $cached) = $serial_window->admit($id);
+        if ($state eq 'cached') { emit('action_result', {%$cached, replay => 1}); return }
+        # A boot-lifetime high-water mark rejects evicted IDs forever. A new
+        # controller learns the next sequence at auth; it never resends intents.
+        if ($state eq 'retired') { result($id, 'rejected', 'retired_request'); return }
+    } else {
+        if (exists $seen{$id}) { emit('action_result', {%{$seen{$id}}, replay => 1}); return }
+        # Preserve the original UUID/demo contract without unsafe eviction.
+        if (keys(%seen) >= 128) { result($id, 'rejected', 'session_action_limit'); return }
+        $seen{$id} = {};
+    }
     unless (join(',', sort keys %$r) eq 'action,deadline_ms,id,session,v' &&
         !ref($r->{v}) && $r->{v} == 1 && !ref($r->{session}) &&
         defined($r->{deadline_ms}) && !ref($r->{deadline_ms}) && $r->{deadline_ms} =~ /^\d{13}$/) {
@@ -388,7 +399,8 @@ sub tick {
                 }
                 $authorized = 1;
                 emit('ready', {resync => 1, pending_request_id => $pending ? $pending->{id} : undef,
-                    limits => {frame_bytes => 4096, output_bytes => 65536, actions_per_session => 128}});
+                    next_serial => $serial_window->next_serial(),
+                    limits => {frame_bytes => 4096, output_bytes => 65536, actions_per_session => 128, serial_results => 128}});
                 snapshot();
             } else { request($r) }
         }

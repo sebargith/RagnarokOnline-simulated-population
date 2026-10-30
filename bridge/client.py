@@ -18,6 +18,7 @@ class Bridge:
         self.events = deque(maxlen=256)
         self.latest = None
         self.session = None
+        self.next_serial = None
         self.sink = sink
         self.send({"type": "auth", "token": self.config["token"]})
 
@@ -54,6 +55,8 @@ class Bridge:
                 self.events.append(event)
                 received.append(event)
                 self.session = event["session"]
+                if event["kind"] == "ready":
+                    self.next_serial = event["data"].get("next_serial")
                 if event["kind"] == "snapshot":
                     self.latest = event
                 if self.sink:
@@ -64,6 +67,13 @@ class Bridge:
         events = list(self.events)
         self.events.clear()
         return events
+
+    def serial_id(self):
+        if self.next_serial is None or self.next_serial >= 10**15:
+            raise RuntimeError('Continuous request sequence unavailable; update/restart project clients')
+        request = 'c_' + str(self.next_serial)
+        self.next_serial += 1
+        return request
 
     def proposal(self, action, *, request_id=None, session=None, deadline_ms=None):
         # Both this boundary and the plugin require a fresh observed game session.

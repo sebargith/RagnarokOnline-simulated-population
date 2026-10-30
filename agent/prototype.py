@@ -22,12 +22,15 @@ class Prototype:
         self.last_send = {who: 0 for who in self.bridges}
         self.last_resource = -10
         self.started = time.monotonic()
-        self.raw = (self.evidence/'events.jsonl').open('w', encoding='utf-8')
+        self.raw = self.open_log(self.evidence/'events.jsonl')
         self.event_count = 0
         self.replies = []
         for memory in self.community.memories.values():
             memory.db.execute('CREATE TABLE IF NOT EXISTS intents(id TEXT PRIMARY KEY, session TEXT, action TEXT, status TEXT)')
             memory.db.commit()
+
+    def open_log(self, path):
+        return path.open('w', encoding='utf-8')
 
     def pump(self, seconds=.1):
         end = time.monotonic()+seconds
@@ -199,12 +202,15 @@ class Prototype:
     def reconnect_clients(self):
         for bridge in self.bridges.values():
             bridge.close()
-        command = [str(__import__('sys').executable), str(self.root/'scripts/prepare_m4.py'), '--runtime', str(self.runtime), '--clients-only', '--start']
+        command = [str(__import__('sys').executable), str(self.root/'scripts/prepare_m4.py'), '--runtime', str(self.runtime), '--clients-only', '--start', '--controller-owned', *self.client_options()]
         # Lifecycle signals only the verified project clients. Server/DB stay up.
         subprocess.run(command, check=True, timeout=100)
         self.bridges = {who: Bridge(self.runtime/'m4/openkore'/who/'bridge.json') for who in ('agent', 'peer', 'third')}
         self.community.bridges = self.bridges
         self.ready()
+
+    def client_options(self):
+        return []
 
     def trade(self, fault=None):
         ledger = TradeLedger(self.runtime/'m4/trades.sqlite')
@@ -270,6 +276,7 @@ class Prototype:
         old_items = {i['id'] for i in self.data(leader)['ground_items']}
         actors = ('agent', 'peer') if cooperative else ('agent',)
         evidence_start = self.event_count
+        encounter_started_ms = int(time.time()*1000)
         if cooperative:
             goal = 'Goal: hunt Poring '+target+'. I lead; Bram flank and strike it.'
             self.chat('agent', goal)
@@ -280,7 +287,7 @@ class Prototype:
             who = actors[turn % len(actors)]
             monsters = self.data(who)['monsters']
             visible = next((m for m in monsters if m['id'] == target), None)
-            deaths = [e for e in self.events if e['agent_id'] == leader and e['kind'] == 'monster_departure' and e['data']['target'] == target and e['data']['dead']]
+            deaths = [e for e in self.events if e['agent_id'] == leader and e['kind'] == 'monster_departure' and e['time_ms'] >= encounter_started_ms and e['data']['target'] == target and e['data']['dead']]
             if deaths:
                 break
             if not visible:

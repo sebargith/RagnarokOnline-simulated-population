@@ -1,7 +1,7 @@
 """Bounded identity-scoped dialogue; model output has no action authority."""
 import json
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, Future
 
 from inference.m2 import BoundedInference
 from inference.web_search import search_public_web
@@ -45,7 +45,12 @@ class Dialogue:
             self.future = self.pool.submit(self.search, PUBLIC_TOPICS[topic], self.web)
             self.stage = 'search'
         else:
-            self.submit_model()
+            try:
+                self.submit_model()
+            except (RuntimeError, ValueError, BufferError) as error:
+                self.future = Future()
+                self.future.set_result({'error': str(error)})
+                self.stage = 'model'
         return True
 
     def submit_model(self):

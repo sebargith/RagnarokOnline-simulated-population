@@ -8,11 +8,13 @@ import json
 from pathlib import Path
 import re
 import secrets
+import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts import m1
+from agent.live_io import exclusive
 
 
 def bind_runtime(runtime):
@@ -22,7 +24,7 @@ def bind_runtime(runtime):
     m1.DB, m1.PERL = m1.VENDOR/'mariadb/bin', m1.VENDOR/'strawberry-perl'
 
 
-def client(who):
+def client(who, quiet=False):
     profile = m1.RUN/'m4/openkore'/who
     args = [m1.PERL/'perl/bin/perl.exe', f'-I{ROOT / "bridge/lib"}', 'openkore.pl',
             f'--control={profile};{m1.OK / "control"}', f'--tables={profile};{m1.OK / "tables"}',
@@ -34,7 +36,15 @@ def client(who):
         raise RuntimeError(f'{name} already registered')
     env = m1.env_perl()
     env['M1_BRIDGE_CONFIG'] = str(profile/'bridge.json')
-    process = m1.launch(args, name, m1.OK, env)
+    if quiet:
+        startup = subprocess.STARTUPINFO()
+        startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        startup.wShowWindow = 0
+        process = subprocess.Popen([str(a) for a in args], cwd=m1.OK, env=env, stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            creationflags=subprocess.CREATE_NEW_CONSOLE, startupinfo=startup)
+    else:
+        process = m1.launch(args, name, m1.OK, env)
     processes[name] = {'pid': process.pid, 'exe': str((m1.PERL/'perl/bin/perl.exe').resolve())}
     m1.write(registry, json.dumps(processes, indent=2))
 
@@ -95,7 +105,17 @@ def main():
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('--start', action='store_true')
     parser.add_argument('--clients-only', action='store_true')
+    parser.add_argument('--continuous', action='store_true', help='Use bounded controller evidence instead of OpenKore file/console logs')
+    parser.add_argument('--controller-owned', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
+    if not args.controller_owned:
+        with exclusive(args.runtime/'m4.lock'):
+            execute(args)
+    else:
+        execute(args)
+
+
+def execute(args):
     bind_runtime(args.runtime)
     if args.start:
         for who in ('agent', 'peer', 'm4-agent', 'm4-peer', 'm4-third'):
@@ -106,7 +126,14 @@ def main():
         if not args.clients_only:
             m1.restart_map()
         for who in ('agent', 'peer', 'third'):
-            client(who)
+            if args.continuous:
+                path = args.runtime/'m4/openkore'/who/'config.txt'
+                text = path.read_text()
+                text = re.sub(r'(?m)^(logChat|logPrivateChat|logPartyChat|logGuildChat|logClanChat|logSystemChat|logLocalBroadcast|logShop|logConsole|logDead|monsterLog|playerLog|logEmoticons)(?:[ \t].*)?$', r'\1 0', text)
+                text = re.sub(r'(?m)^(logToFile_\w+)(?:[ \t].*)?$', r'\1', text)
+                path.write_text(text)
+            client(who, quiet=args.continuous)
+            m1.wait_port(8765+('agent', 'peer', 'third').index(who), 30)
     print('M4 profiles ready; existing characters and database preserved.')
 
 
