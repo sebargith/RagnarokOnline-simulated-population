@@ -42,9 +42,12 @@ def main():
     parser.add_argument('--interrupted', required=True)
     parser.add_argument('--recovery', required=True)
     parser.add_argument('--web', required=True)
+    parser.add_argument('--repeat')
     parser.add_argument('--output', required=True, type=Path)
     args = parser.parse_args()
     runs = {key: load(args.runtime/'evidence'/getattr(args, key)) for key in ('combined', 'interrupted', 'recovery', 'web')}
+    if args.repeat:
+        runs['repeat_conversation'] = load(args.runtime/'evidence'/args.repeat)
     if not runs['combined']['summary']['functional_complete']:
         raise ValueError('Combined proof incomplete')
     if runs['interrupted']['completed_trade_results_consumed']:

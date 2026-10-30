@@ -92,6 +92,8 @@ class Prototype:
         unresolved = db.execute("SELECT id FROM intents WHERE status IN ('unknown','accepted') AND session=?", (bridge.session,)).fetchone()
         if unresolved:
             raise RuntimeError('Unresolved intent blocks further actions in this session')
+        if db.execute('SELECT COUNT(*) FROM intents').fetchone()[0] >= 1024:
+            raise RuntimeError('Intent journal capacity exhausted; unresolved history requires review')
         request = uuid.uuid4().hex
         db.execute('INSERT INTO intents VALUES (?,?,?,?)', (request, bridge.session, json.dumps(action), 'unknown'))
         db.execute("DELETE FROM intents WHERE status IN ('completed','rejected') AND rowid NOT IN (SELECT rowid FROM intents ORDER BY rowid DESC LIMIT 512)")
@@ -136,7 +138,7 @@ class Prototype:
         for sender, target in [('third', 'agent'), ('agent', 'peer'), ('peer', 'third')]:
             self.chat(sender, 'M4:'+target+':Name and one preference only, very briefly?')
         pending_during_movement = any(d.future is not None for d in self.community.dialogues.values())
-        self.walk_to('third', 152, 181)
+        self.walk_to('third', 152, 180 if self.data('third')['destination']['y'] == 181 else 181)
         self.wait(lambda: len(self.replies)-start >= 3, 105)
         replies = self.replies[start:]
         for reply in replies:
