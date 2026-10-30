@@ -29,7 +29,7 @@ $hooks = Plugins::addHooks(
 sub start {
     open my $fh, '<:raw', $ENV{M1_BRIDGE_CONFIG} or die "M1_BRIDGE_CONFIG required: $!";
     local $/; $cfg = $json->decode(<$fh>); close $fh;
-    die 'Invalid bridge configuration' unless $cfg->{port} =~ /^876[56]$/ && length($cfg->{token}) >= 20;
+    die 'Invalid bridge configuration' unless $cfg->{port} =~ /^876[567]$/ && length($cfg->{token}) >= 20;
     $server = IO::Socket::INET->new(LocalAddr => '127.0.0.1', LocalPort => $cfg->{port},
         Listen => 1, Proto => 'tcp', ReuseAddr => 0) or die "Bridge listen: $!";
     $server->blocking(0);
