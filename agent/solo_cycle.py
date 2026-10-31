@@ -46,6 +46,47 @@ class SoloCycle:
         self.state.update(status='blocked', reason=reason)
         self.save()
 
+    def reconcile_navigation(self, observations, now_ms):
+        """Retire only a known-ended uncertain route, without claiming arrival."""
+        s, p = self.state, self.state.get('inflight')
+        if (s.get('status') != 'blocked' or s.get('reason') != 'navigate:unknown/route_ended_off_target'
+                or s.get('phase') != 'hunt' or not p or p['action'].get('type') != 'navigate'):
+            raise RuntimeError('Not a reconcilable navigation result')
+        matches = [h for h in s['history'] if h.get('request_id') == p['request_id']
+                   and h.get('session') == p['session'] and h.get('result', {}).get('status') == 'unknown'
+                   and h['result'].get('reason') == 'route_ended_off_target']
+        if len(matches) != 1 or len(observations) != 2:
+            raise RuntimeError('Missing unique terminal evidence or observations')
+        a, b = observations
+        if (a['session'] != b['session'] or b['session'] == p['session'] or b['time_ms'] - a['time_ms'] < 1000 or
+                now_ms - a['time_ms'] > 5000 or now_ms - b['time_ms'] < 0 or now_ms - b['time_ms'] > 2500):
+            raise RuntimeError('Observations are not fresh and separated')
+        for event in observations:
+            snap = event['data']
+            if (not snap.get('connected') or snap.get('name') != s['identity'] or
+                    snap.get('executor') != 'openkore_route' or snap.get('dead') or
+                    snap.get('map') != p['action']['map'] or 'native_task' not in snap or snap.get('native_task') or
+                    not isinstance(snap.get('ai_queue'), list) or
+                    any(x in (snap.get('ai_queue') or []) for x in ('move', 'route', 'mapRoute')) or
+                    not snap.get('position') or not snap.get('destination') or
+                    dist(snap['position'], snap['destination']) > 1):
+                raise RuntimeError('Character is not stationary and safe to replan')
+        if a['data']['position'] != b['data']['position']:
+            raise RuntimeError('Position changed between observations')
+        s['reconciliations'] = (s.get('reconciliations', []) + [{
+            'request_id': p['request_id'], 'session': p['session'],
+            'disposition': 'retired_unknown_not_arrived', 'observed_session': b['session'],
+            'map': b['data']['map'], 'position': b['data']['position'],
+            'observed_at_ms': b['time_ms']}])[-24:]
+        s['avoid_route'] = {'map': p['action']['map'], 'x': p['action']['x'],
+                            'y': p['action']['y'], 'until': now_ms / 1000 + 60}
+        s.update(status='active', inflight=None, failures=s.get('failures', 0) + 1,
+                 patrol=s['patrol'] + 1, observe_after=b['time_ms'])
+        s.pop('reason', None)
+        if s['failures'] >= 2:
+            s.update(status='blocked', reason='two_consecutive_action_failures')
+        self.save()
+
     def set_goal(self, target):
         """Set an absolute cumulative target, preserving all confirmed history."""
         s = self.state
@@ -164,7 +205,10 @@ class SoloCycle:
                     s['phase'] = 'return'
                 else:
                     s['skip'] = {k: v for k, v in s['skip'].items() if v > now}
-                    monsters = sorted((m for m in snap['monsters'] if m['id'] not in s['skip']),
+                    avoid = s.get('avoid_route') or {}
+                    monsters = sorted((m for m in snap['monsters'] if m['id'] not in s['skip'] and not
+                        (avoid.get('until', 0) > now and avoid.get('map') == snap['map'] and
+                         m['x'] == avoid.get('x') and m['y'] == avoid.get('y'))),
                                       key=lambda m: dist(m, snap['position']))
                     if monsters:
                         m = monsters[0]

@@ -48,6 +48,38 @@ class CycleTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             saved.set_goal(4)
 
+    def test_reconcile_ended_navigation_keeps_unknown_and_progress(self):
+        action = dict(type='navigate', map='prt_fild08', x=122, y=217, timeout_s=25)
+        self.finish(action, 'route_ended_off_target', 'unknown')
+        snap = snapshot(position={'x':131, 'y':226}, destination={'x':131, 'y':226}, ai_queue=[])
+        obs = [dict(session='new:1', time_ms=10000, data=snap),
+               dict(session='new:1', time_ms=11000, data=copy.deepcopy(snap))]
+        self.c.reconcile_navigation(obs, 11100)
+        saved = SoloCycle(self.path)
+        self.assertEqual(saved.state['status'], 'active')
+        self.assertIsNone(saved.state['inflight'])
+        self.assertEqual(saved.state['kills'], 0)
+        self.assertEqual(saved.state['history'][-1]['result']['status'], 'unknown')
+        self.assertEqual(saved.state['reconciliations'][-1]['disposition'], 'retired_unknown_not_arrived')
+
+    def test_reconcile_rejects_non_navigation_or_unstable_observations(self):
+        self.finish(dict(type='npc_buy', x=104, y=49, items=[], max_zeny=15, timeout_s=20), 'result_not_confirmed', 'unknown')
+        with self.assertRaises(RuntimeError):
+            self.c.reconcile_navigation([], 11100)
+        self.c.state.update(status='active', inflight=None)
+        self.finish(dict(type='navigate', map='prt_fild08', x=122, y=217, timeout_s=25), 'route_ended_off_target', 'unknown')
+        snap = snapshot(position={'x':131,'y':226}, destination={'x':131,'y':226}, ai_queue=[])
+        obs = [dict(session='new:1',time_ms=10000,data=copy.deepcopy(snap)), dict(session='new:1',time_ms=11000,data=copy.deepcopy(snap))]
+        for change in (dict(ai_queue=['route']), dict(map='prontera'), dict(native_task={'id':'x'}),
+                       dict(destination={'x':122,'y':217}), dict(connected=False)):
+            bad = copy.deepcopy(obs)
+            bad[1]['data'].update(change)
+            with self.assertRaises(RuntimeError):
+                self.c.reconcile_navigation(bad, 11100)
+        with self.assertRaises(RuntimeError):
+            self.c.reconcile_navigation(obs, 20000)
+        self.assertEqual(self.c.state['status'], 'blocked')
+
     def test_new_goal_rejects_uncertainty_and_invalid_targets(self):
         self.c.state.update(status='complete', kills=1, reason='confirmed_kill_goal', inflight={'request_id': 'c_1'})
         with self.assertRaises(RuntimeError):

@@ -150,7 +150,7 @@ class Runner:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('run', 'status', 'set-goal'))
+    parser.add_argument('command', choices=('run', 'status', 'set-goal', 'reconcile-navigation'))
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('--seconds', type=int, default=180)
     parser.add_argument('--goal-kills', type=int, default=6, help='Only used when creating a new checkpoint')
@@ -172,6 +172,26 @@ def main():
         if args.command == 'set-goal' and (args.target_kills is None or not (directory/'state.json').exists()):
             parser.error('set-goal requires --target-kills and an existing checkpoint')
         cycle = SoloCycle(directory/'state.json', args.goal_kills)
+        if args.command == 'reconcile-navigation':
+            bridge = Bridge(args.runtime/'p1/openkore/solo/bridge.json')
+            observations, ready = [], None
+            try:
+                deadline = time.monotonic() + 12
+                while time.monotonic() < deadline and len(observations) < 2:
+                    bridge.poll(.1)
+                    for event in bridge.drain():
+                        if event['kind'] == 'ready':
+                            ready = event['data']
+                        if event['kind'] == 'snapshot' and event['data'].get('connected') and ready:
+                            if 'pending_request_id' not in ready or ready['pending_request_id'] is not None:
+                                raise RuntimeError('Bridge has a pending action')
+                            if not observations or event['time_ms'] - observations[0]['time_ms'] >= 1000:
+                                observations.append(event)
+                cycle.reconcile_navigation(observations, int(time.time()*1000))
+                print(json.dumps({'status': cycle.state['status'], 'reconciliation': cycle.state['reconciliations'][-1]}))
+            finally:
+                bridge.close()
+            return
         if args.command == 'set-goal':
             changed = cycle.set_goal(args.target_kills)
             print(json.dumps({'changed': changed, 'goal_kills': cycle.state['goal_kills'],
