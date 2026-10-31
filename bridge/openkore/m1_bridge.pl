@@ -140,7 +140,8 @@ sub snapshot {
             x => 0 + $_->{pos_to}{x}, y => 0 + $_->{pos_to}{y}}} @{$playersList->getItems};
         $s->{players} = [@players[0 .. ($#players > 31 ? 31 : $#players)]];
         my @monsters = map {{id => unpack('H*', $_->{ID}), name => $_->{name}, name_id => 0 + $_->{nameID},
-            x => 0 + $_->{pos_to}{x}, y => 0 + $_->{pos_to}{y}}} @{$monstersList->getItems};
+            x => 0 + $_->{pos_to}{x}, y => 0 + $_->{pos_to}{y},
+            eligible => (!$_->{dead} && !engaged_by_other($_)) ? 1 : 0}} @{$monstersList->getItems};
         $s->{monsters} = [@monsters[0 .. ($#monsters > 15 ? 15 : $#monsters)]];
         my @items = map {{id => unpack('H*', $_->{ID}), name_id => 0 + $_->{nameID}, amount => 0 + $_->{amount},
             x => 0 + $_->{pos}{x}, y => 0 + $_->{pos}{y}}} @{$itemsList->getItems};

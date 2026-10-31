@@ -113,6 +113,7 @@ class SoloCycle:
         self.state['inflight'] = dict(action=copy.deepcopy(action), request_id=request_id,
             session=session, deadline=now + action['timeout_s'] + 12)
         if getattr(self, '_exploration', None) == action:
+            self.state['inflight']['exploration'] = True
             visits = self.state.get('explore_visits', [])
             self.state['explore_visits'] = (visits + [self._explore_origin,
                 {'map': action['map'], 'x': action['x'], 'y': action['y']}])[-24:]
@@ -158,6 +159,53 @@ class SoloCycle:
             self.block('two_consecutive_action_failures')
         else:
             self.save()
+        return True
+
+    def interruptible(self, snap, now=None):
+        """Only an explicitly marked exploration route can be interrupted."""
+        now = time.time() if now is None else now
+        s, p = self.state, self.state.get('inflight')
+        return bool(s['status'] == 'active' and p and p.get('exploration') and
+            not p.get('cancel') and now >= s.get('interrupt_after', 0) and
+            snap.get('connected') and snap.get('name') == s['identity'] and
+            snap.get('executor') == 'openkore_route' and not snap.get('dead') and
+            snap.get('recovery') == 'none' and snap.get('hp', 0) > 0 and
+            snap.get('hp_max', 0) > 0 and snap['hp'] * 100 >= snap['hp_max'] * 60 and
+            snap.get('map') == p['action']['map'] and
+            snap.get('native_task') == {'id': p['request_id'], 'kind': 'navigation'} and
+            any(m.get('eligible') == 1 and s['skip'].get(m.get('id'), 0) <= now and
+                not ((s.get('avoid_route') or {}).get('until', 0) > now and
+                     (s.get('avoid_route') or {}).get('map') == snap['map'] and
+                     m.get('x') == (s.get('avoid_route') or {}).get('x') and
+                     m.get('y') == (s.get('avoid_route') or {}).get('y'))
+                for m in snap.get('monsters', [])))
+
+    def prepare_cancel(self, request_id):
+        p = self.state['inflight']
+        if not p or not p.get('exploration') or p.get('cancel'):
+            raise RuntimeError('Cannot cancel this intent')
+        p['cancel'] = {'request_id': request_id, 'results': {}}
+        self.save()  # Never resend after a crash or uncertain send.
+
+    def cancel_result(self, result, observed_after):
+        p = self.state.get('inflight')
+        c = p and p.get('cancel')
+        if not c or result.get('status') not in FINAL:
+            return False
+        rid = result.get('request_id')
+        if rid not in (p['request_id'], c['request_id']):
+            return False
+        c['results'][rid] = result
+        s = self.state
+        s['observe_after'] = max(s.get('observe_after', 0), observed_after)
+        expected = (('cancelled', 'cancel_requested') if rid == p['request_id']
+                    else ('completed', 'navigation_cancelled'))
+        if (result['status'], result.get('reason')) != expected:
+            self.block('exploration_cancel_unconfirmed'); return True
+        if len(c['results']) == 2:
+            s['history'] = (s['history'] + [{**p, 'result': c['results'][p['request_id']]}])[-24:]
+            s.update(inflight=None, interrupt_after=time.time() + 5)
+        self.save()
         return True
 
     @staticmethod
@@ -212,7 +260,7 @@ class SoloCycle:
                 else:
                     s['skip'] = {k: v for k, v in s['skip'].items() if v > now}
                     avoid = s.get('avoid_route') or {}
-                    monsters = sorted((m for m in snap['monsters'] if m['id'] not in s['skip'] and not
+                    monsters = sorted((m for m in snap['monsters'] if m.get('eligible', 1) == 1 and m['id'] not in s['skip'] and not
                         (avoid.get('until', 0) > now and avoid.get('map') == snap['map'] and
                          m['x'] == avoid.get('x') and m['y'] == avoid.get('y'))),
                                       key=lambda m: dist(m, snap['position']))

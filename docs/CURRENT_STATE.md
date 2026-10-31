@@ -1,6 +1,16 @@
 # Estado actual
 
-## P3 — exploración viva y nueva meta del 9B verificadas (2026-10-31)
+## P3 — reacción de exploración y meta completada (2026-10-31)
+
+- Interrupción determinista implementada y 118 tests OK; requiere las dos
+  confirmaciones y snapshot posterior. Incertidumbre bloquea sin replay.
+- Muestra única: ataque inmediato confirmado, 8→9/9; sin ruta ni cancelación
+  real observada. P1 detenido sin petición pendiente. No se inició otra meta.
+- Servicios existentes activos; M4 detenido. [Evidencia y límites](evidence/P3-dynamic-exploration.md).
+- Siguiente: revisión del chat principal; la latencia y cancelación viva siguen
+  sin medir. No repetir muestras ni crear metas sin nueva autorización.
+
+## P3 — estado histórico: exploración viva y nueva meta del 9B verificadas (2026-10-31)
 
 - `90a65af` validado en una muestra: límite 180 s/12 acciones, fin por complete
   a los 30,641 s y 6 envíos. Tarin 6→8 kills; una ruta arrived, dos recogidas,
@@ -9,7 +19,7 @@
   Monstruos visibles en 8/9 snapshots de navegación; el controlador terminó
   la ruta antes de atacar. HP mínimo 40/57. [Evidencia y límites](evidence/P3-dynamic-exploration.md).
 - Una propuesta real del 9B: hunt/additional_kills=1, goal_saved 9, 13,094 s;
-  cero acciones de juego. Checkpoint actual activo **8/9**, sin intención
+  cero acciones de juego. Checkpoint entonces activo **8/9**, sin intención
   pendiente; historial de operaciones conservado y meta 8 añadida al historial.
 - P1 detenido tras lectura fresca sin tarea; prt_fild08 (121,269), HP57/57,
   Zeny13. Inventario conservado, con +1 Jellopy (909) y +1 Empty Bottle (713).
@@ -173,7 +183,6 @@ Validar la recuperación antes de continuar el abastecimiento integrado.
 
 ## Pendientes y próxima acción
 
-La muestra P3 superior sustituye los estados históricos: meta anterior 8/8
-completa y nueva meta del 9B guardada en 8/9, sin intención pendiente. Revisión
+El checkpoint vigente es 9/9 completo, sin intención pendiente. Revisión
 del chat principal antes de ampliar el alcance. Peligro general, SearXNG y
 comportamiento prolongado siguen pendientes. No repetir operaciones inciertas.

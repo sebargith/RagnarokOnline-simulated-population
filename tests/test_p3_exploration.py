@@ -73,6 +73,47 @@ print JSON::PP->new->encode({c=>$c,none=>$none});
             self.assertEqual(restarted.state['inflight']['action'], action)
             self.assertEqual(restarted.state['kills'], 0)
 
+    def test_interrupt_requires_confirmations_and_fresh_replan(self):
+        with tempfile.TemporaryDirectory() as folder:
+            cycle = SoloCycle(Path(folder)/'state.json')
+            action = cycle.plan(snapshot(monsters=[], explore_candidates=[{'x':220,'y':250}]), now=100)
+            cycle.prepare(action, 'c_1', 'boot:1', now=100)
+            seen = snapshot(native_task={'id':'c_1','kind':'navigation'},
+                monsters=[{'id':'01000000','x':171,'y':250,'eligible':1}])
+            self.assertTrue(cycle.interruptible(seen, now=101))
+            cycle.prepare_cancel('c_2')
+            cycle.cancel_result({'request_id':'c_1','status':'cancelled','reason':'cancel_requested'}, 2000)
+            self.assertIsNotNone(cycle.state['inflight'])
+            cycle.cancel_result({'request_id':'c_2','status':'completed','reason':'navigation_cancelled'}, 2100)
+            self.assertIsNone(cycle.state['inflight'])
+            self.assertEqual(cycle.state['observe_after'], 2100)
+            self.assertEqual(cycle.state['kills'], 0)
+            self.assertEqual(cycle.plan(snapshot(monsters=[], explore_candidates=[{'x':120,'y':250}]), now=102)['type'], 'navigate')
+
+    def test_interrupt_excludes_ineligible_recovery_and_other_routes(self):
+        with tempfile.TemporaryDirectory() as folder:
+            cycle = SoloCycle(Path(folder)/'state.json')
+            a = cycle.plan(snapshot(monsters=[], explore_candidates=[{'x':220,'y':250}]), now=100)
+            cycle.prepare(a, 'c_1', 'boot:1', now=100)
+            base = snapshot(native_task={'id':'c_1','kind':'navigation'}, monsters=[{'id':'01000000','x':171,'y':250,'eligible':1}])
+            for changes in ({'recovery':'rest'}, {'hp':20}, {'monsters':[{'id':'01000000','x':171,'y':250,'eligible':0}]}, {'native_task':None}):
+                self.assertFalse(cycle.interruptible({**base, **changes}, now=101))
+            cycle.state['inflight'].pop('exploration')
+            self.assertFalse(cycle.interruptible(base, now=101))
+
+    def test_uncertain_cancel_stays_blocked_and_not_replayed(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)/'state.json'
+            cycle = SoloCycle(path)
+            a = cycle.plan(snapshot(monsters=[], explore_candidates=[{'x':220,'y':250}]), now=100)
+            cycle.prepare(a, 'c_1', 'boot:1', now=100)
+            cycle.prepare_cancel('c_2')
+            cycle = SoloCycle(path)
+            self.assertFalse(cycle.interruptible(snapshot(), now=101))
+            cycle.cancel_result({'request_id':'c_2','status':'unknown','reason':'lost'}, 2000)
+            self.assertEqual(cycle.state['status'], 'blocked')
+            self.assertIsNotNone(cycle.state['inflight'])
+
 
 if __name__ == '__main__':
     unittest.main()

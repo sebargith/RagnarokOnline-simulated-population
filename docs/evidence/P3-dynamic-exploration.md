@@ -126,3 +126,40 @@ contra los JSON de muestra/meta/checkpoint/servicios finales: OK.
 Siguiente acción: revisión del chat principal. Se mantienen los límites de
 rayos rectos 20/35/50 e historial de destinos intentados; no se afirma cobertura
 confirmada a partir de ese historial ni se amplía el alcance a P4/población.
+
+
+## Reacción durante exploración (2026-10-31)
+
+La ruta de exploración se marca en el checkpoint antes del envío. Un snapshot
+actual de la misma tarea nativa puede activar una sola cancelación si muestra
+un monstruo vivo, no reclamado por otro jugador, no omitido y si HP y
+recuperación permiten actuar. El puente calcula elegibilidad con las mismas
+observaciones de combate; este valida otra vez al atacar. La cancelación y la
+ruta tienen IDs separados persistidos: se esperan `cancelled/cancel_requested`
+y `completed/navigation_cancelled`, en cualquier orden. Un resultado distinto,
+inaccesible, sesión distinta o plazo agotado conserva el bloqueo sin reenvío.
+Tras ambas confirmaciones se exige snapshot posterior y se replantea; el destino
+o monstruo puede haber desaparecido. Hay cinco segundos antes de otra
+interrupción y el límite de acciones incluye la cancelación. Viajes, tienda y
+aproximaciones no llevan la marca. La recuperación nativa sigue teniendo prioridad.
+La observación depende del intervalo de snapshots y del ciclo del runner: no
+se midió latencia viva de interrupción y no se promete instantaneidad.
+
+Comprobación: `& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' -m unittest
+discover -s tests -v` fuera del sandbox: 118 OK. El primer intento dentro del
+sandbox falló con WinError 5/623; la primera suite autorizada reveló dos errores
+en mocks de sesión, corregidos antes de repetirla. `perl -c
+bridge/openkore/m1_bridge.pl` con PERL5LIB `../vendor/openkore/src`,
+`../vendor/openkore/src/deps`, `bridge/lib`: syntax OK; compileall y
+`git diff --check` OK. Las pruebas cubren confirmaciones, desaparición,
+cancelación incierta, tareas distintas y recuperación; no miden tiempos reales.
+
+Única muestra: `prepare_p1.py start`, `run_p2_cycle.py run --runtime
+'D:/Ragnarok Agents/runtime' --seconds 120 --max-actions 8`, sin intención,
+y `prepare_p1.py stop`. Monstruo visible al inicio: c_1 attack,
+completed/killed M4 Poring, 5541 ms en puente, 4 golpes y 59 daño; 8→9/9,
+una acción, cero inferencias. No se inició ruta ni cancelación, por lo que la
+prueba viva no demuestra la interrupción ni su latencia. No se creó otra meta.
+Lectura antes de detener: sin petición ni tarea, prt_fild08 (118,272), HP63/63.
+Raw: `runtime/p1/evidence/p3-interrupt-20261031/`. Puertos finales 3306, 6900,
+6121 y 5121 activos; 8770 y 8765–8767 sin escucha. No se reiniciaron servicios.

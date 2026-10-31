@@ -1,8 +1,14 @@
 # Relevo — Ragnarok Agents
 Actualizado: 2026-10-31 por Codex
 Referencia: codex/single-agent-plan; ver historial Git para el commit final.
-## Objetivo actual
-Chat 09 revisado: integración local aceptada; mejorar respuesta durante exploración.
+## Checkpoint Chat 10
+- Reacción de exploración implementada; 118 tests OK. Cancelación real y
+  latencia sin demostrar: muestra única completó 9/9 con ataque inmediato.
+- P1 detenido tras confirmar ausencia de tarea/petición; servicios existentes
+  activos, M4 detenido. Sin nueva meta. Ver docs/evidence/P3-dynamic-exploration.md.
+- Siguiente: revisión del chat principal; no repetir muestra sin autorización.
+## Registro histórico Chat 09
+La siguiente información describe el estado previo a Chat 10.
 ## Estado comprobado
 - Checkout D:/Ragnarok Agents/m4-continuous; WIP raíz/m3-worktree/m4-field preservado.
 - Una muestra de 90a65af: 30,641 s, 6 envíos, 6→8 kills, una ruta arrived,
@@ -22,7 +28,7 @@ Chat 09 revisado: integración local aceptada; mejorar respuesta durante explora
 - Mantener modelo 9B, límites de recursos y transacciones inciertas sin replay.
 - Dos kills contra objetivos llamados M4 Poring; no demuestra spawns naturales,
   cobertura general ni autonomía prolongada. No se crearon fixtures ni spawns.
-## Próxima acción
+## Próxima acción histórica
 Chat 10: reacción a objetivos elegibles durante exploración con cancelación
 confirmada; no afectar viajes, transacciones ni recuperación de HP. Conservar
 8/9 y comprobar procesos/puertos primero. Nuevos chats: Terra 6.1 medio.
