@@ -1,6 +1,6 @@
 # Estado actual
 
-Actualizado: 2026-10-31 11:45 (America/Santiago) por Claude. P1 completada (P1a + P1b).
+Actualizado: 2026-10-31 12:20 (America/Santiago) por Claude. P1 completada; P2a (viaje por portales y diálogo NPC) hecha.
 
 ## Decisión vigente
 
@@ -47,6 +47,13 @@ no bloquean la primera entrega.
   local. Tarin colocado (desconectado, sin recursos) en `prt_fild08`, guardado en
   Prontera; ahora nivel base 4 / job 2, cliente P1 detenido.
   [Evidencia, muerte corregida y límites](evidence/P1b-native-combat.md).
+- P2a implementada y probada en vivo (aprobada por el usuario): `travel` entre
+  mapas solo por portales gratuitos sin diálogo (máx. 3 saltos, nunca
+  `Task::MapRoute`) y `npc_talk` acotado (continuar, etiquetas exactas, cerrar).
+  Ida y vuelta `prt_fild08` → Prontera 157,31 → guía de la puerta sur (`Cancel`)
+  → `prt_fild08` 170,365, Zeny Δ 0; `geffen` → `rejected/no_walk_route`.
+  Tarin queda en `prt_fild08` 170,365, cliente P1 detenido.
+  [Evidencia, fallos corregidos y límites](evidence/P2a-portal-travel-npc.md).
 
 ## Base comprobada y límites
 
@@ -93,6 +100,6 @@ no bloquean la primera entrega.
 
 ## Próxima acción única
 
-Revisar con el usuario el ciclo individual de P1 antes de P2. Primer paso de P2
-propuesto: viaje entre mapas solo por portales caminables (sin transporte de pago)
-y diálogo NPC acotado, para volver a Prontera y regresar al campo.
+Revisar P2a con el usuario. Siguiente paso P2 propuesto: abastecimiento por NPC
+cuando haga falta (vender drops / comprar pociones), con contrato propio de
+compra/venta acotada, antes del ciclo de progreso persistente.

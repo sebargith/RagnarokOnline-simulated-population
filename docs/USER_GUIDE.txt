@@ -30,6 +30,9 @@ ESTADO REAL
 - [HECHO] P1b: el mismo novato combate, recoge drops y se recupera solo (retirada y
   descanso), sin el modelo. Murió una vez y se corrigió la política.
   Ver docs/evidence/P1b-native-combat.md. P1 completo.
+- [HECHO] P2a: el mismo novato viaja entre mapas solo por portales caminables
+  (prt_fild08 -> Prontera -> prt_fild08, sin Kafra ni pago) y mantiene un diálogo
+  NPC acotado. Ver docs/evidence/P2a-portal-travel-npc.md.
 - [PENDIENTE] Progreso individual sostenible y objetivos generales del 9B.
 - [BLOQUEO CONOCIDO] SearXNG estaba offline; hay que verificar/restaurar su backend.
   El ejemplo actual "web poring" no es todavía una herramienta general.

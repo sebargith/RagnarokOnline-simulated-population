@@ -135,6 +135,14 @@ Native combat, pickup and local recovery (P1b) on the same profile, with Tarin o
 & 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/p1_hunt.py --runtime 'D:/Ragnarok Agents/runtime' --probe --kills 6 --seconds 480
 ```
 
+Cross-map travel through free walk portals only (no Kafra/paid/NPC warps) and a
+bounded NPC dialog (P2a), same profile, Tarin starting on `prt_fild08`
+([evidence and limits](docs/evidence/P2a-portal-travel-npc.md)):
+
+```powershell
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/p2_trip.py --runtime 'D:/Ragnarok Agents/runtime' --timeout 150 travel:prontera:157:31 talk:160:29:Cancel travel:prt_fild08:170:365 travel:geffen:120:100
+```
+
 ## Continuous three-agent runtime (M4 continuation, Chat 06)
 
 Use PowerShell from `D:/Ragnarok Agents/m4-continuous`. The existing M4 profiles,
