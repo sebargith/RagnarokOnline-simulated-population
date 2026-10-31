@@ -1,8 +1,9 @@
 """Bounded OpenAI-compatible chat transport (Gemini, Groq, OpenRouter).
 
 Same signature and budgets as inference.m2.stream_chat, so BoundedInference can
-own queueing and the circuit. The API key is read only from the environment
-variable named by the config; it is never returned, logged or put in an error.
+own queueing and the circuit. The API key comes from the environment variable
+named by the config, else that name in config['key_file'] (outside Git); it is
+never returned, logged or put in an error.
 No retries; a refused, slow, oversized or truncated reply raises.
 """
 from __future__ import annotations
@@ -28,14 +29,34 @@ class AuthRejected(RuntimeError):
     """Provider rejected the key (401/403)."""
 
 
+def _file_value(path, name):
+    """NAME=value lines; comments and blanks ignored. Missing file means unset."""
+    try:
+        with open(path, encoding='utf-8-sig') as handle:
+            lines = handle.read().splitlines()
+    except FileNotFoundError:
+        return ''
+    for line in lines:
+        line = line.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        key, value = line.split('=', 1)
+        if key.strip() == name:
+            return value.strip().strip('"\'').strip()
+    return ''
+
+
 def api_key(config, environ=None):
+    """Environment variable first, then the same name in config['key_file']."""
     name = config.get('api_key_env')
     if not isinstance(name, str) or not name:
         raise ValueError('api_key_env must name an environment variable')
-    value = (os.environ if environ is None else environ).get(name, '')
-    if not value.strip():
+    value = (os.environ if environ is None else environ).get(name, '').strip()
+    if not value and config.get('key_file'):
+        value = _file_value(config['key_file'], name)
+    if not value:
         raise KeyUnavailable(name + ' is not set')
-    return value.strip()
+    return value
 
 
 def https_send(url, headers, body, timeout, max_bytes):

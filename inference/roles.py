@@ -21,6 +21,7 @@ from inference.m2 import BoundedInference, stream_chat
 from inference.openai_compat import KeyUnavailable, api_key, openai_chat
 
 ROOT = Path(__file__).resolve().parents[1]
+RUNTIME = ROOT.parent/'runtime'  # shared runtime folder, outside Git
 
 
 def _merge(base, override):
@@ -55,6 +56,8 @@ def candidate(doc, name, environ=None):
         return config, config['model'], stream_chat
     if spec['provider'] == 'openai':
         config = _merge(doc['cloud_limits'], {k: v for k, v in spec.items() if k != 'provider'})
+        if doc.get('key_file'):
+            config['key_file'] = str(RUNTIME/doc['key_file'])
         api_key(config, environ)  # availability only; the value is not kept here
         return config, spec['model'], functools.partial(openai_chat, environ=environ)
     raise ValueError('unknown provider')

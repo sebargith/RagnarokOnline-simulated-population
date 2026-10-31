@@ -12,7 +12,7 @@ from unittest.mock import patch
 from agent.goal_planner import GoalPlanner
 from agent.solo_cycle import SoloCycle
 from inference.m2 import BoundedInference
-from inference.openai_compat import AuthRejected, KeyUnavailable, QuotaExceeded, https_send, openai_chat
+from inference.openai_compat import api_key, AuthRejected, KeyUnavailable, QuotaExceeded, https_send, openai_chat
 from inference.roles import RoleService, build_role, candidate, load_roles
 from scripts.run_p2_cycle import Runner
 
@@ -27,6 +27,13 @@ def reply(content=GOAL, finish='stop', status=200, extra=b''):
                                        'finish_reason': finish}],
             'usage': {'prompt_tokens': 10, 'completion_tokens': 5}}
     return status, json.dumps(body).encode() + extra
+
+
+def isolated():
+    """Roles config that ignores the user's real key file."""
+    doc = load_roles()
+    doc['key_file'] = None
+    return doc
 
 
 class Sender:
@@ -44,7 +51,7 @@ class Sender:
 
 class OpenAICompatTests(unittest.TestCase):
     def setUp(self):
-        self.doc = load_roles()
+        self.doc = isolated()
         self.config, self.model, _ = candidate(self.doc, 'gemini-flash', ENV)
         self.messages = [{'role': 'system', 'content': 'Return only JSON.'},
                          {'role': 'user', 'content': '{"kills":9}'}]
@@ -129,6 +136,48 @@ class OpenAICompatTests(unittest.TestCase):
         self.assertTrue(all('content' in f.result(2) for f in futures))
 
 
+class KeyFileTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.path = Path(self.temp.name)/'model-keys.env'
+        self.config = {'api_key_env': 'GEMINI_API_KEY', 'key_file': str(self.path)}
+
+    def test_file_is_read_when_env_missing_and_env_wins(self):
+        self.path.write_text('# comment\n\nGROQ_API_KEY=\nGEMINI_API_KEY = ' + KEY + '\n', encoding='utf-8')
+        self.assertEqual(api_key(self.config, {}), KEY)
+        self.assertEqual(api_key(self.config, {'GEMINI_API_KEY': ' '}), KEY)
+        self.assertEqual(api_key(self.config, {'GEMINI_API_KEY': 'from-env'}), 'from-env')
+        with self.assertRaises(KeyUnavailable):
+            api_key(dict(self.config, api_key_env='GROQ_API_KEY'), {})
+
+    def test_empty_or_missing_file_means_unavailable(self):
+        for content in (None, 'GEMINI_API_KEY=\n', '# GEMINI_API_KEY=' + KEY + '\n'):
+            if content is None:
+                self.path.unlink(missing_ok=True)
+            else:
+                self.path.write_text(content, encoding='utf-8')
+            with self.subTest(content=content), self.assertRaises(KeyUnavailable) as caught:
+                api_key(self.config, {})
+            self.assertNotIn(KEY, str(caught.exception))
+
+    def test_roles_resolve_key_file_under_runtime_and_never_expose_value(self):
+        doc = load_roles()
+        doc['key_file'] = self.path
+        self.path.write_text('GEMINI_API_KEY=' + KEY + '\n', encoding='utf-8')
+        config, model, transport = candidate(doc, 'gemini-flash', {})
+        self.assertEqual(config['key_file'], str(self.path))  # absolute path wins the join
+        self.assertEqual(Path(candidate(load_roles(), 'gemini-flash', ENV)[0]['key_file']),
+                         ROOT.parent/'runtime/secrets/model-keys.env')
+        sender = Sender(reply(status=429))
+        service = BoundedInference(config, model, functools.partial(openai_chat, send=sender, environ={}))
+        self.addCleanup(service.close)
+        failed = service.submit('a', [{'role': 'user', 'content': 'x'}], 1).result(2)
+        self.assertEqual(sender.calls[0]['headers']['Authorization'], 'Bearer ' + KEY)
+        self.assertIn('QuotaExceeded', failed['error'])
+        self.assertNotIn(KEY, json.dumps([failed, config, repr(transport)]))
+
+
 class RoleTests(unittest.TestCase):
     def test_default_roles_stay_on_current_local_9b(self):
         doc = load_roles()
@@ -152,7 +201,7 @@ class RoleTests(unittest.TestCase):
                 load_roles(path)
 
     def test_missing_key_marks_candidate_unavailable_and_uses_fallback(self):
-        doc = load_roles()
+        doc = isolated()
         doc['roles']['planner'].update(primary='gemini-flash', fallback='qwen9b-current')
         with patch('inference.roles.BoundedInference') as bounded:
             role = build_role('planner', doc, environ={})

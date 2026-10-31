@@ -1,6 +1,7 @@
 {
   "version": 1,
-  "note": "P5 step 1. Default unchanged: both roles use the current 9B until the user chooses. Keys come only from the named environment variables.",
+  "note": "P5 step 1. Default unchanged: both roles use the current 9B until the user chooses. Keys come from the named environment variable, else the same NAME=value line in key_file (relative to the runtime folder, outside Git).",
+  "key_file": "secrets/model-keys.env",
   "roles": {
     "planner": {"primary": "qwen9b-current", "fallback": null, "cloud_cooldown_s": 300},
     "chat": {"primary": "qwen9b-current", "fallback": null, "local_only": true}
