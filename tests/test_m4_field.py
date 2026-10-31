@@ -127,3 +127,8 @@ class FieldTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'epoch changed during approach'):
             c.field_encounter(False)
         c.submit.assert_not_called()
+
+    def test_peer_rendezvous_leaves_room_for_leader(self):
+        c = self.controller()
+        c.outbound('peer')
+        c.walk_to.assert_called_once_with('peer', 170, 366, within=2)

@@ -138,7 +138,7 @@ class FieldController(Continuous):
             self.walk_to(who, 156, 22, transition=FIELD)
         elif self.data(who)['map'] != FIELD:
             raise RuntimeError('Cannot resume outside configured maps')
-        self.walk_to(who, 170, 366)
+        self.walk_to(who, 170, 366, within=2 if who == 'peer' else 0)
 
     def home(self, who):
         returning = self.data(who)['map'] == FIELD
@@ -244,7 +244,9 @@ class FieldController(Continuous):
             self.pump(1.2)
         if death is None or any(n <= 0 for n in damage.values()):
             raise RuntimeError('No confirmed kill or assigned attacker damage')
-        self.pump(1.3)
+        # Stock drops reserve the first 3000 ms for the highest-damage
+        # attacker. Give the agreed gatherer access to the second tier too.
+        self.pump(3.2 if cooperative else 1.3)
         loot = []
         # Ordinary nearby drops only; absence is a valid result. No guarantee
         # that a ground item belongs to this kill is inferred from proximity.
