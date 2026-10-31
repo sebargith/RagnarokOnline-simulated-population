@@ -6,8 +6,9 @@ A local-first project for persistent, socially believable AI players on a classi
 with native OpenKore execution, followed by bounded 9B goals and web knowledge.
 See the [approved plan](docs/NATIVE_AGENT_PLAN.md) and [Claude handoff](HANDOFF.md).
 P1 native navigation/combat and P2 portal travel/NPC supply are implemented;
-the persistent cycle now retains a solo goal across controller restarts. Integrated
-live supply and general 9B goals remain pending. The existing
+the persistent cycle retains a solo goal across controller restarts; its
+[small live hunt/supply loop](docs/evidence/P2e-live-supply.md) is verified.
+General 9B goals remain pending. The existing
 M4 runtime is a controlled three-agent fixture; its [evidence](docs/evidence/M4-continuous.md)
 remains valid for that scope. Social polish and the one-hour trial remain deferred.
 
@@ -130,7 +131,7 @@ Run/resume the saved solo goal from this checkout with the P1 client available:
 & 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/prepare_p1.py stop --runtime 'D:/Ragnarok Agents/runtime'
 ```
 
-The pilot's saved goal is complete at 4/4 after reconciling two uncertain routes; these commands preserve it.\nUse `set-goal --target-kills N` only after a completed goal; the target is cumulative and repeating the same value is idempotent.
+The pilot's saved goal is active at 6/8; these commands resume it.
 Do not delete checkpoint/history to repeat an unknown action. `--goal-kills`
 only initializes a new checkpoint. The runner stops on its time/action budget,
 keeps pending intent, and resumes through read-only result queries. `status`

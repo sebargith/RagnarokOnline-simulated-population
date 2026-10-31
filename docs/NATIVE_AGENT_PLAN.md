@@ -134,6 +134,6 @@ Apple durante descanso seguro con confirmación y protección persistente contra
 replay. P2d integra ese ciclo: checkpoint y reanudación probados en vivo;
 circuito completo con tiendas probado con estados reproducibles. Consultar el
 [estado](CURRENT_STATE.md) y [relevo](../HANDOFF.md) para evidencia y límites.
-La próxima entrega permite asignar otro objetivo sin borrar historial y observa
-el circuito integrado cuando haya necesidad real de abastecimiento. No empezar
-P3/P4 ni otra batería 9B como parte de esa entrega.
+El piloto completó caza, venta, compra y regreso en vivo; la meta queda 6/8.
+Ver [evidencia](evidence/P2e-live-supply.md). El siguiente paso es integrar
+objetivos acotados del 9B (P3), sin repetir la comparación de modelos.

@@ -8,8 +8,8 @@ P3 objetivos del 9B y P4 conocimiento web. Después: segundo jugador, cooperaci�
 y comercio, tercero y posible escala a cinco. La primera entrega es solo
 navegación nativa con progreso, cancelación y resultado confirmado.
 P1 y P2a/P2b ya están implementados; P2c añadió Apple en descanso confirmado.
-P2d integra el ciclo persistente con reanudación real sin replay y tienda
-simulada; falta el circuito integrado vivo con abastecimiento (P2 aún abierta).
+P2d integra el ciclo persistente; P2e verificó en vivo caza, abastecimiento
+y regreso en el mapa y tienda piloto. P3 conecta objetivos acotados del 9B.
 
 Las demos M0–M4 conservan su evidencia; no acreditan autonomía general. El trabajo
 de campo de Chat 07 se preserva por separado. Naturalidad y prueba larga siguen
