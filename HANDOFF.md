@@ -1,30 +1,25 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-10-31 13:57 -03:00 por Codex
-Referencia: codex/single-agent-plan, commit_ref e05d6fc; documentación en commit posterior.
+Actualizado: 2026-10-31 14:02 -03:00 por Codex
+Referencia: codex/single-agent-plan, commit_ref f4dbeac; documentación en commit posterior.
 ## Objetivo actual
-P3: objetivos acotados del 9B sobre ejecución OpenKore; continuación real demostrada.
+Completar meta 8 y comprobar que 9B proponga una nueva meta sin borrar historial.
 ## Estado comprobado
-- Checkout D:/Ragnarok Agents/m4-continuous. WIP raíz, m3-worktree y m4-field preservado.
-- P2 circuito vivo caza/venta/compra/regreso registrado en 9cd0354.
-- P3 e05d6fc: --intent, esquema dependiente del estado, servicio acotado y validación bajo lock.
-- 111 tests OK. Prueba real 9B: continued, goal8, kills6, una acción completada, una inferencia.
-- Checkpoint activo 6/8 sin intención pendiente; P1 detenido.
-- Último snapshot prt_fild08 161,277, HP57/57, Zeny13, base4/job3.
-- Raw P3: runtime/p1/evidence/p3-live-1793465840 (incluye intentos iniciales y final).
-- Acceso autorizado a Ollama y aprobación de publicación disponibles otra vez.
-## Decisiones vigentes
-- 9B Qwen3.5 Q6_K existente, cero retries; gameplay independiente de inferencia.
-- Nuevo objetivo solo tras completar el actual; fingerprint estricto rechaza trabajo obsoleto.
-- No repetir operaciones financieras inciertas; sin consola ni recursos artificiales.
-- Runtime/puertos/GPU/DB compartidos; no ejecutar prepare_m4 sobre clientes existentes.
-## Pendientes y límites
-- Asignar meta nueva con modelo real tras completar la actual: todavía solo simulado.
-- Objetivos variados y conversación integrada pendientes; SearXNG último estado offline.
-- Piloto no demuestra supervivencia general ni calidad social; naturalidad y escala aplazadas.
+- Checkout D:/Ragnarok Agents/m4-continuous; WIP raíz/m3-worktree/m4-field preservado.
+- Meta real activa 6/8, sin acción pendiente. P1 detenido; otros procesos intactos.
+- Prueba limitada: 14 acciones de patrulla, ninguna kill; terminó por action_budget.
+- Dos snapshots prt_fild08 (165,240): lista local de monstruos vacía, HP57/57.
+- Revisión delegada: la política repite seis coordenadas, sin ampliar búsqueda.
+- No se sabe si hay monstruos en otra zona ni si existe fallo de percepción.
+- 9B continuación real ya verificada; nueva meta del modelo solo simulada.
+## Decisiones y límites
+- No falsificar progreso, respawnear mobs ni borrar checkpoint para acelerar.
+- Usar información legítima del cliente; no introducir estado global al agente.
+- P1 detenido; DB/puertos/GPU compartidos; no reiniciar otros servicios.
+- Mantener modelo 9B, límites de recursos y transacciones inciertas sin replay.
 ## Próxima acción
-Completar la meta 8 y verificar una nueva meta acotada del 9B, sin borrar historial;
-después revisar P3 y avanzar al conocimiento web P4 según alcance autorizado.
+Mejorar exploración local más allá de la patrulla fija, con rutas válidas y
+presupuestos finitos; probar una muestra breve antes de reanudar la meta.
 ## Archivos relevantes
-- docs/CURRENT_STATE.md; docs/evidence/P3-goal-boundary.md; docs/USER_GUIDE.txt.
-- agent/goal_planner.py; scripts/run_p2_cycle.py; tests/test_goal_planner.py.
+- docs/evidence/P3-search-limitation.md; agent/solo_cycle.py; scripts/p1_hunt.py.
+- bridge/openkore/m1_bridge.pl; docs/evidence/P3-goal-boundary.md.
 Registro de chats: D:/Ragnarok Agents/.ai/chats/INDEX.md

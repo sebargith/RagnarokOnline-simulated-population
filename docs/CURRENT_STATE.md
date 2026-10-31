@@ -1,5 +1,14 @@
 # Estado actual
 
+## P3 — límite de búsqueda observado (2026-10-31 14:02)
+
+- Una prueba de 14 acciones terminó sin encontrar monstruos visibles; meta
+  real 6/8, sin intención pendiente y P1 detenido. La revisión delegada encontró
+  que la patrulla repite seis posiciones sin ampliar cobertura. La lista vacía
+  es solo percepción local, no prueba ausencia global ni fallo del servidor.
+- Antes de verificar una nueva meta del 9B, mejorar exploración local y probar
+  una muestra breve. [Evidencia](evidence/P3-search-limitation.md).
+
 ## P3 — continuación verificada con 9B real (2026-10-31 13:57)
 
 - e05d6fc integra --intent, una admisión, propuestas restringidas por capacidades
