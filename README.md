@@ -2,11 +2,21 @@
 
 A local-first project for persistent, socially believable AI players on a classic/pre-Renewal Ragnarok Online private server. The first target is one autonomous player with grounded conversation and memory across restarts, followed by three to five distinct players.
 
-**Status:** M4 now has a continuous three-agent fixture controller with start, stop, observation and addressed conversation. Human social quality and the one-hour M4 trial remain deferred. See [continuous-runtime evidence](docs/evidence/M4-continuous.md), the [earlier scripted prototype](docs/evidence/M4-prototype.md) and [current state](docs/CURRENT_STATE.md).
+**Current direction (2026-10-31):** the user approved one normal level-1 player
+with native OpenKore execution, followed by bounded 9B goals and web knowledge.
+See the [approved plan](docs/NATIVE_AGENT_PLAN.md) and [Claude handoff](HANDOFF.md).
+This is the next implementation, not a capability already delivered. The existing
+M4 runtime is a controlled three-agent fixture; its [evidence](docs/evidence/M4-continuous.md)
+remains valid for that scope. Social polish and the one-hour trial remain deferred.
 
 ## Start here
 
-Open the existing **Ragnarok Agents** local project in Codex, rooted at `D:\Ragnarok Agents`. Read the [user direction guide](docs/USER_GUIDE.txt) for status, chats and prompts; use the [current state](docs/CURRENT_STATE.md) for the verified handoff and [bridge contract](docs/BRIDGE.md) for M1 operation.
+The project entry point is `D:\Ragnarok Agents`; current implementation continues
+in the existing checkout `D:\Ragnarok Agents\m4-continuous`, branch
+`codex/single-agent-plan`. Read the [user guide](docs/USER_GUIDE.txt) for the next
+prompt, [current state](docs/CURRENT_STATE.md) for verified facts and
+[bridge contract](docs/BRIDGE.md) for the implemented demo interface. Commands
+below operate the existing demos; they do not launch the planned native agent.
 
 - [General development rules](AGENTS.md)
 - [Architecture and remaining design](docs/ARCHITECTURE.md)

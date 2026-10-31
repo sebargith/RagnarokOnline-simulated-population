@@ -1,244 +1,103 @@
-RAGNAROK AGENTS - USER GUIDE
-===========================
-Updated: 2026-10-30 (America/Santiago)
+RAGNAROK AGENTS — GUÍA PARA DIRIGIR EL PROYECTO
+=============================================
+Actualizada: 2026-10-31
 
-WHAT WE ARE BUILDING
+QUÉ ESTAMOS CONSTRUYENDO
+-----------------------
+Un pequeño grupo de jugadores de IA persistentes en Ragnarok clásico
+Pre-Renewal. Primero necesitamos que un personaje normal pueda jugar y progresar.
+Después añadiremos cooperación PvE, comercio sencillo y personalidades más creíbles.
+
+El usuario aprobó este camino:
+- OpenKore resuelve movimiento, combate y respuestas frecuentes.
+- El modelo local Qwen3.5 9B interpreta objetivos, conversa y planifica de vez en cuando.
+- SearXNG permite consultar mecánicas desconocidas con fuentes y límites.
+- El personaje sigue reaccionando aunque el modelo o Internet no respondan.
+- Primero uno, luego dos para cooperación, después tres y opcionalmente cinco.
+
+ESTADO REAL
+-----------
+- [HECHO] Servidor, conexión OpenKore, memoria y conversación funcional.
+- [DEMOSTRADO] Tres identidades en una demo controlada: combate, loot,
+  cooperación y comercio fijo, con runtime continuo y recuperación de transferencias.
+- [HECHO] Entrada gráfica del jugador Visitor al servidor local.
+- [DECIDIDO] Usar el 9B existente. No continuar comparaciones ni retests de naturalidad.
+- [HECHO] Investigación de otros bots y plan de ejecución nativa.
+- [EXPERIMENTAL] Chat 07 probó navegación/caza de campo; la cooperación completa
+  no quedó aceptada. Sus archivos se conservan en m4-field.
+- [PENDIENTE] Un personaje normal desde nivel 1 con navegación y combate nativos.
+- [PENDIENTE] Progreso individual sostenible y objetivos generales del 9B.
+- [BLOQUEO CONOCIDO] SearXNG estaba offline; hay que verificar/restaurar su backend.
+  El ejemplo actual "web poring" no es todavía una herramienta general.
+- [DESPUÉS] Naturalidad, pruebas prolongadas y población de cinco.
+
+DÓNDE TRABAJAR
+---------------
+- Entrada y relevo: D:\Ragnarok Agents\HANDOFF.md
+- Código y documentos actuales: D:\Ragnarok Agents\m4-continuous
+- Rama de continuación: codex/single-agent-plan
+- Plan completo: docs/NATIVE_AGENT_PLAN.md dentro de ese checkout.
+- Hechos comprobados: docs/CURRENT_STATE.md dentro de ese checkout.
+- La raíz tiene una rama anterior y cambios pendientes. No iniciar código ahí.
+- Los otros checkouts no aíslan servidor, base de datos, puertos ni GPU.
+
+QUÉ HACER AHORA CON CLAUDE
+--------------------------
+1. Abre Claude en D:\Ragnarok Agents.
+2. Envía: "Toma el control. Lee AI_PROTOCOL.md y HANDOFF.md; continúa en el
+   checkout y rama indicados. Implementa solo la primera entrega P1 del plan."
+3. Claude debe comprobar el estado local y trabajar en m4-continuous.
+4. Su primera entrega debe permitir navegar con OpenKore, observar progreso,
+   cancelar y confirmar llegada o fallo con un único controlador del personaje.
+5. Debe entregar evidencia corta, limitaciones y commits descriptivos con push.
+   No necesita repetir el test cooperativo ni volver a evaluar el modelo.
+
+No hace falta crear todos los chats ahora. Mantén un único chat de implementación
+activo. Este chat de Codex puede seguir como coordinador cuando vuelvas.
+
+PASOS DEL CAMINO Y PROMPTS PARA MÁS ADELANTE
+-------------------------------------------
+- [SIGUIENTE] P1a: navegación nativa y perfil normal separado.
+  Prompt: "Completa la navegación nativa con progreso, cancelación y resultados
+  veraces. Conserva las demos y los datos existentes."
+
+- [PENDIENTE] P1b: combate, loot y recuperación reactivos.
+  Prompt: "Amplía el ejecutor nativo a combate y recogida normales, y recuperación
+  local según HP/SP. Mide respuesta con inferencia ausente o lenta."
+
+- [PENDIENTE] P2: ciclo de vida individual.
+  Prompt: "Haz que el mismo personaje progrese, se recupere y se abastezca cuando
+  lo necesite, con persistencia y sin premios artificiales. Empieza por novice."
+
+- [PENDIENTE] P3: objetivos del 9B.
+  Prompt: "Conecta intenciones de alto nivel con las capacidades verificadas.
+  Valida precondiciones y resultados; limita replanteamientos y espera del modelo."
+
+- [PENDIENTE] P4: conocimiento web.
+  Prompt: "Restaura/verifica SearXNG y permite consultas públicas de mecánicas
+  Pre-Renewal cuando falte conocimiento. Conserva fuentes, caché y privacidad."
+
+- [DESPUÉS DE REVISAR EL BOT INDIVIDUAL] Segundo jugador.
+  Prompt: "Añade cooperación PvE y comercio sencillo entre dos jugadores autónomos,
+  con memorias aisladas y resultados confirmados por ambos."
+
+Estos prompts orientan la siguiente entrega; no autorizan empezar todas a la vez.
+P1–P4 y sus criterios completos están en docs/NATIVE_AGENT_PLAN.md.
+
+CÓMO EVITAR PRUEBAS INTERMINABLES
+--------------------------------
+- Primero probar decisiones y fallos con estados reproducibles.
+- En vivo, verificar solo la capacidad que cambió, con un límite y resumen final.
+- Tras dos fallos por la misma causa, revisar antes de repetir.
+- Los scripts pueden trabajar y terminar sin un chat esperando cada acción.
+- Comprobar el resultado no requiere narrar cada paso ni consumir inferencia por tick.
+- No pedir otra prueba larga solo porque una entrega terminó.
+
+CÓMO PEDIR UN RELEVO
 --------------------
-Believable AI players on a classic/pre-Renewal Ragnarok Online private
-server. First prove one persistent, grounded player. Then build a small
-community whose first shared experience is cooperative PvE and simple
-trade. Expand to five players only if quality and resources allow it.
-
-WHERE WE ARE
-------------
-  [DONE] M0 - Environment and deployment choice.
-         Native Windows setup selected and documented.
-
-  [DONE] M1 - Server/client bridge.
-         rAthena, OpenKore and Python passed a 600-second connection
-         trial with movement, chat and reconnect. A later framing fix
-         passed a targeted test and a five-second live run; it has not
-         had a second M1 600-second run. M3 now adds the AI layer below.
-
-  [SELECTED] M2 - Local Qwen3.5 9B Q6_K.
-         You stopped model comparison and selected 9B for implementation.
-         Fixed technical targets passed; later probes still found
-         unsupported dialogue details. Naturalness is now deferred by
-         the user's functional-prototype priority.
-
-  [DONE] Web-search slice - 9B plus local SearXNG.
-         A standalone 9B turn can request one public search and receive
-         short source-linked results. M3 integrates one fixed public topic.
-
-  [FUNCTIONAL] M3 - Baseline complete at ff635f5; social quality deferred.
-         1800.657 seconds, 88 confirmed movements, seven peer-received
-         replies, commitment/map recall after orchestrator restart and
-         recovery after map-server restart. Committed baseline: 37 tests pass.
-         RAM/GPU and measured inference latency stayed within budget.
-         Search kept private context local but selected an irrelevant
-         Ragnarok M source and gave an unhelpful reply. A subsequent
-         search-only repair passed a 35-second live check with a useful,
-         attributed PC source summary. Coordinator review found robotic
-         language and weak web utility. The user explicitly deferred
-         naturalness/social acceptance to prioritize a working prototype;
-         those quality findings are not a pass.
-
-  [CONTINUOUS FIXTURE] M4 - Functional runtime; full acceptance still open.
-         Coordinator accepted the controlled demonstration and reviewed the
-         continuous runtime's demonstrated functional scope and evidence hashes.
-         Three isolated persistent identities, bounded 9B conversation,
-         solo kill/loot, explicit two-agent goal/roles and confirmed damage,
-         then a fixed item/Zeny trade confirmed on both sides after reconnect.
-         A new process reconciled a deliberately interrupted transfer without
-         replay. Earlier SearXNG attribution passed; its Docker backend is
-         currently unavailable and web replies use a fallback. The earlier demo had
-         forty passing tests. Chat 06 adds a continuous controller with bounded
-         retention, repeated gameplay and addressed chat, plus user start,
-         stop and observation commands. Forty-seven tests now pass.
-         Richer social quality and the one-hour trial remain deferred;
-         full M4 acceptance is still open. Evidence: docs/evidence/M4-prototype.md
-         and docs/evidence/M4-continuous.md.
-
-  [OPTIONAL] M5 - Five-agent scale check, after M4 passes.
-
-These labels reflect evidence, not just completed code. The detailed
-acceptance criteria are in docs/ROADMAP.md. Actual handoff facts are in
-docs/CURRENT_STATE.md; M0 through M2 evidence is under docs/evidence/.
-
-YOUR NEXT MOVE
---------------
-1. Keep this chat, "Evaluar arquitectura de población IA", as the
-   coordinator and evaluator. The selected 9B and SearXNG slice are
-   recorded in docs/CURRENT_STATE.md and README.md.
-2. Chat 05 implemented the functional prototype on codex/m4-functional in
-   D:\Ragnarok Agents\m4-worktree, from exact handoff 42bddcc. The preserved
-   M3 polish files remain untouched in D:\Ragnarok Agents\m3-worktree; the
-   M2 WIP remains in its original checkout. Only M4 test clients now run on
-   bridge ports 8765..8767. Existing M1 characters and profiles are preserved.
-3. Chat 06 continues M4 on codex/m4-continuous in
-   D:\Ragnarok Agents\m4-continuous, from reviewed commit a523dbf. Use README's
-   continuous-runtime start/observe/say/status/stop commands. Interaction is
-   verified through headless public chat from an existing test character;
-   a graphical player client/assets/account are not provided by this slice.
-   Coordinator review is complete. Next, try the headless controls; graphical
-   client files have now been downloaded to
-   D:\Ragnarok Agents\runtime\player-client. Static checks passed; connection
-   configuration and a separate player account are now ready. Launch
-   Play-Local.cmd there, select Ragnarok Agents Local, sign in with the local
-   PLAYER_ACCOUNT.txt credentials and select Visitor. Server selection was
-   observed; successful graphical login/map rendering still need verification.
-   SearXNG's offline Docker backend still needs restoration for live search.
-   Naturalness and one-hour stabilization remain deferred. Do not start M5.
-
-HOW TO USE THE CHATS
---------------------
-- Keep this existing planning/review chat as the main coordinator. Use
-  it to assess evidence, decide whether a milestone passes and update
-  the plan. It integrates accepted work into GitHub main.
-- Use one focused implementation chat per milestone. Continue fixes in
-  that chat; do not make a separate chat for every file or test.
-- The implementation chat should inspect Git status and relevant docs,
-  work on a codex/ branch, commit small verified steps with descriptive
-  messages and push regularly. One prompt does not require one commit.
-- Avoid two chats writing to the same checkout at the same time. Use
-  separate worktrees only if parallel work becomes useful; shared game
-  services, database, ports and GPU still need coordination.
-- At handoff, ask for: branch/commit range, changed behavior, checks
-  actually run, evidence paths, limits and one proposed next action.
-  Bring social-quality samples back here for your own review.
-- Keep credentials, raw logs, model weights and databases out of Git.
-  Update this guide when milestone status or direction changes; use
-  docs/CURRENT_STATE.md for more detailed handoffs.
-
-ARCHIVED PROMPT FOR CHAT 03 - LOCAL INFERENCE BENCHMARK (M2)
--------------------------------------------------
-Historical reference only. Do not restart model comparison.
-
-BEGIN PROMPT
-Implement M2 only. Read AGENTS.md, docs/CURRENT_STATE.md and the M2
-criteria in docs/ROADMAP.md. Inspect Git status, installed Windows
-Ollama/model assets, RAM/VRAM and disk space first. Compare two
-justified local candidates, including a smaller baseline; add a third
-only if a specific gap requires it.
-
-Build reproducible conversation, recall and bounded-action fixtures.
-Measure cold and warm one-, three- and five-session profiles, ideally
-beside the running M1 server/client. Record model artifacts/settings,
-sample counts, token counts, latency, queue delay, failures and peak
-RAM/VRAM. Fix explicit operating limits before the final acceptance
-run. Prepare sample conversations for my quality review; do not mark
-that review complete yourself.
-
-Commit and push small verified steps. Update docs/evidence/M2-inference.md
-and docs/CURRENT_STATE.md, then hand off to the coordinator chat. Do
-not start M3. If a model download or resource-budget change is material,
-explain its size and reason before proceeding.
-END PROMPT
-
-PROMPT FOR CHAT 04 - ONE PERSISTENT AGENT (M3)
----------------------------------------------
-Use the user-selected 9B model. M2's grounding caveat remains open.
-
-BEGIN PROMPT
-Implement M3 only with the user-selected 9B configuration, M1 bridge
-and local SearXNG search slice.
-Start from codex/web-search in a clean worktree; do not include the
-unfinished M2 repair files from the coordinator checkout.
-Read AGENTS.md, docs/CURRENT_STATE.md and M3 in docs/ROADMAP.md. Build
-one identity, deterministic routine gameplay, grounded dialogue,
-bounded memory and a commitment that survives restart. Integrate at
-most one public search for dialogue, retaining source URLs while keeping
-private memories and game observations out of search queries. Search
-snippets are external claims, not game truth. Keep observed events,
-beliefs, dialogue and confirmed actions distinct. Validate proposed
-actions against fresh game state.
-
-Run the 30-minute scenario plus inference failure, stale proposal,
-invalid output, search outage and reconnect checks. Retain evidence
-and conversation excerpts for my review. Commit and push small
-verified steps, update
-CURRENT_STATE and hand off to the coordinator. Do not expand the
-population or mark human review complete yourself.
-END PROMPT
-
-ARCHIVED PROMPT FOR CHAT 05 - THREE-AGENT COMMUNITY (M4)
------------------------------------------------
-Use the M3 functional baseline; naturalness is deferred by user direction.
-Keep major verified slices in separate commits.
-Historical implementation prompt; the functional demonstration is now recorded.
-
-BEGIN PROMPT
-Implement the M4 functional prototype only. Start from the committed
-docs-only handoff on codex/m3-persistent, whose runtime baseline is
-ff635f5; do not carry the three unfinished M3 polish files into this
-checkout. Read AGENTS.md, docs/CURRENT_STATE.md and M4 in docs/ROADMAP.md.
-Prove three isolated persistent identities and
-controlled conversation. Then extend the restricted bridge and
-deterministic controllers for a solo PvE fixture, cooperative PvE with
-two agents and simple trade between project agents. Recheck game state
-before actions and reconcile unknown transfers before retrying.
-
-Demonstrate an end-to-end prototype with bounded evidence and checks
-proportional to each slice, including isolation, failure/reconnect and
-unchanged resource limits. Record game-confirmed combat, loot and both
-sides of the trade. Richer naturalness/social quality and the one-hour
-stabilization trial are subsequent acceptance work, not prerequisites to
-implementing the prototype. Commit and push verified slices, then hand
-off to the coordinator. Do not call deferred quality passed, claim
-cooperation from coincidental proximity, or start M5.
-END PROMPT
-
-ARCHIVED PROMPT FOR CHAT 06 - CONTINUOUS THREE-AGENT RUNTIME (M4)
----------------------------------------------------------------
-The implementation and short evidence are recorded in docs/evidence/M4-continuous.md.
-
-BEGIN PROMPT
-Continue M4 from reviewed a523dbf in a clean codex/ worktree. Turn the
-short controlled demo into one continuously running three-agent fixture,
-with understandable start/stop/observe/interaction commands. Preserve
-private memories, unknown transfers, databases, balances and other WIP.
-Solve request-cache/journal capacity, retention, bounded queues, ownership,
-reconnect/backoff and asynchronous addressed dialogue. Use the selected
-local 9B and existing SearXNG; do not compare models or build M5.
-Prove repeated cycles, delivered addressed chat during activity, clean
-stop/restart, bounded outage behavior and no replayed transfer. Record
-final-source commands/hashes and honest headless/fixture limits. Social
-polish and one-hour stabilization remain deferred. Commit/push verified
-slices and hand the working run path back to the coordinator.
-END PROMPT
-
-PROMPT FOR CHAT 07 - FIVE-AGENT SCALE CHECK (M5, DEFERRED)
-------------------------------------------------
-Use only if M4 passes and resource measurements support five agents.
-
-BEGIN PROMPT
-Implement M5 only. Reuse the accepted three-agent design and fixed
-quality/resource targets. Add two distinct agents and repeat isolation,
-persistence, cooperative PvE, trade, reconnect and social review with
-five agents. Record load and limits; commit and push verified steps.
-If targets fail, keep the proven three-agent community and report the
-limit instead of silently weakening acceptance criteria.
-END PROMPT
-
-PROMPT FOR A REVIEW IN THE MAIN COORDINATOR CHAT
-------------------------------------------------
-Use after an implementation chat hands off.
-
-BEGIN PROMPT
-Review the current milestone against docs/ROADMAP.md. Inspect the
-branch diff, docs/CURRENT_STATE.md and retained evidence. Separate
-verified outcomes from claims and untested limits; run proportional
-checks. Tell me whether the milestone is accepted, what needs repair or
-human review, and the exact next action. Update this guide and the
-status, then integrate accepted commits into GitHub main when
-appropriate. Do not start the next milestone unless I request it.
-END PROMPT
-
-WHERE TO LOOK FOR DETAILS
--------------------------
-- README.md: setup, start, stop and verified M1 commands.
-- AGENTS.md: repository rules for Codex.
-- docs/ROADMAP.md: milestone scope and acceptance criteria.
-- docs/CURRENT_STATE.md: latest verified handoff and next action.
-- docs/ARCHITECTURE.md: component boundaries and design rationale.
-- docs/BRIDGE.md: implemented M1 protocol and its limits.
+- Di "prepara el relevo" al agente que está trabajando.
+- El agente actualiza HANDOFF.md, estado y registro local de chats.
+- En el otro asistente di "toma el control".
+- El registro conserva contexto; no crea automáticamente un chat en Claude.
+- Los detalles de errores antiguos están en docs/evidence; no hace falta releerlos
+  todos para cada paso. Consultarlos cuando sean relevantes.
