@@ -29,6 +29,7 @@ class Run:
     def __init__(self, bridge):
         self.b = bridge
         self.results, self.recovery, self.deaths = [], [], []
+        self.healing = deque(maxlen=32)
         self.progress = deque(maxlen=30)
         self.final = {}
         self.last_ask = 0
@@ -45,6 +46,8 @@ class Run:
                 self.recovery.append({**data, 'time_ms': e['time_ms']})
             elif kind == 'death':
                 self.deaths.append(data)
+            elif kind == 'healing':
+                self.healing.append({**data, 'time_ms': e['time_ms']})
             elif kind == 'task_progress':
                 self.progress.append(data)
 
@@ -86,7 +89,10 @@ def main():
     patrol = 0
     summary = {}
     try:
+        connect_deadline = time.monotonic() + 15
         while run.snap is None or run.b.next_serial is None:
+            if time.monotonic() >= connect_deadline:
+                raise RuntimeError('No ready bridge within 15 seconds')
             run.pump()
         summary['start'] = {k: run.snap.get(k) for k in ('map', 'position', 'hp', 'hp_max', 'level', 'inventory', 'executor')}
         kills = 0
@@ -143,7 +149,7 @@ def main():
         run.b.close()
     summary.update(probe=probe, kills=sum(a['result']['status'] == 'completed' for a in attacks),
         attacks=attacks, takes=takes, navigations=navs, recovery=run.recovery, deaths=run.deaths,
-        progress=list(run.progress), wall_s=round(time.monotonic() - start, 1), inference_calls=0)
+        healing=list(run.healing), progress=list(run.progress), wall_s=round(time.monotonic() - start, 1), inference_calls=0)
     out = args.runtime/'p1/evidence'/f'hunt-{int(time.time())}.json'
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(summary, indent=2), encoding='utf-8')
@@ -152,7 +158,7 @@ def main():
                      (a['result'].get('evidence') or {}).get('first_hit_ms')) for a in attacks],
         'takes': [(t['item']['name_id'], t['result']['status'], t['result']['reason']) for t in takes],
         'recovery': [(r['phase'], r['hp'], r.get('hit_to_decision_ms'), r.get('hp_update_to_decision_ms')) for r in run.recovery],
-        'deaths': len(run.deaths), 'end': summary['end'], 'wall_s': summary['wall_s'], 'evidence': str(out)}))
+        'healing': summary['healing'], 'deaths': len(run.deaths), 'end': summary['end'], 'wall_s': summary['wall_s'], 'evidence': str(out)}))
 
 
 if __name__ == '__main__':

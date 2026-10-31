@@ -20,6 +20,8 @@ use M1Navigation;
 use M1Combat;
 use M1Travel;
 use M1Supply;
+use M1Healing;
+use File::Basename ();
 
 my ($server, $client, $cfg, $hooks, $pending);
 my ($input, $output, $authorized, $auth_time) = ('', '', 0, 0);
@@ -31,6 +33,7 @@ my ($attempts, $recovery_deadline, $stopping) = (0, 0, 0);
 my $json = JSON::PP->new->utf8->canonical;
 # Local recovery policy state (native profile only); never driven by the model.
 my %recovery = (phase => 'none', retreats => 0);
+my $healing;
 my ($last_hit_on_me, $last_hp_update, $was_dead) = (0, 0, 0);
 my %item_weight;    # item_weights.txt (tenths), loaded on first purchase.
 my $walk_graph;    # Built once from OpenKore's portals table on first travel.
@@ -40,6 +43,7 @@ Plugins::register('m1_bridge', 'Bounded loopback observation/action bridge', \&u
 $hooks = Plugins::addHooks(
     ['start3', \&start], ['mainLoop_pre', \&tick],
     ['packet/character_moves', \&moved],
+    ['packet_useitem', \&healing_result],
     ['packet_selfChat', \&self_chat], ['packet_pubMsg', \&public_chat],
     ['packet_attack', \&combat], ['monster_disappeared', \&monster_gone],
     ['npc_talk', \&npc_text], ['npc_autotalk', \&npc_autotalk], ['packet/npc_sell_list', \&shop_sell_list], ['buy_result', \&shop_buy_result], ['packet/sell_result', \&shop_sell_result], ['packet/inventory_item_added', \&inventory_added], ['packet/stat_info', \&stat_info],
@@ -55,6 +59,8 @@ sub start {
     die 'Invalid bridge configuration' unless $cfg->{port} =~ /^(876[567]|8770)$/ && length($cfg->{token}) >= 20;
     # Native profiles have exactly one movement owner: OpenKore's route task.
     die 'Native navigation requires --ai=manual' if $cfg->{native_navigation} && AI::state() != AI::MANUAL();
+    $healing = M1Healing->new(File::Basename::dirname($ENV{M1_BRIDGE_CONFIG}) . '/healing-state.json')
+        if $cfg->{native_navigation};
     $server = IO::Socket::INET->new(LocalAddr => '127.0.0.1', LocalPort => $cfg->{port},
         Listen => 1, Proto => 'tcp', ReuseAddr => 0) or die "Bridge listen: $!";
     $server->blocking(0);
@@ -103,6 +109,7 @@ sub snapshot {
         $s->{navigation} = $pending && $pending->{task} ? $pending->{id} : undef;
         $s->{native_task} = $pending && $pending->{native} ? {id => $pending->{id}, kind => $pending->{native}} : undef;
         $s->{recovery} = $recovery{phase};
+        $s->{healing} = $healing->state if $healing;
         $s->{dead} = $char->{dead} ? 1 : 0; $s->{sitting} = $char->{sitting} ? 1 : 0;
         $s->{sp} = 0 + ($char->{sp} // 0); $s->{sp_max} = 0 + ($char->{sp_max} // 0);
         $s->{level} = {base => 0 + ($char->{lv} // 0), job => 0 + ($char->{lv_job} // 0),
@@ -294,6 +301,32 @@ sub native_tick {
 
 # Local, model-free survival: retreat when badly hurt, rest to regenerate,
 # sit only when Basic Skill allows it. Decisions come from M1Combat.
+sub healing_result {
+    my (undef, $a) = @_;
+    return unless $healing;
+    if ($healing->observe({own => $a->{userID} eq $accountID,
+        index => unpack('H*', $a->{serverIndex}), name_id => $a->{itemID},
+        remaining => $a->{remaining}, success => $a->{success} == 1})) {
+        emit('healing', {%{$healing->state}, hp => 0 + $char->{hp}, hp_max => 0 + $char->{hp_max}});
+    }
+}
+
+sub healing_tick {
+    my ($threat) = @_;
+    return unless $healing;
+    emit('healing', $healing->state) if $healing->expire(time);
+    return unless $char->inventory->isReady;
+    my ($item) = grep { $_->{nameID} == 512 } @{$char->inventory->getItems};
+    return unless $item;
+    my $o = {ready => 1, dead => $char->{dead}, busy => $pending || AI::inQueue('route'),
+        threat => $threat ? 1 : 0, phase => $recovery{phase}, hp => $char->{hp}, hp_max => $char->{hp_max},
+        name_id => $item->{nameID}, type => $item->{type}, equipped => $item->{equipped},
+        amount => $item->{amount}, index => unpack('H*', $item->{ID})};
+    return unless $healing->begin($o, time);
+    $messageSender->sendItemUse($item->{ID}, $accountID);
+    emit('healing', $healing->state);
+}
+
 sub recovery_tick {
     my $pos = Utils::calcPosFromPathfinding($field, $char);
     # Nearest monster that is attacking or targeting us.
@@ -310,6 +343,7 @@ sub recovery_tick {
         threat_distance => $threat ? M1Navigation::distance($threat, $pos) : undef,
         retreat_elapsed => $recovery{retreat_since} ? time - $recovery{retreat_since} : 0, retreat_moving => AI::inQueue('route') ? 1 : 0,
         busy => $pending ? 1 : 0, can_sit => ($char->{skills}{NV_BASIC}{lv} // 0) >= 3, sitting => $char->{sitting}});
+    healing_tick($threat);
     return unless $step;
     my $hp = {hp => 0 + $char->{hp}, hp_max => 0 + $char->{hp_max}};
     if ($step eq 'retreat') {
