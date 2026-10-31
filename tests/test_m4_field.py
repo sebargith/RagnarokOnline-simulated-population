@@ -135,3 +135,42 @@ class FieldTests(unittest.TestCase):
         c = self.controller()
         c.outbound('peer')
         c.walk_to.assert_called_once_with('peer', 170, 366, within=2)
+
+    def test_reacquisition_uses_only_own_recent_sighting_and_requires_visibility(self):
+        c = self.controller()
+        c.note = Mock()
+        sighting = {'agent_id': 'agent', 'kind': 'snapshot', 'id': 'seen', 'session': 'epoch1',
+                    'time_ms': time.time()*1000,
+                    'data': {'map': FIELD, 'monsters': [{'id': 'a', 'name_id': 1063, 'x': 170, 'y': 350}]}}
+        c.events.append(sighting)
+        with self.assertRaises(RuntimeError):
+            c.approach('peer', 'a')
+        c.walk_to.assert_not_called()
+        sighting['agent_id'] = 'peer'
+        sighting['session'] = 'old-epoch'
+        with self.assertRaises(RuntimeError):
+            c.approach('peer', 'a')
+        c.walk_to.assert_not_called()
+        sighting['session'] = 'epoch1'
+        sighting['time_ms'] -= 11000
+        with self.assertRaises(RuntimeError):
+            c.approach('peer', 'a')
+        c.walk_to.assert_not_called()
+        sighting['time_ms'] = time.time()*1000
+        def reacquire(*args, **kwargs):
+            c.data.return_value['monsters'] = sighting['data']['monsters']
+        c.walk_to.side_effect = reacquire
+        c.approach('peer', 'a')
+        c.walk_to.assert_called_once_with('peer', 170, 350, within=2)
+        self.assertFalse(c.note.call_args.kwargs['current_visibility'])
+
+    def test_missing_target_reacquisition_does_not_loop_or_attack(self):
+        c = self.controller()
+        c.note = Mock()
+        c.events.append({'agent_id': 'peer', 'kind': 'snapshot', 'id': 'seen', 'session': 'epoch1',
+                         'time_ms': time.time()*1000, 'data': {'map': FIELD, 'monsters':
+                         [{'id': 'a', 'name_id': 1063, 'x': 170, 'y': 350}]}})
+        with self.assertRaises(RuntimeError):
+            c.approach('peer', 'a')
+        self.assertEqual(c.walk_to.call_count, 2)
+        c.action.assert_not_called()

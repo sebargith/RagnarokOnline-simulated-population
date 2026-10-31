@@ -188,7 +188,22 @@ class FieldController(Continuous):
             data = self.data(who)
             visible = next((m for m in data['monsters'] if m['id'] == target and m['name_id'] in WEAK), None)
             if not visible:
-                raise RuntimeError('Target no longer perceived; abandon encounter')
+                # A partner can lose sight while the leader approaches. Use
+                # only this identity's own recent sighting as a search goal,
+                # never another client's target coordinates or attack authority.
+                sighting = next((e for e in reversed(self.events) if
+                    e.get('agent_id') == who and e.get('kind') == 'snapshot' and
+                    e.get('session') == self.bridges[who].session and
+                    0 <= time.time()*1000-e['time_ms'] <= 10000 and
+                    e['data'].get('map') == FIELD and
+                    any(m['id'] == target and m['name_id'] in WEAK for m in e['data'].get('monsters', []))), None)
+                if sighting is None or step >= 2:
+                    raise RuntimeError('Target no longer perceived; abandon encounter')
+                known = next(m for m in sighting['data']['monsters'] if m['id'] == target)
+                self.note('field_reacquire', who=who, target=target, last_seen_source=sighting['id'],
+                          last_seen_position={'x': known['x'], 'y': known['y']}, current_visibility=False)
+                self.walk_to(who, known['x'], known['y'], within=2)
+                continue  # require a NEW own live perception before any attack
             pos = (data['destination']['x'], data['destination']['y'])
             if distance(pos, (visible['x'], visible['y'])) <= 1:
                 return
