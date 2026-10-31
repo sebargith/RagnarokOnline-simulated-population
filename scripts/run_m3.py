@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from agent.memory import Memory
 from agent.routine import Routine
+from inference.roles import role_operating
 from bridge.client import Bridge
 from agent.dialogue import Dialogue
 
@@ -37,7 +38,7 @@ def main():
     memory = Memory(args.state or args.runtime/'m3.sqlite', identity)
     bridge = Bridge(config)
     routine = Routine(memory, bridge)
-    operating = json.loads((ROOT/'config/m2-operating.json').read_text())
+    operating = role_operating('chat')
     web = json.loads((ROOT/'config/web-search.json').read_text())
     if args.fault == 'inference':
         operating['endpoint'] = 'http://127.0.0.1:9'

@@ -27,7 +27,7 @@ def run(args):
         atomic_json(live/'status.json', {'run_id': run_id, 'running': True, 'phase': 'starting_clients', 'updated': time.time()})
         sources = [*ROOT.glob('agent/*.py'), *ROOT.glob('bridge/**/*.pl'), *ROOT.glob('bridge/**/*.pm'), *ROOT.glob('inference/*.py'), ROOT/'bridge/client.py',
                    ROOT/'scripts/live_m4.py', ROOT/'scripts/prepare_m4.py', ROOT/'scripts/m1.py', ROOT/'scripts/bench_m2.py',
-                   ROOT/'fixtures/m4-pve.txt', ROOT/'config/m4-identities.json', ROOT/'config/m2-operating.json', ROOT/'config/web-search.json']
+                   ROOT/'fixtures/m4-pve.txt', ROOT/'config/m4-identities.json', ROOT/'config/m2-operating.json', ROOT/'config/model-roles.json', ROOT/'config/web-search.json']
         atomic_json(live/'manifest.json', {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources})
         controller = None
         try:

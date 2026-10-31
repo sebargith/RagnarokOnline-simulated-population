@@ -8,12 +8,13 @@ import time
 import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
+from urllib.parse import urlsplit
 
 from agent.goal_planner import GoalPlanner
 from agent.solo_cycle import SoloCycle
 from inference.m2 import BoundedInference
 from inference.openai_compat import api_key, AuthRejected, KeyUnavailable, QuotaExceeded, https_send, openai_chat
-from inference.roles import RoleService, build_role, candidate, load_roles
+from inference.roles import RoleService, build_role, candidate, load_roles, role_operating
 from scripts.run_p2_cycle import Runner
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -179,13 +180,28 @@ class KeyFileTests(unittest.TestCase):
 
 
 class RoleTests(unittest.TestCase):
-    def test_default_roles_stay_on_current_local_9b(self):
-        doc = load_roles()
+    def test_user_choice_planner_groq_with_gemma_fallback_and_local_gemma_chat(self):
+        doc = isolated()
         operating = json.loads((ROOT/'config/m2-operating.json').read_text())
-        for role in ('planner', 'chat'):
-            config, model, _ = candidate(doc, doc['roles'][role]['primary'])
-            self.assertEqual(model, operating['model'])
-            self.assertEqual(config, operating)
+        planner, chat = doc['roles']['planner'], doc['roles']['chat']
+        self.assertEqual((planner['primary'], planner['fallback']), ('groq-gpt-oss', 'gemma4-12b'))
+        self.assertEqual(doc['candidates']['groq-gpt-oss']['json_mode'], 'json_schema')
+        self.assertEqual((chat['primary'], chat['fallback'], chat['local_only']), ('gemma4-12b-chat', None, True))
+        self.assertNotIn('qwen', json.dumps(doc['roles']))
+        fallback, fallback_model, _ = candidate(doc, 'gemma4-12b')
+        talk = role_operating('chat', doc)
+        # One loaded model serves both: same weights and context, only sampling differs.
+        self.assertEqual((fallback_model, talk['model']), ('gemma4:12b', 'gemma4:12b'))
+        self.assertEqual(fallback['options']['num_ctx'], talk['options']['num_ctx'])
+        self.assertEqual(talk['options']['num_ctx'], 8192)
+        self.assertFalse(talk['think'])
+        self.assertTrue(.2 < talk['options']['temperature'] <= 1.0)
+        self.assertEqual(fallback['options']['temperature'], .2)
+        self.assertIn('Temperature 0.7', doc['candidates']['gemma4-12b-chat']['sampling_note'])
+        self.assertEqual(urlsplit(talk['endpoint']).hostname, '127.0.0.1')
+        with self.assertRaises(ValueError):
+            role_operating('planner', doc)
+        self.assertEqual(candidate(doc, 'qwen9b-current')[0], operating)  # history only
         tuned, _, _ = candidate(doc, 'qwen9b-tuned')
         self.assertTrue(tuned['think'])
         self.assertEqual(tuned['options']['num_ctx'], 8192)
@@ -209,6 +225,60 @@ class RoleTests(unittest.TestCase):
         self.assertIn('GEMINI_API_KEY is not set', role.unavailable)
         self.assertEqual(role.fallback_name, 'qwen9b-current')
         self.assertEqual(bounded.call_count, 1)
+
+
+class ConfiguredPlannerFallbackTests(unittest.TestCase):
+    """build_role('planner') as configured: Groq primary, Gemma local fallback."""
+    def build(self, cloud_error, environ={'GROQ_API_KEY': KEY}):
+        self.cloud_calls, self.local_calls = [], []
+
+        def cloud(config, model, messages, seed, cold=False, response_format=None, *, environ=None):
+            self.cloud_calls.append(model)
+            raise cloud_error
+
+        def local(config, model, messages, seed, cold, response_format):
+            self.local_calls.append((model, config['options']['temperature']))
+            return {'content': GOAL, 'service_s': .01}
+        doc = isolated()
+        with patch('inference.roles.openai_chat', cloud), patch('inference.roles.stream_chat', local):
+            role = build_role('planner', doc, environ=environ)
+        self.addCleanup(role.close)
+        return role
+
+    def test_groq_429_or_outage_degrades_to_gemma_and_reports(self):
+        for error, label in ((QuotaExceeded('HTTP 429 rate limit or quota exhausted'), 'QuotaExceeded'),
+                             (ConnectionError('ConnectionRefusedError: down'), 'ConnectionError')):
+            with self.subTest(label=label):
+                role = self.build(error)
+                first = role.submit('p1', [{'role': 'user', 'content': 'x'}], 1).result(2)
+                self.assertTrue(first['error'].startswith(label))
+                self.assertEqual((first['served_by'], first['fallback']), ('groq-gpt-oss', 'local_policy'))
+                self.assertEqual(self.local_calls, [])  # the failed request is not re-sent
+                second = role.submit('p2', [{'role': 'user', 'content': 'x'}], 1).result(2)
+                self.assertEqual((second['served_by'], second['degraded'], second['content']),
+                                 ('gemma4-12b', True, GOAL))
+                self.assertEqual(self.local_calls, [('gemma4:12b', .2)])
+                self.assertEqual(self.cloud_calls, ['openai/gpt-oss-120b'])
+                self.assertNotIn(KEY, json.dumps([first, second, role.status()]))
+
+    def test_missing_groq_key_uses_gemma_marked_degraded(self):
+        role = self.build(AssertionError('cloud must not be called'), environ={})
+        result = role.submit('p', [{'role': 'user', 'content': 'x'}], 1).result(2)
+        self.assertEqual((result['served_by'], result['degraded']), ('gemma4-12b', True))
+        self.assertIn('GROQ_API_KEY is not set', result['degraded_reason'])
+        self.assertEqual(self.cloud_calls, [])
+        self.assertFalse(role.circuit.is_set())  # the fallback still serves
+
+    def test_chat_consumers_use_the_chat_role(self):
+        with patch('agent.community.build_role') as build, \
+                patch('agent.community.role_operating', return_value={}) as operating, \
+                tempfile.TemporaryDirectory() as temp:
+            build.return_value = SimpleNamespace(close=lambda: None)
+            from agent.community import Community
+            community = Community(ROOT, temp, {}, identities={})
+            community.close()
+        build.assert_called_once_with('chat')
+        operating.assert_called_once_with('chat')
 
 
 class FallbackTests(unittest.TestCase):

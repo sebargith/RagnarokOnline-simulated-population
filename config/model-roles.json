@@ -1,10 +1,11 @@
 {
   "version": 1,
-  "note": "P5 step 1. Default unchanged: both roles use the current 9B until the user chooses. Keys come from the named environment variable, else the same NAME=value line in key_file (relative to the runtime folder, outside Git).",
+  "note": "P5 step 1. Keys come from the named environment variable, else the same NAME=value line in key_file (relative to the runtime folder, outside Git).",
   "key_file": "secrets/model-keys.env",
+  "decision": "User choice 2026-10-31 after docs/evidence/P5-model-eval.md: planner groq-gpt-oss (JSON schema) with local fallback gemma4-12b; chat gemma4-12b-chat, local. The 9B candidates remain only as history.",
   "roles": {
-    "planner": {"primary": "qwen9b-current", "fallback": null, "cloud_cooldown_s": 300},
-    "chat": {"primary": "qwen9b-current", "fallback": null, "local_only": true}
+    "planner": {"primary": "groq-gpt-oss", "fallback": "gemma4-12b", "cloud_cooldown_s": 300},
+    "chat": {"primary": "gemma4-12b-chat", "fallback": null, "local_only": true}
   },
   "candidates": {
     "qwen9b-current": {"provider": "ollama", "base": "config/m2-operating.json"},
@@ -28,6 +29,15 @@
         "model": "gemma4:12b",
         "model_digest": "6114515d63c17436a7c0417d82820ac65ad643e2806c5a3c89cb62846436ed0b",
         "options": {"num_ctx": 8192, "temperature": 0.2}
+      }
+    },
+    "gemma4-12b-chat": {
+      "provider": "ollama", "base": "config/m2-operating.json",
+      "sampling_note": "Same weights and num_ctx as gemma4-12b, so planner fallback and chat share one loaded model. Temperature 0.7 with Gemma's suggested top_p 0.95/top_k 64: varied but steady replies; 0.2 is for deterministic planner JSON, Gemma's default 1.0 drifts more.",
+      "override": {
+        "model": "gemma4:12b",
+        "model_digest": "6114515d63c17436a7c0417d82820ac65ad643e2806c5a3c89cb62846436ed0b",
+        "options": {"num_ctx": 8192, "temperature": 0.7, "top_p": 0.95, "top_k": 64}
       }
     },
     "gemini-flash": {

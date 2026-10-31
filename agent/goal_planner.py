@@ -1,6 +1,6 @@
-"""Nonblocking, restricted 9B goal proposals. No game command authority.
+"""Nonblocking, restricted goal proposals from the planner role. No game command authority.
 
-The caller owns the existing BoundedInference service and polls between gameplay
+The caller owns the planner service (inference.roles.build_role('planner')) and polls between gameplay
 updates. Applying a new goal requires an unchanged checkpoint and fresh local
 perception; existing active/uncertain work cannot be replaced.
 """

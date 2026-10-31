@@ -1,4 +1,4 @@
-"""Three private minds sharing a single bounded inference scheduler.
+"""Three private minds sharing the single bounded local `chat` role service.
 
 Only addressed, perceived chat starts a turn. Replies cannot trigger another
 turn. The coordinator never supplies another identity's records to a mind.
@@ -9,7 +9,7 @@ from pathlib import Path
 
 from agent.dialogue import Dialogue
 from agent.memory import Memory
-from inference.m2 import BoundedInference
+from inference.roles import build_role, role_operating
 
 
 class Community:
@@ -17,9 +17,9 @@ class Community:
         root, state = Path(root), Path(state)
         state.mkdir(parents=True, exist_ok=True)
         self.identities = identities or json.loads((root/'config/m4-identities.json').read_text())
-        operating = json.loads((root/'config/m2-operating.json').read_text())
+        operating = role_operating('chat')
         web = json.loads((root/'config/web-search.json').read_text())
-        self.service = service or BoundedInference(operating, operating['model'])
+        self.service = service or build_role('chat')
         self.bridges, self.memories, self.dialogues = bridges, {}, {}
         self.last_observation = {}
         for who, profile in self.identities.items():

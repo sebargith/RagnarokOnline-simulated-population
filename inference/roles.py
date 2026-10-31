@@ -21,6 +21,8 @@ from inference.m2 import BoundedInference, stream_chat
 from inference.openai_compat import KeyUnavailable, api_key, openai_chat
 
 ROOT = Path(__file__).resolve().parents[1]
+_OPEN = threading.Event()
+_OPEN.set()  # circuit of a role without any usable model
 RUNTIME = ROOT.parent/'runtime'  # shared runtime folder, outside Git
 
 
@@ -61,6 +63,15 @@ def candidate(doc, name, environ=None):
         api_key(config, environ)  # availability only; the value is not kept here
         return config, spec['model'], functools.partial(openai_chat, environ=environ)
     raise ValueError('unknown provider')
+
+
+def role_operating(role, doc=None):
+    """Ollama operating dict of a local-only role, for callers that take one."""
+    doc = doc or load_roles()
+    spec = doc['roles'][role]
+    if not spec.get('local_only'):
+        raise ValueError(f'{role} is not a local-only role')
+    return candidate(doc, spec['primary'])[0]
 
 
 def _done(result):
@@ -127,6 +138,24 @@ class RoleService:
         self._note('unavailable', reason)
         return _done({'error': 'RoleUnavailable: ' + reason, 'role': self.role,
                       'served_by': None, 'degraded': True, 'fallback': 'local_policy'})
+
+    @property
+    def circuit(self):
+        """BoundedInference-compatible view: set while no model can be used."""
+        for service in (self.primary, self.fallback):
+            if service is not None and not service.circuit.is_set():
+                return service.circuit
+        return (self.primary or self.fallback).circuit if (self.primary or self.fallback) else _OPEN
+
+    def recover_idle_circuit(self):
+        recovered = False
+        for service in (self.primary, self.fallback):
+            if service is not None and service.circuit.is_set():
+                recovered = service.recover_idle_circuit() or recovered
+        if recovered:
+            with self.lock:
+                self.failed_at = None
+        return recovered
 
     def status(self):
         with self.lock:

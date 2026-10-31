@@ -272,9 +272,8 @@ def main():
         try:
             planner = None
             if args.intent is not None:
-                from inference.m2 import BoundedInference
-                config = json.loads((ROOT/'config/m2-operating.json').read_text())
-                service = BoundedInference(config, config['model'])
+                from inference.roles import build_role
+                service = build_role('planner')  # cloud primary, local fallback, explicit errors
                 planner = GoalPlanner(service, directory/'state.json')
             print(json.dumps(Runner(cycle, bridge, directory, planner, args.intent).run(
                 args.seconds, args.max_actions, args.pause_after_send)))

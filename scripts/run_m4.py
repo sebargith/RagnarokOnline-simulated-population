@@ -31,7 +31,7 @@ def main():
     evidence.mkdir(parents=True)
     sources = [*ROOT.glob('agent/*.py'), *ROOT.glob('inference/*.py'), *ROOT.glob('bridge/**/*.pl'), *ROOT.glob('bridge/**/*.pm'), ROOT/'bridge/client.py',
                ROOT/'scripts/run_m4.py', ROOT/'scripts/prepare_m4.py', ROOT/'scripts/m1.py', ROOT/'scripts/bench_m2.py',
-               ROOT/'fixtures/m4-pve.txt', ROOT/'config/m4-identities.json', ROOT/'config/m2-operating.json', ROOT/'config/web-search.json']
+               ROOT/'fixtures/m4-pve.txt', ROOT/'config/m4-identities.json', ROOT/'config/m2-operating.json', ROOT/'config/model-roles.json', ROOT/'config/web-search.json']
     (evidence/'manifest.json').write_text(json.dumps({str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}, indent=2))
     print(evidence, flush=True)
     prototype = None
