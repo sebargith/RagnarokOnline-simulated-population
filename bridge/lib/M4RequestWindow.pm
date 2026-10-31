@@ -6,6 +6,8 @@ use warnings;
 # after eviction. Legacy UUID requests retain their original separate limit.
 sub new { bless {high => 0, cap => $_[1], results => {}, order => []}, $_[0] }
 sub next_serial { $_[0]{high} + 1 }
+# Read-only lookup: unlike admit, never advances IDs or creates an intent.
+sub lookup { $_[0]{results}{$_[1]} }
 sub admit {
     my ($self, $id) = @_;
     return ('cached', $self->{results}{$id}) if exists $self->{results}{$id};

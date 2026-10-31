@@ -130,6 +130,7 @@ sub snapshot {
             type => 0 + ($_->{type} // 0), equipped => $_->{equipped} ? 1 : 0}}
             @{$char->inventory->getItems};
         $s->{inventory} = [@inventory[0 .. ($#inventory > 31 ? 31 : $#inventory)]];
+        $s->{inventory_truncated} = @inventory > 32 ? 1 : 0;
         my @players = map {{name => $_->{name} // '', id => unpack('H*', $_->{ID}),
             x => 0 + $_->{pos_to}{x}, y => 0 + $_->{pos_to}{y}}} @{$playersList->getItems};
         $s->{players} = [@players[0 .. ($#players > 31 ? 31 : $#players)]];
@@ -708,6 +709,18 @@ sub npc_text {
 sub request {
     my ($r) = @_;
     unless (ref($r) eq 'HASH') { emit('protocol_error', {reason => 'object_required'}); return }
+    # Status lookup is not an action admission and cannot replay a packet.
+    if (($r->{type} // '') eq 'query_result') {
+        unless ($cfg->{native_navigation} && join(',', sort keys %$r) eq 'request_id,session,type' &&
+            !ref($r->{request_id}) && ($r->{request_id} // '') =~ /^c_\d{1,15}$/ &&
+            defined($r->{session}) && !ref($r->{session})) {
+            emit('protocol_error', {reason => 'invalid_result_query'}); return;
+        }
+        my $cached = $r->{session} eq session() ? $serial_window->lookup($r->{request_id}) : undef;
+        emit('request_status', {request_id => $r->{request_id}, session => $r->{session},
+            result => $cached, available => $cached && $cached->{status} ? 1 : 0});
+        return;
+    }
     my $id = $r->{id};
     unless (defined($id) && !ref($id) && $id =~ /^[A-Za-z0-9_-]{1,64}$/) {
         emit('protocol_error', {reason => 'invalid_request_id'}); return;
