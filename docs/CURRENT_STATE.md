@@ -71,6 +71,22 @@ Actualizado: 2026-10-31 13:24 (America/Santiago), Codex.
 - Las demos M3/M4 conservan evidencia histórica en docs/evidence; no equivalen
   a progreso general. Naturalidad, prueba larga y escala a cinco aplazadas.
 
+## Avance — nuevo objetivo y ruta incierta
+
+Commit `4d31c1e`: `set-goal --target-kills N` asigna una meta acumulada
+solo tras completar la anterior, sin intención pendiente. Repetir la misma
+meta es idempotente; conserva las últimas 24 operaciones y 24 objetivos.
+96 tests OK; revisión delegada de condiciones de reinicio.
+
+Prueba real: meta 2→4 guardada; tres rutas completadas, cuarta terminó
+`unknown/route_ended_off_target`. Checkpoint `runtime/p1/cycle/state.json`
+bloqueado, kills 2/4, intención c_4 conservada, última posición 131,226,
+57/57 HP. No llegó a la tienda. Cliente P1 detenido; no borrar el checkpoint.
+
+Próximo paso: inspeccionar la causa y diseñar conciliación segura de navegación
+incierta desde observaciones frescas, sin repetir operaciones financieras.
+Validar la recuperación antes de continuar el abastecimiento integrado.
+
 ## Pendientes y próxima acción
 
 El ciclo persistente ya une las capacidades. Queda observar un circuito real
