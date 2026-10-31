@@ -11,6 +11,11 @@ P1 y P2a/P2b ya están implementados; P2c añadió Apple en descanso confirmado.
 P2d integra el ciclo persistente; P2e verificó en vivo caza, abastecimiento
 y regreso en el mapa y tienda piloto. P3 conecta objetivos acotados del 9B.
 
+**Actualización (usuario, 2026-10-31):** P5 progresión autónoma desde nivel 1
+con dos funciones de modelo (planificador inteligente, conversador local); ver
+[P5](NATIVE_AGENT_PLAN.md#p5--progresión-autónoma-desde-nivel-1). Paso 1: adaptador
+de modelos y evaluación de candidatos para el planificador.
+
 Las demos M0–M4 conservan su evidencia; no acreditan autonomía general. El trabajo
 de campo de Chat 07 se preserva por separado. Naturalidad y prueba larga siguen
 aplazadas. Este orden sustituye la secuencia de implementación histórica de abajo.

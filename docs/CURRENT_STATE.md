@@ -1,5 +1,15 @@
 # Estado actual
 
+## P5 — nueva dirección del usuario (2026-10-31 15:50)
+
+- El 9B no basta para decidir e informar. Se adoptan dos funciones de modelo
+  (planificador inteligente, conversador local) y la meta de progreso autónomo
+  desde nivel 1 hasta primera clase; luego comunidad. [Plan P5](NATIVE_AGENT_PLAN.md#p5--progresión-autónoma-desde-nivel-1).
+- Modelo configurado sin cambios hasta evaluar. Hallazgo: `config/m2-operating.json`
+  limita al 9B (num_ctx 2048, num_predict 160, think false, temperature 0.7).
+- Relevo único en `HANDOFF.md` de este checkout; el de la raíz se borró por atrasado.
+- Siguiente: P5 paso 1 en sesión propia (adaptador y evaluación de candidatos).
+
 ## P4 — SearXNG restaurado, calidad pendiente (2026-10-31)
 
 - Docker iniciado por el usuario; contenedor SearXNG activo en 8080. Dos consultas

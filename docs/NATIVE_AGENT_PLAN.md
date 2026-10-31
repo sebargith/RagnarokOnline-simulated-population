@@ -4,6 +4,11 @@ Decisión del usuario: 2026-10-31. Este documento cambia la prioridad del proyec
 describe trabajo pendiente, no capacidades ya implementadas. La investigación
 que sustenta la elección está en [opciones de ejecución](research/BOT_EXECUTION_OPTIONS.md).
 
+Actualización 2026-10-31 (usuario): el 9B no basta para decidir e informar. La
+dirección vigente es [P5](#p5--progresión-autónoma-desde-nivel-1): dos funciones
+de modelo (planificador inteligente y conversador local) y progreso autónomo de un
+novato nuevo hasta primera clase. El texto de P1–P4 se conserva como historial.
+
 ## Resultado que buscamos
 
 Un personaje normal desde nivel 1 que pueda desplazarse, combatir, recuperarse,
@@ -137,3 +142,39 @@ circuito completo con tiendas probado con estados reproducibles. Consultar el
 El piloto completó caza, venta, compra y regreso en vivo; la meta queda 6/8.
 Ver [evidencia](evidence/P2e-live-supply.md). El siguiente paso es integrar
 objetivos acotados del 9B (P3), sin repetir la comparación de modelos.
+
+## P5 — Progresión autónoma desde nivel 1
+
+Decisión del usuario, 2026-10-31. Prueba inicial: un personaje nuevo de nivel 1
+decide por sí mismo cómo progresar. Después, varios personajes similares para
+simular una comunidad. P1–P4 aportan las capacidades; hoy el planificador solo
+elige "cazar 0–3 más", "pedir ayuda" o "seguir", y eso no es progreso autónomo.
+
+Principios:
+- El código ejecuta y valida; el modelo elige estrategia entre macro-metas
+  validadas (campo de caza, abastecerse, repartir puntos, equiparse, ir a la
+  prueba de clase). Precondiciones y resultados se comprueban con el estado actual.
+- Dos funciones de modelo con colas, límites y respaldo propios:
+  `planner` (pocas llamadas, razonamiento; candidato en la nube, p. ej. Gemini
+  Flash gratis) y `chat` (frecuente; modelo local, el chat del jugador no sale del PC).
+  A la nube solo van hechos del juego necesarios; nunca credenciales ni chat privado.
+  Si la nube falla o se agota el cupo, el bot sigue con la política local y lo informa.
+- El informe de estado se construye de forma determinista desde observaciones;
+  un modelo solo lo redacta. El conversador no afirma estado fuera de esos hechos
+  ni ejecuta acciones: las peticiones pasan al planificador y al validador.
+- Ambos modelos leen la misma memoria aislada del personaje.
+
+Pasos (una sesión por paso, coordinada por el chat orquestador):
+1. Adaptador compatible con OpenAI y configuración por función (`planner`/`chat`),
+   9B local como respaldo; evaluar candidatos de planificador con prompts reales
+   grabados (metas, informe de estado, P4) y el 9B bien configurado. El usuario elige.
+2. Stats, habilidades y equipo: repartir puntos según una build y equipar objetos.
+3. Campos de caza según nivel y peligro, no solo distancia.
+4. Personaje nuevo que sale de la zona de entrenamiento por NPC, sin recolocación.
+5. Cambio a primera clase al llegar a Job 10 (prueba NPC de una clase viable).
+6. Prueba larga acotada con muertes, atascos y reinicios.
+7. Segundo jugador (cooperación y comercio), luego tres y opcionalmente cinco.
+
+Aceptación de la prueba inicial: desde nivel 1, sin ayuda, premios ni
+recolocaciones, el personaje llega a Job 10 y cambia a primera clase; cada
+decisión queda registrada con su motivo y los hechos verificados que la sustentan.

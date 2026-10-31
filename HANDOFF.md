@@ -1,9 +1,9 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-10-31 15:40 -03:00 por Claude
-Referencia: rama codex/single-agent-plan, commit_ref b8af0a3; sin commit: ninguno.
+Actualizado: 2026-10-31 15:50 -03:00 por Claude
+Referencia: rama codex/single-agent-plan, commit_ref 6efed78; plan P5 en el commit siguiente.
 ## Objetivo actual
-Un jugador normal (Tarin) con ejecución nativa OpenKore; ahora P4 (conocimiento web) y
-decidir el modelo que reemplaza al Qwen3.5 9B para objetivos e informes.
+P5: un novato nuevo de nivel 1 decide solo cómo progresar hasta primera clase; luego
+comunidad. Dos funciones de modelo: planner inteligente (nube) y chat local.
 ## Estado comprobado
 - Único relevo: este archivo. Checkout D:/Ragnarok Agents/m4-continuous; la raíz
   (codex/web-search, WIP M2) no se implementa. WIP preservado en m3-worktree y m4-field.
@@ -19,8 +19,8 @@ decidir el modelo que reemplaza al Qwen3.5 9B para objetivos e informes.
 - rAthena pre-Renewal, versiones fijadas; OpenKore manual es el único ejecutor.
 - Solo portales caminables gratuitos; sin Kafra/pago. Sin premios, spawns ni progreso falso.
 - El agente usa solo información legítima del cliente; el modelo propone, el ejecutor valida.
-- Usuario: el 9B no basta para decidir e informar; se evaluará un reemplazo (p. ej. Gemini
-  gratis u otros). Hasta decidirlo no cambiar el modelo configurado.
+- Usuario: el 9B no basta; P5 usa planner (candidato Gemini gratis) y chat local; 9B de
+  respaldo. Hasta evaluar no cambiar el modelo configurado. Ver plan P5.
 - Un chat orquestador y una sesión por objetivo, en este checkout; un solo escritor.
 ## Incompleto / problemas / validaciones pendientes
 - P4: selección de consulta demasiado amplia; status ok no implica evidencia suficiente.
@@ -29,8 +29,8 @@ decidir el modelo que reemplaza al Qwen3.5 9B para objetivos e informes.
 - DB/puertos/GPU compartidos: no reiniciar servicios sin permiso; no ejecutar prepare_m4.py
   con clientes m4-field vivos; transacciones inciertas sin replay.
 ## Próxima acción
-Decidir con el usuario el modelo de reemplazo y evaluarlo con prompts reales grabados
-(metas, informe de estado, P4) antes de cambiar la configuración.
+P5 paso 1 (sesión propia): adaptador OpenAI-compatible y config planner/chat; evaluar
+candidatos con prompts reales grabados; el usuario elige. Luego pasos 2–7 del plan P5.
 ## Archivos relevantes
 - docs/CURRENT_STATE.md; docs/NATIVE_AGENT_PLAN.md; docs/USER_GUIDE.txt.
 - docs/evidence/P2*.md, P3-*.md, P4-public-mechanics.md; agent/solo_cycle.py.
