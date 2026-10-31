@@ -1,5 +1,16 @@
 # Estado actual
 
+## P3 — exploración dinámica implementada; falta muestra viva (2026-10-31)
+
+- El ciclo elige destinos de hasta 50 casillas con geometría local de OpenKore,
+  camino recto libre e historial de zonas; sin modelo y con ejecución acotada.
+  115 tests OK; mapa local: 41 candidatos desde (165,240). [Evidencia y límites](evidence/P3-dynamic-exploration.md).
+- No se hizo prueba viva: los PID heredados de rAthena/MariaDB y M4 no existen
+  y sus puertos no escuchan. No se iniciaron servicios. P1 sin proceso registrado;
+  checkpoint real leído: 6/8 activo, sin intención pendiente.
+- Siguiente acción: cuando los servicios estén disponibles, comprobar procesos y
+  hacer una única muestra breve con P1, sin borrar ni repetir intenciones.
+
 ## P3 — límite de búsqueda observado (2026-10-31 14:02)
 
 - Una prueba de 14 acciones terminó sin encontrar monstruos visibles; meta

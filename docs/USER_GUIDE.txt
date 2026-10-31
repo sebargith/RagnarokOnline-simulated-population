@@ -58,8 +58,10 @@ CÓMO CONTINUAR AHORA
 - Evidencia: docs/evidence/P2e-live-supply.md. No demuestra autonomía general.
 - [DEMOSTRADO] P3: el 9B propone continuar la meta activa y el runner valida
   la propuesta mientras sigue jugando. 111 tests OK; prueba real continued.
-- [SIGUIENTE] Completar la meta 8 y comprobar que el 9B pueda proponer una
-  meta nueva permitida. Ese camino tiene tests, pero falta la prueba viva.
+- [SIGUIENTE] Verificar una muestra breve de exploración dinámica con los
+  servicios disponibles. El código y los tests están listos; no hubo prueba viva
+  porque los servicios heredados estaban detenidos. Ver docs/evidence/P3-dynamic-exploration.md.
+  Después, completar la meta 8 antes de probar una nueva meta del 9B.
 - La naturalidad y la búsqueda general con SearXNG quedan para más adelante.
 - Mantén un único chat de implementación activo; el relevo sigue en HANDOFF.md.
 
