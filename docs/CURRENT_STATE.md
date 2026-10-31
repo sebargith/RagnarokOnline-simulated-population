@@ -1,6 +1,6 @@
 # Estado actual
 
-Actualizado: 2026-10-31 12:20 (America/Santiago) por Claude. P1 completada; P2a (viaje por portales y diálogo NPC) hecha.
+Actualizado: 2026-10-31 12:45 (America/Santiago) por Claude. P1 completada; P2a (portales y diálogo NPC) y P2b (abastecimiento NPC) hechas.
 
 ## Decisión vigente
 
@@ -54,6 +54,12 @@ no bloquean la primera entrega.
   → `prt_fild08` 170,365, Zeny Δ 0; `geffen` → `rejected/no_walk_route`.
   Tarin queda en `prt_fild08` 170,365, cliente P1 detenido.
   [Evidencia, fallos corregidos y límites](evidence/P2a-portal-travel-npc.md).
+- P2b implementada y probada en vivo (aprobada por el usuario): `npc_sell` (solo
+  botín sin equipar) y `npc_buy` (presupuesto ≤ Zeny, peso < 50 %) con precios del
+  servidor y conciliación exacta; política local `p2_supply.py`. Vendió 5 Jellopy +
+  2 Clover (+25 z) y compró 1 Apple (−15 z) en el Fruit Gardener; pruebas
+  negativas rechazadas sin paquete. Tarin en `prt_fild08` 170,365 con 10 z y
+  1 Apple; cliente P1 detenido. [Evidencia y límites](evidence/P2b-npc-supply.md).
 
 ## Base comprobada y límites
 
@@ -100,6 +106,6 @@ no bloquean la primera entrega.
 
 ## Próxima acción única
 
-Revisar P2a con el usuario. Siguiente paso P2 propuesto: abastecimiento por NPC
-cuando haga falta (vender drops / comprar pociones), con contrato propio de
-compra/venta acotada, antes del ciclo de progreso persistente.
+Revisar P2b con el usuario. Siguiente paso P2 propuesto: usar consumibles en la
+recuperación local y unir caza, recuperación y abastecimiento en un ciclo
+persistente que se retome tras reiniciar.

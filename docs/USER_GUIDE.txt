@@ -33,6 +33,9 @@ ESTADO REAL
 - [HECHO] P2a: el mismo novato viaja entre mapas solo por portales caminables
   (prt_fild08 -> Prontera -> prt_fild08, sin Kafra ni pago) y mantiene un diálogo
   NPC acotado. Ver docs/evidence/P2a-portal-travel-npc.md.
+- [HECHO] P2b: decide solo (sin el modelo) cuándo abastecerse, vende su botín y
+  compra curación en una tienda NPC de Prontera, con Zeny e inventario conciliados.
+  Ver docs/evidence/P2b-npc-supply.md.
 - [PENDIENTE] Progreso individual sostenible y objetivos generales del 9B.
 - [BLOQUEO CONOCIDO] SearXNG estaba offline; hay que verificar/restaurar su backend.
   El ejemplo actual "web poring" no es todavía una herramienta general.

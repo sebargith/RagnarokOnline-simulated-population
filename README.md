@@ -143,6 +143,14 @@ bounded NPC dialog (P2a), same profile, Tarin starting on `prt_fild08`
 & 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/p2_trip.py --runtime 'D:/Ragnarok Agents/runtime' --timeout 150 travel:prontera:157:31 talk:160:29:Cancel travel:prt_fild08:170:365 travel:geffen:120:100
 ```
 
+Bounded NPC supply (P2b): a local, model-free decision from loot, weight, healing
+and Zeny, then a walk-portal trip to sell loot and buy healing at the Prontera
+Fruit Gardener ([evidence and limits](docs/evidence/P2b-npc-supply.md)):
+
+```powershell
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/p2_supply.py --runtime 'D:/Ragnarok Agents/runtime' --probe
+```
+
 ## Continuous three-agent runtime (M4 continuation, Chat 06)
 
 Use PowerShell from `D:/Ragnarok Agents/m4-continuous`. The existing M4 profiles,
