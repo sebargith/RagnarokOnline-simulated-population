@@ -116,6 +116,17 @@ retained conversation review set.
 
 ## Native single-player navigation (P1a)
 
+P3 can request one bounded goal proposal from the selected local 9B while the
+native executor continues. With P1 running, this command was verified:
+
+```powershell
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/run_p2_cycle.py run --runtime 'D:/Ragnarok Agents/runtime' --seconds 30 --max-actions 1 --intent 'Continue the current goal without replacing it.'
+```
+
+The real model returned a validated continuation. New goals after completion
+are covered by simulation; that path still needs a live check. See
+[P3 evidence](docs/evidence/P3-goal-boundary.md).
+
 P2c also uses an owned Apple during safe rest, with a server confirmation and
 durable protection against replay. The existing bounded hunt command below
 records `healing` events. [Evidence and limits](docs/evidence/P2c-local-healing.md).

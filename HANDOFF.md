@@ -1,29 +1,30 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-10-31 13:36 -03:00 por Codex
-Referencia: codex/single-agent-plan, commit_ref c9077df; documentación en commit posterior.
+Actualizado: 2026-10-31 13:57 -03:00 por Codex
+Referencia: codex/single-agent-plan, commit_ref e05d6fc; documentación en commit posterior.
 ## Objetivo actual
-Jugador individual con OpenKore nativo; ciclo persistente y abastecimiento.
+P3: objetivos acotados del 9B sobre ejecución OpenKore; continuación real demostrada.
 ## Estado comprobado
-- Checkout D:/Ragnarok Agents/m4-continuous; WIP previo raíz, m3-worktree y m4-field intacto.
-- 31196aa: conciliación estricta de navigate/unknown/route_ended_off_target.
-- Dos rutas anteriores conciliadas con sesiones nuevas y dos snapshots estables; sin replay ni falsa llegada.
-- c9077df: hasta 5 s para movimiento tras terminar Task::Route si pos_to es destino exacto.
-- 98 tests OK; 17 tests de ciclo tras reforzar snapshots; sintaxis Perl OK.
-- Objetivo acumulado 4/4 completado; última continuación una acción de ataque, sin inferencia.
-- Último snapshot prt_fild08 170,287, HP 41/57, Zeny 10. Cliente P1 detenido.
-- La espera nueva no se probó con una ruta real después del cambio; tampoco hubo visita a tienda.
-- Registro congelado: runtime/p1/evidence/cycle-reconcile-1793464544.
+- Checkout D:/Ragnarok Agents/m4-continuous. WIP raíz, m3-worktree y m4-field preservado.
+- P2 circuito vivo caza/venta/compra/regreso registrado en 9cd0354.
+- P3 e05d6fc: --intent, esquema dependiente del estado, servicio acotado y validación bajo lock.
+- 111 tests OK. Prueba real 9B: continued, goal8, kills6, una acción completada, una inferencia.
+- Checkpoint activo 6/8 sin intención pendiente; P1 detenido.
+- Último snapshot prt_fild08 161,277, HP57/57, Zeny13, base4/job3.
+- Raw P3: runtime/p1/evidence/p3-live-1793465840 (incluye intentos iniciales y final).
+- Acceso autorizado a Ollama y aprobación de publicación disponibles otra vez.
 ## Decisiones vigentes
-- Conservar resultados unknown y conciliaciones; nunca repetir transacciones inciertas.
-- Reconciliación solo para ruta terminada conocida; no aplica a ataque, loot, travel o tienda.
-- Mantener rAthena, perfil OpenKore, 9B local, SearXNG y límites de recursos.
-## Pendientes
-- Verificar una ruta real con nueva espera y observar abastecimiento integrado cuando sea necesario.
-- No inventar la causa de la primera ruta: su pos_to fue distinto del destino.
-- Cliente/puertos/GPU/DB compartidos. No ejecutar prepare_m4 sobre clientes m4-field vivos.
+- 9B Qwen3.5 Q6_K existente, cero retries; gameplay independiente de inferencia.
+- Nuevo objetivo solo tras completar el actual; fingerprint estricto rechaza trabajo obsoleto.
+- No repetir operaciones financieras inciertas; sin consola ni recursos artificiales.
+- Runtime/puertos/GPU/DB compartidos; no ejecutar prepare_m4 sobre clientes existentes.
+## Pendientes y límites
+- Asignar meta nueva con modelo real tras completar la actual: todavía solo simulado.
+- Objetivos variados y conversación integrada pendientes; SearXNG último estado offline.
+- Piloto no demuestra supervivencia general ni calidad social; naturalidad y escala aplazadas.
 ## Próxima acción
-Asignar otro objetivo explícito y continuar una prueba acotada con evidencia de navegación/tienda.
+Completar la meta 8 y verificar una nueva meta acotada del 9B, sin borrar historial;
+después revisar P3 y avanzar al conocimiento web P4 según alcance autorizado.
 ## Archivos relevantes
-- docs/CURRENT_STATE.md; docs/USER_GUIDE.txt; docs/evidence/P2d-persistent-cycle.md.
-- agent/solo_cycle.py; scripts/run_p2_cycle.py; bridge/lib/M1Navigation.pm; tests/test_p2_cycle.py.
+- docs/CURRENT_STATE.md; docs/evidence/P3-goal-boundary.md; docs/USER_GUIDE.txt.
+- agent/goal_planner.py; scripts/run_p2_cycle.py; tests/test_goal_planner.py.
 Registro de chats: D:/Ragnarok Agents/.ai/chats/INDEX.md

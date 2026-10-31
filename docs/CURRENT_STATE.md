@@ -1,6 +1,34 @@
 # Estado actual
 
+## P3 — continuación verificada con 9B real (2026-10-31 13:57)
+
+- e05d6fc integra --intent, una admisión, propuestas restringidas por capacidades
+  actuales y aplicación validada sobre el mismo objeto bajo el bloqueo del runner.
+- Prueba real: modelo 9B seleccionado propuso continuar; resultado continued,
+  goal8, kills6, una acción completada, sin intención pendiente. P1 detenido.
+- 111 tests OK. Nuevas metas tras completar la actual: probadas con simulación,
+  aún no en vivo. [Evidencia y comandos](evidence/P3-goal-boundary.md).
+- Fallo anterior de permisos resuelto mediante aprobación autorizada.
+  Documentación P2 pendiente confirmada en 9cd0354; publicación en curso.
+- Snapshot final prt_fild08 161,277, HP57/57, Zeny13. No se alteraron servicios
+  ni otros clientes. Mantener checkpoint 6/8, límites y modelo existentes.
+
+## Registro anterior
 Actualizado: 2026-10-31 13:24 (America/Santiago), Codex.
+
+## Avance — circuito individual real (2026-10-31 13:41)
+
+- Meta acumulada 8: Tarin 4→6 kills, cliente P1 detenido; objetivo activo
+  6/8, sin intención pendiente. Continuó tras vender y comprar.
+- Caza/loot → Prontera → venta cinco objetos (+18 Zeny) → compra Apple
+  (−15 Zeny) → regreso a prt_fild08: resultados y deltas confirmados.
+  [Evidencia y límites](evidence/P2e-live-supply.md).
+- La ruta c_14 seguía activa al acabar el límite; una consulta de solo lectura
+  recuperó completed/arrived sin reenvío antes de detener P1.
+- 99 tests OK. `ac845da` corrige el script anterior para detenerse ante
+  rechazos. Revisión de tienda delegada, sin otros procesos tocados.
+- P2 demuestra el ciclo individual en este mapa y tienda; autonomía general,
+  selección de peligro y operación prolongada siguen sin demostrarse.
 
 ## Dirección y checkout
 
@@ -111,9 +139,7 @@ Validar la recuperación antes de continuar el abastecimiento integrado.
 
 ## Pendientes y próxima acción
 
-El objetivo 4/4 está completo. Usar set-goal para asignar otro sin borrar
-historial. La espera de posición tras finalizar una ruta está cubierta por
-tests pero no fue ejercitada en la última prueba real. El circuito completo
-de abastecimiento integrado sigue verificado solo con estados reproducibles.
-Continuar una prueba acotada cuando haya necesidad real; no repetir una
-operación financiera incierta. P3/P4 y calidad social siguen pendientes.
+Integrar objetivos acotados del 9B (P3) sin bloquear la ejecución reactiva.
+Meta de Tarin 6/8 guardada; no hay intención pendiente. P2 demuestra caza,
+venta, compra y regreso en el piloto. Peligro general, SearXNG y comportamiento
+prolongado siguen pendientes. No repetir operaciones financieras inciertas.

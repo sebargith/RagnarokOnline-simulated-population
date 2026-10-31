@@ -56,8 +56,10 @@ CÓMO CONTINUAR AHORA
 - [HECHO] P2: Tarin cazó, vendió 5 objetos (+18 Zeny), compró una Apple
   (−15) y regresó al campo. Meta guardada 6/8; cliente P1 detenido.
 - Evidencia: docs/evidence/P2e-live-supply.md. No demuestra autonomía general.
-- [SIGUIENTE] P3: conectar el 9B a objetivos de alto nivel mediante capacidades
-  restringidas, manteniendo la ejecución reactiva independiente del modelo.
+- [DEMOSTRADO] P3: el 9B propone continuar la meta activa y el runner valida
+  la propuesta mientras sigue jugando. 111 tests OK; prueba real continued.
+- [SIGUIENTE] Completar la meta 8 y comprobar que el 9B pueda proponer una
+  meta nueva permitida. Ese camino tiene tests, pero falta la prueba viva.
 - La naturalidad y la búsqueda general con SearXNG quedan para más adelante.
 - Mantén un único chat de implementación activo; el relevo sigue en HANDOFF.md.
 
