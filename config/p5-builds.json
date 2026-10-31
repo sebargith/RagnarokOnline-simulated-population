@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "note": "P5 step 2. Candidate builds the planner may choose or keep. Stats: ordered [stat, target] steps, applied strictly in order (points are saved while the next step is unaffordable). Skills: ordered [handle, level]; entries the server does not list or does not allow yet are skipped. NV_BASIC 9 is required for any first-class change.",
+  "builds": {
+    "novice-swordman": {
+      "target_class": "Swordman",
+      "summary": "Melee tank: STR for damage, VIT for HP; DEX for hit later.",
+      "stats": [["str", 20], ["vit", 15], ["dex", 10], ["str", 40], ["vit", 30], ["dex", 20], ["str", 70], ["vit", 50]],
+      "skills": [["NV_BASIC", 9], ["SM_SWORD", 10], ["SM_BASH", 10], ["SM_RECOVERY", 5], ["SM_PROVOKE", 5], ["SM_MAGNUM", 10], ["SM_ENDURE", 5]]
+    },
+    "novice-archer": {
+      "target_class": "Archer",
+      "summary": "Ranged: DEX for damage and hit, AGI for attack speed and flee.",
+      "stats": [["dex", 25], ["agi", 15], ["dex", 45], ["agi", 30], ["vit", 10], ["dex", 70], ["agi", 50]],
+      "skills": [["NV_BASIC", 9], ["AC_OWL", 10], ["AC_VULTURE", 10], ["AC_DOUBLE", 10], ["AC_CONCENTRATION", 10], ["AC_SHOWER", 10]]
+    },
+    "novice-thief": {
+      "target_class": "Thief",
+      "summary": "Fast melee: AGI for flee and attack speed, STR for damage.",
+      "stats": [["agi", 25], ["str", 15], ["agi", 45], ["str", 30], ["dex", 15], ["agi", 70], ["str", 50]],
+      "skills": [["NV_BASIC", 9], ["TF_DOUBLE", 10], ["TF_MISS", 10], ["TF_STEAL", 5], ["TF_HIDING", 5], ["TF_POISON", 5]]
+    }
+  }
+}

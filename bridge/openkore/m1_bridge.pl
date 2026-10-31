@@ -22,6 +22,8 @@ use M1Combat;
 use M1Travel;
 use M1Supply;
 use M1Healing;
+use M1Progress;
+use Skill;
 use File::Basename ();
 
 my ($server, $client, $cfg, $hooks, $pending);
@@ -38,6 +40,8 @@ my $healing;
 my ($last_hit_on_me, $last_hp_update, $was_dead) = (0, 0, 0);
 my %item_weight;    # item_weights.txt (tenths), loaded on first purchase.
 my $walk_graph;    # Built once from OpenKore's portals table on first travel.
+my $equipment;    # config/p5-equipment.json items, loaded on first equip.
+my %STAT_CODE = (str => 13, agi => 14, vit => 15, int => 16, dex => 17, luk => 18);
 my $boot = sprintf('%x-%x-%x', time * 1000, $$, rand(2**30));
 
 Plugins::register('m1_bridge', 'Bounded loopback observation/action bridge', \&unload);
@@ -48,6 +52,8 @@ $hooks = Plugins::addHooks(
     ['packet_selfChat', \&self_chat], ['packet_pubMsg', \&public_chat],
     ['packet_attack', \&combat], ['monster_disappeared', \&monster_gone],
     ['npc_talk', \&npc_text], ['npc_autotalk', \&npc_autotalk], ['packet/npc_sell_list', \&shop_sell_list], ['buy_result', \&shop_buy_result], ['packet/sell_result', \&shop_sell_result], ['packet/inventory_item_added', \&inventory_added], ['packet/stat_info', \&stat_info],
+    ['packet_pre/stats_added', \&progress_stat_ack], ['packet/skill_update', \&progress_skill_ack],
+    ['packet/equip_item', \&progress_equip_ack], ['packet/unequip_item', \&progress_unequip_ack],
     ['engaged_deal', \&trade_engaged], ['incoming_deal', \&trade_incoming],
     ['packet/deal_add_you', \&trade_added], ['packet/deal_finalize', \&trade_locked],
     ['complete_deal', \&trade_complete], ['cancelled_deal', \&trade_cancelled],
@@ -127,12 +133,14 @@ sub snapshot {
             you_locked => $currentDeal{you_finalize} ? 1 : 0, other_locked => $currentDeal{other_finalize} ? 1 : 0};
         $s->{inventory_ready} = $char->inventory->isReady ? 1 : 0;
         $s->{field} = {width => $field->width, height => $field->height};
+        $s->{progress} = progress_state() if $cfg->{native_navigation};
         if ($cfg->{native_navigation} && !$pending && $recovery{phase} eq 'none' && !$char->{dead}) {
             $s->{explore_candidates} = M1Explore::candidates($s->{position}, $field->width, $field->height,
                 sub { $field->isWalkable(@_) }, sub { $field->checkPathFree(@_) });
         }
         my @inventory = map {{name => $_->{name}, name_id => 0 + $_->{nameID}, amount => 0 + $_->{amount},
-            type => 0 + ($_->{type} // 0), equipped => $_->{equipped} ? 1 : 0}}
+            type => 0 + ($_->{type} // 0), equipped => $_->{equipped} ? 1 : 0,
+            location => 0 + ($_->{type_equip} // 0), identified => $_->{identified} ? 1 : 0}}
             @{$char->inventory->getItems};
         $s->{inventory} = [@inventory[0 .. ($#inventory > 31 ? 31 : $#inventory)]];
         $s->{inventory_truncated} = @inventory > 32 ? 1 : 0;
@@ -718,6 +726,136 @@ sub npc_text {
     push @{$pending->{transcript}}, substr($line, 0, 120) if @{$pending->{transcript}} < 40;
 }
 
+# P5 progress: one stat point, one skill point, or one equip/take-off per
+# request. The packet is sent once; only the server's own acknowledgement for
+# that stat, skill or inventory slot can complete it (M1Progress).
+sub progress_state {
+    my %stats = map {; $_ => {value => 0 + ($char->{$_} // 0), cost => 0 + ($char->{"points_$_"} // 0)} } @M1Progress::STATS;
+    my @skills = map {{handle => $_, lv => 0 + ($char->{skills}{$_}{lv} // 0), up => $char->{skills}{$_}{up} ? 1 : 0}}
+        sort keys %{$char->{skills} || {}};
+    return {job_id => defined $char->{jobID} ? 0 + $char->{jobID} : undef, job => M1Progress::job_name($char->{jobID}),
+        sex => defined $char->{sex} ? 0 + $char->{sex} : undef,
+        stats_ready => defined $char->{points_free} ? 1 : 0, points_free => 0 + ($char->{points_free} // 0),
+        points_skill => 0 + ($char->{points_skill} // 0), stats => \%stats,
+        skills => [@skills[0 .. ($#skills > 31 ? 31 : $#skills)]]};
+}
+
+sub equipment_table {
+    unless ($equipment) {
+        my $path = File::Basename::dirname(__FILE__) . '/../../config/p5-equipment.json';
+        open my $fh, '<:raw', $path or return {};
+        local $/; $equipment = eval { $json->decode(<$fh>)->{items} } || {}; close $fh;
+    }
+    $equipment;
+}
+
+sub progress_request {
+    my ($id, $a) = @_;
+    my $type = $a->{type};
+    my %ctx = (manual_ai => AI::state() == AI::MANUAL(), dead => $char->{dead}, hp => $char->{hp},
+        recovering => $recovery{phase} ne 'none');
+    my $state = progress_state();
+    my ($reason, $item);
+    if ($type eq 'stat_up') {
+        $reason = M1Progress::validate_stat($a, {%ctx, stats => $state->{stats_ready} ? $state->{stats} : undef,
+            points_free => $state->{points_free}});
+    } elsif ($type eq 'skill_up') {
+        $reason = M1Progress::validate_skill($a, {%ctx, skills => {map { $_->{handle} => $_ } @{$state->{skills}}},
+            points_skill => $state->{points_skill}});
+    } else {
+        my @items = @{$char->inventory->getItems};
+        my %c = (%ctx, inventory_ready => $char->inventory->isReady ? 1 : 0,
+            inventory => [map {{name_id => 0 + $_->{nameID}, equipped => $_->{equipped} ? 1 : 0,
+                identified => $_->{identified} ? 1 : 0, equippable => $_->equippable ? 1 : 0}} @items]);
+        if ($type eq 'equip') {
+            my $known = defined($a->{name_id}) && !ref($a->{name_id}) && $a->{name_id} =~ /^\d{1,6}$/;
+            $reason = M1Progress::validate_equip($a, {%c, job_id => $char->{jobID}, base_level => $char->{lv},
+                sex => $char->{sex}, requirements => $known ? equipment_table()->{$a->{name_id}} : undef});
+            ($item) = grep { $_->{nameID} == $a->{name_id} && !$_->{equipped} && $_->equippable && $_->{identified} } @items
+                unless $reason;
+        } else {
+            $reason = M1Progress::validate_unequip($a, \%c);
+            ($item) = grep { $_->{nameID} == $a->{name_id} && $_->{equipped} } @items unless $reason;
+        }
+    }
+    if ($reason) { result($id, 'rejected', $reason); return }
+    my $idn = $type eq 'skill_up' ? Skill->new(handle => $a->{skill})->getIDN : undef;
+    if ($type eq 'skill_up' && !$idn) { result($id, 'rejected', 'skill_not_available'); return }
+    my $now = time;
+    $pending = {id => $id, action => $a, native => 'progress', started => $now, deadline => $now + $a->{timeout_s},
+        sent_ms => int($now * 1000)};
+    if ($type eq 'stat_up') {
+        $pending->{before} = {value => $state->{stats}{$a->{stat}}{value}, points_free => $state->{points_free}};
+        $messageSender->sendAddStatusPoint($STAT_CODE{$a->{stat}});
+    } elsif ($type eq 'skill_up') {
+        $pending->{skill_id} = $idn;
+        $pending->{before} = {lv => 0 + $char->{skills}{$a->{skill}}{lv}, points_skill => $state->{points_skill}};
+        $messageSender->sendAddSkillPoint($idn);
+    } else {
+        @$pending{qw(item_bin item_name)} = ($item->{ID}, $item->{name});
+        $pending->{before} = {equipped => 0 + ($item->{equipped} || 0), location => 0 + ($item->{type_equip} // 0)};
+        # Direct packets, not Item::equip, so OpenKore's AI 'equip' task never runs.
+        if ($type eq 'equip') { $messageSender->sendEquip($item->{ID}, $item->{type_equip}) }
+        else { $messageSender->sendUnequip($item->{ID}) }
+    }
+    $last_action = $now;
+    result($id, 'accepted', 'request_sent');
+}
+
+sub progress_tick {
+    my $p = $pending;
+    my $type = $p->{action}{type};
+    my $expired = time >= $p->{deadline} ? 1 : 0;
+    my ($status, $reason);
+    if ($type eq 'stat_up') {
+        ($status, $reason) = M1Progress::stat_outcome({ack => $p->{ack}, before => $p->{before}{value}, expired => $expired});
+        $p->{after} = {value => 0 + ($char->{$p->{action}{stat}} // 0), points_free => 0 + ($char->{points_free} // 0)};
+    } elsif ($type eq 'skill_up') {
+        ($status, $reason) = M1Progress::skill_outcome({level => $p->{ack} && $p->{ack}{lv}, before => $p->{before}{lv}, expired => $expired});
+        $p->{after} = {lv => 0 + ($char->{skills}{$p->{action}{skill}}{lv} // 0), points_skill => 0 + ($char->{points_skill} // 0)};
+    } else {
+        ($status, $reason) = M1Progress::equip_outcome({ack => $p->{ack}, expired => $expired},
+            $type eq 'equip' ? 'equipped' : 'unequipped');
+        my $item = $char->inventory->getByID($p->{item_bin});
+        $p->{after} = {equipped => $item ? 0 + ($item->{equipped} || 0) : undef};
+    }
+    return unless $status;
+    my $e = {kind => $type, before => $p->{before}, after => $p->{after}, ack => $p->{ack}, sent_ms => $p->{sent_ms}};
+    $e->{item} = $p->{item_name} if $p->{item_name};
+    finish($status, $reason, $e);
+}
+
+sub progress_wait {
+    my ($type) = @_;
+    $pending && ($pending->{native} // '') eq 'progress' && $pending->{action}{type} eq $type && !$pending->{ack};
+}
+
+# 00BC <type>.W <ok>.B <value>.B; OpenKore's own layout skips the ok byte.
+sub progress_stat_ack {
+    my (undef, $args) = @_;
+    return unless progress_wait('stat_up') && ($args->{type} // -1) == $STAT_CODE{$pending->{action}{stat}} &&
+        length($args->{RAW_MSG} // '') >= 6;
+    my (undef, undef, $ok, $value) = unpack('v v C C', $args->{RAW_MSG});
+    $pending->{ack} = {ok => $ok ? 1 : 0, value => 0 + $value, switch => $args->{switch}};
+}
+
+sub progress_skill_ack {
+    my (undef, $args) = @_;
+    return unless progress_wait('skill_up') && ($args->{skillID} // -1) == $pending->{skill_id};
+    $pending->{ack} = {lv => 0 + $args->{lv}, up => $args->{up} ? 1 : 0, switch => $args->{switch}};
+}
+
+# OpenKore marks an item taken off even when the server refused, so the flag
+# in the acknowledgement itself decides (M1Progress::ack_ok).
+sub progress_item_ack {
+    my ($type, $args) = @_;
+    return unless progress_wait($type) && defined($args->{ID}) && $args->{ID} eq $pending->{item_bin};
+    $pending->{ack} = {ok => M1Progress::ack_ok($args->{switch}, $args->{success} // -1),
+        flag => 0 + ($args->{success} // -1), location => 0 + ($args->{type} // 0), switch => $args->{switch}};
+}
+sub progress_equip_ack { progress_item_ack('equip', $_[1]) }
+sub progress_unequip_ack { progress_item_ack('unequip', $_[1]) }
+
 sub request {
     my ($r) = @_;
     unless (ref($r) eq 'HASH') { emit('protocol_error', {reason => 'object_required'}); return }
@@ -765,7 +903,7 @@ sub request {
     # Cancel is exempt from busy/rate limits: it only ends the active native task.
     if ($a->{type} eq 'cancel') {
         unless (join(',', sort keys %$a) eq 'target,type' && defined($a->{target}) && !ref($a->{target}) &&
-            $pending && $pending->{native} && $pending->{native} ne 'respawn' && $a->{target} eq $pending->{id}) {
+            $pending && $pending->{native} && $pending->{native} !~ /^(respawn|progress)$/ && $a->{target} eq $pending->{id}) {
             result($id, 'rejected', 'no_matching_task'); return;
         }
         my $kind = $pending->{native};
@@ -800,6 +938,7 @@ sub request {
     if ($a->{type} eq 'npc_talk') { talk_request($id, $a); return }
     if ($a->{type} =~ /^npc_(sell|buy)$/) { shop_request($id, $a); return }
     if ($cfg->{native_navigation} && $a->{type} =~ /^(attack|take|respawn)$/) { native_request($id, $a); return }
+    if ($cfg->{native_navigation} && $a->{type} =~ /^(stat_up|skill_up|equip|unequip)$/) { progress_request($id, $a); return }
     if ($a->{type} eq 'move' && $cfg->{native_navigation}) { result($id, 'rejected', 'legacy_executor_disabled'); return }
     if ($a->{type} eq 'move') {
         unless (join(',', sort keys %$a) eq 'map,type,x,y' && !ref($a->{map}) && $a->{map} eq $field->baseName &&
@@ -1040,6 +1179,7 @@ sub tick {
     if ($native eq 'travel') { travel_tick() if $ready }
     elsif ($native eq 'npc_talk') { talk_tick() if $ready }
     elsif ($native eq 'shop') { shop_tick() if $ready }
+    elsif ($native eq 'progress') { progress_tick() if $ready }
     elsif ($pending && $pending->{task}) { navigation_tick() if $ready }
     elsif ($pending && $pending->{native}) { native_tick() if $ready }
     elsif ($pending && time >= $pending->{deadline}) { finish('unknown', 'confirmation_timeout') }
