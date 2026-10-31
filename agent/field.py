@@ -36,12 +36,13 @@ class Geometry:
 
     def path(self, start, goal, blocked=(), within=0):
         blocked = set(blocked)-{start}
-        queue, costs, previous = [(distance(start, goal), 0, start)], {start: 0}, {}
+        manhattan = lambda p: abs(p[0]-goal[0])+abs(p[1]-goal[1])
+        queue, costs, previous = [(distance(start, goal), manhattan(start), 0, start)], {start: 0}, {}
         # Finite two-map local planner; no world route framework.
         for _ in range(50000):
             if not queue:
                 break
-            _, cost, p = heapq.heappop(queue)
+            _, _, cost, p = heapq.heappop(queue)
             if cost != costs[p]:
                 continue
             if distance(p, goal) <= within:
@@ -59,7 +60,7 @@ class Geometry:
                     new = cost+1
                     if new < costs.get(q, 10**9):
                         costs[q], previous[q] = new, p
-                        heapq.heappush(queue, (new+distance(q, goal), new, q))
+                        heapq.heappush(queue, (new+distance(q, goal), manhattan(q), new, q))
         raise RuntimeError('Static route unavailable or search budget exhausted')
 
 
@@ -200,12 +201,29 @@ class FieldController(Continuous):
             who = actors[turn % len(actors)]
             if any(self.bridges[a].session != sessions[a] for a in actors):
                 raise RuntimeError('Encounter epoch changed; abandon target')
-            visible = next((m for m in self.data(who)['monsters'] if m['id'] == target and m['name_id'] in WEAK), None)
-            if not visible:
-                raise RuntimeError('Target no longer perceived; abandon encounter')
-            self.walk_to(who, visible['x'], visible['y'], within=1)
+            for _ in range(4):
+                data = self.data(who)
+                visible = next((m for m in data['monsters'] if m['id'] == target and m['name_id'] in WEAK), None)
+                if not visible:
+                    raise RuntimeError('Target no longer perceived; abandon encounter')
+                pos = (data['destination']['x'], data['destination']['y'])
+                if distance(pos, (visible['x'], visible['y'])) <= 1:
+                    break
+                blocked = {(p['x'], p['y']) for p in data['players']}
+                route = self.geometry[FIELD].path(pos, (visible['x'], visible['y']), blocked, within=1)
+                self.walk_to(who, *segment(route))
+            else:
+                raise RuntimeError('Moving target approach budget exhausted')
             # Bridge checks the current actor and melee range again.
-            result = self.action(who, {'type': 'attack', 'target': target})
+            request = self.submit(who, {'type': 'attack', 'target': target})
+            self.wait(lambda: self.results.get((who, request), {}).get('status') in ('completed', 'rejected', 'unknown'), 7)
+            result = self.results[(who, request)]
+            if result['status'] == 'rejected' and result['reason'] == 'target_not_visible_nearby_or_allowed':
+                self.note('field_target_moved', who=who, target=target)
+                self.pump(1.2)
+                continue  # new perception/decision; rejected packet was never sent
+            if result['status'] != 'completed':
+                raise RuntimeError('Uncertain attack; do not replay: '+str(result))
             damage[who] += result['evidence']['damage']
             self.pump(1.2)
         if death is None or any(n <= 0 for n in damage.values()):

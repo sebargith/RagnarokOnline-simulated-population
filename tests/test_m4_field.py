@@ -30,6 +30,8 @@ class FieldTests(unittest.TestCase):
                 self.assertTrue(geometry.walkable((b[0], a[1])))
         self.assertEqual(segment([(x, 0) for x in range(20)]), (8, 0))
         self.assertEqual(segment([(0, 0), (1, 0), (1, 1)]), (1, 0))
+        straight = self.geometry([[1]*10 for _ in range(10)])
+        self.assertEqual(straight.path((5, 9), (5, 0)), [(5, y) for y in range(9, -1, -1)])
 
     def test_unreachable_geometry_fails(self):
         geometry = self.geometry([[1, 0, 1]])
