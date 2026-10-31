@@ -1,5 +1,18 @@
 # Estado actual
 
+## P5 paso 2 — stats, habilidades y equipo (2026-10-31)
+
+- Acciones nativas `stat_up`, `skill_up`, `equip` y `unequip` (contrato en `M1Progress.pm`), admitidas
+  con el estado observado y completadas solo con el paquete del servidor (`00BC`, `010E`, `0999`/`099A`).
+  Tabla de requisitos de equipo generada desde rAthena pre-re (122 objetos). Política local
+  determinista (`agent/build_policy.py`), tres builds (`config/p5-builds.json`) y macro-meta
+  `BuildPlanner` que solo elige o mantiene una build; si falla, la build se mantiene. Suite: 166 OK.
+- En vivo con Tarin (`a8052d5`): Groq eligió `novice-swordman` en 2,16 s; Knife desequipado y reequipado;
+  STR 5→11 (12→0 puntos) y NV_BASIC 0→2, 10/10 acciones confirmadas. Cliente P1 detenido.
+  [Evidencia y límites](evidence/P5-stats-equipment.md).
+- Pendiente: en vivo no se vio un rechazo ni un equipo nuevo mejor; la política todavía no
+  está en el runner continuo. Siguiente: revisión del orquestador; luego, P5 paso 3.
+
 ## P5 paso 1 — funciones planner/chat y evaluación (2026-10-31)
 
 - Adaptador compatible con OpenAI y servicio por función (`planner`/`chat`) con
