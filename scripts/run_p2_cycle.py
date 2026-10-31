@@ -18,10 +18,11 @@ from agent.live_io import RingLog, atomic_json, exclusive
 from agent.solo_cycle import SoloCycle, FINAL
 from bridge.client import Bridge
 from scripts.bench_m2 import ram_sample
+from agent.goal_planner import GoalPlanner, apply_proposal_locked
 
 
 class Runner:
-    def __init__(self, cycle, bridge, directory):
+    def __init__(self, cycle, bridge, directory, planner=None, intent=None):
         self.cycle, self.b, self.directory = cycle, bridge, directory
         self.ready = None
         self.last_send, self.last_query, self.last_status = 0, 0, 0
@@ -30,6 +31,39 @@ class Runner:
         self.actions = 0
         self.inventory_session, self.inventory_ready_after = None, None
         self.log = RingLog(directory/'events.jsonl')
+        self.planner, self.intent = planner, intent
+        self.planning_requested, self.planning_done = False, planner is None
+        self.inference_calls, self.planning_result = 0, None
+
+    def planning_tick(self):
+        if self.planning_done:
+            return
+        latest = self.b.latest
+        if not latest or not latest['data'].get('connected') or not 0 <= time.time()*1000-latest['time_ms'] <= 2500:
+            return
+        self.resource_guard()
+        if not self.planning_requested:
+            self.planning_requested = True
+            try:
+                self.planner.request(self.intent)
+                self.inference_calls += 1
+            except Exception as error:
+                self.planning_done = True
+                self.planning_result = {'status':'unavailable','reason':type(error).__name__}
+                self.note('planning_result', self.planning_result)
+                return
+        result = self.planner.poll()
+        if result is None:
+            return
+        self.planning_done = True
+        self.note('planning_proposal', result)
+        if result['status'] == 'proposed':
+            try:
+                result = apply_proposal_locked(self.cycle, result, latest)
+            except (ValueError, RuntimeError, OSError) as error:
+                result = {'status':'rejected','reason':str(error)}
+        self.planning_result = result
+        self.note('planning_result', result)
 
     def note(self, kind, data):
         self.log.write(json.dumps({'time': time.time(), 'kind': kind, 'data': data})+'\n')
@@ -63,6 +97,7 @@ class Runner:
             'status': s['status'], 'phase': s['phase'], 'kills': s['kills'],
             'goal_kills': s['goal_kills'], 'inflight': s['inflight'],
             'block_reason': s.get('reason'), 'resources': self.resources,
+            'planning_result': self.planning_result, 'inference_calls': self.inference_calls,
             'observed': {k: latest['data'].get(k) for k in
                 ('map', 'position', 'hp', 'hp_max', 'level', 'recovery', 'zeny')} if latest else None})
 
@@ -88,8 +123,14 @@ class Runner:
         try:
             while time.monotonic() < end:
                 self.pump()
-                if self.cycle.state['status'] != 'active':
+                self.planning_tick()
+                if self.cycle.state['status'] != 'active' and self.planning_done:
                     reason = self.cycle.state['status']; break
+                if self.cycle.state['status'] != 'active':
+                    if time.monotonic() - self.last_status >= 1:
+                        self.status(True)
+                        self.last_status = time.monotonic()
+                    continue
                 latest = self.b.latest
                 if not self.ready or not latest or not latest['data'].get('connected') or self.b.next_serial is None:
                     if time.monotonic() >= connect_end:
@@ -111,7 +152,14 @@ class Runner:
                         self.b.send({'type': 'query_result', 'request_id': p['request_id'], 'session': p['session']})
                         self.last_query = time.monotonic()
                 elif max_actions and self.actions >= max_actions:
-                    reason = 'action_budget'; break
+                    if self.planning_done:
+                        reason = 'action_budget'; break
+                    # Gameplay budget is exhausted; finish observing this one
+                    # admitted inference without sending further game actions.
+                    if time.monotonic() - self.last_status >= 1:
+                        self.status(True)
+                        self.last_status = time.monotonic()
+                    continue
                 elif time.monotonic() - self.last_send >= 1.2:
                     if self.inventory_ready_after is None or latest['time_ms'] <= max(
                             self.inventory_ready_after, self.cycle.state.get('observe_after', 0)):
@@ -140,12 +188,16 @@ class Runner:
             self.note('runner_error', {'reason': reason})
             raise
         finally:
+            if not self.planning_done:
+                self.planning_result = {'status':'unfinished','reason':reason}
+                self.note('planning_result', self.planning_result)
             self.status(False, reason)
             self.log.close()
             self.b.close()
         return {'reason': reason, 'status': self.cycle.state['status'],
                 'kills': self.cycle.state['kills'], 'actions_sent': self.actions,
-                'inflight': self.cycle.state['inflight'], 'inference_calls': 0}
+                'inflight': self.cycle.state['inflight'], 'inference_calls': self.inference_calls,
+                'planning_result': self.planning_result}
 
 
 def main():
@@ -155,9 +207,12 @@ def main():
     parser.add_argument('--seconds', type=int, default=180)
     parser.add_argument('--goal-kills', type=int, default=6, help='Only used when creating a new checkpoint')
     parser.add_argument('--target-kills', type=int, help='New absolute cumulative goal for set-goal')
+    parser.add_argument('--intent', help='One bounded player intention for the local 9B (max 400 characters)')
     parser.add_argument('--max-actions', type=int, default=0)
     parser.add_argument('--pause-after-send', action='store_true', help='Disconnect after one proposal to verify restart recovery')
     args = parser.parse_args()
+    if args.intent is not None and (args.command != 'run' or not 1 <= len(args.intent) <= 400):
+        parser.error('--intent requires run and 1..400 characters')
     directory = args.runtime/'p1/cycle'
     if args.command == 'status':
         path = directory/'status.json'
@@ -197,11 +252,23 @@ def main():
             print(json.dumps({'changed': changed, 'goal_kills': cycle.state['goal_kills'],
                               'kills': cycle.state['kills'], 'status': cycle.state['status']}))
             return
-        if cycle.state['status'] != 'active':
+        if cycle.state['status'] != 'active' and args.intent is None:
             print(json.dumps(cycle.state)); return
         bridge = Bridge(args.runtime/'p1/openkore/solo/bridge.json')
-        print(json.dumps(Runner(cycle, bridge, directory).run(
-            args.seconds, args.max_actions, args.pause_after_send)))
+        service = None
+        try:
+            planner = None
+            if args.intent is not None:
+                from inference.m2 import BoundedInference
+                config = json.loads((ROOT/'config/m2-operating.json').read_text())
+                service = BoundedInference(config, config['model'])
+                planner = GoalPlanner(service, directory/'state.json')
+            print(json.dumps(Runner(cycle, bridge, directory, planner, args.intent).run(
+                args.seconds, args.max_actions, args.pause_after_send)))
+        finally:
+            bridge.close()
+            if service:
+                service.close()
 
 
 if __name__ == '__main__':
