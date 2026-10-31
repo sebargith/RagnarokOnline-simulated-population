@@ -4,15 +4,18 @@
 
 - Adaptador compatible con OpenAI y servicio por función (`planner`/`chat`) con
   cola, límites y respaldo propios; `chat` solo local. Fallo o 429 de la nube:
-  error explícito, el runner sigue y las siguientes peticiones usan el 9B local
-  marcadas `degraded`. Claves por entorno o `runtime/secrets/model-keys.env`.
+  error explícito, el runner sigue y las siguientes peticiones usan el respaldo
+  local marcadas `degraded`. Claves por entorno o `runtime/secrets/model-keys.env`.
 - Banco grabado de 13 casos (metas, informe determinista, P4). Groq gpt-oss-120b:
   100 % JSON, 96 % coherencia, ~0,8 s. 9B actual 77 %; 9B con think no termina
   (bucle hasta agotar tokens). Gemini 3.6 Flash gratis: 503 y 429 tras 21 llamadas.
   Gemma 4 12B local: 85 %, ~0,6 s, pico GPU 11,5 GiB; mejor respaldo local que el 9B.
-  [Evidencia](evidence/P5-model-eval.md). Suite: 146 OK. Sin pruebas en vivo.
-- **Modelo por defecto sin cambios.** Siguiente: el usuario elige el planner en
-  `config/model-roles.json`; luego P5 paso 2.
+  [Evidencia](evidence/P5-model-eval.md). Sin pruebas en vivo del juego.
+- **Decisión del usuario aplicada (`4fb70b1`):** planner Groq gpt-oss con esquema y
+  respaldo Gemma 4 12B; chat Gemma 4 12B local (ctx 8192, temperatura 0,7). Un solo
+  modelo local cargado (11.529 MiB). Metas, comunidad, M3 y mecánicas usan las
+  funciones. Llamada real: Groq 0,81 s; Gemma saludo 11,7 s en frío. Suite 149 OK.
+- Pendiente: revisión humana del chat con Gemma. Siguiente: P5 paso 2.
 
 ## P5 — nueva dirección del usuario (2026-10-31 15:50)
 

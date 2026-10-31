@@ -160,13 +160,35 @@ Todas válidas; el esquema impide superar 3 muertes y el validador decide.
   necesita revisión humana. Ningún informe inventó números.
 - Los IDs de modelo de la nube cambian con el tiempo; revisar antes de elegir.
 
-## Decisión pendiente del usuario
+## Decisión del usuario (2026-10-31)
 
-Elegir el modelo de `planner` (y su respaldo) en
-[model-roles.json](../../config/model-roles.json). Opción con mejor evidencia:
-`groq-gpt-oss` con respaldo local. Como respaldo del planner, `gemma4-12b` rinde
-mejor que el 9B en este banco (85 % frente a 77 %) y cabe en la GPU. Para `chat`
-es candidato local razonable por velocidad y fidelidad a los hechos, pero este
-banco no mide conversación (tono, memoria, español, rechazo de peticiones): hace
-falta una prueba de chat antes de adoptarlo. Si ambos roles usan modelos locales
-distintos, la GPU tendría que alojar los dos o recargar; no se midió.
+Aplicada en [model-roles.json](../../config/model-roles.json), commit `4fb70b1`:
+
+- `planner`: `groq-gpt-oss` con esquema JSON; respaldo local `gemma4-12b`
+  (temperatura 0,2). Si Groq falla o da 429, esa petición devuelve error y la
+  política local sigue; las siguientes van a Gemma marcadas `degraded`.
+- `chat`: `gemma4-12b-chat`, local, `num_ctx` 8192, sin think, temperatura **0,7**
+  con top_p 0,95 y top_k 64 (los valores que sugiere Gemma). Motivo: 0,2 sirve
+  para JSON determinista del planner, pero en conversación repite frases; el 1,0
+  por defecto de Gemma divaga más. 0,7 da respuestas variadas y estables.
+- El respaldo del planner y `chat` usan los mismos pesos y contexto, así que
+  Ollama mantiene un solo modelo cargado (pico observado 11.529 MiB, techo 14.336).
+- Los candidatos 9B quedan solo como historial.
+
+Consumidores conectados: `scripts/run_p2_cycle.py` crea el servicio de metas con
+`build_role('planner')` (contrato de `GoalPlanner` intacto); `agent/community.py`
+usa `build_role('chat')`; `scripts/run_m3.py` y `scripts/ask_mechanics.py` toman
+la configuración de `chat` (las preguntas de mecánicas pueden venir de jugadores,
+así que no salen del PC). `agent/dialogue.py` usa la configuración que le pasan
+sus llamadores (ya de `chat`); `agent/solo_cycle.py` no llama a modelos.
+`scripts/ask_9b.py` queda como herramienta histórica del 9B.
+
+Llamadas reales breves (sin juego):
+- `planner`, caso `goal-complete-next`: Groq respondió
+  `{"type":"hunt","additional_kills":2}` en 0,81 s, sin degradar.
+- `chat`, saludo «Hi! I just started playing, nice to meet you.»: Gemma respondió
+  `{"text": "Nice to meet you too, let's learn the game together!"}` en 11,7 s
+  (en frío, incluye carga del modelo).
+
+Pendiente: este banco no mide conversación (tono, memoria, español, rechazo de
+peticiones); hace falta una revisión humana del chat con Gemma.
