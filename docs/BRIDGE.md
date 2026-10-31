@@ -1,8 +1,9 @@
 # M1 bridge and local operation
 
-The [approved native-execution plan](NATIVE_AGENT_PLAN.md) will extend this
-boundary with typed tasks, progress, cancellation and observed results. That
-adapter is pending; this document describes the implemented demo contract.
+The [approved native-execution plan](NATIVE_AGENT_PLAN.md) now has P1 tasks,
+P2 portal/NPC capabilities and local Apple recovery. The native profile uses
+typed tasks, progress, cancellation and observed results. The historical M1/M4
+contract below remains for those profiles; see the P1/P2 evidence for native scope.
 Do not enable native AI while Python still commands movement/combat for the
 same character. Session, perception and action-truth checks must survive the change.
 

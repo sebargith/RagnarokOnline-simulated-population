@@ -127,11 +127,12 @@ Internet; no requiere el buscador de pago de Ollama.
   sigue siendo el destino: cooperación PvE y comercio sencillo, luego tres y,
   opcionalmente, cinco. La prueba larga y el pulido social no bloquean P1.
 
-## Primera tarea para Claude
+## Avance y próxima entrega — 2026-10-31
 
-Leer el [relevo](../HANDOFF.md) y el estado actual; trabajar en el checkout y rama
-indicados. Implementar únicamente la primera entrega P1 de navegación nativa.
-Presentar contrato y aceptación antes de editar; validar con pruebas acotadas y
-una integración corta, revisar el diff, confirmar y subir el paso. Actualizar
-estado y relevo con hechos. No empezar cooperación, P2–P4 ni otra batería 9B en
-esta primera entrega.
+P1, P2a portales/diálogo y P2b tiendas están implementados. P2c ya permite usar
+Apple durante descanso seguro con confirmación y protección persistente contra
+replay; falta integrar el ciclo individual persistente. Consultar el
+[estado](CURRENT_STATE.md) y [relevo](../HANDOFF.md) para evidencia y límites.
+La próxima entrega une caza, recuperación y abastecimiento con un objetivo
+persistente y conciliación tras reiniciar. No empezar P3/P4 ni otra batería 9B
+como parte de esa entrega.

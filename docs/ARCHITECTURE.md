@@ -8,8 +8,12 @@ validará objetivos y resultados, conservará memoria y solicitará inferencia
 selectiva al 9B. El modelo podrá consultar mecánicas públicas mediante SearXNG,
 con presupuestos y fuentes, cuando esa capacidad se amplíe y verifique.
 
-Esta integración está pendiente. Hoy las demos arrancan con `--ai=off` y Python
-dirige acciones individuales. No activar dos controladores sobre el mismo
+P1 y las capacidades P2 de portales/diálogo/tiendas están implementadas en el
+perfil separado de Tarin (`--ai=manual`, puerto 8770). OpenKore ejecuta las tareas
+nativas y la recuperación local; los runners Python seleccionan tareas acotadas.
+Las demos M4 conservan `--ai=off` y acciones individuales. El ciclo individual
+persistente y los objetivos generales del 9B siguen pendientes.
+No activar dos controladores sobre el mismo
 personaje ni exponer consola libre al LLM. El adaptador conservará percepción
 aislada, sesiones, límites y la diferencia entre aceptación y resultado. Los
 componentes descritos abajo corresponden a la base implementada de las demos;

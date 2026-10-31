@@ -51,27 +51,26 @@ DÓNDE TRABAJAR
 - La raíz tiene una rama anterior y cambios pendientes. No iniciar código ahí.
 - Los otros checkouts no aíslan servidor, base de datos, puertos ni GPU.
 
-QUÉ HACER AHORA CON CLAUDE
---------------------------
-1. Abre Claude en D:\Ragnarok Agents.
-2. Envía: "Toma el control. Lee AI_PROTOCOL.md y HANDOFF.md; continúa en el
-   checkout y rama indicados. Implementa solo la primera entrega P1 del plan."
-3. Claude debe comprobar el estado local y trabajar en m4-continuous.
-4. Su primera entrega debe permitir navegar con OpenKore, observar progreso,
-   cancelar y confirmar llegada o fallo con un único controlador del personaje.
-5. Debe entregar evidencia corta, limitaciones y commits descriptivos con push.
-   No necesita repetir el test cooperativo ni volver a evaluar el modelo.
-
-No hace falta crear todos los chats ahora. Mantén un único chat de implementación
-activo. Este chat de Codex puede seguir como coordinador cuando vuelvas.
+CÓMO CONTINUAR AHORA
+--------------------
+- Codex retomó el proyecto en codex/single-agent-plan desde el avance de Claude.
+- [HECHO] P2c, primera entrega: Tarin usa su Apple al descansar; el servidor
+  confirma el consumo y un registro impide repetirlo si el resultado es incierto.
+  Ver docs/evidence/P2c-local-healing.md. 81 tests OK y una caza breve sin muertes.
+- [SIGUIENTE] Unir caza, recuperación y abastecimiento en un ciclo persistente.
+  Prompt: "Continúa P2 con un objetivo persistente y conciliación tras reiniciar.
+  Usa las capacidades nativas verificadas; no repitas compras ni consumos inciertos."
+- El cliente P1 quedó detenido. Los tres clientes m4-field se conservaron.
+- Abre un único chat de implementación. Para alternar entre Claude y Codex,
+  usa "prepara el relevo" y después "toma el control" en la otra aplicación.
 
 PASOS DEL CAMINO Y PROMPTS PARA MÁS ADELANTE
 -------------------------------------------
-- [SIGUIENTE] P1a: navegación nativa y perfil normal separado.
+- [HECHO] P1a: navegación nativa y perfil normal separado.
   Prompt: "Completa la navegación nativa con progreso, cancelación y resultados
   veraces. Conserva las demos y los datos existentes."
 
-- [PENDIENTE] P1b: combate, loot y recuperación reactivos.
+- [HECHO] P1b: combate, loot y recuperación reactivos.
   Prompt: "Amplía el ejecutor nativo a combate y recogida normales, y recuperación
   local según HP/SP. Mide respuesta con inferencia ausente o lenta."
 
@@ -109,7 +108,7 @@ CÓMO PEDIR UN RELEVO
 - El agente actualiza HANDOFF.md, estado y registro local de chats.
 - En el otro asistente di "toma el control".
 - El registro conserva contexto; no crea automáticamente un chat en Claude.
-- En este relevo el registro automático falló por la carpeta asociada al chat.
-  HANDOFF.md conserva el contexto y el error; Claude puede continuar desde ahí.
+- Un relevo anterior tuvo un fallo de registro por la carpeta asociada al chat.
+  El registro entrante actual sí se actualizó; HANDOFF.md conserva el contexto vigente.
 - Los detalles de errores antiguos están en docs/evidence; no hace falta releerlos
   todos para cada paso. Consultarlos cuando sean relevantes.

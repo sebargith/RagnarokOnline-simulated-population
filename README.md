@@ -5,7 +5,8 @@ A local-first project for persistent, socially believable AI players on a classi
 **Current direction (2026-10-31):** the user approved one normal level-1 player
 with native OpenKore execution, followed by bounded 9B goals and web knowledge.
 See the [approved plan](docs/NATIVE_AGENT_PLAN.md) and [Claude handoff](HANDOFF.md).
-This is the next implementation, not a capability already delivered. The existing
+P1 native navigation/combat and P2 portal travel/NPC supply are implemented;
+the persistent individual cycle and general 9B goals remain pending. The existing
 M4 runtime is a controlled three-agent fixture; its [evidence](docs/evidence/M4-continuous.md)
 remains valid for that scope. Social polish and the one-hour trial remain deferred.
 
@@ -16,7 +17,7 @@ in the existing checkout `D:\Ragnarok Agents\m4-continuous`, branch
 `codex/single-agent-plan`. Read the [user guide](docs/USER_GUIDE.txt) for the next
 prompt, [current state](docs/CURRENT_STATE.md) for verified facts and
 [bridge contract](docs/BRIDGE.md) for the implemented demo interface. Commands
-below operate the existing demos; they do not launch the planned native agent.
+below cover the native single-player slices and the older controlled demos.
 
 - [General development rules](AGENTS.md)
 - [Architecture and remaining design](docs/ARCHITECTURE.md)
@@ -112,6 +113,11 @@ limits. [Results and hashes](docs/evidence/M3-results.json) accompany the
 retained conversation review set.
 
 ## Native single-player navigation (P1a)
+
+P2c also uses an owned Apple during safe rest, with a server confirmation and
+durable protection against replay. The existing bounded hunt command below
+records `healing` events. [Evidence and limits](docs/evidence/P2c-local-healing.md).
+The persistent hunt/recovery/supply cycle is still pending.
 
 Separate normal novice, OpenKore `--ai=manual`, bridge port 8770. Requires the
 local server/database already running; creates only new P1 records and does not
