@@ -6,7 +6,8 @@ use IO::Socket::INET;
 use IO::Select;
 use JSON::PP;
 use Time::HiRes qw(time);
-use Globals qw($net $char $field $messageSender $playersList $monstersList $itemsList $accountID %monsters_old %currentDeal %incomingDeal %outgoingDeal %config $quit $conState_tries);
+use Globals qw($net $char $field $messageSender $playersList $monstersList $itemsList $accountID %monsters_old %currentDeal %incomingDeal %outgoingDeal %config $quit $conState_tries
+    $npcsList %portals_lut %ai_v %talk);
 use Misc ();
 use Plugins;
 use Network;
@@ -16,6 +17,7 @@ use Utils ();
 use M4RequestWindow;
 use M1Navigation;
 use M1Combat;
+use M1Travel;
 
 my ($server, $client, $cfg, $hooks, $pending);
 my ($input, $output, $authorized, $auth_time) = ('', '', 0, 0);
@@ -28,6 +30,7 @@ my $json = JSON::PP->new->utf8->canonical;
 # Local recovery policy state (native profile only); never driven by the model.
 my %recovery = (phase => 'none', retreats => 0);
 my ($last_hit_on_me, $last_hp_update, $was_dead) = (0, 0, 0);
+my $walk_graph;    # Built once from OpenKore's portals table on first travel.
 my $boot = sprintf('%x-%x-%x', time * 1000, $$, rand(2**30));
 
 Plugins::register('m1_bridge', 'Bounded loopback observation/action bridge', \&unload);
@@ -36,7 +39,7 @@ $hooks = Plugins::addHooks(
     ['packet/character_moves', \&moved],
     ['packet_selfChat', \&self_chat], ['packet_pubMsg', \&public_chat],
     ['packet_attack', \&combat], ['monster_disappeared', \&monster_gone],
-    ['packet/inventory_item_added', \&inventory_added], ['packet/stat_info', \&stat_info],
+    ['npc_talk', \&npc_text], ['packet/inventory_item_added', \&inventory_added], ['packet/stat_info', \&stat_info],
     ['engaged_deal', \&trade_engaged], ['incoming_deal', \&trade_incoming],
     ['packet/deal_add_you', \&trade_added], ['packet/deal_finalize', \&trade_locked],
     ['complete_deal', \&trade_complete], ['cancelled_deal', \&trade_cancelled],
@@ -124,6 +127,9 @@ sub snapshot {
         my @items = map {{id => unpack('H*', $_->{ID}), name_id => 0 + $_->{nameID}, amount => 0 + $_->{amount},
             x => 0 + $_->{pos}{x}, y => 0 + $_->{pos}{y}}} @{$itemsList->getItems};
         $s->{ground_items} = [@items[0 .. ($#items > 15 ? 15 : $#items)]];
+        my @npcs = map {{name => $_->{name} // '', x => 0 + $_->{pos}{x}, y => 0 + $_->{pos}{y}}} @{$npcsList->getItems};
+        $s->{npcs} = [@npcs[0 .. ($#npcs > 15 ? 15 : $#npcs)]];
+        $s->{ai_queue} = [@AI::ai_seq[0 .. ($#AI::ai_seq > 7 ? 7 : $#AI::ai_seq)]];
     }
     emit('snapshot', $s);
 }
@@ -158,13 +164,18 @@ sub stop_route {
     $char->sendAttackStop if connected();
 }
 
-sub navigation_tick {
-    my $task = $pending->{task};
+sub route_state {
+    my ($task) = @_;
     my $state = !grep({ ref($_) && $_ == $task } @AI::ai_seq_args) ? 'missing' :
         $task->getStatus() == Task::DONE() ? 'done' : $task->getStatus() == Task::STOPPED() ? 'stopped' : 'running';
     # processTask dequeues a DONE task in the same AI pass, so a finished task
     # is usually 'missing' here; its retained status still tells us the outcome.
-    $state = 'done' if $state eq 'missing' && $task->getStatus() == Task::DONE();
+    $state eq 'missing' && $task->getStatus() == Task::DONE() ? 'done' : $state;
+}
+
+sub navigation_tick {
+    my $task = $pending->{task};
+    my $state = route_state($task);
     if (AI::state() != AI::MANUAL()) {
         stop_route(); finish('unknown', 'executor_mode_changed', nav_evidence()); return;
     }
@@ -191,6 +202,7 @@ sub navigation_tick {
 }
 
 sub stop_native {
+    cancel_talk() if $pending && ($pending->{native} // '') eq 'npc_talk';
     AI::clear(qw/attack take move route mapRoute/);
     $char->sendAttackStop if connected() && !$char->{dead};
 }
@@ -300,6 +312,7 @@ sub recovery_tick {
         $threat //= $fighting && $monstersList->getByID($pending->{target_bin}) ? $monstersList->getByID($pending->{target_bin})->{pos_to} : $pos;
         # Survival preempts any task in progress; its result says so.
         if ($pending && $pending->{native} && $pending->{native} ne 'respawn') {
+            cancel_talk() if $pending->{native} eq 'npc_talk';
             AI::clear(qw/attack take/);
             finish('failed', 'retreat_low_hp', {%{nav_evidence()}, %$hp});
         }
@@ -331,6 +344,175 @@ sub recovery_tick {
             duration_s => int(time - ($recovery{since} // time))});
         %recovery = (phase => 'none', retreats => 0);
     }
+}
+
+# P2a travel: each leg is a same-map Task::Route to a free walk portal (or the
+# destination); a hop counts only on the observed map change. Never MapRoute.
+sub travel_evidence {
+    my $p = $pending;
+    {%{nav_evidence()}, leg => $p->{leg} + 1, legs => scalar @{$p->{legs}}, hops => $p->{hops},
+        zeny_delta => ($char->{zeny} // 0) - $p->{zeny}, map_route_seen => $p->{map_route_seen} ? 1 : 0};
+}
+
+sub start_leg {
+    my $p = $pending;
+    my $leg = $p->{legs}[$p->{leg}];
+    my $final = !defined $leg->{to_map};
+    if ($final) {
+        my $reason = !($leg->{x} < $field->width && $leg->{y} < $field->height) ? 'out_of_bounds' :
+            !$field->isWalkable($leg->{x}, $leg->{y}) ? 'destination_not_walkable' : undef;
+        if ($reason) { finish('failed', $reason, travel_evidence()); return }
+        if ($char->{pos_to}{x} == $leg->{x} && $char->{pos_to}{y} == $leg->{y}) {
+            finish('completed', 'arrived', travel_evidence()); return;
+        }
+    }
+    my $cell = $final ? $leg : M1Travel::approach_cell($leg, sub { $field->isWalkable(@_) });
+    unless ($cell) { finish('failed', 'portal_unreachable', travel_evidence()); return }
+    $p->{approach} = {x => $cell->{x}, y => $cell->{y}};
+    my $remaining = int($p->{deadline} - time);
+    AI::clear(qw/move route mapRoute/);
+    $char->route($field->baseName, $cell->{x}, $cell->{y}, noMapRoute => 1, maxRouteTime => $remaining > 1 ? $remaining : 1,
+        attackOnRoute => 0, noSitAuto => 1);
+    $p->{task} = AI::action() eq 'route' ? $AI::ai_seq_args[0] : undef;
+    $p->{phase} = 'route';
+    unless ($p->{task}) { stop_route(); finish('failed', 'route_not_queued', travel_evidence()) }
+}
+
+sub travel_request {
+    my ($id, $a) = @_;
+    my $reason = M1Travel::validate($a, {manual_ai => $cfg->{native_navigation} && AI::state() == AI::MANUAL(),
+        hp => $char->{hp}, map => $field->baseName});
+    if ($reason) { result($id, 'rejected', $reason); return }
+    $walk_graph //= M1Travel::walk_graph(\%portals_lut);
+    my @legs = M1Travel::plan($walk_graph, $field->baseName, $char->{pos_to}, $a->{map}, $a);
+    unless (@legs) { result($id, 'rejected', 'no_walk_route'); return }
+    my $now = time;
+    $pending = {id => $id, action => $a, native => 'travel', legs => \@legs, leg => 0, hops => [],
+        zeny => $char->{zeny} // 0, started => $now, progress => 0, deadline => $now + $a->{timeout_s} + M1Navigation::GRACE};
+    $last_action = $now;
+    start_leg();
+    result($id, 'accepted', 'walk_route_planned', {legs => \@legs}) if $pending && $pending->{id} eq $id;
+}
+
+sub travel_tick {
+    my $p = $pending;
+    if (AI::state() != AI::MANUAL()) { stop_route(); finish('unknown', 'executor_mode_changed', travel_evidence()); return }
+    if ($char->{dead}) { stop_route(); finish('failed', 'died', travel_evidence()); return }
+    $p->{map_route_seen} = 1 if AI::inQueue('mapRoute');
+    if (time >= $p->{deadline}) { stop_route(); finish('failed', 'timeout', travel_evidence()); return }
+    if ($p->{settle_until}) {
+        # Let the client finish loading the new map before the next leg.
+        return if time < $p->{settle_until};
+        delete $p->{settle_until};
+        start_leg(); return;
+    }
+    my $leg = $p->{legs}[$p->{leg}];
+    my $task = $p->{task};
+    my $state = $task ? route_state($task) : 'missing';
+    my $calc = Utils::calcPosFromPathfinding($field, $char);
+    my ($step, $status, $reason) = M1Travel::leg_step({map => $field->baseName, leg => $leg, phase => $p->{phase},
+        task_state => $state, error => $state eq 'done' ? $task->getError() : undef,
+        pos_to => $char->{pos_to}, calc => $calc, enter_elapsed => $p->{enter_since} ? time - $p->{enter_since} : 0});
+    $step //= '';
+    if ($step eq 'hopped') {
+        AI::clear(qw/move route mapRoute/);
+        my $hop = {from => $leg->{map}, to => $field->baseName, elapsed_ms => int((time - $p->{started}) * 1000),
+            position => {x => 0 + $char->{pos_to}{x}, y => 0 + $char->{pos_to}{y}}};
+        push @{$p->{hops}}, $hop;
+        emit('travel_hop', {request_id => $p->{id}, %$hop});
+        $p->{leg}++; undef $p->{task}; delete $p->{enter_since};
+        $p->{settle_until} = time + .5;
+        return;
+    }
+    if ($step eq 'final') {
+        stop_route() unless $status eq 'completed';
+        finish($status, $reason, travel_evidence()); return;
+    }
+    if ($step eq 'enter') { $p->{phase} = 'enter'; $p->{enter_since} = time; $p->{enter_sent} = 0 }
+    if ($p->{phase} eq 'enter' && time - $p->{enter_sent} >= .5) {
+        # Like MapRoute's 'Enter Distance' step: re-send the step into the warp area.
+        $char->sendMove(@{$p->{approach}}{qw(x y)}); $p->{enter_sent} = time;
+    }
+    if (time - $p->{progress} >= 1) {
+        $p->{progress} = time;
+        emit('travel_progress', {request_id => $p->{id}, %{travel_evidence()}, phase => $p->{phase},
+            target => {map => $leg->{map}, x => $leg->{x}, y => $leg->{y}}});
+    }
+}
+
+# P2a dialog: continue, pre-declared exact menu labels and closing only.
+sub talk_snapshot {
+    {map => $field->baseName, zeny => 0 + ($char->{zeny} // 0),
+        inventory => join(',', sort map { "$_->{nameID}:$_->{amount}" } @{$char->inventory->getItems})};
+}
+
+sub cancel_talk { $messageSender->sendTalkCancel($pending->{npc_bin}) if connected() }
+
+sub talk_request {
+    my ($id, $a) = @_;
+    my $at = sub { defined($_[0]) && !ref($_[0]) && $_[0] =~ /^\d{1,3}$/ };
+    my ($npc) = $at->($a->{x}) && $at->($a->{y}) ?
+        grep { $_->{pos}{x} == $a->{x} && $_->{pos}{y} == $a->{y} } @{$npcsList->getItems} : ();
+    my $reason = M1Travel::validate_talk($a, {manual_ai => $cfg->{native_navigation} && AI::state() == AI::MANUAL(),
+        hp => $char->{hp}, recovering => $recovery{phase} ne 'none', talking => %talk ? 1 : 0,
+        npc => $npc && $npc->{pos}, pos => Utils::calcPosFromPathfinding($field, $char)});
+    if ($reason) { result($id, 'rejected', $reason); return }
+    AI::clear(qw/move route mapRoute/);
+    my $now = time;
+    $pending = {id => $id, action => $a, native => 'npc_talk', npc_bin => $npc->{ID}, npc_name => $npc->{name},
+        choices => [@{$a->{choices}}], chosen => [], menus => [], transcript => [], pages => 0,
+        before => talk_snapshot(), acted => $now, started => $now, progress => 0, deadline => $now + $a->{timeout_s}};
+    $last_action = $now;
+    $messageSender->sendTalk($npc->{ID});
+    result($id, 'accepted', 'talk_sent');
+}
+
+sub talk_finish {
+    my ($status, $reason) = @_;
+    my $p = $pending;
+    my $after = talk_snapshot();
+    my ($final, $why, $changed) = M1Travel::talk_outcome($status, $reason, $p->{before}, $after);
+    finish($final, $why, {%{nav_evidence()}, npc => $p->{npc_name}, transcript => $p->{transcript},
+        menus => $p->{menus}, chosen => $p->{chosen}, pages => $p->{pages},
+        dialog_result => $final eq $status ? undef : "$status/$reason", changed => $changed,
+        before => $p->{before}, after => $after});
+}
+
+sub talk_tick {
+    my $p = $pending;
+    my $now = time;
+    if ($p->{closing}) {
+        # Like OpenKore's TalkNPC: acknowledge the close button after a short wait.
+        return if $now < $p->{closing};
+        cancel_talk(); talk_finish(@{$p->{close_result}}); return;
+    }
+    if ($char->{dead}) { cancel_talk(); talk_finish('failed', 'died'); return }
+    if ($now >= $p->{deadline}) { cancel_talk(); talk_finish('failed', 'timeout'); return }
+    my $v = $ai_v{npc_talk} || {};
+    # Act once per new NPC packet, after a human-like pause, and only for our NPC.
+    return unless ($v->{time} // 0) > $p->{acted} && $now - $v->{time} >= .5 &&
+        (!defined $v->{ID} || $v->{ID} eq $p->{npc_bin});
+    my ($act, $status, $reason) = M1Travel::dialog_step({state => $v->{talk}, choices => $p->{choices},
+        pages => $p->{pages}, responses => $talk{responses}});
+    return unless $act;
+    $p->{acted} = $now;
+    if (($v->{talk} // '') eq 'select') {
+        my @menu = @{$talk{responses} || []}; pop @menu;
+        push @{$p->{menus}}, [@menu[0 .. ($#menu > 15 ? 15 : $#menu)]] if @{$p->{menus}} < 8;
+    }
+    if ($act eq 'continue') { $p->{pages}++; $messageSender->sendTalkContinue($p->{npc_bin}) }
+    elsif ($act eq 'respond') {
+        push @{$p->{chosen}}, shift @{$p->{choices}};
+        $messageSender->sendTalkResponse($p->{npc_bin}, $status);
+    } elsif ($act eq 'close') { $p->{closing} = $now + .5; $p->{close_result} = [$status, $reason] }
+    else { cancel_talk(); talk_finish($status, $reason) }
+}
+
+sub npc_text {
+    my (undef, $args) = @_;
+    return unless $pending && ($pending->{native} // '') eq 'npc_talk' && $args->{ID} eq $pending->{npc_bin};
+    my $line = (split /\n/, $args->{msg} // '')[-1] // '';
+    push @{$pending->{transcript}}, substr($line, 0, 120) if @{$pending->{transcript}} < 40;
 }
 
 sub request {
@@ -379,7 +561,7 @@ sub request {
     }
     if ($pending) { result($id, 'rejected', 'busy'); return }
     if (time - $last_action < 1) { result($id, 'rejected', 'rate_limited'); return }
-    if ($cfg->{native_navigation} && $a->{type} =~ /^(navigate|attack|take)$/ && $recovery{phase} ne 'none') {
+    if ($cfg->{native_navigation} && $a->{type} =~ /^(navigate|travel|npc_talk|attack|take)$/ && $recovery{phase} ne 'none') {
         result($id, 'rejected', 'recovering'); return;
     }
     if ($a->{type} eq 'navigate') {
@@ -399,6 +581,8 @@ sub request {
         result($id, 'accepted', 'route_queued');
         return;
     }
+    if ($a->{type} eq 'travel') { travel_request($id, $a); return }
+    if ($a->{type} eq 'npc_talk') { talk_request($id, $a); return }
     if ($cfg->{native_navigation} && $a->{type} =~ /^(attack|take|respawn)$/) { native_request($id, $a); return }
     if ($a->{type} eq 'move' && $cfg->{native_navigation}) { result($id, 'rejected', 'legacy_executor_disabled'); return }
     if ($a->{type} eq 'move') {
@@ -636,7 +820,10 @@ sub tick {
         $stopping = time + .2;
     }
     $quit = 1 if $stopping && time >= $stopping;
-    if ($pending && $pending->{task}) { navigation_tick() if $ready }
+    my $native = $pending ? $pending->{native} // '' : '';
+    if ($native eq 'travel') { travel_tick() if $ready }
+    elsif ($native eq 'npc_talk') { talk_tick() if $ready }
+    elsif ($pending && $pending->{task}) { navigation_tick() if $ready }
     elsif ($pending && $pending->{native}) { native_tick() if $ready }
     elsif ($pending && time >= $pending->{deadline}) { finish('unknown', 'confirmation_timeout') }
     recovery_tick() if $ready && $cfg->{native_navigation};
