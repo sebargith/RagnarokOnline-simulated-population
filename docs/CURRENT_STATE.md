@@ -47,6 +47,19 @@ fue denegada, la consulta elevada funcionó. No se detuvo ningún proceso.
   de puertos con cierre controlado cuando corresponda. No arrancar otro controlador
   contra los mismos clientes. Preservar servidor, DB y sesión gráfica.
 
+Diagnóstico de Claude, 11:00 -03:00 (solo lectura):
+
+- Tests: dueño = shell pwsh 67520 de Codex (Chat 07). Ejecutó en cadena
+  `rg … m4_field`, `unittest discover`, `compileall`, `perl -c` y `git diff --check`.
+  El hijo 44956 está inactivo (0,4 s de CPU, 1 hilo) con un listener local 55685
+  propio de la prueba; cuelgue de un test con servidor simulado, sin efecto en el
+  juego. Cerrar el árbol 67520→49236→44956 fue denegado al agente: requiere
+  que el usuario lo detenga o lo autorice.
+- Clientes OpenKore: solo ocupan 8765–8767 (puente) y sus sesiones de juego.
+  P1a no los reutiliza ni los detiene: usará su propio perfil en
+  `runtime/p1/openkore/`, otra cuenta/personaje y el puerto de puente 8770.
+  No ejecutar `prepare_m4.py` mientras sigan vivos (reasigna 8765–8767).
+
 ## Base comprobada y límites
 
 - rAthena pre-Renewal, protocolo 20130807; versiones en
