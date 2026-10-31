@@ -64,7 +64,7 @@ CÓMO CONTINUAR AHORA
   de abastecimiento cuando sea necesario. Prompt: "Continúa P2 sin borrar el
   checkpoint: permite un nuevo objetivo explícito y comprueba el circuito
   integrado cuando haya necesidad real. No repitas operaciones inciertas."
-- El objetivo nuevo 4 quedó bloqueado en 2 kills por una ruta incierta. No borrar el checkpoint.\n- Siguiente: conciliar navegación desde observaciones frescas y luego continuar el abastecimiento.
+- El objetivo acumulado 4 terminó: dos rutas inciertas se conciliaron sin repetirlas.\n- La espera de llegada corregida requiere comprobación real; la tienda integrada sigue pendiente.
 - El cliente P1 quedó detenido. Los tres clientes m4-field se conservaron.
 - Abre un único chat de implementación. Para alternar entre Claude y Codex,
   usa "prepara el relevo" y después "toma el control" en la otra aplicación.

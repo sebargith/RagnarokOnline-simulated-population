@@ -71,7 +71,29 @@ Actualizado: 2026-10-31 13:24 (America/Santiago), Codex.
 - Las demos M3/M4 conservan evidencia histórica en docs/evidence; no equivalen
   a progreso general. Naturalidad, prueba larga y escala a cinco aplazadas.
 
-## Avance — nuevo objetivo y ruta incierta
+## Avance — conciliación y llegada diferida (2026-10-31 13:36)
+
+- `31196aa`: conciliar únicamente navigate terminado con
+  `unknown/route_ended_off_target`: sesión nueva y dos snapshots frescos,
+  separados y estables, misma identidad/mapa, sin tarea ni movimiento.
+  Conserva el resultado unknown, registra posición sin afirmar llegada y replantea.
+  No aplica a compras, ventas, recogidas ni ataques inciertos.
+- Primera ruta conciliada en prt_fild08 130,225; continuación logró kill 3,
+  pero otra ruta devolvió el mismo unknown. Se revisó el diseño antes de repetir.
+- En el segundo caso Task::Route terminó con destino establecido pero posición
+  aún en movimiento. `c9077df` espera hasta 5 s en ese caso y solo confirma
+  llegada si la posición llega; la primera ruta tenía destino distinto, por lo
+  que la espera no se aplica. 98 tests OK; sintaxis Perl OK.
+- Segunda ruta conciliada desde una sesión nueva en 170,280. Continuación:
+  una acción de ataque, meta completa 4/4, sin replay ni inferencia; snapshot
+  170,287, 41/57 HP, 10 Zeny. Cliente P1 detenido.
+- La continuación no ejecutó una ruta tras la reparación, por tanto el tiempo
+  de espera nuevo solo está verificado por tests, no por navegación real.
+  Tampoco se activó abastecimiento; la prueba integrada de tienda sigue pendiente.
+- Evidencia fuera de Git: `runtime/p1/evidence/cycle-reconcile-1793464544`.
+  Revisión delegada independiente del puente; sin otros procesos tocados.
+
+## Avance histórico — nuevo objetivo y ruta incierta
 
 Commit `4d31c1e`: `set-goal --target-kills N` asigna una meta acumulada
 solo tras completar la anterior, sin intención pendiente. Repetir la misma
@@ -89,14 +111,9 @@ Validar la recuperación antes de continuar el abastecimiento integrado.
 
 ## Pendientes y próxima acción
 
-El ciclo persistente ya une las capacidades. Queda observar un circuito real
-que necesite abastecimiento: la prueba real verificó continuidad y caza; las
-transiciones completas de tienda se verificaron con estados reproducibles.
-P2 completo aún no está aceptado. Próximo cambio: asignar un nuevo objetivo
-explícito conservando historial, antes de continuar el piloto cuando necesite
-abastecerse. `--goal-kills` solo inicializa, no cambia el objetivo guardado.
-Consumible actual: solo Apple en descanso seguro, no durante pelea/retirada;
-timeout/rechazo/reinicio y fallo de almacenamiento probados con estados
-reproducibles, no inyectados en vivo. Retirada corregida de P1b sigue con su
-límite de evidencia anterior. Elección de monstruos aún no evalúa peligro.
-P3 objetivos generales del 9B y P4 búsqueda autónoma quedan después.
+El objetivo 4/4 está completo. Usar set-goal para asignar otro sin borrar
+historial. La espera de posición tras finalizar una ruta está cubierta por
+tests pero no fue ejercitada en la última prueba real. El circuito completo
+de abastecimiento integrado sigue verificado solo con estados reproducibles.
+Continuar una prueba acotada cuando haya necesidad real; no repetir una
+operación financiera incierta. P3/P4 y calidad social siguen pendientes.

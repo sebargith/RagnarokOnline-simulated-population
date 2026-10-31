@@ -130,7 +130,7 @@ Run/resume the saved solo goal from this checkout with the P1 client available:
 & 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/prepare_p1.py stop --runtime 'D:/Ragnarok Agents/runtime'
 ```
 
-The pilot's saved goal is currently blocked at 2/4 after an uncertain route; these commands preserve it.\nUse `set-goal --target-kills N` only after a completed goal; the target is cumulative and repeating the same value is idempotent.
+The pilot's saved goal is complete at 4/4 after reconciling two uncertain routes; these commands preserve it.\nUse `set-goal --target-kills N` only after a completed goal; the target is cumulative and repeating the same value is idempotent.
 Do not delete checkpoint/history to repeat an unknown action. `--goal-kills`
 only initializes a new checkpoint. The runner stops on its time/action budget,
 keeps pending intent, and resumes through read-only result queries. `status`
