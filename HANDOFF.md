@@ -1,6 +1,11 @@
 # Relevo — Ragnarok Agents
 Actualizado: 2026-10-31 por Codex
 Referencia: codex/single-agent-plan; ver historial Git para el commit final.
+## Checkpoint — pruebas del runner
+- Revisión independiente y del orquestador aceptó 60023ce. Cinco pruebas de
+  integración con puente controlado; suite completa 123 OK. Sin cambios de runtime.
+- Carrera de llegada bloquea conservadoramente; cancelación viva y latencia
+  siguen sin demostrar. Último checkpoint vivo 9/9 completo; revisión principal.
 ## Checkpoint Chat 10
 - Reacción de exploración implementada; 118 tests OK. Cancelación real y
   latencia sin demostrar: muestra única completó 9/9 con ataque inmediato.

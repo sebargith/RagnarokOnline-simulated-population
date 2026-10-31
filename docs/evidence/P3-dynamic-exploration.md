@@ -163,3 +163,31 @@ prueba viva no demuestra la interrupción ni su latencia. No se creó otra meta.
 Lectura antes de detener: sin petición ni tarea, prt_fild08 (118,272), HP63/63.
 Raw: `runtime/p1/evidence/p3-interrupt-20261031/`. Puertos finales 3306, 6900,
 6121 y 5121 activos; 8770 y 8765–8767 sin escucha. No se reiniciaron servicios.
+
+
+## Revisión y pruebas del runner (2026-10-31)
+
+La revisión del orquestador y una revisión independiente aceptaron `60023ce`;
+no identificaron un fallo demostrable del protocolo. El raw confirma 9/9 y
+ninguna cancelación viva. Se añadieron pruebas de integración de `Runner` con
+un puente controlado y checkpoints temporales, sin servicios ni runtime real.
+
+Se comprueba una sola cancelación ante snapshot fresco de la tarea correcta;
+no se envían acciones nuevas hasta recibir ambas confirmaciones en orden inverso
+y un snapshot posterior. Tras reiniciar con una confirmación persistida, solo se
+consulta la pendiente y no se reenvía. La desconexión conserva la intención
+pendiente; una sesión nueva o resultado inaccesible bloquea sin replay. No se
+cancela durante recuperación, ante snapshot viejo ni para aproximación o viaje.
+La carrera `completed/arrived` y `rejected/no_matching_task` bloquea
+conservadoramente con intención retenida, aunque la ruta haya llegado. No se
+modificó esa política. Estas pruebas no demuestran cancelación viva ni latencia.
+
+Comandos ejecutados fuera del sandbox, desde este checkout:
+
+- `& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' -m unittest discover -s tests -p test_p3_runner.py -v`: 5 OK.
+- `& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' -m unittest discover -s tests -v`: 123 OK.
+- `& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' -m compileall -q tests/test_p3_runner.py` y `git diff --check`: OK.
+
+No se iniciaron P1 ni servicios, ni se ejecutaron acciones de juego o se modificó
+el runtime real en este cierre. El último checkpoint vivo sigue siendo 9/9
+completo, sin intención pendiente; no se consultaron procesos compartidos aquí.

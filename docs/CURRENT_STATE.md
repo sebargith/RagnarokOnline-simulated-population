@@ -1,5 +1,14 @@
 # Estado actual
 
+## P3 — cobertura de integración del runner (2026-10-31)
+
+- `60023ce` aceptado por revisión del orquestador e independiente. Cinco pruebas
+  nuevas con puente simulado; suite completa 123 OK. Cubren cancelación, orden
+  inverso, snapshot posterior, reinicio, fallos y carrera de llegada.
+- Sin runtime ni servicios tocados en este cierre. Último checkpoint vivo 9/9
+  completo; cancelación real y latencia siguen sin demostrar.
+- Siguiente: revisión del chat principal. [Evidencia](evidence/P3-dynamic-exploration.md).
+
 ## P3 — reacción de exploración y meta completada (2026-10-31)
 
 - Interrupción determinista implementada y 118 tests OK; requiere las dos
