@@ -78,16 +78,23 @@ def summarize(rows):
             'max_s': round(latencies[-1], 2) if latencies else None}
 
 
-def run_candidate(doc, name, cases, repeats):
+STOP = {'QuotaExceeded': 'quota_exhausted', 'AuthRejected': 'key_rejected'}
+
+
+def run_candidate(doc, name, cases, repeats, interval_s=0):
     try:
         config, model, transport = candidate(doc, name)
     except KeyUnavailable as error:
         return {'status': 'unavailable', 'reason': str(error), 'rows': []}
     service = BoundedInference(config, model, transport)
-    rows, first = [], True
+    rows, first, status, last = [], True, 'ran', 0.0
     try:
         for repeat in range(repeats):
+            if status != 'ran':
+                break
             for case in cases:
+                time.sleep(max(0, last + interval_s - time.monotonic()))  # free-tier spacing
+                last = time.monotonic()
                 future = service.submit(f"{case['id']}-{repeat}", case['messages'], case['seed'],
                                         cold=first or case['cold'], response_format=case['response_format'])
                 limit = config['cold_request_deadline_s'] + 10
@@ -104,19 +111,24 @@ def run_candidate(doc, name, cases, repeats):
                 print(json.dumps({'candidate': name, 'case': case['id'], 'repeat': repeat,
                                   'response_s': row['response_s'], 'error': row['error'],
                                   'score': row['score']}), flush=True)
+                if row['error'] and row['error'].split(':')[0] in STOP:
+                    status = STOP[row['error'].split(':')[0]]  # recorded; provider not retried
+                    break
                 if row['error']:
                     time.sleep(2)
                     # Explicit, recorded reset so later cases are still measured.
                     row['circuit_reset'] = service.recover_idle_circuit()
     finally:
         service.close()
-    return {'status': 'ran', 'model': model, 'rows': rows}
+    return {'status': status, 'model': model, 'rows': rows}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--candidates', default='qwen9b-current,qwen9b-tuned,gemini-flash,groq-gpt-oss')
     parser.add_argument('--repeats', type=int, default=2)
+    parser.add_argument('--cloud-interval', type=float, default=7.0,
+                        help='minimum seconds between calls to a cloud candidate')
     parser.add_argument('--bench', type=Path, default=ROOT/'fixtures/p5-planner-bench.json')
     parser.add_argument('--out', type=Path, default=ROOT/'docs/evidence/P5-model-eval-results.json')
     args = parser.parse_args()
@@ -125,7 +137,9 @@ def main():
     previous = json.loads(args.out.read_text(encoding='utf-8')) if args.out.exists() else {'candidates': {}}
     for name in args.candidates.split(','):
         started = time.time()
-        result = run_candidate(doc, name, bench['cases'], args.repeats)
+        cloud = doc['candidates'][name]['provider'] != 'ollama'
+        result = run_candidate(doc, name, bench['cases'], args.repeats,
+                               args.cloud_interval if cloud else 0)
         result['started_utc'] = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(started))
         result['summary'] = summarize(result['rows'])
         result['by_kind'] = {kind: summarize([r for r in result['rows'] if r['kind'] == kind])

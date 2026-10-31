@@ -18,8 +18,12 @@
         "max_response_bytes": 2000000
       }
     },
+    "qwen9b-ctx-lowtemp": {
+      "provider": "ollama", "base": "config/m2-operating.json",
+      "override": {"options": {"num_ctx": 8192, "temperature": 0.2}}
+    },
     "gemini-flash": {
-      "provider": "openai", "model": "gemini-2.5-flash",
+      "provider": "openai", "model": "gemini-3.6-flash",
       "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
       "api_key_env": "GEMINI_API_KEY", "json_mode": "json_schema",
       "options": {"temperature": 0.2, "max_tokens": 4096}
@@ -27,7 +31,7 @@
     "groq-gpt-oss": {
       "provider": "openai", "model": "openai/gpt-oss-120b",
       "endpoint": "https://api.groq.com/openai/v1",
-      "api_key_env": "GROQ_API_KEY", "json_mode": "json_object",
+      "api_key_env": "GROQ_API_KEY", "json_mode": "json_schema",
       "options": {"temperature": 0.2, "max_completion_tokens": 4096, "reasoning_effort": "medium"}
     }
   },
