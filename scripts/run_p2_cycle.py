@@ -150,10 +150,11 @@ class Runner:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('run', 'status'))
+    parser.add_argument('command', choices=('run', 'status', 'set-goal'))
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('--seconds', type=int, default=180)
     parser.add_argument('--goal-kills', type=int, default=6, help='Only used when creating a new checkpoint')
+    parser.add_argument('--target-kills', type=int, help='New absolute cumulative goal for set-goal')
     parser.add_argument('--max-actions', type=int, default=0)
     parser.add_argument('--pause-after-send', action='store_true', help='Disconnect after one proposal to verify restart recovery')
     args = parser.parse_args()
@@ -168,7 +169,14 @@ def main():
         parser.error('seconds must be 1..3600 and max-actions 0..100')
     directory.mkdir(parents=True, exist_ok=True)
     with exclusive(args.runtime/'p1/cycle.lock'):
+        if args.command == 'set-goal' and (args.target_kills is None or not (directory/'state.json').exists()):
+            parser.error('set-goal requires --target-kills and an existing checkpoint')
         cycle = SoloCycle(directory/'state.json', args.goal_kills)
+        if args.command == 'set-goal':
+            changed = cycle.set_goal(args.target_kills)
+            print(json.dumps({'changed': changed, 'goal_kills': cycle.state['goal_kills'],
+                              'kills': cycle.state['kills'], 'status': cycle.state['status']}))
+            return
         if cycle.state['status'] != 'active':
             print(json.dumps(cycle.state)); return
         bridge = Bridge(args.runtime/'p1/openkore/solo/bridge.json')

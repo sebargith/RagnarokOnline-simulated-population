@@ -37,6 +37,29 @@ class CycleTests(unittest.TestCase):
         self.c.result(result, now=101)
         return result
 
+    def test_new_goal_preserves_history_and_is_idempotent(self):
+        self.c.state.update(status='complete', kills=1, reason='confirmed_kill_goal', history=[{'old': 1}])
+        self.c.save()
+        self.assertTrue(self.c.set_goal(3))
+        self.assertFalse(self.c.set_goal(3))
+        saved = SoloCycle(self.path)
+        self.assertEqual((saved.state['kills'], saved.state['goal_kills'], saved.state['status']), (1, 3, 'active'))
+        self.assertEqual(saved.state['history'], [{'old': 1}])
+        with self.assertRaises(RuntimeError):
+            saved.set_goal(4)
+
+    def test_new_goal_rejects_uncertainty_and_invalid_targets(self):
+        self.c.state.update(status='complete', kills=1, reason='confirmed_kill_goal', inflight={'request_id': 'c_1'})
+        with self.assertRaises(RuntimeError):
+            self.c.set_goal(2)
+        self.c.state['inflight'] = None
+        for target in (0, 101, True):
+            with self.assertRaises(ValueError):
+                self.c.set_goal(target)
+        self.c.state['status'] = 'blocked'
+        with self.assertRaises(RuntimeError):
+            self.c.set_goal(2)
+
     def test_full_hunt_loot_supply_return_goal_with_reload(self):
         s = snapshot()
         a = self.c.plan(s, now=100)

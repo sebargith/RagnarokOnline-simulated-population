@@ -46,6 +46,25 @@ class SoloCycle:
         self.state.update(status='blocked', reason=reason)
         self.save()
 
+    def set_goal(self, target):
+        """Set an absolute cumulative target, preserving all confirmed history."""
+        s = self.state
+        if not isinstance(target, int) or isinstance(target, bool) or not 1 <= target <= 100:
+            raise ValueError('goal must be an integer between 1 and 100')
+        if target == s['goal_kills'] and s['status'] in {'active', 'complete'} and not s['inflight']:
+            return False  # An identical request is idempotent.
+        if (s['status'] != 'complete' or s.get('reason') != 'confirmed_kill_goal' or
+                s['phase'] != 'hunt' or s['inflight'] or s['kills'] < s['goal_kills']):
+            raise RuntimeError('A new goal requires a completed goal without an unresolved intent')
+        if target <= s['kills']:
+            raise ValueError('New goal must exceed confirmed kills')
+        s['goal_history'] = (s.get('goal_history', []) + [
+            {'goal_kills': s['goal_kills'], 'confirmed_kills': s['kills']}])[-24:]
+        s.update(goal_kills=target, status='active', phase='hunt', failures=0)
+        s.pop('reason', None)
+        self.save()
+        return True
+
     def prepare(self, action, request_id, session, now=None):
         if self.state['inflight'] or self.state['status'] != 'active':
             raise RuntimeError('Cannot replace unresolved intent')
