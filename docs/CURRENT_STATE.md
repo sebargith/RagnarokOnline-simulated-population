@@ -1,5 +1,18 @@
 # Estado actual
 
+## P5 paso 1 — funciones planner/chat y evaluación (2026-10-31)
+
+- Adaptador compatible con OpenAI y servicio por función (`planner`/`chat`) con
+  cola, límites y respaldo propios; `chat` solo local. Fallo o 429 de la nube:
+  error explícito, el runner sigue y las siguientes peticiones usan el 9B local
+  marcadas `degraded`. Claves por entorno o `runtime/secrets/model-keys.env`.
+- Banco grabado de 13 casos (metas, informe determinista, P4). Groq gpt-oss-120b:
+  100 % JSON, 96 % coherencia, ~0,8 s. 9B actual 77 %; 9B con think no termina
+  (bucle hasta agotar tokens). Gemini 3.6 Flash gratis: 503 y 429 tras 21 llamadas.
+  [Evidencia](evidence/P5-model-eval.md). Suite: 146 OK. Sin pruebas en vivo.
+- **Modelo por defecto sin cambios.** Siguiente: el usuario elige el planner en
+  `config/model-roles.json`; luego P5 paso 2.
+
 ## P5 — nueva dirección del usuario (2026-10-31 15:50)
 
 - El 9B no basta para decidir e informar. Se adoptan dos funciones de modelo

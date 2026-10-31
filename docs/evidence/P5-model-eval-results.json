@@ -1,0 +1,2029 @@
+{
+ "candidates": {
+  "qwen9b-current": {
+   "status": "ran",
+   "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+   "rows": [
+    {
+     "case": "goal-complete-next",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 10.118,
+     "error": null,
+     "eval_count": 22,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 3,\n  \"type\": \"hunt\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-continue",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.812,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"continue_current\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-asks-new",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.749,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"continue_current\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-inflight",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.911,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-blocked",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.745,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-injection",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.697,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "report-final",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 1.133,
+     "error": null,
+     "eval_count": 41,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is alive and connected on map prt_fild08 at position (121, 269) with a complete goal of 8 confirmed kills.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       4,
+       57,
+       13
+      ]
+     }
+    },
+    {
+     "case": "report-hurt-active",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 2.31,
+     "error": null,
+     "eval_count": 100,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is alive and connected on map prt_fild08 at position (121, 269) with no visible monsters or players nearby. The character has 40 out of 57 HP and is equipped with a Cotton Shirt and Knife while carrying an Apple, Empty Bottle, Jellopy, and Chrysalis. Tarin's active goal is nearly complete, having achieved 8 out of the required 9 confirmed kills.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       4,
+       13
+      ]
+     }
+    },
+    {
+     "case": "mech-weight",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.319,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false
+     }
+    },
+    {
+     "case": "mech-death",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.267,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"death\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-skills",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.236,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"skills\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-healing",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.29,
+     "error": null,
+     "eval_count": 7,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"healing\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-offtopic",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 3.464,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-complete-next",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.852,
+     "error": null,
+     "eval_count": 22,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 3,\n  \"type\": \"hunt\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-continue",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.755,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"continue_current\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-asks-new",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.76,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"continue_current\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-inflight",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.951,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-blocked",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.803,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-injection",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.779,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "report-final",
+     "kind": "report",
+     "repeat": 1,
+     "response_s": 0.928,
+     "error": null,
+     "eval_count": 41,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is alive and connected on map prt_fild08 at position (121, 269) with a complete goal of 8 confirmed kills.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       4,
+       57,
+       13
+      ]
+     }
+    },
+    {
+     "case": "report-hurt-active",
+     "kind": "report",
+     "repeat": 1,
+     "response_s": 2.186,
+     "error": null,
+     "eval_count": 100,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is alive and connected on map prt_fild08 at position (121, 269) with no visible monsters or players nearby. The character has 40 out of 57 HP and is equipped with a Cotton Shirt and Knife while carrying an Apple, Empty Bottle, Jellopy, and Chrysalis. Tarin's active goal is nearly complete, having achieved 8 out of the required 9 confirmed kills.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       4,
+       13
+      ]
+     }
+    },
+    {
+     "case": "mech-weight",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.283,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false
+     }
+    },
+    {
+     "case": "mech-death",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.222,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"death\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-skills",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.237,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"skills\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-healing",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.248,
+     "error": null,
+     "eval_count": 7,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"healing\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-offtopic",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.221,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    }
+   ],
+   "started_utc": "2026-10-31T19:33:53Z",
+   "summary": {
+    "calls": 26,
+    "json_pct": 100,
+    "capability_pct": 100,
+    "fact_pct": 77,
+    "errors": 0,
+    "p50_s": 0.76,
+    "max_s": 10.12
+   },
+   "by_kind": {
+    "goal": {
+     "calls": 12,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 100,
+     "errors": 0,
+     "p50_s": 0.79,
+     "max_s": 10.12
+    },
+    "report": {
+     "calls": 4,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 0,
+     "errors": 0,
+     "p50_s": 1.66,
+     "max_s": 2.31
+    },
+    "mechanics": {
+     "calls": 10,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 80,
+     "errors": 0,
+     "p50_s": 0.26,
+     "max_s": 3.46
+    }
+   }
+  },
+  "gemini-flash": {
+   "status": "quota_exhausted",
+   "model": "gemini-3.6-flash",
+   "rows": [
+    {
+     "case": "goal-complete-next",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 6.457,
+     "error": null,
+     "eval_count": 11,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"type\":\"hunt\",\"additional_kills\":1}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-continue",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 9.562,
+     "error": null,
+     "eval_count": 13,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"type\":\"continue_current\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-asks-new",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 1.731,
+     "error": "RuntimeError: HTTP 503",
+     "content": "",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     },
+     "circuit_reset": true
+    },
+    {
+     "case": "goal-inflight",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 3.961,
+     "error": null,
+     "eval_count": 13,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"type\":\"ask_help\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-blocked",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 4.346,
+     "error": null,
+     "eval_count": 13,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"type\":\"ask_help\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-injection",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 4.701,
+     "error": null,
+     "eval_count": 11,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"type\":\"hunt\",\"additional_kills\":1}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "report-final",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 10.433,
+     "error": null,
+     "eval_count": 59,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"summary\":\"Tarin is connected at map prt_fild08 at position (121, 269). The character is Base Level 4 and Job Level 3 with a Cotton Shirt and Knife equipped. Their goal is complete with 8 confirmed kills.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       57,
+       13
+      ]
+     }
+    },
+    {
+     "case": "report-hurt-active",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 4.564,
+     "error": "RuntimeError: HTTP 503",
+     "content": "",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     },
+     "circuit_reset": true
+    },
+    {
+     "case": "mech-weight",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 8.891,
+     "error": null,
+     "eval_count": 5,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"topic\":\"weight\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-death",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 8.825,
+     "error": null,
+     "eval_count": 5,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"topic\":\"death\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-skills",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 4.9,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"topic\": \"skills\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-healing",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 4.122,
+     "error": null,
+     "eval_count": 5,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"topic\":\"healing\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-offtopic",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 12.568,
+     "error": null,
+     "eval_count": 5,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-complete-next",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 14.64,
+     "error": null,
+     "eval_count": 11,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"type\":\"hunt\",\"additional_kills\":1}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-continue",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 9.185,
+     "error": "RuntimeError: HTTP 503",
+     "content": "",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     },
+     "circuit_reset": true
+    },
+    {
+     "case": "goal-active-asks-new",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 5.96,
+     "error": null,
+     "eval_count": 13,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"type\":\"continue_current\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-inflight",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 9.114,
+     "error": null,
+     "eval_count": 13,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"type\":\"ask_help\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-blocked",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 5.035,
+     "error": null,
+     "eval_count": 13,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"type\":\"ask_help\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-injection",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 8.467,
+     "error": null,
+     "eval_count": 11,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"type\":\"hunt\",\"additional_kills\":1}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "report-final",
+     "kind": "report",
+     "repeat": 1,
+     "response_s": 11.579,
+     "error": null,
+     "eval_count": 82,
+     "thinking_chars": 0,
+     "served_model": "gemini-3.6-flash",
+     "content": "{\"summary\":\"Tarin is connected on map prt_fild08 at position (121, 269) with 57/57 HP and 14/14 SP. The character is Base Level 4 and Job Level 3, equipped with a Cotton Shirt and a Knife. The goal is complete with 8 out of 8 confirmed kills.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       13
+      ]
+     }
+    },
+    {
+     "case": "report-hurt-active",
+     "kind": "report",
+     "repeat": 1,
+     "response_s": 1.153,
+     "error": "QuotaExceeded: HTTP 429 rate limit or quota exhausted",
+     "content": "",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     }
+    }
+   ],
+   "started_utc": "2026-10-31T19:41:43Z",
+   "summary": {
+    "calls": 21,
+    "json_pct": 81,
+    "capability_pct": 81,
+    "fact_pct": 71,
+    "errors": 4,
+    "p50_s": 8.47,
+    "max_s": 14.64
+   },
+   "by_kind": {
+    "goal": {
+     "calls": 12,
+     "json_pct": 83,
+     "capability_pct": 83,
+     "fact_pct": 83,
+     "errors": 2,
+     "p50_s": 6.21,
+     "max_s": 14.64
+    },
+    "report": {
+     "calls": 4,
+     "json_pct": 50,
+     "capability_pct": 50,
+     "fact_pct": 0,
+     "errors": 2,
+     "p50_s": 11.01,
+     "max_s": 11.58
+    },
+    "mechanics": {
+     "calls": 5,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 100,
+     "errors": 0,
+     "p50_s": 8.82,
+     "max_s": 12.57
+    }
+   }
+  },
+  "groq-gpt-oss": {
+   "status": "ran",
+   "model": "openai/gpt-oss-120b",
+   "rows": [
+    {
+     "case": "goal-complete-next",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.878,
+     "error": null,
+     "eval_count": 189,
+     "thinking_chars": 761,
+     "reasoning_tokens": 166,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"hunt\",\"additional_kills\":2}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-continue",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.638,
+     "error": null,
+     "eval_count": 128,
+     "thinking_chars": 476,
+     "reasoning_tokens": 104,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"continue_current\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-asks-new",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 1.145,
+     "error": null,
+     "eval_count": 198,
+     "thinking_chars": 785,
+     "reasoning_tokens": 174,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"continue_current\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-inflight",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.944,
+     "error": null,
+     "eval_count": 273,
+     "thinking_chars": 1174,
+     "reasoning_tokens": 249,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"ask_help\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-blocked",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 1.078,
+     "error": null,
+     "eval_count": 327,
+     "thinking_chars": 1380,
+     "reasoning_tokens": 303,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"ask_help\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-injection",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.914,
+     "error": null,
+     "eval_count": 221,
+     "thinking_chars": 849,
+     "reasoning_tokens": 198,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"hunt\",\"additional_kills\":2}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "report-final",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 0.955,
+     "error": null,
+     "eval_count": 279,
+     "thinking_chars": 776,
+     "reasoning_tokens": 183,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"summary\":\"Tarin is alive and connected on map prt_fild08 at position (121,269). He is level 4 (base) with 57/57 HP and 14/14 SP, and has completed the goal with 8 confirmed kills. Inventory includes an Apple, an Empty Bottle, a Jellopy, and a Chrysalis, and he carries a Cotton Shirt and Knife.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       13
+      ]
+     }
+    },
+    {
+     "case": "report-hurt-active",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 2.056,
+     "error": null,
+     "eval_count": 784,
+     "thinking_chars": 2502,
+     "reasoning_tokens": 664,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"summary\":\"Tarin is connected, alive, and located in prt_fild08 at (121,269) wearing a Cotton Shirt and Knife. He is base level 4 (34/36 exp) and job level 3 (12/28 exp) with 40/57 HP, full SP, 13 zeny, weight 56/2150, and inventory containing Apple, Empty Bottle, Jellopy, Chrysalis. His active goal has 8 of 9 confirmed kills and no unresolved action.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true,
+      "invented_numbers": [],
+      "missing_facts": []
+     }
+    },
+    {
+     "case": "mech-weight",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.775,
+     "error": null,
+     "eval_count": 137,
+     "thinking_chars": 583,
+     "reasoning_tokens": 123,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"topic\":\"weight\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-death",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.617,
+     "error": null,
+     "eval_count": 60,
+     "thinking_chars": 213,
+     "reasoning_tokens": 43,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"topic\":\"experience\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-skills",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.579,
+     "error": null,
+     "eval_count": 60,
+     "thinking_chars": 197,
+     "reasoning_tokens": 46,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"topic\":\"skills\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-healing",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.593,
+     "error": null,
+     "eval_count": 93,
+     "thinking_chars": 306,
+     "reasoning_tokens": 74,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"topic\":\"healing\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-offtopic",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.568,
+     "error": null,
+     "eval_count": 46,
+     "thinking_chars": 148,
+     "reasoning_tokens": 32,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-complete-next",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.9,
+     "error": null,
+     "eval_count": 236,
+     "thinking_chars": 932,
+     "reasoning_tokens": 213,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"hunt\",\"additional_kills\":2}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-continue",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.67,
+     "error": null,
+     "eval_count": 142,
+     "thinking_chars": 515,
+     "reasoning_tokens": 118,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"continue_current\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-asks-new",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.849,
+     "error": null,
+     "eval_count": 182,
+     "thinking_chars": 718,
+     "reasoning_tokens": 158,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"continue_current\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-inflight",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 1.761,
+     "error": null,
+     "eval_count": 591,
+     "thinking_chars": 2800,
+     "reasoning_tokens": 567,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"ask_help\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-blocked",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 1.096,
+     "error": null,
+     "eval_count": 355,
+     "thinking_chars": 1544,
+     "reasoning_tokens": 331,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"ask_help\",\"additional_kills\":0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-injection",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.776,
+     "error": null,
+     "eval_count": 208,
+     "thinking_chars": 814,
+     "reasoning_tokens": 185,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"type\":\"hunt\",\"additional_kills\":2}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "report-final",
+     "kind": "report",
+     "repeat": 1,
+     "response_s": 1.508,
+     "error": null,
+     "eval_count": 535,
+     "thinking_chars": 1797,
+     "reasoning_tokens": 433,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"summary\":\"Tarin is connected, alive, and currently at map prt_fild08 (x:121, y:269). He is level 4 (base) and level 3 (job) with full HP (57/57) and SP (14/14), carrying 13 zeny, wearing a Cotton Shirt and Knife, and has an Apple, Empty Bottle, Jellopy, and Chrysalis in inventory.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true,
+      "invented_numbers": [],
+      "missing_facts": []
+     }
+    },
+    {
+     "case": "report-hurt-active",
+     "kind": "report",
+     "repeat": 1,
+     "response_s": 1.357,
+     "error": null,
+     "eval_count": 418,
+     "thinking_chars": 1093,
+     "reasoning_tokens": 303,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"summary\":\"Tarin is alive and connected in prt_fild08 at (121,269) with 40/57 HP, 14/14 SP, level 4 base (34/36 EXP) and level 3 job (12/28 EXP). He carries 13 zeny, weighs 56/2150, equipped with Cotton Shirt and Knife, and holds an Apple, Empty Bottle, Jellopy, and Chrysalis. His goal is active with 8 of 9 kills confirmed.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true,
+      "invented_numbers": [],
+      "missing_facts": []
+     }
+    },
+    {
+     "case": "mech-weight",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.791,
+     "error": null,
+     "eval_count": 183,
+     "thinking_chars": 836,
+     "reasoning_tokens": 169,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"topic\":\"weight\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-death",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.72,
+     "error": null,
+     "eval_count": 131,
+     "thinking_chars": 560,
+     "reasoning_tokens": 117,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"topic\":\"experience\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-skills",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.606,
+     "error": null,
+     "eval_count": 60,
+     "thinking_chars": 197,
+     "reasoning_tokens": 46,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"topic\":\"skills\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-healing",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.611,
+     "error": null,
+     "eval_count": 90,
+     "thinking_chars": 311,
+     "reasoning_tokens": 75,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"topic\":\"healing\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-offtopic",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.543,
+     "error": null,
+     "eval_count": 78,
+     "thinking_chars": 296,
+     "reasoning_tokens": 64,
+     "served_model": "openai/gpt-oss-120b",
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    }
+   ],
+   "started_utc": "2026-10-31T19:48:13Z",
+   "summary": {
+    "calls": 26,
+    "json_pct": 100,
+    "capability_pct": 100,
+    "fact_pct": 96,
+    "errors": 0,
+    "p50_s": 0.82,
+    "max_s": 2.06
+   },
+   "by_kind": {
+    "goal": {
+     "calls": 12,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 100,
+     "errors": 0,
+     "p50_s": 0.91,
+     "max_s": 1.76
+    },
+    "report": {
+     "calls": 4,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 75,
+     "errors": 0,
+     "p50_s": 1.43,
+     "max_s": 2.06
+    },
+    "mechanics": {
+     "calls": 10,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 100,
+     "errors": 0,
+     "p50_s": 0.61,
+     "max_s": 0.79
+    }
+   }
+  },
+  "qwen9b-ctx-lowtemp": {
+   "status": "ran",
+   "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+   "rows": [
+    {
+     "case": "goal-complete-next",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 1.005,
+     "error": null,
+     "eval_count": 22,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 1,\n  \"type\": \"hunt\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-continue",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.857,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"continue_current\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-asks-new",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.799,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"continue_current\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-inflight",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 1.036,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-blocked",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.926,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-injection",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.848,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "report-final",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 2.394,
+     "error": null,
+     "eval_count": 80,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is alive and currently located at position (121, 269) on map prt_fild08 with no visible monsters or players nearby. The character has completed their goal of 8 confirmed kills and is equipped with a Cotton Shirt and Knife while holding an Apple, Empty Bottle, Jellopy, and Chrysalis in inventory.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       4,
+       57,
+       13
+      ]
+     }
+    },
+    {
+     "case": "report-hurt-active",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 1.966,
+     "error": null,
+     "eval_count": 68,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is alive and connected on map prt_fild08 at position x:121, y:269. The character has 40 HP out of 57 maximum and is equipped with a Cotton Shirt and a Knife. Currently, there are no visible monsters or players nearby.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       4,
+       13
+      ]
+     }
+    },
+    {
+     "case": "mech-weight",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.345,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"weight\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-death",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.26,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"experience\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-skills",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.262,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"skills\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-healing",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.292,
+     "error": null,
+     "eval_count": 7,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"healing\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-offtopic",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.282,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-complete-next",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.873,
+     "error": null,
+     "eval_count": 22,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 1,\n  \"type\": \"hunt\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-continue",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.818,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"continue_current\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-asks-new",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.787,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"continue_current\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-inflight",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.951,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-blocked",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.89,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-injection",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.83,
+     "error": null,
+     "eval_count": 23,
+     "thinking_chars": 0,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"ask_help\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "report-final",
+     "kind": "report",
+     "repeat": 1,
+     "response_s": 2.121,
+     "error": null,
+     "eval_count": 80,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is alive and currently located at position (121, 269) on map prt_fild08 with no visible monsters or players nearby. The character has completed their goal of 8 confirmed kills and is equipped with a Cotton Shirt and Knife while holding an Apple, Empty Bottle, Jellopy, and Chrysalis in inventory.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       4,
+       57,
+       13
+      ]
+     }
+    },
+    {
+     "case": "report-hurt-active",
+     "kind": "report",
+     "repeat": 1,
+     "response_s": 1.88,
+     "error": null,
+     "eval_count": 68,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is alive and connected on map prt_fild08 at position x:121, y:269. The character has 40 HP out of 57 maximum and is equipped with a Cotton Shirt and a Knife. Currently, there are no visible monsters or players nearby.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       4,
+       13
+      ]
+     }
+    },
+    {
+     "case": "mech-weight",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.326,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"weight\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-death",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.26,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"experience\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-skills",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.258,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"skills\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-healing",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.281,
+     "error": null,
+     "eval_count": 7,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"healing\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-offtopic",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.273,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    }
+   ],
+   "started_utc": "2026-10-31T19:51:21Z",
+   "summary": {
+    "calls": 26,
+    "json_pct": 100,
+    "capability_pct": 100,
+    "fact_pct": 85,
+    "errors": 0,
+    "p50_s": 0.82,
+    "max_s": 2.39
+   },
+   "by_kind": {
+    "goal": {
+     "calls": 12,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 100,
+     "errors": 0,
+     "p50_s": 0.86,
+     "max_s": 1.04
+    },
+    "report": {
+     "calls": 4,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 0,
+     "errors": 0,
+     "p50_s": 2.04,
+     "max_s": 2.39
+    },
+    "mechanics": {
+     "calls": 10,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 100,
+     "errors": 0,
+     "p50_s": 0.28,
+     "max_s": 0.34
+    }
+   }
+  },
+  "qwen9b-tuned": {
+   "status": "ran",
+   "model": "hf.co/bartowski/Qwen_Qwen3.5-9B-GGUF:Q6_K",
+   "rows": [
+    {
+     "case": "goal-complete-next",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 77.619,
+     "error": "ValueError: empty visible answer",
+     "content": "",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     },
+     "circuit_reset": true
+    },
+    {
+     "case": "goal-active-continue",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 57.652,
+     "error": null,
+     "eval_count": 2303,
+     "thinking_chars": 9180,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"continue_current\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-asks-new",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 67.63,
+     "error": null,
+     "eval_count": 2869,
+     "thinking_chars": 11703,
+     "content": "{\n  \"additional_kills\": 0,\n  \"type\": \"continue_current\"\n}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-inflight",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 68.854,
+     "error": "ValueError: empty visible answer",
+     "content": "",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     },
+     "circuit_reset": true
+    },
+    {
+     "case": "goal-blocked",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 68.09,
+     "error": "ValueError: empty visible answer",
+     "content": "",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     },
+     "circuit_reset": true
+    },
+    {
+     "case": "goal-injection",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 66.452,
+     "error": "ValueError: empty visible answer",
+     "content": "",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     },
+     "circuit_reset": true
+    },
+    {
+     "case": "report-final",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 66.164,
+     "error": "ValueError: empty visible answer",
+     "content": "",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     },
+     "circuit_reset": true
+    },
+    {
+     "case": "report-hurt-active",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 68.146,
+     "error": "ValueError: empty visible answer",
+     "content": "",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     },
+     "circuit_reset": true
+    },
+    {
+     "case": "mech-weight",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 65.382,
+     "error": "ValueError: empty visible answer",
+     "content": "",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     },
+     "circuit_reset": true
+    },
+    {
+     "case": "mech-death",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 38.057,
+     "error": null,
+     "eval_count": 1763,
+     "thinking_chars": 7232,
+     "content": "{\"topic\":\"experience\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-skills",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 12.704,
+     "error": null,
+     "eval_count": 591,
+     "thinking_chars": 2253,
+     "content": "```json\n{\"topic\":\"skills\"}\n```",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     }
+    },
+    {
+     "case": "mech-healing",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 12.219,
+     "error": null,
+     "eval_count": 568,
+     "thinking_chars": 2138,
+     "content": "```json\n{\"topic\":\"healing\"}\n```",
+     "score": {
+      "json": false,
+      "capability": false,
+      "fact": false
+     }
+    },
+    {
+     "case": "mech-offtopic",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 16.854,
+     "error": null,
+     "eval_count": 568,
+     "thinking_chars": 2113,
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    }
+   ],
+   "started_utc": "2026-10-31T19:51:43Z",
+   "summary": {
+    "calls": 13,
+    "json_pct": 31,
+    "capability_pct": 31,
+    "fact_pct": 31,
+    "errors": 7,
+    "p50_s": 27.46,
+    "max_s": 67.63
+   },
+   "by_kind": {
+    "goal": {
+     "calls": 6,
+     "json_pct": 33,
+     "capability_pct": 33,
+     "fact_pct": 33,
+     "errors": 4,
+     "p50_s": 62.64,
+     "max_s": 67.63
+    },
+    "report": {
+     "calls": 2,
+     "json_pct": 0,
+     "capability_pct": 0,
+     "fact_pct": 0,
+     "errors": 2,
+     "p50_s": null,
+     "max_s": null
+    },
+    "mechanics": {
+     "calls": 5,
+     "json_pct": 40,
+     "capability_pct": 40,
+     "fact_pct": 40,
+     "errors": 1,
+     "p50_s": 14.78,
+     "max_s": 38.06
+    }
+   }
+  }
+ }
+}

@@ -92,6 +92,19 @@ With SearXNG and Ollama running, this command was verified:
 
 The endpoint and limits are in [web-search configuration](config/web-search.json). SearXNG needs no API key, but sends public queries to its configured internet search engines. If the local service is unavailable, the turn reports the failure. M3 separately integrates a fixed public query through a worker that receives no private context; its narrow relevance filter is not a general search-quality guarantee.
 
+## Model roles and planner evaluation (P5 step 1)
+
+[Model roles](config/model-roles.json) give `planner` and `chat` their own model, bounded queue, limits and local fallback; both still default to the current 9B. `chat` only accepts local models. Cloud candidates use the OpenAI-compatible adapter. API keys come from the environment variable named in the config (`GEMINI_API_KEY`, `GROQ_API_KEY`) or, when it is unset or empty, from the same `NAME=value` line in `D:/Ragnarok Agents/runtime/secrets/model-keys.env` (`key_file`, relative to the runtime folder, outside Git). An empty value marks the candidate unavailable; key values are never printed or stored.
+
+These commands were run (no game connection; the bench holds only recorded game facts):
+
+```powershell
+python scripts/build_p5_bench.py
+python scripts/eval_p5_planner.py --candidates qwen9b-current,gemini-flash,groq-gpt-oss --repeats 2
+```
+
+Results and side-by-side examples: [P5 model evaluation](docs/evidence/P5-model-eval.md).
+
 ## Persistent agent scenario (M3)
 
 The implementation worktree is `D:\Ragnarok Agents\m3-worktree`; shared native
