@@ -25,7 +25,9 @@ ESTADO REAL
 - [HECHO] Investigación de otros bots y plan de ejecución nativa.
 - [EXPERIMENTAL] Chat 07 probó navegación/caza de campo; la cooperación completa
   no quedó aceptada. Sus archivos se conservan en m4-field.
-- [PENDIENTE] Un personaje normal desde nivel 1 con navegación y combate nativos.
+- [HECHO] P1a: novato nivel 1 separado con navegación nativa OpenKore en el mismo mapa
+  (progreso, cancelación y resultado veraz). Ver docs/evidence/P1a-native-navigation.md.
+- [PENDIENTE] Combate, recogida y recuperación nativos del mismo personaje (resto de P1).
 - [PENDIENTE] Progreso individual sostenible y objetivos generales del 9B.
 - [BLOQUEO CONOCIDO] SearXNG estaba offline; hay que verificar/restaurar su backend.
   El ejemplo actual "web poring" no es todavía una herramienta general.

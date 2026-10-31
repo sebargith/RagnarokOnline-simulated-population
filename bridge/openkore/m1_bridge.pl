@@ -10,7 +10,11 @@ use Globals qw($net $char $field $messageSender $playersList $monstersList $item
 use Misc ();
 use Plugins;
 use Network;
+use AI ();
+use Task ();
+use Utils ();
 use M4RequestWindow;
+use M1Navigation;
 
 my ($server, $client, $cfg, $hooks, $pending);
 my ($input, $output, $authorized, $auth_time) = ('', '', 0, 0);
@@ -38,7 +42,9 @@ $hooks = Plugins::addHooks(
 sub start {
     open my $fh, '<:raw', $ENV{M1_BRIDGE_CONFIG} or die "M1_BRIDGE_CONFIG required: $!";
     local $/; $cfg = $json->decode(<$fh>); close $fh;
-    die 'Invalid bridge configuration' unless $cfg->{port} =~ /^876[567]$/ && length($cfg->{token}) >= 20;
+    die 'Invalid bridge configuration' unless $cfg->{port} =~ /^(876[567]|8770)$/ && length($cfg->{token}) >= 20;
+    # Native profiles have exactly one movement owner: OpenKore's route task.
+    die 'Native navigation requires --ai=manual' if $cfg->{native_navigation} && AI::state() != AI::MANUAL();
     $server = IO::Socket::INET->new(LocalAddr => '127.0.0.1', LocalPort => $cfg->{port},
         Listen => 1, Proto => 'tcp', ReuseAddr => 0) or die "Bridge listen: $!";
     $server->blocking(0);
@@ -83,6 +89,8 @@ sub snapshot {
         $s->{name} = $char->{name}; $s->{map} = $field->baseName;
         $s->{position} = {x => 0 + $char->{pos}{x}, y => 0 + $char->{pos}{y}};
         $s->{destination} = {x => 0 + $char->{pos_to}{x}, y => 0 + $char->{pos_to}{y}};
+        $s->{executor} = $cfg->{native_navigation} ? 'openkore_route' : 'bridge_steps';
+        $s->{navigation} = $pending && $pending->{task} ? $pending->{id} : undef;
         $s->{hp} = 0 + ($char->{hp} // 0); $s->{hp_max} = 0 + ($char->{hp_max} // 0);
         $s->{zeny} = 0 + ($char->{zeny} // 0);
         my $own_items = $currentDeal{you} // {};
@@ -125,6 +133,52 @@ sub finish {
     undef $pending;
 }
 
+sub nav_evidence {
+    return {} unless connected();
+    my $calc = Utils::calcPosFromPathfinding($field, $char);
+    {map => $field->baseName, position => {x => 0 + $calc->{x}, y => 0 + $calc->{y}},
+        pos_to => {x => 0 + $char->{pos_to}{x}, y => 0 + $char->{pos_to}{y}},
+        elapsed_ms => int((time - $pending->{started}) * 1000)};
+}
+
+# Removes the route task and halts at the predicted cell; never resumes later.
+sub stop_route {
+    AI::clear(qw/move route mapRoute/);
+    $char->sendAttackStop if connected();
+}
+
+sub navigation_tick {
+    my $task = $pending->{task};
+    my $state = !grep({ ref($_) && $_ == $task } @AI::ai_seq_args) ? 'missing' :
+        $task->getStatus() == Task::DONE() ? 'done' : $task->getStatus() == Task::STOPPED() ? 'stopped' : 'running';
+    # processTask dequeues a DONE task in the same AI pass, so a finished task
+    # is usually 'missing' here; its retained status still tells us the outcome.
+    $state = 'done' if $state eq 'missing' && $task->getStatus() == Task::DONE();
+    if (AI::state() != AI::MANUAL()) {
+        stop_route(); finish('unknown', 'executor_mode_changed', nav_evidence()); return;
+    }
+    my $a = $pending->{action};
+    my $evidence = nav_evidence();
+    # Task::getError asserts DONE; a running task has no error to read.
+    my $error = $state eq 'done' ? $task->getError() : undef;
+    my ($status, $reason) = M1Navigation::outcome($state, $error,
+        {map => $evidence->{map}, dest_map => $a->{map}, pos_to => $evidence->{pos_to},
+         calc => $evidence->{position}, dest => {x => $a->{x}, y => $a->{y}}});
+    if ($status) {
+        # Any non-arrival halts at the predicted cell instead of coasting on.
+        stop_route() unless $status eq 'completed';
+        $evidence->{route_error} = $error->{message} if $error;
+        finish($status, $reason, $evidence); return;
+    }
+    if (time >= $pending->{deadline}) { stop_route(); finish('failed', 'timeout', $evidence); return }
+    if (time - $pending->{progress} >= 1) {
+        $pending->{progress} = time;
+        emit('navigation_progress', {request_id => $pending->{id}, %$evidence,
+            destination => {x => 0 + $a->{x}, y => 0 + $a->{y}},
+            distance => M1Navigation::distance($evidence->{position}, $a)});
+    }
+}
+
 sub request {
     my ($r) = @_;
     unless (ref($r) eq 'HASH') { emit('protocol_error', {reason => 'object_required'}); return }
@@ -153,12 +207,41 @@ sub request {
     if (!connected()) { result($id, 'rejected', 'disconnected'); return }
     my $remaining = $r->{deadline_ms} - time * 1000;
     if ($remaining <= 0 || $remaining > 5000) { result($id, 'rejected', 'invalid_deadline'); return }
-    if ($pending) { result($id, 'rejected', 'busy'); return }
-    if (time - $last_action < 1) { result($id, 'rejected', 'rate_limited'); return }
     my $a = $r->{action};
     unless (ref($a) eq 'HASH' && defined($a->{type}) && !ref($a->{type})) {
         result($id, 'rejected', 'invalid_action'); return;
     }
+    # Cancel is exempt from busy/rate limits: it only ends the active route.
+    if ($a->{type} eq 'cancel') {
+        unless (join(',', sort keys %$a) eq 'target,type' && defined($a->{target}) && !ref($a->{target}) &&
+            $pending && $pending->{task} && $a->{target} eq $pending->{id}) {
+            result($id, 'rejected', 'no_matching_navigation'); return;
+        }
+        stop_route();
+        finish('cancelled', 'cancel_requested', nav_evidence());
+        result($id, 'completed', 'navigation_cancelled');
+        return;
+    }
+    if ($pending) { result($id, 'rejected', 'busy'); return }
+    if (time - $last_action < 1) { result($id, 'rejected', 'rate_limited'); return }
+    if ($a->{type} eq 'navigate') {
+        my $reason = M1Navigation::validate($a, {manual_ai => $cfg->{native_navigation} && AI::state() == AI::MANUAL(),
+            hp => $char->{hp}, map => $field->baseName, width => $field->width, height => $field->height,
+            walkable => sub { $field->isWalkable(@_) }, pos_to => $char->{pos_to}});
+        if ($reason) { result($id, 'rejected', $reason); return }
+        AI::clear(qw/move route mapRoute/);
+        $char->route($field->baseName, $a->{x}, $a->{y}, noMapRoute => 1, maxRouteTime => $a->{timeout_s},
+            attackOnRoute => 0, noSitAuto => 1);
+        my $task = AI::action() eq 'route' ? $AI::ai_seq_args[0] : undef;
+        unless ($task) { result($id, 'rejected', 'route_not_queued'); return }
+        my $now = time;
+        $pending = {id => $id, action => $a, task => $task, started => $now, progress => 0,
+            deadline => $now + $a->{timeout_s} + M1Navigation::GRACE};
+        $last_action = $now;
+        result($id, 'accepted', 'route_queued');
+        return;
+    }
+    if ($a->{type} eq 'move' && $cfg->{native_navigation}) { result($id, 'rejected', 'legacy_executor_disabled'); return }
     if ($a->{type} eq 'move') {
         unless (join(',', sort keys %$a) eq 'map,type,x,y' && !ref($a->{map}) && $a->{map} eq $field->baseName &&
             defined($a->{x}) && defined($a->{y}) && !ref($a->{x}) && !ref($a->{y}) &&
@@ -357,7 +440,11 @@ sub tick {
     return unless $server;
     my $ready = connected() ? 1 : 0;
     if ($ready != $in_game) {
-        finish('unknown', 'game_disconnected') unless $ready;
+        unless ($ready) {
+            # A route must not silently resume after reconnecting.
+            AI::clear(qw/move route mapRoute/) if $pending && $pending->{task};
+            finish('unknown', 'game_disconnected');
+        }
         if ($ready) { ++$epoch; %seen = (); $attempts = 0; $recovery_deadline = 0 }
         else { $recovery_deadline = time + 90 }
         $in_game = $ready;
@@ -371,7 +458,8 @@ sub tick {
         $stopping = time + .2;
     }
     $quit = 1 if $stopping && time >= $stopping;
-    finish('unknown', 'confirmation_timeout') if $pending && time >= $pending->{deadline};
+    if ($pending && $pending->{task}) { navigation_tick() if $ready }
+    elsif ($pending && time >= $pending->{deadline}) { finish('unknown', 'confirmation_timeout') }
     if (!$client) {
         $client = $server->accept();
         if ($client) { $client->blocking(0); $auth_time = time }

@@ -1,6 +1,6 @@
 # Estado actual
 
-Actualizado: 2026-10-31 (America/Santiago). Relevo a Claude.
+Actualizado: 2026-10-31 11:15 (America/Santiago) por Claude. P1a completada.
 
 ## Decisión vigente
 
@@ -8,8 +8,7 @@ El usuario aprobó el [plan de un jugador con ejecución nativa](NATIVE_AGENT_PL
 Primero un personaje normal desde nivel 1 con OpenKore reactivo; después ciclo
 individual, objetivos del 9B y conocimiento web. Cooperación y comercio siguen
 como objetivo posterior. Naturalidad, comparación de modelos, prueba larga y M5
-no bloquean la primera entrega. Este turno prepara documentos; no implementa
-el adaptador ni modifica procesos del juego.
+no bloquean la primera entrega.
 
 ## Dónde continuar
 
@@ -27,38 +26,19 @@ el adaptador ni modifica procesos del juego.
   README, BRIDGE, CURRENT_STATE, ROADMAP, USER_GUIDE y evidencia M4-field.
   No se ha aceptado su cooperación general ni incorporado toda esa rama.
 
-## Inventario de procesos — 2026-10-31 10:47 -03:00
+## Procesos y P1a — 2026-10-31 11:15 -03:00
 
-Inspección de solo lectura con `Get-CimInstance Win32_Process` y
-`Get-NetTCPConnection -State Listen`; la primera consulta CIM sin elevación
-fue denegada, la consulta elevada funcionó. No se detuvo ningún proceso.
-
-- OpenKore agent/peer/third: PID 30496/60476/43560, desde 08:38:44/47/49,
-  plugins de `m4-field`, `--ai=off`, listeners 8765/8766/8767.
-  Son clientes vivos; no demuestra que el controlador Python siga ejecutándose.
-- Tests: PID 49236 y su hijo 44956, desde 2026-10-30 21:23:13,
-  `-m unittest discover -s tests -v`. Es un árbol de una invocación, no evidencia
-  de dos suites independientes. Persisten; bloqueo y causa no diagnosticados.
-- MariaDB PID 29928:3306; rAthena login 29496:6900, char 51448:6121,
-  map 24944:5121; Ollama PID 500:11434. Procesos y listeners presentes,
-  sin prueba de salud funcional. No se observó listener en 8080.
-- Docker fue reportado iniciado por Claude; su salud no se verificó en esta consulta.
-- Antes de P1a, identificar el dueño de esos clientes/tests y resolver ocupación
-  de puertos con cierre controlado cuando corresponda. No arrancar otro controlador
-  contra los mismos clientes. Preservar servidor, DB y sesión gráfica.
-
-Diagnóstico de Claude, 11:00 -03:00 (solo lectura):
-
-- Tests: dueño = shell pwsh 67520 de Codex (Chat 07). Ejecutó en cadena
-  `rg … m4_field`, `unittest discover`, `compileall`, `perl -c` y `git diff --check`.
-  El hijo 44956 está inactivo (0,4 s de CPU, 1 hilo) con un listener local 55685
-  propio de la prueba; cuelgue de un test con servidor simulado, sin efecto en el
-  juego. Cerrar el árbol 67520→49236→44956 fue denegado al agente: requiere
-  que el usuario lo detenga o lo autorice.
-- Clientes OpenKore: solo ocupan 8765–8767 (puente) y sus sesiones de juego.
-  P1a no los reutiliza ni los detiene: usará su propio perfil en
-  `runtime/p1/openkore/`, otra cuenta/personaje y el puerto de puente 8770.
-  No ejecutar `prepare_m4.py` mientras sigan vivos (reasigna 8765–8767).
+- Árbol de tests colgado de Codex (pwsh 67520 → 49236 → 44956, `unittest`
+  inactivo con un listener simulado) cerrado por Claude con autorización del
+  usuario. La suite actual termina en ~5 s (57 tests OK).
+- OpenKore agent/peer/third de `m4-field` (PID 30496/60476/43560, `--ai=off`,
+  8765–8767) siguen vivos y sin tocar. No ejecutar `prepare_m4.py` mientras
+  existan: reasigna esos puertos.
+- P1a implementada y probada en vivo: perfil separado `runtime/p1/openkore/solo`,
+  personaje Tarin (novato nivel 1, `new_1-1`), OpenKore `--ai=manual`, puerto 8770,
+  registro propio `runtime/p1/processes.json`. Cliente P1 detenido al terminar.
+  [Evidencia y límites](evidence/P1a-native-navigation.md).
+- rAthena, MariaDB y Ollama con listeners; 8080 (SearXNG) sin listener.
 
 ## Base comprobada y límites
 
@@ -105,8 +85,6 @@ Diagnóstico de Claude, 11:00 -03:00 (solo lectura):
 
 ## Próxima acción única
 
-Claude implementa la primera entrega P1: perfil normal separado y navegación
-nativa con progreso, cancelación, llegada/fallo confirmados y un solo ejecutor.
-Leer el [plan](NATIVE_AGENT_PLAN.md), comprobar procesos/puertos antes de probar
-y usar pruebas reproducibles antes de una integración corta. No iniciar P2–P4
-ni repetir cooperación de Chat 07 en esta entrega.
+Resto de P1 sobre el mismo perfil nativo: combate y recogida con las tareas de
+OpenKore, y una respuesta local de recuperación (HP/SP), sin inferencia, con
+evidencia y latencia medida. Mantener un solo ejecutor. No iniciar P2–P4.

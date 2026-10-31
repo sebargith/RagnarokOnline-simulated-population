@@ -111,6 +111,23 @@ outage checks, failed preflights, latency/resources and remaining acceptance
 limits. [Results and hashes](docs/evidence/M3-results.json) accompany the
 retained conversation review set.
 
+## Native single-player navigation (P1a)
+
+Separate normal novice, OpenKore `--ai=manual`, bridge port 8770. Requires the
+local server/database already running; creates only new P1 records and does not
+touch M1/M4 clients. [Evidence and limits](docs/evidence/P1a-native-navigation.md).
+
+```powershell
+Set-Location 'D:/Ragnarok Agents/m4-continuous'
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/prepare_p1.py prepare --runtime 'D:/Ragnarok Agents/runtime'
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/prepare_p1.py start --runtime 'D:/Ragnarok Agents/runtime'
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/p1_nav.py --runtime 'D:/Ragnarok Agents/runtime' --x 95 --y 111 --timeout 45
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/p1_nav.py --runtime 'D:/Ragnarok Agents/runtime' --x 45 --y 100 --timeout 45 --cancel-after 2
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/prepare_p1.py stop --runtime 'D:/Ragnarok Agents/runtime'
+```
+
+Coordinates are on the start map `new_1-1`; same-map destinations only.
+
 ## Continuous three-agent runtime (M4 continuation, Chat 06)
 
 Use PowerShell from `D:/Ragnarok Agents/m4-continuous`. The existing M4 profiles,
