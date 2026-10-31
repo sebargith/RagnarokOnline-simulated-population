@@ -39,7 +39,7 @@ $hooks = Plugins::addHooks(
     ['packet/character_moves', \&moved],
     ['packet_selfChat', \&self_chat], ['packet_pubMsg', \&public_chat],
     ['packet_attack', \&combat], ['monster_disappeared', \&monster_gone],
-    ['npc_talk', \&npc_text], ['packet/inventory_item_added', \&inventory_added], ['packet/stat_info', \&stat_info],
+    ['npc_talk', \&npc_text], ['npc_autotalk', \&npc_autotalk], ['packet/inventory_item_added', \&inventory_added], ['packet/stat_info', \&stat_info],
     ['engaged_deal', \&trade_engaged], ['incoming_deal', \&trade_incoming],
     ['packet/deal_add_you', \&trade_added], ['packet/deal_finalize', \&trade_locked],
     ['complete_deal', \&trade_complete], ['cancelled_deal', \&trade_cancelled],
@@ -350,7 +350,7 @@ sub recovery_tick {
 # destination); a hop counts only on the observed map change. Never MapRoute.
 sub travel_evidence {
     my $p = $pending;
-    {%{nav_evidence()}, leg => $p->{leg} + 1, legs => scalar @{$p->{legs}}, hops => $p->{hops},
+    return {%{nav_evidence()}, leg => $p->{leg} + 1, legs => scalar @{$p->{legs}}, hops => $p->{hops},
         zeny_delta => ($char->{zeny} // 0) - $p->{zeny}, map_route_seen => $p->{map_route_seen} ? 1 : 0};
 }
 
@@ -442,7 +442,7 @@ sub travel_tick {
 
 # P2a dialog: continue, pre-declared exact menu labels and closing only.
 sub talk_snapshot {
-    {map => $field->baseName, zeny => 0 + ($char->{zeny} // 0),
+    return {map => $field->baseName, zeny => 0 + ($char->{zeny} // 0),
         inventory => join(',', sort map { "$_->{nameID}:$_->{amount}" } @{$char->inventory->getItems})};
 }
 
@@ -474,6 +474,7 @@ sub talk_finish {
     my ($final, $why, $changed) = M1Travel::talk_outcome($status, $reason, $p->{before}, $after);
     finish($final, $why, {%{nav_evidence()}, npc => $p->{npc_name}, transcript => $p->{transcript},
         menus => $p->{menus}, chosen => $p->{chosen}, pages => $p->{pages},
+        autotalk_suppressed => $p->{autotalk_suppressed} // 0, npc_task_left => AI::inQueue('NPC') ? 1 : 0,
         dialog_result => $final eq $status ? undef : "$status/$reason", changed => $changed,
         before => $p->{before}, after => $after});
 }
@@ -506,6 +507,17 @@ sub talk_tick {
         $messageSender->sendTalkResponse($p->{npc_bin}, $status);
     } elsif ($act eq 'close') { $p->{closing} = $now + .5; $p->{close_result} = [$status, $reason] }
     else { cancel_talk(); talk_finish($status, $reason) }
+}
+
+# OpenKore queues its own 'autotalk' TalkNPC (with autoTalkCont it would page
+# on its own) when an NPC answers. During our dialog the bridge is the only
+# speaker: drop that task before it ever iterates.
+sub npc_autotalk {
+    my (undef, $args) = @_;
+    return unless $pending && ($pending->{native} // '') eq 'npc_talk';
+    $args->{task}->delHooks if $args->{task};
+    AI::clear('NPC');
+    $pending->{autotalk_suppressed}++;
 }
 
 sub npc_text {
