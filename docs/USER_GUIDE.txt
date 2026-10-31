@@ -63,10 +63,14 @@ CÓMO CONTINUAR AHORA
   del 9B guardó meta 9 conservando historial, sin nuevas acciones de juego.
   Estado actual: 8/9, sin intención pendiente, P1 detenido. MariaDB/rAthena
   quedan activos. Ver docs/evidence/P3-dynamic-exploration.md para límites.
-- [SIGUIENTE] El chat principal revisa la entrega y fija el próximo alcance;
-  no se inicia otra caza ni una prueba extensa automáticamente.
+- [REVISADO] Chat 09: ruta, 6→8 kills y nueva meta 8/9 comprobadas contra JSON.
+  Esto valida la integración local; los objetivos se llamaban M4 Poring.
+- [SIGUIENTE] Chat 10: reaccionar a objetivos elegibles durante exploración,
+  cancelando la ruta de forma confirmada y sin afectar viajes o transacciones.
 - La naturalidad y la búsqueda general con SearXNG quedan para más adelante.
 - Mantén un único chat de implementación activo; el relevo sigue en HANDOFF.md.
+- Configuración de nuevos chats: Terra 6.1, razonamiento medio
+  (gpt-6.1-terra / medium), por instrucción del usuario.
 - Preferencia permanente: el chat principal organiza nuevos chats de alcance
   concreto, delega y revisa. Se procede con pasos rutinarios reversibles y con
   autorizaciones ya dadas sin preguntas repetidas; las decisiones materiales

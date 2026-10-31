@@ -20,8 +20,10 @@
   código ni preparación de DB, fixtures, spawns o recompensas en esta entrega.
   Los dos objetivos muertos se llamaban M4 Poring; no demuestra spawns naturales
   ni autonomía general. Se mantienen límites de rayos e historial de intentos.
-- Siguiente acción: revisión del chat principal sobre esta evidencia; reanudar
-  8/9 en otra muestra solo con alcance acordado, sin ampliar ahora a P4 o población.
+- Revisión del chat principal: run-result y planning-result confirman la muestra
+  y meta 8/9. Aceptada la integración local con los límites descritos.
+- Siguiente entrega: Chat 10, respuesta a objetivos elegibles durante exploración
+  con cancelación confirmada; conservar 8/9 e historial. Nuevos chats: Terra 6.1 medio.
 
 ## P3 — límite de búsqueda observado (2026-10-31 14:02)
 

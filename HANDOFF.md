@@ -2,7 +2,7 @@
 Actualizado: 2026-10-31 por Codex
 Referencia: codex/single-agent-plan; ver historial Git para el commit final.
 ## Objetivo actual
-Entregar para revisión la exploración viva y la nueva meta real del 9B, verificadas.
+Chat 09 revisado: integración local aceptada; mejorar respuesta durante exploración.
 ## Estado comprobado
 - Checkout D:/Ragnarok Agents/m4-continuous; WIP raíz/m3-worktree/m4-field preservado.
 - Una muestra de 90a65af: 30,641 s, 6 envíos, 6→8 kills, una ruta arrived,
@@ -23,9 +23,11 @@ Entregar para revisión la exploración viva y la nueva meta real del 9B, verifi
 - Dos kills contra objetivos llamados M4 Poring; no demuestra spawns naturales,
   cobertura general ni autonomía prolongada. No se crearon fixtures ni spawns.
 ## Próxima acción
-El chat principal revisa evidencia y decide el próximo alcance. No arrancar
-otra caza ni P4/múltiples jugadores como continuación automática de esta entrega.
-En una futura reanudación conservar 8/9 y comprobar procesos/puertos primero.
+Chat 10: reacción a objetivos elegibles durante exploración con cancelación
+confirmada; no afectar viajes, transacciones ni recuperación de HP. Conservar
+8/9 y comprobar procesos/puertos primero. Nuevos chats: Terra 6.1 medio.
+El chat principal revisó run-result/planning-result y aceptó el alcance local;
+no se ha demostrado autonomía general ni spawns naturales.
 ## Archivos relevantes
 - docs/evidence/P3-dynamic-exploration.md; agent/solo_cycle.py; bridge/lib/M1Explore.pm.
 - bridge/openkore/m1_bridge.pl; docs/evidence/P3-goal-boundary.md.
