@@ -27,6 +27,26 @@ el adaptador ni modifica procesos del juego.
   README, BRIDGE, CURRENT_STATE, ROADMAP, USER_GUIDE y evidencia M4-field.
   No se ha aceptado su cooperación general ni incorporado toda esa rama.
 
+## Inventario de procesos — 2026-10-31 10:47 -03:00
+
+Inspección de solo lectura con `Get-CimInstance Win32_Process` y
+`Get-NetTCPConnection -State Listen`; la primera consulta CIM sin elevación
+fue denegada, la consulta elevada funcionó. No se detuvo ningún proceso.
+
+- OpenKore agent/peer/third: PID 30496/60476/43560, desde 08:38:44/47/49,
+  plugins de `m4-field`, `--ai=off`, listeners 8765/8766/8767.
+  Son clientes vivos; no demuestra que el controlador Python siga ejecutándose.
+- Tests: PID 49236 y su hijo 44956, desde 2026-10-30 21:23:13,
+  `-m unittest discover -s tests -v`. Es un árbol de una invocación, no evidencia
+  de dos suites independientes. Persisten; bloqueo y causa no diagnosticados.
+- MariaDB PID 29928:3306; rAthena login 29496:6900, char 51448:6121,
+  map 24944:5121; Ollama PID 500:11434. Procesos y listeners presentes,
+  sin prueba de salud funcional. No se observó listener en 8080.
+- Docker fue reportado iniciado por Claude; su salud no se verificó en esta consulta.
+- Antes de P1a, identificar el dueño de esos clientes/tests y resolver ocupación
+  de puertos con cierre controlado cuando corresponda. No arrancar otro controlador
+  contra los mismos clientes. Preservar servidor, DB y sesión gráfica.
+
 ## Base comprobada y límites
 
 - rAthena pre-Renewal, protocolo 20130807; versiones en

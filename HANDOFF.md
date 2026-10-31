@@ -1,6 +1,6 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-10-31 10:39 -03:00 por Codex
-Referencia: codex/single-agent-plan, commit_ref 8f76877; metadatos de relevo en commit posterior.
+Actualizado: 2026-10-31 10:47 -03:00 por Codex
+Referencia: codex/single-agent-plan, commit_ref db0a7df; metadatos de relevo en commit posterior.
 ## Objetivo actual
 Un personaje normal desde nivel 1, ejecutor nativo OpenKore, 9B para objetivos y conocimiento.
 ## Estado comprobado
@@ -9,7 +9,9 @@ Un personaje normal desde nivel 1, ejecutor nativo OpenKore, 9B para objetivos y
 - Demos M3/M4 funcionales en su alcance; no prueban autonomía ni progresión general.
 - Chat 07 inactivo/interrumpido; m4-field en b560852, documentación con WIP.
 - status.json guardado: run 69798d3240904ea5a436a4ae07770373, failed, ciclo 1, sin objetivo compartido.
-- Servicios actuales por verificar; Visitor entró gráficamente antes. No reinicié procesos.
+- Inventario 10:47: OpenKore 30496/60476/43560 desde 08:38, m4-field, ai=off, puertos 8765–8767.
+- Tests 49236→44956 desde ayer 21:23: una invocación padre/hijo persistente, causa sin diagnosticar.
+- rAthena/MariaDB/Ollama con procesos y listeners; 8080 sin listener. No detuve nada; detalle en CURRENT_STATE.
 ## Cambios desde el último relevo
 - Plan P1–P4, roadmap, arquitectura, estado y guía actualizados; ninguna implementación nativa nueva.
 - Reglas de relevo, CLAUDE.md y exclusión de registro privado .ai añadidos.
