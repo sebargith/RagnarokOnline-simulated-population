@@ -1,6 +1,14 @@
 # Estado actual
 
-## P4 — interfaz inicial de mecánica pública (2026-10-31)
+## P4 — SearXNG restaurado, calidad pendiente (2026-10-31)
+
+- Docker iniciado por el usuario; contenedor SearXNG activo en 8080. Dos consultas
+  reales con 9B devolvieron fuentes, pero ninguna respuesta factual sustentada:
+  categoría demasiado amplia y fragmento ambiguo. [Evidencia](evidence/P4-public-mechanics.md).
+- Siguiente: mejorar selección y evidencia útil con pruebas reproducibles; P4
+  sigue incompleto y la interfaz standalone no está conectada al planner.
+
+## P4 — estado anterior al reintento (2026-10-31)
 
 - Consulta standalone con 9B y categorías públicas cerradas; una búsqueda como
   máximo, fuentes externas fechadas y caché en memoria por 24 h. No está conectada

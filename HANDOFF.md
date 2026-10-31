@@ -1,7 +1,12 @@
 # Relevo — Ragnarok Agents
 Actualizado: 2026-10-31 por Codex
 Referencia: codex/single-agent-plan; ver historial Git para el commit final.
-## Checkpoint — P4 inicial
+## Checkpoint — SearXNG activo
+- Usuario inició Docker; SearXNG respondió en 8080. Dos consultas del 9B con
+  fuentes no lograron sustentar una respuesta: categoría amplia y snippet ambiguo.
+  Ver docs/evidence/P4-public-mechanics.md. Mejorar selección/evidencia antes de
+  integrar al planner; P4 sigue incompleto.
+## Checkpoint — P4 inicial (anterior al reintento)
 - Interfaz standalone de mecánica pública, categorías cerradas y caché local;
   127 tests OK. No integrada al planner/runner, P4 incompleto.
 - 9B disponible; búsqueda real terminó SearchUnavailable: backend Docker Linux

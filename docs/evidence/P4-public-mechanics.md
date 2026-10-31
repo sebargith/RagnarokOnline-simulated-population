@@ -31,3 +31,24 @@ Verificado:
 Pendiente: restaurar el backend existente y comprobar una búsqueda real con fuentes;
 después diseñar integración asíncrona al planner con aislamiento y validación de
 herramientas. Esto no demuestra P4 completo ni garantiza que la fuente sea correcta.
+
+## Reintento con Docker activo (2026-10-31)
+
+El usuario inició Docker. `docker ps -a --format '{{.Names}} {{.Status}} {{.Ports}}'`
+mostró `local-web-search-searxng-1` activo en 127.0.0.1:8080 y Open WebUI
+activo en 3000. Ollama respondió. Dos consultas standalone completaron el
+circuito sin acciones de juego:
+
+- Peso y regeneración: el 9B eligió `character stats`, no `weight regeneration`.
+  La búsqueda devolvió calculadoras [rocalc](https://rocalc.com/) y
+  [free-ro](https://calc.free-ro.com/), 18:15:23 UTC. El modelo declaró que los
+  fragmentos no contestaban; no se verificó una respuesta de mecánica útil.
+- Penalización de experiencia por muerte: consulta `death penalty`, 18:15:33 UTC;
+  [TrivalRO](https://trivalro.net/?module=server&action=info) mostró un fragmento
+  ambiguo de servidor privado. El 9B declaró que no podía confirmar el efecto
+  sobre experiencia. No se extrapoló esa tasa a nuestro servidor.
+
+Ambas respuestas devolvieron `status: ok`, que indica transporte y generación,
+no suficiencia de evidencia. El filtro de relevancia es superficial y la selección
+puede ser demasiado amplia. Siguiente: mejorar selección y evidencia útil con
+pruebas reproducibles antes de afirmar aceptación P4 o conectar al planner.
