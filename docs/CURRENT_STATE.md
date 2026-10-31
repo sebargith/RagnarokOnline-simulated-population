@@ -19,6 +19,9 @@ el adaptador ni modifica procesos del juego.
   (`c1f7956`), anterior y con WIP. No implementar allí ni limpiar sus cambios.
 - [HANDOFF](../HANDOFF.md) contiene referencias y la primera tarea de Claude.
   Los checkouts comparten runtime, servicios, GPU y puertos.
+- El registro automático de la ficha falló: este chat pertenece a otra carpeta
+  según AI Relay. Error literal en HANDOFF; no se reintentó con otra conversación.
+  La ficha local queda en `D:/Ragnarok Agents/runtime/relevo-codex-ficha.txt`.
 - Chat 07 está inactivo; su último turno quedó interrumpido. En
   `m4-field`, HEAD `b560852`, permanecen cambios de documentación sin commit:
   README, BRIDGE, CURRENT_STATE, ROADMAP, USER_GUIDE y evidencia M4-field.

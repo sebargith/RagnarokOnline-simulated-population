@@ -99,5 +99,7 @@ CÓMO PEDIR UN RELEVO
 - El agente actualiza HANDOFF.md, estado y registro local de chats.
 - En el otro asistente di "toma el control".
 - El registro conserva contexto; no crea automáticamente un chat en Claude.
+- En este relevo el registro automático falló por la carpeta asociada al chat.
+  HANDOFF.md conserva el contexto y el error; Claude puede continuar desde ahí.
 - Los detalles de errores antiguos están en docs/evidence; no hace falta releerlos
   todos para cada paso. Consultarlos cuando sean relevantes.

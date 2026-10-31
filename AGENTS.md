@@ -1,3 +1,10 @@
+# Relevo Codex ↔ Claude
+
+El usuario alterna entre Codex y Claude en los mismos proyectos.
+- Si dice "toma el control" o "prepara el relevo": lee `C:\Users\azusu\AI_PROTOCOL.md` y síguelo.
+- Tras un avance o decisión importante, actualiza brevemente el `HANDOFF.md` del proyecto con lo que ya sabes (checkpoint; sin reanalizar).
+- No releas el protocolo ni HANDOFF.md en cada prompt.
+
 # Repository rules
 
 Build a persistent community of believable AI players on a classic/pre-Renewal Ragnarok Online private server. Prioritize continuity, social behavior, and reliable gameplay over population size. Start with one agent, then three to five.

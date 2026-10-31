@@ -23,6 +23,7 @@ htmlcov/
 *.safetensors
 
 # Local databases and raw logs
+/.ai/
 *.db
 *.db-*
 *.sqlite
