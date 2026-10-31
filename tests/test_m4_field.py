@@ -99,3 +99,22 @@ class FieldTests(unittest.TestCase):
         c.events[-1]['data']['speaker'] = 'M4 Alden'
         self.assertTrue(c.perceived_chat('peer', 'M4 Alden', 'goal', 90))
         self.assertFalse(c.perceived_chat('peer', 'M4 Alden', 'goal', 101))
+
+    def test_fourth_approach_move_gets_a_final_range_check(self):
+        c = self.controller()
+        data = c.data.return_value
+        data.update(destination={'x': 0, 'y': 0}, players=[],
+                    monsters=[{'id': 'a', 'name_id': 1002, 'x': 5, 'y': 0}])
+        c.geometry = {FIELD: SimpleNamespace(path=lambda start, *args, **kw: [start, (start[0]+1, 0)])}
+        def move(who, x, y):
+            data['destination'] = {'x': x, 'y': y}
+        c.walk_to.side_effect = move
+        c.approach('agent', 'a')
+        self.assertEqual(c.walk_to.call_count, 4)
+        self.assertEqual(data['destination'], {'x': 4, 'y': 0})
+
+    def test_town_recovery_does_not_send_untouched_peer_to_gate(self):
+        c = self.controller()
+        c.data.return_value['map'] = 'prontera'
+        c.home('peer')
+        c.walk_to.assert_called_once_with('peer', 153, 180)

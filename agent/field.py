@@ -141,14 +141,16 @@ class FieldController(Continuous):
         self.walk_to(who, 170, 366)
 
     def home(self, who):
-        if self.data(who)['map'] == FIELD:
+        returning = self.data(who)['map'] == FIELD
+        if returning:
             # Stock warp center 170,378 has radius 3,2; its center is
             # unwalkable in the installed FLD. Enter at the walkable edge.
             self.walk_to(who, 170, 376, transition=TOWN)
         if self.data(who)['map'] != TOWN:
             raise RuntimeError('Return not confirmed')
         # Leave the portal, then restore the established demo gathering area.
-        self.walk_to(who, 153 if who == 'agent' else 159, 32)
+        if returning:
+            self.walk_to(who, 153 if who == 'agent' else 159, 32)
         self.walk_to(who, 154 if who == 'agent' else 153, 179 if who == 'agent' else 180)
 
     def eligible(self, who):
@@ -177,6 +179,23 @@ class FieldController(Continuous):
         return any(e['agent_id'] == who and e['kind'] == 'chat' and e['time_ms'] >= since and
                    not e['data']['self'] and e['data']['speaker'] == speaker and e['data']['text'] == text for e in self.events)
 
+    def approach(self, who, target):
+        # Four moves permit five range checks: the final move may have
+        # succeeded and must be checked before declaring budget exhaustion.
+        for step in range(5):
+            data = self.data(who)
+            visible = next((m for m in data['monsters'] if m['id'] == target and m['name_id'] in WEAK), None)
+            if not visible:
+                raise RuntimeError('Target no longer perceived; abandon encounter')
+            pos = (data['destination']['x'], data['destination']['y'])
+            if distance(pos, (visible['x'], visible['y'])) <= 1:
+                return
+            if step == 4:
+                raise RuntimeError('Moving target approach budget exhausted')
+            blocked = {(p['x'], p['y']) for p in data['players']}
+            route = self.geometry[FIELD].path(pos, (visible['x'], visible['y']), blocked, within=1)
+            self.walk_to(who, *segment(route))
+
     def field_encounter(self, cooperative):
         actors = ('agent', 'peer') if cooperative else ('agent',)
         monster = self.search_target(actors)
@@ -204,19 +223,7 @@ class FieldController(Continuous):
             who = actors[turn % len(actors)]
             if any(self.bridges[a].session != sessions[a] for a in actors):
                 raise RuntimeError('Encounter epoch changed; abandon target')
-            for _ in range(4):
-                data = self.data(who)
-                visible = next((m for m in data['monsters'] if m['id'] == target and m['name_id'] in WEAK), None)
-                if not visible:
-                    raise RuntimeError('Target no longer perceived; abandon encounter')
-                pos = (data['destination']['x'], data['destination']['y'])
-                if distance(pos, (visible['x'], visible['y'])) <= 1:
-                    break
-                blocked = {(p['x'], p['y']) for p in data['players']}
-                route = self.geometry[FIELD].path(pos, (visible['x'], visible['y']), blocked, within=1)
-                self.walk_to(who, *segment(route))
-            else:
-                raise RuntimeError('Moving target approach budget exhausted')
+            self.approach(who, target)
             # Bridge checks the current actor and melee range again.
             request = self.submit(who, {'type': 'attack', 'target': target})
             self.wait(lambda: self.results.get((who, request), {}).get('status') in ('completed', 'rejected', 'unknown'), 7)
