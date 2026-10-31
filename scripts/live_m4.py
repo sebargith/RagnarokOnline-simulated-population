@@ -11,6 +11,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from agent.continuous import Continuous, StopRequested
+from agent.field import FieldController
 from agent.live_io import atomic_json, exclusive
 
 
@@ -20,6 +21,7 @@ def read_status(live):
 
 
 def run(args):
+    mode = getattr(args, 'mode', 'fixture')
     live = args.runtime/'m4/live'
     live.mkdir(parents=True, exist_ok=True)
     with exclusive(args.runtime/'m4.lock'):
@@ -34,8 +36,8 @@ def run(args):
             # Load current bridge source and full inventories. Never touches
             # server lifecycle, accounts, balances, fixture or memory databases.
             subprocess.run([sys.executable, str(ROOT/'scripts/prepare_m4.py'), '--runtime', str(args.runtime),
-                            '--clients-only', '--start', '--continuous', '--controller-owned'], check=True, timeout=100)
-            controller = Continuous(ROOT, args.runtime, run_id, args.seconds)
+                            '--clients-only', '--start', '--continuous', '--controller-owned', *(['--field'] if mode == 'field' else [])], check=True, timeout=100)
+            controller = (FieldController if mode == 'field' else Continuous)(ROOT, args.runtime, run_id, args.seconds)
             controller.run()
         except (StopRequested, KeyboardInterrupt):
             pass
@@ -57,6 +59,7 @@ def main():
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('command', choices=('start', 'run', 'stop', 'status', 'observe', 'say'))
     parser.add_argument('--seconds', type=int, help='Optional run duration or observe duration (default observe: 5)')
+    parser.add_argument('--mode', choices=('fixture', 'field'), default='fixture')
     parser.add_argument('--sender', choices=('agent', 'peer', 'third'), default='third')
     parser.add_argument('--target', choices=('agent', 'peer', 'third'), default='agent')
     parser.add_argument('--text')
@@ -74,7 +77,7 @@ def main():
         with exclusive(args.runtime/'m4.lock'):
             pass
         run_id = uuid.uuid4().hex
-        command = [sys.executable, str(Path(__file__).resolve()), '--runtime', str(args.runtime), 'run', '--run-id', run_id]
+        command = [sys.executable, str(Path(__file__).resolve()), '--runtime', str(args.runtime), 'run', '--run-id', run_id, '--mode', args.mode]
         if args.seconds:
             command += ['--seconds', str(args.seconds)]
         process = subprocess.Popen(command, cwd=ROOT, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
@@ -97,6 +100,7 @@ def main():
         for _ in range(args.seconds or 5):
             status = read_status(live)
             agents = {who: {'name': (a.get('snapshot') or {}).get('data', {}).get('name'),
+                            'map': (a.get('snapshot') or {}).get('data', {}).get('map'),
                             'position': (a.get('snapshot') or {}).get('data', {}).get('destination'),
                             'connected': (a.get('snapshot') or {}).get('data', {}).get('connected'),
                             'inference_pending': a.get('pending_inference')}

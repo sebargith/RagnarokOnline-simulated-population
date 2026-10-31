@@ -19,6 +19,7 @@ my %seen;
 my $serial_window = M4RequestWindow->new(128);
 my ($trade_offered, $trade_used) = (0, 0);
 my ($attempts, $recovery_deadline, $stopping) = (0, 0, 0);
+my $last_map = '';
 my $json = JSON::PP->new->utf8->canonical;
 my $boot = sprintf('%x-%x-%x', time * 1000, $$, rand(2**30));
 
@@ -159,7 +160,32 @@ sub request {
     unless (ref($a) eq 'HASH' && defined($a->{type}) && !ref($a->{type})) {
         result($id, 'rejected', 'invalid_action'); return;
     }
-    if ($a->{type} eq 'move') {
+    if ($a->{type} eq 'walk') {
+        # Field mode only: short straight local segments, never global routing.
+        unless ($cfg->{m4_field} && ($field->baseName eq 'prontera' || $field->baseName eq 'prt_fild08') &&
+            join(',', sort keys %$a) eq 'map,type,x,y' && !ref($a->{map}) && $a->{map} eq $field->baseName &&
+            defined($a->{x}) && defined($a->{y}) && !ref($a->{x}) && !ref($a->{y}) &&
+            $a->{x} =~ /^\d{1,3}$/ && $a->{y} =~ /^\d{1,3}$/ && $char->{hp} > 0) {
+            result($id, 'rejected', 'invalid_walk'); return;
+        }
+        my ($x, $y) = @{$char->{pos_to}}{qw(x y)};
+        my ($dx, $dy) = ($a->{x}-$x, $a->{y}-$y);
+        my $steps = abs($dx) > abs($dy) ? abs($dx) : abs($dy);
+        unless ($steps > 0 && $steps <= 8 && (!$dx || !$dy || abs($dx) == abs($dy))) {
+            result($id, 'rejected', 'invalid_walk'); return;
+        }
+        my ($sx, $sy) = ($dx <=> 0, $dy <=> 0);
+        for (1..$steps) {
+            unless ($field->isWalkable($x+$sx, $y+$sy) &&
+                (!$sx || !$sy || ($field->isWalkable($x+$sx, $y) && $field->isWalkable($x, $y+$sy))) &&
+                !grep { $_->{pos_to}{x} == $x+$sx && $_->{pos_to}{y} == $y+$sy } @{$playersList->getItems}) {
+                result($id, 'rejected', 'walk_blocked'); return;
+            }
+            $x += $sx; $y += $sy;
+        }
+        $pending = {id => $id, action => $a, deadline => $r->{deadline_ms}/1000};
+        $messageSender->sendMove($a->{x}, $a->{y});
+    } elsif ($a->{type} eq 'move') {
         unless (join(',', sort keys %$a) eq 'map,type,x,y' && !ref($a->{map}) && $a->{map} eq $field->baseName &&
             defined($a->{x}) && defined($a->{y}) && !ref($a->{x}) && !ref($a->{y}) &&
             $a->{x} =~ /^\d{1,3}$/ && $a->{y} =~ /^\d{1,3}$/ &&
@@ -180,17 +206,18 @@ sub request {
     } elsif ($a->{type} eq 'attack' || $a->{type} eq 'take') {
         unless ($cfg->{m4_fixture} && join(',', sort keys %$a) eq 'target,type' &&
             defined($a->{target}) && !ref($a->{target}) && $a->{target} =~ /^[a-f0-9]{8}$/ &&
-            $field->baseName eq 'prontera' && $char->{hp} > 0) {
+            ($field->baseName eq 'prontera' || ($cfg->{m4_field} && $field->baseName eq 'prt_fild08')) && $char->{hp} > 0) {
             result($id, 'rejected', 'invalid_pve'); return;
         }
         my $target = ($a->{type} eq 'attack' ? $monstersList : $itemsList)->getByID(pack('H*', $a->{target}));
         my $pos = $target ? ($a->{type} eq 'attack' ? $target->{pos_to} : $target->{pos}) : undef;
         unless ($target && $pos && abs($pos->{x} - $char->{pos_to}{x}) <= 1 &&
             abs($pos->{y} - $char->{pos_to}{y}) <= 1 &&
-            ($a->{type} eq 'attack' ? ($target->{nameID} == 1002 && !$target->{dead}) : $target->{nameID} == 909)) {
+            ($a->{type} eq 'attack' ? (($target->{nameID} == 1002 || ($cfg->{m4_field} && $field->baseName eq 'prt_fild08' && $target->{nameID} == 1113)) && !$target->{dead}) :
+                ($target->{nameID} == 909 || ($cfg->{m4_field} && $field->baseName eq 'prt_fild08' && $target->{nameID} =~ /^(909|938|512|713)$/)))) {
             result($id, 'rejected', 'target_not_visible_nearby_or_allowed'); return;
         }
-        $pending = {id => $id, action => $a, deadline => $r->{deadline_ms}/1000};
+        $pending = {id => $id, action => $a, item_name_id => $target->{nameID}, deadline => $r->{deadline_ms}/1000};
         if ($a->{type} eq 'attack') { $messageSender->sendAction($target->{ID}, 0) }
         else { $messageSender->sendTake($target->{ID}) }
     } elsif ($a->{type} =~ /^trade_(request|accept|offer|lock|commit)$/) {
@@ -258,7 +285,7 @@ sub moved {
     return unless connected();
     my $dest = {x => 0 + $char->{pos_to}{x}, y => 0 + $char->{pos_to}{y}};
     emit('movement_ack', {destination => $dest, packet => $args->{switch}});
-    if ($pending && $pending->{action}{type} eq 'move' &&
+    if ($pending && $pending->{action}{type} =~ /^(move|walk)$/ &&
         $dest->{x} == $pending->{action}{x} && $dest->{y} == $pending->{action}{y}) {
         finish('completed', 'server_movement_ack', {destination => $dest, packet => $args->{switch}});
     }
@@ -299,7 +326,7 @@ sub inventory_added {
     return if $args->{fail};
     my $data = {name_id => 0 + $args->{nameID}, amount => 0 + $args->{amount}};
     emit('inventory_added', $data);
-    if ($pending && $pending->{action}{type} eq 'take' && $data->{name_id} == 909 && $data->{amount} > 0) {
+    if ($pending && $pending->{action}{type} eq 'take' && $data->{name_id} == $pending->{item_name_id} && $data->{amount} > 0) {
         finish('completed', 'server_inventory_add', $data);
     }
 }
@@ -356,6 +383,13 @@ sub trade_cancelled {
 sub tick {
     return unless $server;
     my $ready = connected() ? 1 : 0;
+    if ($ready && $last_map ne '' && $last_map ne $field->baseName) {
+        finish('unknown', 'map_changed');
+        ++$epoch; %seen = ();
+        emit('map_transition', {from => $last_map, to => $field->baseName});
+        snapshot();
+    }
+    $last_map = $field->baseName if $ready;
     if ($ready != $in_game) {
         finish('unknown', 'game_disconnected') unless $ready;
         if ($ready) { ++$epoch; %seen = (); $attempts = 0; $recovery_deadline = 0 }

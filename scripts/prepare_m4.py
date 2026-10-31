@@ -106,6 +106,7 @@ def main():
     parser.add_argument('--start', action='store_true')
     parser.add_argument('--clients-only', action='store_true')
     parser.add_argument('--continuous', action='store_true', help='Use bounded controller evidence instead of OpenKore file/console logs')
+    parser.add_argument('--field', action='store_true', help='Enable the bounded Prontera/south-field bridge allowlist')
     parser.add_argument('--controller-owned', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
     if not args.controller_owned:
@@ -126,6 +127,10 @@ def execute(args):
         if not args.clients_only:
             m1.restart_map()
         for who in ('agent', 'peer', 'third'):
+            bridge_path = args.runtime/'m4/openkore'/who/'bridge.json'
+            bridge_config = json.loads(bridge_path.read_text())
+            bridge_config['m4_field'] = bool(args.field)
+            m1.write(bridge_path, json.dumps(bridge_config))
             if args.continuous:
                 path = args.runtime/'m4/openkore'/who/'config.txt'
                 text = path.read_text()
