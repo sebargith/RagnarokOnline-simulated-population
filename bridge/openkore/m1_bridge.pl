@@ -7,17 +7,19 @@ use IO::Select;
 use JSON::PP;
 use Time::HiRes qw(time);
 use Globals qw($net $char $field $messageSender $playersList $monstersList $itemsList $accountID %monsters_old %currentDeal %incomingDeal %outgoingDeal %config $quit $conState_tries
-    $npcsList %portals_lut %ai_v %talk);
+    $npcsList $storeList %portals_lut %ai_v %talk);
 use Misc ();
 use Plugins;
 use Network;
 use AI ();
 use Task ();
 use Utils ();
+use Settings ();
 use M4RequestWindow;
 use M1Navigation;
 use M1Combat;
 use M1Travel;
+use M1Supply;
 
 my ($server, $client, $cfg, $hooks, $pending);
 my ($input, $output, $authorized, $auth_time) = ('', '', 0, 0);
@@ -30,6 +32,7 @@ my $json = JSON::PP->new->utf8->canonical;
 # Local recovery policy state (native profile only); never driven by the model.
 my %recovery = (phase => 'none', retreats => 0);
 my ($last_hit_on_me, $last_hp_update, $was_dead) = (0, 0, 0);
+my %item_weight;    # item_weights.txt (tenths), loaded on first purchase.
 my $walk_graph;    # Built once from OpenKore's portals table on first travel.
 my $boot = sprintf('%x-%x-%x', time * 1000, $$, rand(2**30));
 
@@ -39,7 +42,7 @@ $hooks = Plugins::addHooks(
     ['packet/character_moves', \&moved],
     ['packet_selfChat', \&self_chat], ['packet_pubMsg', \&public_chat],
     ['packet_attack', \&combat], ['monster_disappeared', \&monster_gone],
-    ['npc_talk', \&npc_text], ['npc_autotalk', \&npc_autotalk], ['packet/inventory_item_added', \&inventory_added], ['packet/stat_info', \&stat_info],
+    ['npc_talk', \&npc_text], ['npc_autotalk', \&npc_autotalk], ['packet/npc_sell_list', \&shop_sell_list], ['buy_result', \&shop_buy_result], ['packet/sell_result', \&shop_sell_result], ['packet/inventory_item_added', \&inventory_added], ['packet/stat_info', \&stat_info],
     ['engaged_deal', \&trade_engaged], ['incoming_deal', \&trade_incoming],
     ['packet/deal_add_you', \&trade_added], ['packet/deal_finalize', \&trade_locked],
     ['complete_deal', \&trade_complete], ['cancelled_deal', \&trade_cancelled],
@@ -107,6 +110,7 @@ sub snapshot {
             job_exp => 0 + ($char->{exp_job} // 0), job_exp_max => 0 + ($char->{exp_job_max} // 0)};
         $s->{hp} = 0 + ($char->{hp} // 0); $s->{hp_max} = 0 + ($char->{hp_max} // 0);
         $s->{zeny} = 0 + ($char->{zeny} // 0);
+        $s->{weight} = 0 + ($char->{weight} // 0); $s->{weight_max} = 0 + ($char->{weight_max} // 0);
         my $own_items = $currentDeal{you} // {};
         my $other_items = $currentDeal{other} // {};
         $s->{deal} = {name => $currentDeal{name} // '', incoming => $incomingDeal{name} // '',
@@ -115,7 +119,8 @@ sub snapshot {
             you_locked => $currentDeal{you_finalize} ? 1 : 0, other_locked => $currentDeal{other_finalize} ? 1 : 0};
         $s->{inventory_ready} = $char->inventory->isReady ? 1 : 0;
         $s->{field} = {width => $field->width, height => $field->height};
-        my @inventory = map {{name => $_->{name}, name_id => 0 + $_->{nameID}, amount => 0 + $_->{amount}}}
+        my @inventory = map {{name => $_->{name}, name_id => 0 + $_->{nameID}, amount => 0 + $_->{amount},
+            type => 0 + ($_->{type} // 0), equipped => $_->{equipped} ? 1 : 0}}
             @{$char->inventory->getItems};
         $s->{inventory} = [@inventory[0 .. ($#inventory > 31 ? 31 : $#inventory)]];
         my @players = map {{name => $_->{name} // '', id => unpack('H*', $_->{ID}),
@@ -509,12 +514,151 @@ sub talk_tick {
     else { cancel_talk(); talk_finish($status, $reason) }
 }
 
+# P2b shops: talk -> buy/sell list from the server -> one bulk packet -> the
+# server's result, then the trade is reconciled against Zeny and inventory.
+sub item_totals {
+    my %t;
+    $t{$_->{nameID}} += $_->{amount} for @{$char->inventory->getItems};
+    return {zeny => 0 + ($char->{zeny} // 0), items => \%t};
+}
+
+sub item_weights {
+    unless (%item_weight) {
+        open my $fh, '<', Settings::getTableFilename('item_weights.txt') or return \%item_weight;
+        while (<$fh>) { $item_weight{$1} = $2 if /^(\d+)\s+(\d+)/ }
+        close $fh;
+    }
+    \%item_weight;
+}
+
+sub shop_request {
+    my ($id, $a) = @_;
+    my $sell = $a->{type} eq 'npc_sell';
+    my $at = sub { defined($_[0]) && !ref($_[0]) && $_[0] =~ /^\d{1,3}$/ };
+    my ($npc) = $at->($a->{x}) && $at->($a->{y}) ?
+        grep { $_->{pos}{x} == $a->{x} && $_->{pos}{y} == $a->{y} } @{$npcsList->getItems} : ();
+    my $ctx = {manual_ai => $cfg->{native_navigation} && AI::state() == AI::MANUAL(), hp => $char->{hp},
+        recovering => $recovery{phase} ne 'none', talking => %talk ? 1 : 0, npc => $npc && $npc->{pos},
+        pos => Utils::calcPosFromPathfinding($field, $char), zeny => $char->{zeny} // 0,
+        inventory => [map {{name_id => $_->{nameID}, amount => $_->{amount}, type => $_->{type} // 0,
+            equipped => $_->{equipped} ? 1 : 0}} @{$char->inventory->getItems}]};
+    my $reason = $sell ? M1Supply::validate_sell($a, $ctx) : M1Supply::validate_buy($a, $ctx);
+    if ($reason) { result($id, 'rejected', $reason); return }
+    AI::clear(qw/move route mapRoute/);
+    my $now = time;
+    $pending = {id => $id, action => $a, native => 'shop', mode => $sell ? 'sell' : 'buy', npc_bin => $npc->{ID},
+        npc_name => $npc->{name}, phase => 'open', before => item_totals(), acted => $now,
+        started => $now, progress => 0, deadline => $now + $a->{timeout_s}};
+    $last_action = $now;
+    $messageSender->sendTalk($npc->{ID});
+    result($id, 'accepted', 'talk_sent');
+}
+
+sub shop_finish {
+    my ($status, $reason, $extra) = @_;
+    my $p = $pending;
+    finish($status, $reason, {%{nav_evidence()}, npc => $p->{npc_name}, mode => $p->{mode},
+        quote => $p->{quote}, sent => $p->{sent}, expected => $p->{expect}, server_result => $p->{server_result},
+        autotalk_suppressed => $p->{autotalk_suppressed} // 0,
+        before => $p->{before}, after => item_totals(), %{$extra || {}}});
+}
+
+sub shop_tick {
+    my $p = $pending;
+    my $now = time;
+    my $sent = $p->{phase} eq 'sent' || $p->{phase} eq 'settle';
+    if ($now >= $p->{deadline} || $char->{dead}) {
+        # Once a trade packet left, only the observed state can say what happened.
+        shop_finish($sent ? ('unknown', 'result_not_confirmed') : ('failed', $char->{dead} ? 'died' : 'timeout'));
+        return;
+    }
+    my $v = $ai_v{npc_talk} || {};
+    my $fresh = ($v->{time} // 0) > $p->{acted} && (!defined $v->{ID} || $v->{ID} eq $p->{npc_bin});
+    if ($p->{phase} eq 'open') {
+        return unless $fresh;
+        $p->{acted} = $now;
+        if (($v->{talk} // '') ne 'buy_or_sell') { cancel_talk(); shop_finish('failed', 'not_a_shop'); return }
+        $messageSender->sendNPCBuySellList($p->{npc_bin}, $p->{mode} eq 'sell' ? 1 : 0);
+        $p->{phase} = 'list';
+    } elsif ($p->{phase} eq 'list') {
+        my $a = $p->{action};
+        if ($p->{mode} eq 'buy') {
+            return unless $fresh && ($v->{talk} // '') eq 'store';
+            my %store; $store{$_->{nameID}} //= 0 + $_->{price} for @{$storeList->getItems};
+            $p->{quote} = {store => \%store};
+            my ($why, $cost) = M1Supply::buy_quote($a->{items}, \%store, {max_zeny => $a->{max_zeny},
+                zeny => $char->{zeny} // 0, weight => $char->{weight} // 0, weight_max => $char->{weight_max} // 0,
+                item_weight => item_weights()});
+            if ($why) { shop_finish('failed', $why); return }
+            $p->{expect} = {zeny => -$cost, items => {map { $_->{name_id} => $_->{amount} } @{$a->{items}}}};
+            $p->{sent} = [map {{itemID => 0 + $_->{name_id}, amount => 0 + $_->{amount}}} @{$a->{items}}];
+            $messageSender->sendBuyBulk($p->{sent});
+        } else {
+            return unless $p->{offers};
+            $p->{quote} = {offers => $p->{offers}};
+            my ($why, $total) = M1Supply::sell_quote($a->{items}, $p->{offers});
+            if ($why) { shop_finish('failed', $why); return }
+            my @bulk;
+            for my $i (@{$a->{items}}) {
+                my $left = $i->{amount};
+                for my $item (grep { $_->{nameID} == $i->{name_id} && !$_->{equipped} } @{$char->inventory->getItems}) {
+                    last unless $left;
+                    my $n = $item->{amount} < $left ? $item->{amount} : $left;
+                    push @bulk, {ID => $item->{ID}, amount => $n}; $left -= $n;
+                }
+            }
+            $p->{expect} = {zeny => $total, items => {map { $_->{name_id} => -$_->{amount} } @{$a->{items}}}};
+            $p->{sent} = [map {{name_id => 0 + $_->{name_id}, amount => 0 + $_->{amount}}} @{$a->{items}}];
+            $messageSender->sendSellBulk(\@bulk);
+        }
+        $p->{phase} = 'sent'; $p->{acted} = $now;
+    } elsif ($p->{phase} eq 'sent') {
+        return unless defined $p->{server_result};
+        if ($p->{server_result}) {
+            shop_finish($p->{mode} eq 'buy' ? M1Supply::buy_failure($p->{server_result}) : ('failed', 'server_sell_failed'));
+            return;
+        }
+        # Zeny/inventory updates may trail the result packet; give them 2 s.
+        $p->{phase} = 'settle'; $p->{settle_until} = $now + 2;
+    }
+    if ($p->{phase} eq 'settle') {
+        my ($status, $reason, $observed) = M1Supply::reconcile($p->{mode} eq 'buy' ? 'bought' : 'sold',
+            $p->{before}, item_totals(), $p->{expect});
+        shop_finish($status, $reason, {observed => $observed}) if $status eq 'completed' || $now >= $p->{settle_until};
+    }
+}
+
+# 00C7 rows: inventory index (a2), price, overcharge price (what is paid).
+sub shop_sell_list {
+    my (undef, $args) = @_;
+    return unless $pending && ($pending->{native} // '') eq 'shop' && $pending->{mode} eq 'sell';
+    my %offers;
+    for (my $i = 0; $i + 10 <= length($args->{itemsdata} // ''); $i += 10) {
+        my ($index, undef, $paid) = unpack('a2 V V', substr($args->{itemsdata}, $i, 10));
+        my $item = $char->inventory->getByID($index) or next;
+        $offers{$item->{nameID}} //= 0 + $paid;
+    }
+    $pending->{offers} = \%offers;
+}
+
+sub shop_buy_result {
+    my (undef, $args) = @_;
+    return unless $pending && ($pending->{native} // '') eq 'shop' && $pending->{mode} eq 'buy' && $pending->{phase} eq 'sent';
+    $pending->{server_result} = 0 + ($args->{fail} // 0);
+}
+
+sub shop_sell_result {
+    my (undef, $args) = @_;
+    return unless $pending && ($pending->{native} // '') eq 'shop' && $pending->{mode} eq 'sell' && $pending->{phase} eq 'sent';
+    $pending->{server_result} = $args->{fail} ? 1 : 0;
+}
+
 # OpenKore queues its own 'autotalk' TalkNPC (with autoTalkCont it would page
 # on its own) when an NPC answers. During our dialog the bridge is the only
 # speaker: drop that task before it ever iterates.
 sub npc_autotalk {
     my (undef, $args) = @_;
-    return unless $pending && ($pending->{native} // '') eq 'npc_talk';
+    return unless $pending && ($pending->{native} // '') =~ /^(npc_talk|shop)$/;
     $args->{task}->delHooks if $args->{task};
     AI::clear('NPC');
     $pending->{autotalk_suppressed}++;
@@ -573,7 +717,7 @@ sub request {
     }
     if ($pending) { result($id, 'rejected', 'busy'); return }
     if (time - $last_action < 1) { result($id, 'rejected', 'rate_limited'); return }
-    if ($cfg->{native_navigation} && $a->{type} =~ /^(navigate|travel|npc_talk|attack|take)$/ && $recovery{phase} ne 'none') {
+    if ($cfg->{native_navigation} && $a->{type} =~ /^(navigate|travel|npc_talk|npc_sell|npc_buy|attack|take)$/ && $recovery{phase} ne 'none') {
         result($id, 'rejected', 'recovering'); return;
     }
     if ($a->{type} eq 'navigate') {
@@ -595,6 +739,7 @@ sub request {
     }
     if ($a->{type} eq 'travel') { travel_request($id, $a); return }
     if ($a->{type} eq 'npc_talk') { talk_request($id, $a); return }
+    if ($a->{type} =~ /^npc_(sell|buy)$/) { shop_request($id, $a); return }
     if ($cfg->{native_navigation} && $a->{type} =~ /^(attack|take|respawn)$/) { native_request($id, $a); return }
     if ($a->{type} eq 'move' && $cfg->{native_navigation}) { result($id, 'rejected', 'legacy_executor_disabled'); return }
     if ($a->{type} eq 'move') {
@@ -835,6 +980,7 @@ sub tick {
     my $native = $pending ? $pending->{native} // '' : '';
     if ($native eq 'travel') { travel_tick() if $ready }
     elsif ($native eq 'npc_talk') { talk_tick() if $ready }
+    elsif ($native eq 'shop') { shop_tick() if $ready }
     elsif ($pending && $pending->{task}) { navigation_tick() if $ready }
     elsif ($pending && $pending->{native}) { native_tick() if $ready }
     elsif ($pending && time >= $pending->{deadline}) { finish('unknown', 'confirmation_timeout') }
