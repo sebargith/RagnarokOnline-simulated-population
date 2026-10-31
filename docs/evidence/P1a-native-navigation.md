@@ -43,7 +43,7 @@ recuperación ni rutas entre mapas.
 | 53,111 → 95,111 (42 celdas) | `completed/arrived` en 6,5 s; 7 progresos |
 | 95,111 → 45,100, cancelar a 2 s | `cancelled` a 2,1 s; snapshot posterior quieto en 81–82 |
 | `move` / 2º `navigate` durante ruta | `rejected/busy` |
-| `cancel` a otra solicitud | `rejected/no_matching_navigation` |
+| `cancel` a otra solicitud | `rejected/no_matching_navigation` (desde P1b: `no_matching_task`) |
 | `navigate` a `prontera` | `rejected/cross_map_not_supported` |
 | `move` en reposo | `rejected/legacy_executor_disabled` |
 | ruta de ~6,7 s con `timeout_s` 5 | `failed/timeout` a 5,1 s; quieto en 68–69 |

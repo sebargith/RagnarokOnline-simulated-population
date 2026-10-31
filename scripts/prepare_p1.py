@@ -43,7 +43,9 @@ WHERE c.account_id={ACCOUNT} AND NOT EXISTS(SELECT 1 FROM inventory v WHERE v.ch
         text = (runtime/'openkore/agent'/filename).read_text()
         if filename == 'config.txt':
             for key, value in {'username': 'p1solo', 'password': credentials['password'],
-                    'dealAuto': '0', 'sitAuto_idle': '0'}.items():
+                    'dealAuto': '0', 'sitAuto_idle': '0',
+                    # One requested target per attack; no teleport on giving up.
+                    'attackChangeTarget': '0', 'teleportAuto_dropTargetEngaged': '0'}.items():
                 text = re.sub(rf'(?m)^{key}(?:[ \t].*)?$', key+' '+value, text)
         m1.write(profile/filename, text)
     (profile/'logs').mkdir(exist_ok=True)

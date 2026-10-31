@@ -1,6 +1,6 @@
 # Estado actual
 
-Actualizado: 2026-10-31 11:15 (America/Santiago) por Claude. P1a completada.
+Actualizado: 2026-10-31 11:45 (America/Santiago) por Claude. P1 completada (P1a + P1b).
 
 ## Decisión vigente
 
@@ -39,6 +39,10 @@ no bloquean la primera entrega.
   registro propio `runtime/p1/processes.json`. Cliente P1 detenido al terminar.
   [Evidencia y límites](evidence/P1a-native-navigation.md).
 - rAthena, MariaDB y Ollama con listeners; 8080 (SearXNG) sin listener.
+- P1b implementada y probada en vivo: attack/take/respawn nativos y recuperación
+  local. Tarin colocado (desconectado, sin recursos) en `prt_fild08`, guardado en
+  Prontera; ahora nivel base 4 / job 2, cliente P1 detenido.
+  [Evidencia, muerte corregida y límites](evidence/P1b-native-combat.md).
 
 ## Base comprobada y límites
 
@@ -85,6 +89,6 @@ no bloquean la primera entrega.
 
 ## Próxima acción única
 
-Resto de P1 sobre el mismo perfil nativo: combate y recogida con las tareas de
-OpenKore, y una respuesta local de recuperación (HP/SP), sin inferencia, con
-evidencia y latencia medida. Mantener un solo ejecutor. No iniciar P2–P4.
+Revisar con el usuario el ciclo individual de P1 antes de P2. Primer paso de P2
+propuesto: viaje entre mapas solo por portales caminables (sin transporte de pago)
+y diálogo NPC acotado, para volver a Prontera y regresar al campo.

@@ -128,6 +128,13 @@ Set-Location 'D:/Ragnarok Agents/m4-continuous'
 
 Coordinates are on the start map `new_1-1`; same-map destinations only.
 
+Native combat, pickup and local recovery (P1b) on the same profile, with Tarin on
+`prt_fild08` ([evidence and test placement](docs/evidence/P1b-native-combat.md)):
+
+```powershell
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/p1_hunt.py --runtime 'D:/Ragnarok Agents/runtime' --probe --kills 6 --seconds 480
+```
+
 ## Continuous three-agent runtime (M4 continuation, Chat 06)
 
 Use PowerShell from `D:/Ragnarok Agents/m4-continuous`. The existing M4 profiles,

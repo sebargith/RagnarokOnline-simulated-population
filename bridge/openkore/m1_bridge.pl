@@ -6,7 +6,7 @@ use IO::Socket::INET;
 use IO::Select;
 use JSON::PP;
 use Time::HiRes qw(time);
-use Globals qw($net $char $field $messageSender $playersList $monstersList $itemsList $accountID %currentDeal %incomingDeal %outgoingDeal %config $quit $conState_tries);
+use Globals qw($net $char $field $messageSender $playersList $monstersList $itemsList $accountID %monsters_old %currentDeal %incomingDeal %outgoingDeal %config $quit $conState_tries);
 use Misc ();
 use Plugins;
 use Network;
@@ -15,6 +15,7 @@ use Task ();
 use Utils ();
 use M4RequestWindow;
 use M1Navigation;
+use M1Combat;
 
 my ($server, $client, $cfg, $hooks, $pending);
 my ($input, $output, $authorized, $auth_time) = ('', '', 0, 0);
@@ -24,6 +25,9 @@ my $serial_window = M4RequestWindow->new(128);
 my ($trade_offered, $trade_used) = (0, 0);
 my ($attempts, $recovery_deadline, $stopping) = (0, 0, 0);
 my $json = JSON::PP->new->utf8->canonical;
+# Local recovery policy state (native profile only); never driven by the model.
+my %recovery = (phase => 'none', retreats => 0);
+my ($last_hit_on_me, $last_hp_update, $was_dead) = (0, 0, 0);
 my $boot = sprintf('%x-%x-%x', time * 1000, $$, rand(2**30));
 
 Plugins::register('m1_bridge', 'Bounded loopback observation/action bridge', \&unload);
@@ -32,7 +36,7 @@ $hooks = Plugins::addHooks(
     ['packet/character_moves', \&moved],
     ['packet_selfChat', \&self_chat], ['packet_pubMsg', \&public_chat],
     ['packet_attack', \&combat], ['monster_disappeared', \&monster_gone],
-    ['packet/inventory_item_added', \&inventory_added],
+    ['packet/inventory_item_added', \&inventory_added], ['packet/stat_info', \&stat_info],
     ['engaged_deal', \&trade_engaged], ['incoming_deal', \&trade_incoming],
     ['packet/deal_add_you', \&trade_added], ['packet/deal_finalize', \&trade_locked],
     ['complete_deal', \&trade_complete], ['cancelled_deal', \&trade_cancelled],
@@ -91,6 +95,13 @@ sub snapshot {
         $s->{destination} = {x => 0 + $char->{pos_to}{x}, y => 0 + $char->{pos_to}{y}};
         $s->{executor} = $cfg->{native_navigation} ? 'openkore_route' : 'bridge_steps';
         $s->{navigation} = $pending && $pending->{task} ? $pending->{id} : undef;
+        $s->{native_task} = $pending && $pending->{native} ? {id => $pending->{id}, kind => $pending->{native}} : undef;
+        $s->{recovery} = $recovery{phase};
+        $s->{dead} = $char->{dead} ? 1 : 0; $s->{sitting} = $char->{sitting} ? 1 : 0;
+        $s->{sp} = 0 + ($char->{sp} // 0); $s->{sp_max} = 0 + ($char->{sp_max} // 0);
+        $s->{level} = {base => 0 + ($char->{lv} // 0), job => 0 + ($char->{lv_job} // 0),
+            exp => 0 + ($char->{exp} // 0), exp_max => 0 + ($char->{exp_max} // 0),
+            job_exp => 0 + ($char->{exp_job} // 0), job_exp_max => 0 + ($char->{exp_job_max} // 0)};
         $s->{hp} = 0 + ($char->{hp} // 0); $s->{hp_max} = 0 + ($char->{hp_max} // 0);
         $s->{zeny} = 0 + ($char->{zeny} // 0);
         my $own_items = $currentDeal{you} // {};
@@ -179,6 +190,149 @@ sub navigation_tick {
     }
 }
 
+sub stop_native {
+    AI::clear(qw/attack take move route mapRoute/);
+    $char->sendAttackStop if connected() && !$char->{dead};
+}
+
+# Another player's damage or misses on it, or its attacks on them, mark a claim.
+sub engaged_by_other {
+    my ($m) = @_;
+    for my $field (qw(dmgFromPlayer missedFromPlayer dmgToPlayer missedToPlayer)) {
+        return 1 if grep { $_ ne $accountID && $m->{$field}{$_} } keys %{$m->{$field} || {}};
+    }
+    return 0;
+}
+
+sub native_request {
+    my ($id, $a) = @_;
+    my $now = time;
+    if ($a->{type} eq 'respawn') {
+        unless (join(',', sort keys %$a) eq 'type' && $char->{dead}) { result($id, 'rejected', 'not_dead'); return }
+        $messageSender->sendRestart(0);
+        $pending = {id => $id, action => $a, native => 'respawn', started => $now, deadline => $now + 20};
+        $last_action = $now;
+        result($id, 'accepted', 'respawn_sent');
+        return;
+    }
+    my $attack = $a->{type} eq 'attack';
+    my $bin = defined($a->{target}) && !ref($a->{target}) && $a->{target} =~ /^[a-f0-9]{8}$/ ? pack('H*', $a->{target}) : undef;
+    my $actor = $bin ? ($attack ? $monstersList : $itemsList)->getByID($bin) : undef;
+    my $ctx = {manual_ai => AI::state() == AI::MANUAL(), dead => $char->{dead}, hp => $char->{hp},
+        hp_max => $char->{hp_max}, recovering => $recovery{phase} ne 'none',
+        pos => Utils::calcPosFromPathfinding($field, $char)};
+    if ($attack) {
+        $ctx->{monster} = $actor && {dead => $actor->{dead}, pos => $actor->{pos_to}, engaged_by_other => engaged_by_other($actor)};
+    } else {
+        $ctx->{item} = $actor && {pos => $actor->{pos}};
+    }
+    my $reason = $attack ? M1Combat::validate_attack($a, $ctx) : M1Combat::validate_take($a, $ctx);
+    if ($reason) { result($id, 'rejected', $reason); return }
+    AI::clear(qw/attack take move route mapRoute/);
+    if ($attack) { $char->attack($actor->{ID}) } else { AI::take($actor->{ID}) }
+    unless (AI::action() eq $a->{type}) { result($id, 'rejected', 'task_not_queued'); return }
+    $pending = {id => $id, action => $a, native => $a->{type}, target_bin => $actor->{ID},
+        name_id => 0 + $actor->{nameID}, name => $actor->{name}, started => $now, progress => 0,
+        hits => 0, damage => 0, deadline => $now + $a->{timeout_s}};
+    $last_action = $now;
+    result($id, 'accepted', 'task_queued');
+}
+
+sub native_tick {
+    my $p = $pending;
+    my $evidence = nav_evidence();
+    $evidence->{hp} = 0 + $char->{hp}; $evidence->{hp_max} = 0 + $char->{hp_max};
+    my ($status, $reason);
+    if ($p->{native} eq 'respawn') {
+        ($status, $reason) = ('completed', 'respawned') unless $char->{dead};
+    } elsif ($p->{native} eq 'attack') {
+        my $m = $monstersList->getByID($p->{target_bin});
+        my $old = $monsters_old{$p->{target_bin}};
+        my $dmg = $p->{dmg_from_you} // ($m ? $m->{dmgFromYou} : $old ? $old->{dmgFromYou} : 0);
+        ($status, $reason) = M1Combat::attack_outcome({self_dead => $char->{dead} ? 1 : 0,
+            in_queue => AI::inQueue('attack') ? 1 : 0,
+            target_dead => $p->{target_dead} || ($old && $old->{dead}) || ($m && $m->{dead}) ? 1 : 0,
+            dmg_from_you => $dmg // 0, gave_up => $m && ($m->{attack_failed} // 0) >= $p->{started} ? 1 : 0,
+            target_visible => $m ? 1 : 0});
+        @$evidence{qw(target_name first_hit_ms hits damage_dealt)} = ($p->{name}, $p->{first_hit_ms}, $p->{hits}, $p->{damage});
+    } else {
+        my $item = $itemsList->getByID($p->{target_bin});
+        $p->{gone_at} //= time unless $item;
+        ($status, $reason) = M1Combat::take_outcome({self_dead => $char->{dead} ? 1 : 0,
+            inventory_added => $p->{added} ? 1 : 0, in_queue => AI::inQueue('take') ? 1 : 0,
+            item_visible => $item ? 1 : 0, since_gone => $p->{gone_at} ? time - $p->{gone_at} : 0});
+        $evidence->{item} = $p->{added} if $p->{added};
+        $evidence->{item_name} = $p->{name};
+    }
+    if ($status) {
+        stop_native() unless $status eq 'completed';
+        finish($status, $reason, $evidence); return;
+    }
+    if (time >= $p->{deadline}) { stop_native(); finish('failed', 'timeout', $evidence); return }
+    if (time - ($p->{progress} // 0) >= 1) {
+        $p->{progress} = time;
+        emit('task_progress', {request_id => $p->{id}, kind => $p->{native}, %$evidence});
+    }
+}
+
+# Local, model-free survival: retreat when badly hurt, rest to regenerate,
+# sit only when Basic Skill allows it. Decisions come from M1Combat.
+sub recovery_tick {
+    my $pos = Utils::calcPosFromPathfinding($field, $char);
+    # Nearest monster that is attacking or targeting us.
+    my ($threat) = sort { M1Navigation::distance($a, $pos) <=> M1Navigation::distance($b, $pos) }
+        map { $_->{pos_to} } grep { $_ } map { $monstersList->getByID($_) } AI::ai_getAggressives();
+    my $fighting = $pending && ($pending->{native} // '') eq 'attack' ? 1 : 0;
+    if ($char->{dead} && !$was_dead) {
+        emit('death', {map => $field->baseName, hp_max => 0 + $char->{hp_max}});
+        %recovery = (phase => 'none', retreats => 0);
+    }
+    $was_dead = $char->{dead} ? 1 : 0;
+    my ($step) = M1Combat::recovery_step({dead => $char->{dead}, hp => $char->{hp}, hp_max => $char->{hp_max},
+        phase => $recovery{phase}, fighting => $fighting,
+        threat_distance => $threat ? M1Navigation::distance($threat, $pos) : undef,
+        retreat_elapsed => $recovery{retreat_since} ? time - $recovery{retreat_since} : 0, retreat_moving => AI::inQueue('route') ? 1 : 0,
+        busy => $pending ? 1 : 0, can_sit => ($char->{skills}{NV_BASIC}{lv} // 0) >= 3, sitting => $char->{sitting}});
+    return unless $step;
+    my $hp = {hp => 0 + $char->{hp}, hp_max => 0 + $char->{hp_max}};
+    if ($step eq 'retreat') {
+        my $decided = time;
+        $threat //= $fighting && $monstersList->getByID($pending->{target_bin}) ? $monstersList->getByID($pending->{target_bin})->{pos_to} : $pos;
+        # Survival preempts any task in progress; its result says so.
+        if ($pending && $pending->{native} && $pending->{native} ne 'respawn') {
+            AI::clear(qw/attack take/);
+            finish('failed', 'retreat_low_hp', {%{nav_evidence()}, %$hp});
+        }
+        my $cell = M1Combat::retreat_cell($pos, $threat, sub { $field->isWalkable(@_) }, $field->width, $field->height);
+        AI::clear(qw/move route mapRoute/);
+        $char->route($field->baseName, $cell->{x}, $cell->{y}, noMapRoute => 1, maxRouteTime => 15,
+            attackOnRoute => 0, noSitAuto => 1) if $cell;
+        $recovery{since} //= $decided; $recovery{retreat_since} //= $decided;
+        $recovery{phase} = 'retreat'; $recovery{retreats}++;
+        emit('recovery', {phase => 'retreat', %$hp, from => $pos, threat => $threat, destination => $cell,
+            retreats => $recovery{retreats},
+            hit_to_decision_ms => $last_hit_on_me ? int(($decided - $last_hit_on_me) * 1000) : undef,
+            hp_update_to_decision_ms => $last_hp_update ? int(($decided - $last_hp_update) * 1000) : undef});
+    } elsif ($step eq 'rest') {
+        $recovery{since} //= time;
+        $recovery{phase} = 'rest';
+        emit('recovery', {phase => 'rest', %$hp});
+    } elsif ($step eq 'sit') {
+        return if $recovery{sit_sent} && time - $recovery{sit_sent} < 3;
+        $recovery{sit_sent} = time;
+        AI::sit();
+        emit('recovery', {phase => 'sit', %$hp});
+    } elsif ($step eq 'exhausted') {
+        $recovery{phase} = 'exhausted';
+        emit('recovery', {phase => 'exhausted', %$hp, retreats => $recovery{retreats}});
+    } elsif ($step eq 'recovered') {
+        AI::stand() if $char->{sitting};
+        emit('recovery', {phase => 'recovered', %$hp, retreats => $recovery{retreats},
+            duration_s => int(time - ($recovery{since} // time))});
+        %recovery = (phase => 'none', retreats => 0);
+    }
+}
+
 sub request {
     my ($r) = @_;
     unless (ref($r) eq 'HASH') { emit('protocol_error', {reason => 'object_required'}); return }
@@ -211,19 +365,23 @@ sub request {
     unless (ref($a) eq 'HASH' && defined($a->{type}) && !ref($a->{type})) {
         result($id, 'rejected', 'invalid_action'); return;
     }
-    # Cancel is exempt from busy/rate limits: it only ends the active route.
+    # Cancel is exempt from busy/rate limits: it only ends the active native task.
     if ($a->{type} eq 'cancel') {
         unless (join(',', sort keys %$a) eq 'target,type' && defined($a->{target}) && !ref($a->{target}) &&
-            $pending && $pending->{task} && $a->{target} eq $pending->{id}) {
-            result($id, 'rejected', 'no_matching_navigation'); return;
+            $pending && $pending->{native} && $pending->{native} ne 'respawn' && $a->{target} eq $pending->{id}) {
+            result($id, 'rejected', 'no_matching_task'); return;
         }
-        stop_route();
+        my $kind = $pending->{native};
+        stop_native();
         finish('cancelled', 'cancel_requested', nav_evidence());
-        result($id, 'completed', 'navigation_cancelled');
+        result($id, 'completed', "${kind}_cancelled");
         return;
     }
     if ($pending) { result($id, 'rejected', 'busy'); return }
     if (time - $last_action < 1) { result($id, 'rejected', 'rate_limited'); return }
+    if ($cfg->{native_navigation} && $a->{type} =~ /^(navigate|attack|take)$/ && $recovery{phase} ne 'none') {
+        result($id, 'rejected', 'recovering'); return;
+    }
     if ($a->{type} eq 'navigate') {
         my $reason = M1Navigation::validate($a, {manual_ai => $cfg->{native_navigation} && AI::state() == AI::MANUAL(),
             hp => $char->{hp}, map => $field->baseName, width => $field->width, height => $field->height,
@@ -235,12 +393,13 @@ sub request {
         my $task = AI::action() eq 'route' ? $AI::ai_seq_args[0] : undef;
         unless ($task) { result($id, 'rejected', 'route_not_queued'); return }
         my $now = time;
-        $pending = {id => $id, action => $a, task => $task, started => $now, progress => 0,
+        $pending = {id => $id, action => $a, task => $task, native => 'navigation', started => $now, progress => 0,
             deadline => $now + $a->{timeout_s} + M1Navigation::GRACE};
         $last_action = $now;
         result($id, 'accepted', 'route_queued');
         return;
     }
+    if ($cfg->{native_navigation} && $a->{type} =~ /^(attack|take|respawn)$/) { native_request($id, $a); return }
     if ($a->{type} eq 'move' && $cfg->{native_navigation}) { result($id, 'rejected', 'legacy_executor_disabled'); return }
     if ($a->{type} eq 'move') {
         unless (join(',', sort keys %$a) eq 'map,type,x,y' && !ref($a->{map}) && $a->{map} eq $field->baseName &&
@@ -366,7 +525,12 @@ sub combat {
     my $data = {source => unpack('H*', $args->{sourceID}), target => unpack('H*', $args->{targetID}),
         damage => 0 + $args->{dmg}, self => $args->{sourceID} eq $accountID ? 1 : 0};
     emit('combat', $data);
-    if ($pending && $pending->{action}{type} eq 'attack' && $data->{self} && $data->{target} eq $pending->{action}{target}) {
+    $last_hit_on_me = time if $data->{target} eq unpack('H*', $accountID) && $data->{damage} > 0;
+    if ($pending && ($pending->{native} // '') eq 'attack' && $data->{self} && $args->{targetID} eq $pending->{target_bin}) {
+        $pending->{first_hit_ms} //= int((time - $pending->{started}) * 1000);
+        $pending->{hits}++; $pending->{damage} += $data->{damage};
+    }
+    if ($pending && !$pending->{native} && $pending->{action}{type} eq 'attack' && $data->{self} && $data->{target} eq $pending->{action}{target}) {
         finish('completed', 'server_attack', $data);
     }
 }
@@ -375,6 +539,16 @@ sub monster_gone {
     my (undef, $args) = @_;
     my $m = $args->{monster};
     emit('monster_departure', {target => unpack('H*', $m->{ID}), dead => $m->{dead} ? 1 : 0, name_id => 0 + $m->{nameID}});
+    if ($pending && ($pending->{native} // '') eq 'attack' && $m->{ID} eq $pending->{target_bin}) {
+        $pending->{target_dead} = $m->{dead} ? 1 : 0;
+        $pending->{dmg_from_you} = 0 + ($m->{dmgFromYou} // 0);
+    }
+}
+
+# VAR_HP (5): when the server's HP value reached us, to time our own reaction.
+sub stat_info {
+    my (undef, $args) = @_;
+    $last_hp_update = time if ($args->{type} // -1) == 5;
 }
 
 sub inventory_added {
@@ -382,7 +556,10 @@ sub inventory_added {
     return if $args->{fail};
     my $data = {name_id => 0 + $args->{nameID}, amount => 0 + $args->{amount}};
     emit('inventory_added', $data);
-    if ($pending && $pending->{action}{type} eq 'take' && $data->{name_id} == 909 && $data->{amount} > 0) {
+    if ($pending && ($pending->{native} // '') eq 'take' && $data->{name_id} == $pending->{name_id} && $data->{amount} > 0) {
+        $pending->{added} = $data;
+    }
+    if ($pending && !$pending->{native} && $pending->{action}{type} eq 'take' && $data->{name_id} == 909 && $data->{amount} > 0) {
         finish('completed', 'server_inventory_add', $data);
     }
 }
@@ -442,7 +619,8 @@ sub tick {
     if ($ready != $in_game) {
         unless ($ready) {
             # A route must not silently resume after reconnecting.
-            AI::clear(qw/move route mapRoute/) if $pending && $pending->{task};
+            AI::clear(qw/move route mapRoute attack take/) if $pending && $pending->{native};
+            $recovery{phase} = 'rest' if $recovery{phase} eq 'retreat';
             finish('unknown', 'game_disconnected');
         }
         if ($ready) { ++$epoch; %seen = (); $attempts = 0; $recovery_deadline = 0 }
@@ -459,7 +637,9 @@ sub tick {
     }
     $quit = 1 if $stopping && time >= $stopping;
     if ($pending && $pending->{task}) { navigation_tick() if $ready }
+    elsif ($pending && $pending->{native}) { native_tick() if $ready }
     elsif ($pending && time >= $pending->{deadline}) { finish('unknown', 'confirmation_timeout') }
+    recovery_tick() if $ready && $cfg->{native_navigation};
     if (!$client) {
         $client = $server->accept();
         if ($client) { $client->blocking(0); $auth_time = time }
