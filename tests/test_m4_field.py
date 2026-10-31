@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock
 
-from agent.field import FieldController, Geometry, FIELD, segment
+from agent.field import FieldController, Geometry, FIELD, PATROL, segment
 
 
 class FieldTests(unittest.TestCase):
@@ -46,6 +46,9 @@ class FieldTests(unittest.TestCase):
         geometry = Geometry(path)
         self.assertFalse(geometry.walkable((170, 378)))
         self.assertEqual(geometry.path((168, 357), (170, 376))[-1], (170, 376))
+        for point in PATROL:
+            self.assertTrue(geometry.walkable(point), str(point))
+            self.assertEqual(geometry.path((170, 375), point)[-1], point)
 
     def controller(self):
         c = FieldController.__new__(FieldController)

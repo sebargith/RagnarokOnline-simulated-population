@@ -213,8 +213,8 @@ sub request {
         my $pos = $target ? ($a->{type} eq 'attack' ? $target->{pos_to} : $target->{pos}) : undef;
         unless ($target && $pos && abs($pos->{x} - $char->{pos_to}{x}) <= 1 &&
             abs($pos->{y} - $char->{pos_to}{y}) <= 1 &&
-            ($a->{type} eq 'attack' ? (($target->{nameID} == 1002 || ($cfg->{m4_field} && $field->baseName eq 'prt_fild08' && $target->{nameID} == 1113)) && !$target->{dead}) :
-                ($target->{nameID} == 909 || ($cfg->{m4_field} && $field->baseName eq 'prt_fild08' && $target->{nameID} =~ /^(909|938|512|713)$/)))) {
+            ($a->{type} eq 'attack' ? (($target->{nameID} == 1002 || ($cfg->{m4_field} && $field->baseName eq 'prt_fild08' && $target->{nameID} =~ /^(1113|1063)$/)) && !$target->{dead}) :
+                ($target->{nameID} == 909 || ($cfg->{m4_field} && $field->baseName eq 'prt_fild08' && $target->{nameID} =~ /^(909|938|512|713|705|949|507|515)$/)))) {
             result($id, 'rejected', 'target_not_visible_nearby_or_allowed'); return;
         }
         $pending = {id => $id, action => $a, item_name_id => $target->{nameID}, deadline => $r->{deadline_ms}/1000};

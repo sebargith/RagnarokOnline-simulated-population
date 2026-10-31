@@ -13,9 +13,9 @@ from agent.trade import TradeLedger
 
 
 TOWN, FIELD = 'prontera', 'prt_fild08'
-WEAK = (1002, 1113)
-DROPS = (909, 938, 512, 713)  # ordinary Jellopy, mucus, apple, bottle
-PATROL = ((170, 350), (150, 330), (190, 330), (170, 310), (150, 290), (190, 290))
+WEAK = (1002, 1113, 1063)
+DROPS = (909, 938, 512, 713, 705, 949, 507, 515)
+PATROL = ((170, 350), (150, 330), (190, 330), (170, 310), (150, 290), (185, 285))
 
 
 def distance(a, b):
@@ -79,6 +79,8 @@ class FieldController(Continuous):
         super().__init__(*args, **kwargs)
         fields = self.runtime.parent/'vendor/openkore/fields'
         self.geometry = {name: Geometry(fields/(name+'.fld2.gz')) for name in (TOWN, FIELD)}
+        for point in (*PATROL, (170, 366), (170, 376)):
+            self.geometry[FIELD].path((170, 375), point)
         self.field_results = deque(maxlen=8)
 
     def client_options(self):
