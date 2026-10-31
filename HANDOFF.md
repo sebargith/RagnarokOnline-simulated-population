@@ -1,39 +1,40 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-10-31 13:08 -03:00 por Codex
-Referencia: codex/single-agent-plan, commit_ref 67c35eb; documentación en commit posterior.
+Actualizado: 2026-10-31 13:24 -03:00 por Codex
+Referencia: codex/single-agent-plan, commit_ref 3463953; documentación en commit posterior.
 ## Objetivo actual
-Un jugador normal autónomo con OpenKore nativo; 9B y conocimiento web después.
+Un jugador normal con ejecución nativa; completar el piloto individual antes del 9B general.
 ## Estado comprobado
-- Checkout: D:/Ragnarok Agents/m4-continuous. Raíz codex/web-search con WIP: no implementar allí.
-- Claude completó P1, P2a portales/diálogo y P2b tiendas hasta 500b542.
-- P2c primera entrega: Apple en descanso seguro, consumo confirmado, registro previo al envío.
-- 81 tests OK, Perl syntax OK, compileall OK; una caza 91,3 s, 3 kills, 1 loot, 0 muertes.
-- Apple 1→0 confirmada por servidor. Cero inferencia. Raw hunt-1793461320.json.
-- Fin de muestra: Tarin base4/job2, prt_fild08 174,246, 22/57 HP descansando.
-- Cliente P1 detenido después; HP al detener no medido. Perfil solo/manual/8770, cuenta 2000030.
-- Clientes m4-field 30496/60476/43560 verificados antes de iniciar P1; no tocados.
-- No se reinició servidor/DB/Ollama ni se alteró Observer de Visitor.
+- Checkout D:/Ragnarok Agents/m4-continuous; raíz codex/web-search con WIP: no implementar allí.
+- P1, P2a portales/diálogo, P2b tiendas y P2c Apple en descanso implementados.
+- P2d ciclo persistente, consulta de resultados sin replay y checkpoint previo al envío.
+- 94 tests OK (13 nuevos), syntax Perl/compileall/diff-check OK.
+- Prueba viva: envío c_1 y cierre, consulta de su kill al reiniciar, continuación y cierre de objetivo.
+- Objetivo 2/2 completo, 2 drops, cero muertes e inferencia; última reanudación envió cero acciones.
+- Fin: Tarin prt_fild08 156,243, 57/57 HP, base4/job3, 10 Zeny.
+- Cliente P1 detenido al terminar. Perfil solo/manual, puerto8770, cuenta2000030.
+- Los tres clientes m4-field fueron verificados vivos y no tocados; tampoco servidor/DB/Ollama/Visitor.
 ## Cambios desde el último relevo
-- M1Healing.pm, hook packet_useitem y recuperación; p1_hunt retiene evidencia de consumo.
-- Estado, guía y arquitectura corregidos; HANDOFF de raíz estaba atrasado en P1b, sincronizado.
-- AI Relay entrante OK: 12 conversaciones, 3 actualizadas.
+- Puente 1238a3d: query_result de solo lectura por sesión y flag de inventario truncado.
+- Ciclo 3463953: agent/solo_cycle.py, scripts/run_p2_cycle.py, tests/test_p2_cycle.py.
+- Revisión delegada sin escrituras: se corrigieron aislamiento de sesión y barreras de inventario/snapshot.
+- Evidencia: runtime/p1/evidence/cycle-1793463752 (copias de events, state, status).
 ## Decisiones vigentes
-- Mantener rAthena pre-Renewal, versiones fijadas, Qwen3.5 9B Q6_K y SearXNG local.
-- Un dueño de ejecución por personaje; solo travel por portales, nunca Task::MapRoute.
-- Ledger healing-state.json: pending al reiniciar, timeout o fallo de escritura bloquean consumos.
-- No borrar ese registro para reintentar; conciliar inventario y evidencia primero.
-- Primero uno, luego dos para cooperación/comercio, tres y opcionalmente cinco.
-## Incompleto / problemas / validaciones pendientes
-- P2 persistente pendiente; consumible limitado a Apple y descanso sin amenaza ni tarea activa.
-- Timeout/reinicio/rechazo de consumo: probados en módulo real con estados simulados.
-- Retirada corregida P1b aún sin prueba viva específica; selección de monstruo ignora peligro.
-- P3/P4 pendientes. SearXNG último estado offline, no comprobado de nuevo.
-- WIP raíz, m3-worktree y m4-field preservado; no ejecutar prepare_m4.py sobre clientes vivos.
-- Runtime, DB, puertos y GPU compartidos. No resetear datos ni repetir transferencias.
+- Un ejecutor nativo por personaje; travel caminable, no MapRoute/pagos.
+- No repetir intención pendiente: consultar resultado; caché perdida o nueva sesión bloquean.
+- Checkpoint runtime/p1/cycle/state.json; solo resultados confirmados cuentan progreso.
+- Logs rotativos, history24; RAM libre2GiB/GPU14336MiB; sin LLM por tick.
+- Mantener 9B Q6_K y SearXNG; naturalidad, escala y prueba larga aplazadas.
+## Incompleto / límites
+- Circuito integrado de tiendas probado con estados reproducibles, no vivo: este run no necesitó tienda.
+- Objetivo guardado completo; --goal-kills solo inicializa, no sustituye ni reinicia ese objetivo.
+- Falta interfaz para asignar otro objetivo conservando historial; no borrar checkpoint para continuar.
+- Piloto fijo Tarin/prt_fild08/Fruit Gardener; selección de objetivos aún ignora peligro.
+- Caché de resultados de un boot: perderla requiere conciliación/revisión, no reenvío.
+- SearXNG último estado offline; P3/P4 pendientes. P2 aceptación completa aún abierta.
+- WIP raíz, m3-worktree y m4-field preservado. Runtime/DB/puertos/GPU compartidos.
 ## Próxima acción
-Implementar ciclo individual persistente caza/recuperación/abastecimiento con conciliación tras reinicio.
+Nuevo objetivo explícito sin borrar historial y observar abastecimiento integrado cuando haya necesidad real.
 ## Archivos relevantes
-- docs/CURRENT_STATE.md; docs/USER_GUIDE.txt; docs/NATIVE_AGENT_PLAN.md.
-- docs/evidence/P2c-local-healing.md; bridge/lib/M1Healing.pm; bridge/openkore/m1_bridge.pl.
-- scripts/p1_hunt.py; scripts/p2_supply.py; tests/test_p2_healing.py.
+- docs/CURRENT_STATE.md; docs/USER_GUIDE.txt; docs/evidence/P2d-persistent-cycle.md.
+- agent/solo_cycle.py; scripts/run_p2_cycle.py; tests/test_p2_cycle.py; bridge/openkore/m1_bridge.pl.
 Registro de chats: D:/Ragnarok Agents/.ai/chats/INDEX.md

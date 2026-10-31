@@ -12,7 +12,10 @@ P1 y las capacidades P2 de portales/diálogo/tiendas están implementadas en el
 perfil separado de Tarin (`--ai=manual`, puerto 8770). OpenKore ejecuta las tareas
 nativas y la recuperación local; los runners Python seleccionan tareas acotadas.
 Las demos M4 conservan `--ai=off` y acciones individuales. El ciclo individual
-persistente y los objetivos generales del 9B siguen pendientes.
+persistente ya conserva objetivos e intenciones y consulta resultados sin replay;
+su [prueba de reanudación](evidence/P2d-persistent-cycle.md) distingue caza real
+y circuito de tiendas con estados reproducibles. Los objetivos generales del
+9B siguen pendientes.
 No activar dos controladores sobre el mismo
 personaje ni exponer consola libre al LLM. El adaptador conservará percepción
 aislada, sesiones, límites y la diferencia entre aceptación y resultado. Los

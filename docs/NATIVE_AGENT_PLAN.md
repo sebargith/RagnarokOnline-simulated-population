@@ -131,8 +131,9 @@ Internet; no requiere el buscador de pago de Ollama.
 
 P1, P2a portales/diálogo y P2b tiendas están implementados. P2c ya permite usar
 Apple durante descanso seguro con confirmación y protección persistente contra
-replay; falta integrar el ciclo individual persistente. Consultar el
+replay. P2d integra ese ciclo: checkpoint y reanudación probados en vivo;
+circuito completo con tiendas probado con estados reproducibles. Consultar el
 [estado](CURRENT_STATE.md) y [relevo](../HANDOFF.md) para evidencia y límites.
-La próxima entrega une caza, recuperación y abastecimiento con un objetivo
-persistente y conciliación tras reiniciar. No empezar P3/P4 ni otra batería 9B
-como parte de esa entrega.
+La próxima entrega permite asignar otro objetivo sin borrar historial y observa
+el circuito integrado cuando haya necesidad real de abastecimiento. No empezar
+P3/P4 ni otra batería 9B como parte de esa entrega.

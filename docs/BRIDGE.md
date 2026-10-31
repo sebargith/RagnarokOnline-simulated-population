@@ -11,6 +11,14 @@ The M1 baseline described below is one OpenKore plugin, a headless output adapte
 
 ## Protocol and truth
 
+P2d adds an authenticated native-only read query (not an action envelope):
+`{"type":"query_result","request_id":"c_1","session":"<saved-session>"}`.
+`request_status` returns `available` and the retained `result`. It does not
+admit an ID, alter the high-water mark or execute gameplay. Cache lifetime is
+one plugin boot and retention remains bounded. Missing/session-mismatched
+results must not be resolved by resending the action. Native snapshots now
+include `inventory_truncated`; the solo cycle blocks partial inventories.
+
 Each OpenKore process owns only its own decoded game state. The agent listens on `127.0.0.1:8765`; the temporary verification peer uses `8766`. Authenticate with a newline-delimited JSON object containing exactly `type: "auth"` and the runtime token. Tokens and game/database passwords are generated into ignored `runtime/` files. The peer exists for testing, not as another persistent agent.
 
 After authentication the plugin emits `ready` with `resync: 1`, then a snapshot. Every event carries `v`, `agent_id`, `source`, `id`, `time_ms`, `session`, `kind`, and `data`. A session consists of a plugin boot identifier and game connection epoch. Event IDs are monotonic within a plugin process. Snapshot payloads contain connection state and, when in game, map, HP, inventory readiness/items, field dimensions, and nearby visible players. Items/players are capped at 32 each. The numeric item ID is stable; stock kRO display names can be Korean.

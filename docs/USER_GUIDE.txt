@@ -57,9 +57,14 @@ CÓMO CONTINUAR AHORA
 - [HECHO] P2c, primera entrega: Tarin usa su Apple al descansar; el servidor
   confirma el consumo y un registro impide repetirlo si el resultado es incierto.
   Ver docs/evidence/P2c-local-healing.md. 81 tests OK y una caza breve sin muertes.
-- [SIGUIENTE] Unir caza, recuperación y abastecimiento en un ciclo persistente.
-  Prompt: "Continúa P2 con un objetivo persistente y conciliación tras reiniciar.
-  Usa las capacidades nativas verificadas; no repitas compras ni consumos inciertos."
+- [HECHO, PILOTO] P2d: ciclo persistente con caza/recuperación/abastecimiento.
+  Reanudación real sin repetir ataque; tiendas integradas probadas con estados
+  reproducibles. 94 tests OK. Ver docs/evidence/P2d-persistent-cycle.md.
+- [SIGUIENTE] Asignar otro objetivo conservando historial y observar el circuito
+  de abastecimiento cuando sea necesario. Prompt: "Continúa P2 sin borrar el
+  checkpoint: permite un nuevo objetivo explícito y comprueba el circuito
+  integrado cuando haya necesidad real. No repitas operaciones inciertas."
+- El objetivo guardado está completo (2/2); reiniciar el runner no lo reinicia.
 - El cliente P1 quedó detenido. Los tres clientes m4-field se conservaron.
 - Abre un único chat de implementación. Para alternar entre Claude y Codex,
   usa "prepara el relevo" y después "toma el control" en la otra aplicación.
@@ -74,7 +79,7 @@ PASOS DEL CAMINO Y PROMPTS PARA MÁS ADELANTE
   Prompt: "Amplía el ejecutor nativo a combate y recogida normales, y recuperación
   local según HP/SP. Mide respuesta con inferencia ausente o lenta."
 
-- [PENDIENTE] P2: ciclo de vida individual.
+- [PILOTO IMPLEMENTADO] P2: ciclo de vida individual; aceptación completa pendiente.
   Prompt: "Haz que el mismo personaje progrese, se recupere y se abastezca cuando
   lo necesite, con persistencia y sin premios artificiales. Empieza por novice."
 

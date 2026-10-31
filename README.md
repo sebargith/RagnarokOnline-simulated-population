@@ -6,7 +6,8 @@ A local-first project for persistent, socially believable AI players on a classi
 with native OpenKore execution, followed by bounded 9B goals and web knowledge.
 See the [approved plan](docs/NATIVE_AGENT_PLAN.md) and [Claude handoff](HANDOFF.md).
 P1 native navigation/combat and P2 portal travel/NPC supply are implemented;
-the persistent individual cycle and general 9B goals remain pending. The existing
+the persistent cycle now retains a solo goal across controller restarts. Integrated
+live supply and general 9B goals remain pending. The existing
 M4 runtime is a controlled three-agent fixture; its [evidence](docs/evidence/M4-continuous.md)
 remains valid for that scope. Social polish and the one-hour trial remain deferred.
 
@@ -117,7 +118,25 @@ retained conversation review set.
 P2c also uses an owned Apple during safe rest, with a server confirmation and
 durable protection against replay. The existing bounded hunt command below
 records `healing` events. [Evidence and limits](docs/evidence/P2c-local-healing.md).
-The persistent hunt/recovery/supply cycle is still pending.
+The persistent hunt/recovery/supply cycle is implemented; live restart and hunt
+are verified, while its full supply transitions are covered by reproducible states.
+
+Run/resume the saved solo goal from this checkout with the P1 client available:
+
+```powershell
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/prepare_p1.py start --runtime 'D:/Ragnarok Agents/runtime'
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/run_p2_cycle.py run --runtime 'D:/Ragnarok Agents/runtime' --seconds 100 --max-actions 4
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/run_p2_cycle.py status --runtime 'D:/Ragnarok Agents/runtime'
+& 'D:/Ragnarok Agents/.venv/Scripts/python.exe' scripts/prepare_p1.py stop --runtime 'D:/Ragnarok Agents/runtime'
+```
+
+The pilot's saved goal is currently complete (2/2); these commands preserve it.
+Do not delete checkpoint/history to repeat an unknown action. `--goal-kills`
+only initializes a new checkpoint. The runner stops on its time/action budget,
+keeps pending intent, and resumes through read-only result queries. `status`
+reads files and includes heartbeat age; it does not occupy the bridge. No model
+turns or chat are required while the runner executes in a terminal. See
+[restart evidence and limits](docs/evidence/P2d-persistent-cycle.md).
 
 Separate normal novice, OpenKore `--ai=manual`, bridge port 8770. Requires the
 local server/database already running; creates only new P1 records and does not

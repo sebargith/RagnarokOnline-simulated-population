@@ -1,6 +1,6 @@
 # Estado actual
 
-Actualizado: 2026-10-31 13:08 (America/Santiago), Codex.
+Actualizado: 2026-10-31 13:24 (America/Santiago), Codex.
 
 ## Dirección y checkout
 
@@ -38,6 +38,21 @@ Actualizado: 2026-10-31 13:08 (America/Santiago), Codex.
 
 ## Procesos y datos compartidos
 
+- P2d persistente implementado, `1238a3d` y `3463953`: objetivo, fase,
+  intención antes del envío y consulta de resultado sin replay. 94 tests OK;
+  revisión delegada de solo lectura y correcciones de sesión/inventario.
+  [Evidencia y comandos](evidence/P2d-persistent-cycle.md).
+- Estado actual del piloto: objetivo 2/2 completo, sin intención pendiente.
+  Tres procesos sucesivos: envío y cierre, consulta/continuación, cierre del
+  objetivo con cero acciones nuevas. Dos kills, dos recogidas, cero muertes
+  propias e inferencia. Snapshot final prt_fild08 156,243, 57/57 HP,
+  base4/job3, 10 Zeny. Cliente P1 detenido al terminar.
+- Estado persistente: `runtime/p1/cycle/state.json`; eventos/status acotados
+  en esa carpeta. Copia congelada en `runtime/p1/evidence/cycle-1793463752`.
+  Cambio de boot/sesión, caché perdida o resultado incierto bloquean; no borrar
+  checkpoint para repetir una operación. El objetivo cumplido no se reinicia.
+- El bloque P2c anterior conserva el estado de su prueba, no el estado actual.
+
 - Tarin, cuenta 2000030, perfil P1 solo, manual, puente 8770: detenido tras esta
   prueba con prepare_p1.py stop. No se preparó/resetearon sus datos ni se añadió
   HP, objetos o experiencia. La Apple comprada por Claude se consumió.
@@ -58,9 +73,12 @@ Actualizado: 2026-10-31 13:08 (America/Santiago), Codex.
 
 ## Pendientes y próxima acción
 
-Unir caza, recuperación y abastecimiento en un ciclo individual persistente,
-con objetivo y punto de control, conciliar estado actual al reiniciar y
-sin repetir una operación incierta. P2 completo aún no está aceptado.
+El ciclo persistente ya une las capacidades. Queda observar un circuito real
+que necesite abastecimiento: la prueba real verificó continuidad y caza; las
+transiciones completas de tienda se verificaron con estados reproducibles.
+P2 completo aún no está aceptado. Próximo cambio: asignar un nuevo objetivo
+explícito conservando historial, antes de continuar el piloto cuando necesite
+abastecerse. `--goal-kills` solo inicializa, no cambia el objetivo guardado.
 Consumible actual: solo Apple en descanso seguro, no durante pelea/retirada;
 timeout/rechazo/reinicio y fallo de almacenamiento probados con estados
 reproducibles, no inyectados en vivo. Retirada corregida de P1b sigue con su
