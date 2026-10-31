@@ -80,6 +80,8 @@ def local_chat(operating: dict, messages: list, *, tools=None, cold=False) -> di
         if len(raw) > operating["max_response_bytes"]:
             raise ValueError("Ollama response byte budget exceeded")
         payload = json.loads(raw)
+        if payload.get("done_reason") == "length":
+            raise ValueError("truncated Ollama response")
         if not payload.get("done"):
             raise ValueError("incomplete Ollama response")
         message = payload.get("message")

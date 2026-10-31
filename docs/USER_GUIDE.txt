@@ -37,8 +37,8 @@ ESTADO REAL
   compra curación en una tienda NPC de Prontera, con Zeny e inventario conciliados.
   Ver docs/evidence/P2b-npc-supply.md.
 - [PENDIENTE] Progreso individual sostenible y objetivos generales del 9B.
-- [BLOQUEO CONOCIDO] SearXNG estaba offline; hay que verificar/restaurar su backend.
-  El ejemplo actual "web poring" no es todavía una herramienta general.
+- [PARCIAL] P4: interfaz standalone con categorías públicas, fuentes y caché;
+  backend Docker/SearXNG no respondió. Falta muestra real y conexión al planner.
 - [DESPUÉS] Naturalidad, pruebas prolongadas y población de cinco.
 
 DÓNDE TRABAJAR
@@ -67,8 +67,10 @@ CÓMO CONTINUAR AHORA
   Esto valida la integración local; los objetivos se llamaban M4 Poring.
 - [HECHO] Chat 10: reacción implementada, 118 tests OK; muestra única 9/9
   con ataque inmediato, sin observar cancelación real ni medir su latencia.
-- [SIGUIENTE] Revisión del chat principal; sin nueva meta ni repetir muestra.
-- La naturalidad y la búsqueda general con SearXNG quedan para más adelante.
+- [REVISADO] Chat 10 aceptado, 123 tests; 9/9 completo sin intención pendiente.
+- [SIGUIENTE] Recuperar SearXNG existente y validar consulta real con fuentes.
+  Interfaz inicial standalone: 127 tests OK; no integrada al planner.
+  Ver docs/evidence/P4-public-mechanics.md. Naturalidad queda para más adelante.
 - Mantén un único chat de implementación activo; el relevo sigue en HANDOFF.md.
 - Configuración de nuevos chats: Terra 6.1, razonamiento medio
   (gpt-6.1-terra / medium), por instrucción del usuario.

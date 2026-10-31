@@ -1,17 +1,25 @@
 # Relevo — Ragnarok Agents
 Actualizado: 2026-10-31 por Codex
 Referencia: codex/single-agent-plan; ver historial Git para el commit final.
+## Checkpoint — P4 inicial
+- Interfaz standalone de mecánica pública, categorías cerradas y caché local;
+  127 tests OK. No integrada al planner/runner, P4 incompleto.
+- 9B disponible; búsqueda real terminó SearchUnavailable: backend Docker Linux
+  no respondió tras intentar iniciar Docker Desktop. Ver docs/evidence/P4-public-mechanics.md.
+- Siguiente: recuperar backend existente y validar una respuesta real con fuentes.
+- Revisión 10 aceptada: 9/9 completo sin intención pendiente; cancelación viva
+  y latencia no medidas; carrera de llegada conserva bloqueo conservador.
 ## Checkpoint — pruebas del runner
 - Revisión independiente y del orquestador aceptó 60023ce. Cinco pruebas de
   integración con puente controlado; suite completa 123 OK. Sin cambios de runtime.
 - Carrera de llegada bloquea conservadoramente; cancelación viva y latencia
-  siguen sin demostrar. Último checkpoint vivo 9/9 completo; revisión principal.
+  siguen sin demostrar. Último checkpoint vivo 9/9 completo; revisión principal aceptada.
 ## Checkpoint Chat 10
 - Reacción de exploración implementada; 118 tests OK. Cancelación real y
   latencia sin demostrar: muestra única completó 9/9 con ataque inmediato.
 - P1 detenido tras confirmar ausencia de tarea/petición; servicios existentes
   activos, M4 detenido. Sin nueva meta. Ver docs/evidence/P3-dynamic-exploration.md.
-- Siguiente: revisión del chat principal; no repetir muestra sin autorización.
+- La muestra quedó aceptada; no repetirla fuera del alcance vigente.
 ## Registro histórico Chat 09
 La siguiente información describe el estado previo a Chat 10.
 ## Estado comprobado

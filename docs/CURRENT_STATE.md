@@ -1,5 +1,20 @@
 # Estado actual
 
+## P4 — interfaz inicial de mecánica pública (2026-10-31)
+
+- Consulta standalone con 9B y categorías públicas cerradas; una búsqueda como
+  máximo, fuentes externas fechadas y caché en memoria por 24 h. No está conectada
+  al planner ni al runner y no ejecuta acciones. P4 sigue incompleto.
+- Ollama respondió; SearXNG no: Docker Desktop se intentó iniciar, pero el motor
+  Linux no respondió y el contenedor existente no pudo verificarse. Muestra real
+  del 9B sobre peso/regeneración terminó en `SearchUnavailable`, fallback explícito.
+- `python -m unittest discover -s tests -v`: 127 OK. Evidencia y límites:
+  [P4](evidence/P4-public-mechanics.md). Próximo paso: reparar el backend Docker
+  existente y comprobar una consulta real con fuentes antes de integrar al planner.
+- Chat 10 aceptado por el principal: 9/9 completo, sin intención pendiente;
+  cancelación viva y latencia no medidas, carrera de llegada bloquea conservadoramente.
+
+
 ## P3 — cobertura de integración del runner (2026-10-31)
 
 - `60023ce` aceptado por revisión del orquestador e independiente. Cinco pruebas
@@ -17,7 +32,7 @@
   real observada. P1 detenido sin petición pendiente. No se inició otra meta.
 - Servicios existentes activos; M4 detenido. [Evidencia y límites](evidence/P3-dynamic-exploration.md).
 - Siguiente: revisión del chat principal; la latencia y cancelación viva siguen
-  sin medir. No repetir muestras ni crear metas sin nueva autorización.
+  sin medir. No repetir muestras ni crear metas fuera del alcance de la entrega vigente.
 
 ## P3 — estado histórico: exploración viva y nueva meta del 9B verificadas (2026-10-31)
 
@@ -192,6 +207,5 @@ Validar la recuperación antes de continuar el abastecimiento integrado.
 
 ## Pendientes y próxima acción
 
-El checkpoint vigente es 9/9 completo, sin intención pendiente. Revisión
-del chat principal antes de ampliar el alcance. Peligro general, SearXNG y
+El checkpoint vigente es 9/9 completo, sin intención pendiente. Peligro general, SearXNG y
 comportamiento prolongado siguen pendientes. No repetir operaciones inciertas.
