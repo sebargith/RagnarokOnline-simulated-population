@@ -54,16 +54,23 @@ DÓNDE TRABAJAR
 CÓMO CONTINUAR AHORA
 --------------------
 - [HECHO] P2: Tarin cazó, vendió 5 objetos (+18 Zeny), compró una Apple
-  (−15) y regresó al campo. Meta guardada 6/8; cliente P1 detenido.
+  (−15) y regresó al campo. Esa muestra dejó 6/8; ver avance P3 siguiente.
 - Evidencia: docs/evidence/P2e-live-supply.md. No demuestra autonomía general.
 - [DEMOSTRADO] P3: el 9B propone continuar la meta activa y el runner valida
   la propuesta mientras sigue jugando. 111 tests OK; prueba real continued.
-- [SIGUIENTE] Verificar una muestra breve de exploración dinámica con los
-  servicios disponibles. El código y los tests están listos; no hubo prueba viva
-  porque los servicios heredados estaban detenidos. Ver docs/evidence/P3-dynamic-exploration.md.
-  Después, completar la meta 8 antes de probar una nueva meta del 9B.
+- [DEMOSTRADO] P3: exploración dinámica en vivo, una ruta llegada, dos kills
+  y dos recogidas; 6/8→8/8 en 30,641 s y 6 envíos. Después, una propuesta real
+  del 9B guardó meta 9 conservando historial, sin nuevas acciones de juego.
+  Estado actual: 8/9, sin intención pendiente, P1 detenido. MariaDB/rAthena
+  quedan activos. Ver docs/evidence/P3-dynamic-exploration.md para límites.
+- [SIGUIENTE] El chat principal revisa la entrega y fija el próximo alcance;
+  no se inicia otra caza ni una prueba extensa automáticamente.
 - La naturalidad y la búsqueda general con SearXNG quedan para más adelante.
 - Mantén un único chat de implementación activo; el relevo sigue en HANDOFF.md.
+- Preferencia permanente: el chat principal organiza nuevos chats de alcance
+  concreto, delega y revisa. Se procede con pasos rutinarios reversibles y con
+  autorizaciones ya dadas sin preguntas repetidas; las decisiones materiales
+  nuevas mantienen su autorización aplicable.
 
 PASOS DEL CAMINO Y PROMPTS PARA MÁS ADELANTE
 -------------------------------------------
@@ -79,7 +86,8 @@ PASOS DEL CAMINO Y PROMPTS PARA MÁS ADELANTE
   Prompt: "Haz que el mismo personaje progrese, se recupere y se abastezca cuando
   lo necesite, con persistencia y sin premios artificiales. Empieza por novice."
 
-- [PENDIENTE] P3: objetivos del 9B.
+- [PILOTO VERIFICADO] P3: continuar y guardar metas acotadas del 9B; objetivos
+  generales pendientes.
   Prompt: "Conecta intenciones de alto nivel con las capacidades verificadas.
   Valida precondiciones y resultados; limita replanteamientos y espera del modelo."
 

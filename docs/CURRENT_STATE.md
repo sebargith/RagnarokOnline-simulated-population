@@ -1,15 +1,27 @@
 # Estado actual
 
-## P3 — exploración dinámica implementada; falta muestra viva (2026-10-31)
+## P3 — exploración viva y nueva meta del 9B verificadas (2026-10-31)
 
-- El ciclo elige destinos de hasta 50 casillas con geometría local de OpenKore,
-  camino recto libre e historial de zonas; sin modelo y con ejecución acotada.
-  115 tests OK; mapa local: 41 candidatos desde (165,240). [Evidencia y límites](evidence/P3-dynamic-exploration.md).
-- No se hizo prueba viva: los PID heredados de rAthena/MariaDB y M4 no existen
-  y sus puertos no escuchan. No se iniciaron servicios. P1 sin proceso registrado;
-  checkpoint real leído: 6/8 activo, sin intención pendiente.
-- Siguiente acción: cuando los servicios estén disponibles, comprobar procesos y
-  hacer una única muestra breve con P1, sin borrar ni repetir intenciones.
+- `90a65af` validado en una muestra: límite 180 s/12 acciones, fin por complete
+  a los 30,641 s y 6 envíos. Tarin 6→8 kills; una ruta arrived, dos recogidas,
+  un ataque rechazado por distancia, cero muertes e inferencia durante la caza.
+- Ruta prt_fild08 (175,240)→destino (125,265), llegada observada (126,265).
+  Monstruos visibles en 8/9 snapshots de navegación; el controlador terminó
+  la ruta antes de atacar. HP mínimo 40/57. [Evidencia y límites](evidence/P3-dynamic-exploration.md).
+- Una propuesta real del 9B: hunt/additional_kills=1, goal_saved 9, 13,094 s;
+  cero acciones de juego. Checkpoint actual activo **8/9**, sin intención
+  pendiente; historial de operaciones conservado y meta 8 añadida al historial.
+- P1 detenido tras lectura fresca sin tarea; prt_fild08 (121,269), HP57/57,
+  Zeny13. Inventario conservado, con +1 Jellopy (909) y +1 Empty Bottle (713).
+- Se iniciaron solo los servicios existentes ausentes: MariaDB PID50024,
+  login40760, char55704, map36528. Quedan activos; Ollama ya estaba disponible,
+  ahora con el 9B cargado (GPU observada 9800 MiB). M4 no se inició ni reinició.
+- Raw fuera de Git: `runtime/p1/evidence/p3-live-1793468925/`. Sin cambios de
+  código ni preparación de DB, fixtures, spawns o recompensas en esta entrega.
+  Los dos objetivos muertos se llamaban M4 Poring; no demuestra spawns naturales
+  ni autonomía general. Se mantienen límites de rayos e historial de intentos.
+- Siguiente acción: revisión del chat principal sobre esta evidencia; reanudar
+  8/9 en otra muestra solo con alcance acordado, sin ampliar ahora a P4 o población.
 
 ## P3 — límite de búsqueda observado (2026-10-31 14:02)
 
@@ -159,7 +171,7 @@ Validar la recuperación antes de continuar el abastecimiento integrado.
 
 ## Pendientes y próxima acción
 
-Integrar objetivos acotados del 9B (P3) sin bloquear la ejecución reactiva.
-Meta de Tarin 6/8 guardada; no hay intención pendiente. P2 demuestra caza,
-venta, compra y regreso en el piloto. Peligro general, SearXNG y comportamiento
-prolongado siguen pendientes. No repetir operaciones financieras inciertas.
+La muestra P3 superior sustituye los estados históricos: meta anterior 8/8
+completa y nueva meta del 9B guardada en 8/9, sin intención pendiente. Revisión
+del chat principal antes de ampliar el alcance. Peligro general, SearXNG y
+comportamiento prolongado siguen pendientes. No repetir operaciones inciertas.
