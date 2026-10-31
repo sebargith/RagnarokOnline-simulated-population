@@ -142,11 +142,14 @@ class FieldController(Continuous):
 
     def home(self, who):
         if self.data(who)['map'] == FIELD:
-            self.walk_to(who, 170, 378, transition=TOWN)
+            # Stock warp center 170,378 has radius 3,2; its center is
+            # unwalkable in the installed FLD. Enter at the walkable edge.
+            self.walk_to(who, 170, 376, transition=TOWN)
         if self.data(who)['map'] != TOWN:
             raise RuntimeError('Return not confirmed')
-        # Leave the portal; town rest occurs at the south gate.
+        # Leave the portal, then restore the established demo gathering area.
         self.walk_to(who, 153 if who == 'agent' else 159, 32)
+        self.walk_to(who, 154 if who == 'agent' else 153, 179 if who == 'agent' else 180)
 
     def eligible(self, who):
         data = self.data(who)

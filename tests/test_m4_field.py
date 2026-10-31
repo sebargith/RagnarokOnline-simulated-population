@@ -38,6 +38,15 @@ class FieldTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             geometry.path((0, 0), (2, 0))
 
+    def test_configured_return_enters_walkable_warp_edge(self):
+        root = Path(__file__).resolve().parents[2]
+        path = root/'vendor/openkore/fields/prt_fild08.fld2.gz'
+        if not path.exists():
+            self.skipTest('Installed static map unavailable')
+        geometry = Geometry(path)
+        self.assertFalse(geometry.walkable((170, 378)))
+        self.assertEqual(geometry.path((168, 357), (170, 376))[-1], (170, 376))
+
     def controller(self):
         c = FieldController.__new__(FieldController)
         c.events = deque()
