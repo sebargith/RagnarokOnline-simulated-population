@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "note": "P5 step 1. Default unchanged: both roles use the current 9B until the user chooses. Keys come only from the named environment variables.",
+  "roles": {
+    "planner": {"primary": "qwen9b-current", "fallback": null, "cloud_cooldown_s": 300},
+    "chat": {"primary": "qwen9b-current", "fallback": null, "local_only": true}
+  },
+  "candidates": {
+    "qwen9b-current": {"provider": "ollama", "base": "config/m2-operating.json"},
+    "qwen9b-tuned": {
+      "provider": "ollama", "base": "config/m2-operating.json",
+      "override": {
+        "options": {"num_ctx": 8192, "num_predict": 3072, "temperature": 0.3},
+        "think": true,
+        "service_timeout_s": 150, "cold_service_timeout_s": 180,
+        "request_deadline_s": 170, "cold_request_deadline_s": 200,
+        "max_response_bytes": 2000000
+      }
+    },
+    "gemini-flash": {
+      "provider": "openai", "model": "gemini-2.5-flash",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "api_key_env": "GEMINI_API_KEY", "json_mode": "json_schema",
+      "options": {"temperature": 0.2, "max_tokens": 4096}
+    },
+    "groq-gpt-oss": {
+      "provider": "openai", "model": "openai/gpt-oss-120b",
+      "endpoint": "https://api.groq.com/openai/v1",
+      "api_key_env": "GROQ_API_KEY", "json_mode": "json_object",
+      "options": {"temperature": 0.2, "max_completion_tokens": 4096, "reasoning_effort": "medium"}
+    }
+  },
+  "cloud_limits": {
+    "concurrency": 1, "max_waiting": 4, "retries": 0,
+    "service_timeout_s": 45, "cold_service_timeout_s": 60,
+    "request_deadline_s": 60, "cold_request_deadline_s": 90,
+    "max_prompt_chars": 5000, "max_response_bytes": 262144, "max_content_chars": 4096
+  }
+}
