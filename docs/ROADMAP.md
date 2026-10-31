@@ -1,5 +1,20 @@
 # Roadmap
 
+## Prioridad vigente — 2026-10-31
+
+El usuario aprobó el [plan de un jugador con ejecución nativa](NATIVE_AGENT_PLAN.md).
+Orden actual: P1 OpenKore y navegación/combate reactivos, P2 ciclo individual,
+P3 objetivos del 9B y P4 conocimiento web. Después: segundo jugador, cooperación
+y comercio, tercero y posible escala a cinco. La primera entrega es solo
+navegación nativa con progreso, cancelación y resultado confirmado.
+
+Las demos M0–M4 conservan su evidencia; no acreditan autonomía general. El trabajo
+de campo de Chat 07 se preserva por separado. Naturalidad y prueba larga siguen
+aplazadas. Este orden sustituye la secuencia de implementación histórica de abajo.
+El [relevo a Claude](../HANDOFF.md) indica checkout, cambios preservados y tarea.
+
+## Roadmap histórico y criterios de las demos
+
 Work on one milestone outcome at a time. Default order: M0 -> M1 -> M2 -> M3 -> M4 -> M5. M1 and M2 can be investigated independently after M0, but sequential work is the default for this single-machine setup. Evaluation begins with the first experiment. The first community demonstration targets cooperative PvE and simple trade on classic/pre-Renewal rules; five agents are a later scale check, not a prerequisite for that experience.
 
 On 2026-10-29 the user selected the measured Qwen3.5 9B Q6_K model and stopped further model comparison. M2's unresolved dialogue-grounding findings remain recorded rather than being called a quality pass. Continue with M3 using that model; assess naturalness and factual grounding in the live agent scenario. The local SearXNG web-search slice is available for M3 integration, with web claims kept separate from game observations.

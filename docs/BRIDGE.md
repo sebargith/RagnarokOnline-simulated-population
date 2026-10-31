@@ -1,5 +1,11 @@
 # M1 bridge and local operation
 
+The [approved native-execution plan](NATIVE_AGENT_PLAN.md) will extend this
+boundary with typed tasks, progress, cancellation and observed results. That
+adapter is pending; this document describes the implemented demo contract.
+Do not enable native AI while Python still commands movement/combat for the
+same character. Session, perception and action-truth checks must survive the change.
+
 The M1 baseline described below is one OpenKore plugin, a headless output adapter, a Python stream client, native setup/lifecycle tooling, and a live acceptance harness. M3 adds inference/memory; the M4 controlled gameplay extension is documented at the end of this file.
 
 ## Protocol and truth

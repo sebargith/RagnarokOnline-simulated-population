@@ -1,5 +1,22 @@
 # Architecture and constraints
 
+## Dirección aprobada — 2026-10-31
+
+El [plan vigente](NATIVE_AGENT_PLAN.md) prioriza un personaje normal desde nivel 1.
+OpenKore será el único ejecutor de navegación, combate y rutinas reactivas; Python
+validará objetivos y resultados, conservará memoria y solicitará inferencia
+selectiva al 9B. El modelo podrá consultar mecánicas públicas mediante SearXNG,
+con presupuestos y fuentes, cuando esa capacidad se amplíe y verifique.
+
+Esta integración está pendiente. Hoy las demos arrancan con `--ai=off` y Python
+dirige acciones individuales. No activar dos controladores sobre el mismo
+personaje ni exponer consola libre al LLM. El adaptador conservará percepción
+aislada, sesiones, límites y la diferencia entre aceptación y resultado. Los
+componentes descritos abajo corresponden a la base implementada de las demos;
+sus fixtures y criterios no equivalen a progreso autónomo general.
+
+## Base implementada
+
 Status: M1 passed; M3's persistent functional baseline and M4's controlled
 three-agent demonstration are recorded. M4 now also has a continuous fixture
 controller with bounded request/evidence retention, asynchronous addressed
@@ -71,7 +88,7 @@ limited Prontera fixture; long-duration and social acceptance remain open.
 
 M0 verified Lenovo model 82N6, Ryzen 9 5900HX (8 cores/16 threads), RTX 3080 Laptop with 16 GiB VRAM, 31.86 GiB visible system RAM, Windows 11, and WSL2 Ubuntu 22.04.4. The user-reported Legion marketing model was not independently resolved. Resource snapshots and installed versions are in [M0 evidence](evidence/M0-environment.md).
 
-The user selected native Windows on 2026-10-29, with project-local files where practical. Run rAthena, MariaDB, OpenKore and Python as Windows processes from this project. Put external source/build trees and portable MariaDB/Perl in `vendor\`, mutable DB/configuration/logs in `runtime\`, and the Python environment in `.venv\`, all under `D:\Ragnarok Agents` and ignored by Git. Reuse existing system Git/Python/Visual Studio tools and Ollama/model assets in place. This keeps new project-owned files together without copying installed tools or large existing models. WSL findings remain historical audit evidence; WSL/Docker are outside the selected deployment.
+The user selected native Windows on 2026-10-29, with project-local files where practical. Run rAthena, MariaDB, OpenKore and Python as Windows processes from this project. Put external source/build trees and portable MariaDB/Perl in `vendor\`, mutable DB/configuration/logs in `runtime\`, and the Python environment in `.venv\`, all under `D:\Ragnarok Agents` and ignored by Git. Reuse existing system Git/Python/Visual Studio tools and Ollama/model assets in place. This keeps new project-owned files together without copying installed tools or large existing models. The game stack remains native. The existing local SearXNG instance uses Docker; its last known backend state is unavailable. Restoring it is a separate search task, not a migration of the game stack to WSL/Docker.
 
 Portable MariaDB 10.11.19 x64 runs as an explicitly started process. rAthena builds with the installed VS 2019/v142 tools and SDK 10.0.19041.0. Portable Strawberry Perl 5.32.1.1 loads the built 32-bit XSTools DLL; Python 3.11.9 x64 communicates across TCP. Build/launch and gameplay worked in the project path with spaces; no drive alias, service, global PATH change or additional system runtime installation was needed. Keep eight GiB free before initial setup; actual footprint/resource samples belong in milestone evidence. No hardware purchase or paid inference is used.
 
@@ -82,7 +99,7 @@ Portable MariaDB 10.11.19 x64 runs as an explicitly started process. rAthena bui
 - Keep public web search in the Python tool boundary through the existing local SearXNG service. SearXNG forwards public queries to configured external engines. The M3 worker receives only a controller-owned public query literal, never player chat or memory. Web-answer inference receives one source snippet and no private records; the retained reply preserves its exact URL.
 - Add only minimal identity and memory to the first conversational slice. Expand relationships and goals after restart continuity works.
 - Expand from one persistent agent to three only after continuity works. The first community demonstration includes cooperative PvE and simple trade; extend the restricted bridge and deterministic controllers in measured slices, confirming combat, loot and transfers from game observations before claiming success. Five agents are a later capacity check.
-- M1 uses English test messages and stock pre-Renewal data/rates on Prontera. An exact historical episode and future conversation language remain choices before content/social customization.
+- English is the selected dialogue target. M1 uses stock pre-Renewal data/rates on Prontera; an exact historical episode remains a choice before content customization.
 
 ## References
 

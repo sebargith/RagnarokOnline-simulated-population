@@ -5,6 +5,9 @@ instalaron ni ejecutaron estos proyectos. La compatibilidad y calidad de sus
 funciones no se consideran verificadas por sus README. Recomendación de diseño,
 no una integración implementada ni aceptación del trabajo de campo de Chat 07.
 
+El usuario aprobó esta dirección el 2026-10-31. El [plan vigente](../NATIVE_AGENT_PLAN.md)
+detalla entregas y aceptación; la investigación siguiente conserva sus límites.
+
 ## Recomendación
 
 Mantener rAthena y la instalación fijada de OpenKore. Probar primero un único
