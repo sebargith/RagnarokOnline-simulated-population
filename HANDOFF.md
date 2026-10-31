@@ -15,7 +15,7 @@ comunidad. Dos funciones de modelo: planner inteligente (nube) y chat local.
 - P5 paso 1 hecho: inference/openai_compat.py + inference/roles.py + config/model-roles.json
   (planner/chat, respaldo local, claves por entorno o runtime/secrets/model-keys.env).
   Banco fixtures/p5-planner-bench.json; evaluación en docs/evidence/P5-model-eval.md:
-  Groq gpt-oss mejor (96 %, ~0,8 s); 9B think inviable; Gemini gratis con 503/429. 146 tests OK.
+  Groq gpt-oss mejor (96 %, ~0,8 s); Gemma 4 12B local 85 %; 9B 77 %; 9B think inviable; Gemini gratis con 503/429. 146 tests OK.
 - Servicios: MariaDB 50024, login 40760, char 55704, map 36528, Ollama, Docker/SearXNG.
   Cliente P1 detenido; clientes m4-field no están corriendo.
 - Visitor en grupo local Observer (20: @jumpto, @hide); carga tras el último reinicio [por verificar].

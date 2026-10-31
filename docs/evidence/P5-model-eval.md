@@ -43,6 +43,7 @@ python scripts/eval_p5_planner.py --candidates qwen9b-current --repeats 2
 python scripts/eval_p5_planner.py --candidates gemini-flash,groq-gpt-oss --repeats 2
 python scripts/eval_p5_planner.py --candidates qwen9b-ctx-lowtemp --repeats 2
 python scripts/eval_p5_planner.py --candidates qwen9b-tuned --repeats 1
+python scripts/eval_p5_planner.py --candidates gemma4-12b --repeats 2   # pico GPU 11.552 MiB
 python -m unittest discover -s tests      # 146 OK
 ```
 
@@ -65,6 +66,7 @@ el informe menciona mapa, nivel base, HP y Zeny. Latencia por llamada completa.
 | 9B, ctx 8192 + think + temp 0,3 (`qwen9b-tuned`) | 13 | 31 % | 31 % | 31 % | 7 | 27,5 s | 67,6 s |
 | Gemini 3.6 Flash gratis (`gemini-flash`) | 21 | 81 % | 81 % | 71 % | 4 (3×503, 1×429) | 8,5 s | 14,6 s |
 | Groq gpt-oss-120b (`groq-gpt-oss`) | 26 | 100 % | 100 % | 96 % | 0 | 0,82 s | 2,1 s |
+| Gemma 4 12B Q4_K_M local, ctx 8192 + temp 0,2, sin think (`gemma4-12b`) | 26 | 100 % | 100 % | 85 % | 0 | 0,57 s | 10,7 s* |
 
 \* primera llamada en frío (carga del modelo).
 
@@ -77,6 +79,7 @@ Por tipo (JSON / capacidades / coherencia):
 | 9B think | 33/33/33 | 0/0/0 | 40/40/40 |
 | Gemini Flash | 83/83/83 | 50/50/0 | 100/100/100 |
 | Groq gpt-oss | 100/100/100 | 100/100/75 | 100/100/100 |
+| Gemma 4 12B | 100/100/100 | 100/100/0 | 100/100/100 |
 
 ## Ejemplos lado a lado
 
@@ -88,6 +91,7 @@ Por tipo (JSON / capacidades / coherencia):
 | 9B ctx+temp baja | `{"additional_kills": 0, "type": "ask_help"}` |
 | Gemini Flash | `{"type":"hunt","additional_kills":1}` |
 | Groq gpt-oss | `{"type":"hunt","additional_kills":2}` |
+| Gemma 4 12B | `{"type": "hunt", "additional_kills": 3}` |
 | 9B think | sin respuesta visible (66 s) |
 
 Todas válidas; el esquema impide superar 3 muertes y el validador decide.
@@ -100,6 +104,7 @@ Todas válidas; el esquema impide superar 3 muertes y el validador decide.
 | 9B ctx+temp baja | `weight` |
 | Gemini Flash | `weight` |
 | Groq gpt-oss | `weight` |
+| Gemma 4 12B | `weight` |
 
 **Informe con HP 40/57, meta activa 8/9:**
 
@@ -109,6 +114,9 @@ Todas válidas; el esquema impide superar 3 muertes y el validador decide.
 - Groq gpt-oss: «…base level 4 (34/36 exp) and job level 3 (12/28 exp) with 40/57
   HP, full SP, 13 zeny, weight 56/2150… 8 of 9 confirmed kills and no unresolved
   action.» Completo; ningún número inventado.
+- Gemma 4 12B: «…base level 4 and job level 3 on map prt_fild08. The character has
+  40 out of 57 HP and 14 out of 14 SP. The active goal has 8 confirmed kills toward
+  a target of 9.» Correcto; omite solo el Zeny (en ambas repeticiones).
 - Gemini Flash: 503 en la primera vuelta y 429 en la segunda (sin respuesta).
 - 9B think: sin respuesta visible.
 
@@ -122,6 +130,12 @@ Todas válidas; el esquema impide superar 3 muertes y el validador decide.
   rechaza.
 - **9B sin think con más contexto y temperatura baja** mejora P4 (100 %) al mismo
   coste, pero sus informes siguen omitiendo hechos clave.
+- **Gemma 4 12B local** (añadido a petición del usuario; ya descargado, digest
+  `6114515d…`): 100 % JSON, 85 % coherencia, sin errores, ~0,6 s en caliente. Cargó
+  con 8192 de contexto; pico de GPU 11.552 MiB (incluye ~2,4 GiB ya usados), bajo
+  el techo de 14.336. Sus informes incluyen nivel y HP pero omiten el Zeny; acierta
+  P4. Supera al 9B en informes y P4 con la misma latencia. En la inyección propuso
+  `hunt` 3 (máximo permitido); el esquema y el validador lo acotan.
 - **Groq gpt-oss-120b** fue el mejor: 96 % de coherencia, sin errores, ~0,8 s.
   Con `json_object` (sin esquema) inventó campos (`{"action":"hunt","kills":2}`) y
   bajó a 54 % JSON; con `json_schema` quedó en 100 %. Configurado con esquema.
@@ -150,4 +164,9 @@ Todas válidas; el esquema impide superar 3 muertes y el validador decide.
 
 Elegir el modelo de `planner` (y su respaldo) en
 [model-roles.json](../../config/model-roles.json). Opción con mejor evidencia:
-`groq-gpt-oss` con respaldo `qwen9b-current`. `chat` queda local.
+`groq-gpt-oss` con respaldo local. Como respaldo del planner, `gemma4-12b` rinde
+mejor que el 9B en este banco (85 % frente a 77 %) y cabe en la GPU. Para `chat`
+es candidato local razonable por velocidad y fidelidad a los hechos, pero este
+banco no mide conversación (tono, memoria, español, rechazo de peticiones): hace
+falta una prueba de chat antes de adoptarlo. Si ambos roles usan modelos locales
+distintos, la GPU tendría que alojar los dos o recargar; no se midió.

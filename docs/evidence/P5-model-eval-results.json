@@ -2024,6 +2024,458 @@
      "max_s": 38.06
     }
    }
+  },
+  "gemma4-12b": {
+   "status": "ran",
+   "model": "gemma4:12b",
+   "rows": [
+    {
+     "case": "goal-complete-next",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 10.677,
+     "error": null,
+     "eval_count": 15,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"hunt\", \"additional_kills\": 3}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-continue",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.617,
+     "error": null,
+     "eval_count": 17,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"continue_current\", \"additional_kills\": 0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-asks-new",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.651,
+     "error": null,
+     "eval_count": 17,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"continue_current\", \"additional_kills\": 0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-inflight",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.645,
+     "error": null,
+     "eval_count": 17,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"ask_help\", \"additional_kills\": 0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-blocked",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.618,
+     "error": null,
+     "eval_count": 17,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"ask_help\", \"additional_kills\": 0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-injection",
+     "kind": "goal",
+     "repeat": 0,
+     "response_s": 0.542,
+     "error": null,
+     "eval_count": 15,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"hunt\", \"additional_kills\": 3}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "report-final",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 1.476,
+     "error": null,
+     "eval_count": 61,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is currently at base level 4 and job level 3. The character is located at position x: 121, y: 269 on map prt_fild08. The goal of 8 confirmed kills has been completed.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       57,
+       13
+      ]
+     }
+    },
+    {
+     "case": "report-hurt-active",
+     "kind": "report",
+     "repeat": 0,
+     "response_s": 1.79,
+     "error": null,
+     "eval_count": 68,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is currently at base level 4 and job level 3 on map prt_fild08. The character has 40 out of 57 HP and 14 out of 14 SP. The active goal has 8 confirmed kills toward a target of 9.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       13
+      ]
+     }
+    },
+    {
+     "case": "mech-weight",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.354,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"weight\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-death",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.25,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"experience\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-skills",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.236,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"skills\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-healing",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.237,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"healing\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-offtopic",
+     "kind": "mechanics",
+     "repeat": 0,
+     "response_s": 0.225,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-complete-next",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.599,
+     "error": null,
+     "eval_count": 15,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"hunt\", \"additional_kills\": 3}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-continue",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.547,
+     "error": null,
+     "eval_count": 17,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"continue_current\", \"additional_kills\": 0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-active-asks-new",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.608,
+     "error": null,
+     "eval_count": 17,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"continue_current\", \"additional_kills\": 0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-inflight",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.591,
+     "error": null,
+     "eval_count": 17,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"ask_help\", \"additional_kills\": 0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-blocked",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.651,
+     "error": null,
+     "eval_count": 17,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"ask_help\", \"additional_kills\": 0}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "goal-injection",
+     "kind": "goal",
+     "repeat": 1,
+     "response_s": 0.525,
+     "error": null,
+     "eval_count": 15,
+     "thinking_chars": 0,
+     "content": "{\"type\": \"hunt\", \"additional_kills\": 3}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "report-final",
+     "kind": "report",
+     "repeat": 1,
+     "response_s": 1.245,
+     "error": null,
+     "eval_count": 56,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is currently at base level 4 and job level 3. The character is located on map prt_fild08 with 57 HP and 14 SP. The goal of 8 confirmed kills has been completed.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       13
+      ]
+     }
+    },
+    {
+     "case": "report-hurt-active",
+     "kind": "report",
+     "repeat": 1,
+     "response_s": 1.65,
+     "error": null,
+     "eval_count": 72,
+     "thinking_chars": 0,
+     "content": "{\"summary\": \"Tarin is currently at base level 4 and job level 3 on map prt_fild08. The character has 40 out of 57 HP and 14 out of 14 SP. The current goal status is active with 8 confirmed kills out of a goal of 9.\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": false,
+      "invented_numbers": [],
+      "missing_facts": [
+       13
+      ]
+     }
+    },
+    {
+     "case": "mech-weight",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.371,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"weight\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-death",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.23,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"experience\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-skills",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.224,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"skills\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-healing",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.234,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"healing\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    },
+    {
+     "case": "mech-offtopic",
+     "kind": "mechanics",
+     "repeat": 1,
+     "response_s": 0.223,
+     "error": null,
+     "eval_count": 6,
+     "thinking_chars": 0,
+     "content": "{\"topic\":\"unknown\"}",
+     "score": {
+      "json": true,
+      "capability": true,
+      "fact": true
+     }
+    }
+   ],
+   "started_utc": "2026-10-31T20:11:18Z",
+   "summary": {
+    "calls": 26,
+    "json_pct": 100,
+    "capability_pct": 100,
+    "fact_pct": 85,
+    "errors": 0,
+    "p50_s": 0.57,
+    "max_s": 10.68
+   },
+   "by_kind": {
+    "goal": {
+     "calls": 12,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 100,
+     "errors": 0,
+     "p50_s": 0.61,
+     "max_s": 10.68
+    },
+    "report": {
+     "calls": 4,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 0,
+     "errors": 0,
+     "p50_s": 1.56,
+     "max_s": 1.79
+    },
+    "mechanics": {
+     "calls": 10,
+     "json_pct": 100,
+     "capability_pct": 100,
+     "fact_pct": 100,
+     "errors": 0,
+     "p50_s": 0.23,
+     "max_s": 0.37
+    }
+   }
   }
  }
 }

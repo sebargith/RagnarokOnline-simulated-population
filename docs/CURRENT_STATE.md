@@ -9,6 +9,7 @@
 - Banco grabado de 13 casos (metas, informe determinista, P4). Groq gpt-oss-120b:
   100 % JSON, 96 % coherencia, ~0,8 s. 9B actual 77 %; 9B con think no termina
   (bucle hasta agotar tokens). Gemini 3.6 Flash gratis: 503 y 429 tras 21 llamadas.
+  Gemma 4 12B local: 85 %, ~0,6 s, pico GPU 11,5 GiB; mejor respaldo local que el 9B.
   [Evidencia](evidence/P5-model-eval.md). Suite: 146 OK. Sin pruebas en vivo.
 - **Modelo por defecto sin cambios.** Siguiente: el usuario elige el planner en
   `config/model-roles.json`; luego P5 paso 2.
