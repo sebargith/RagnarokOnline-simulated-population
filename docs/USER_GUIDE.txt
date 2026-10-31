@@ -43,7 +43,7 @@ ESTADO REAL
 
 DÓNDE TRABAJAR
 ---------------
-- Entrada y relevo: D:\Ragnarok Agents\HANDOFF.md
+- Entrada y relevo: D:\Ragnarok Agents\m4-continuous\HANDOFF.md
 - Código y documentos actuales: D:\Ragnarok Agents\m4-continuous
 - Rama de continuación: codex/single-agent-plan
 - Plan completo: docs/NATIVE_AGENT_PLAN.md dentro de ese checkout.

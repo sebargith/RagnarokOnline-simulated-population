@@ -1,58 +1,38 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-10-31 por Codex
-Referencia: codex/single-agent-plan; ver historial Git para el commit final.
-## Checkpoint — SearXNG activo
-- Usuario inició Docker; SearXNG respondió en 8080. Dos consultas del 9B con
-  fuentes no lograron sustentar una respuesta: categoría amplia y snippet ambiguo.
-  Ver docs/evidence/P4-public-mechanics.md. Mejorar selección/evidencia antes de
-  integrar al planner; P4 sigue incompleto.
-## Checkpoint — P4 inicial (anterior al reintento)
-- Interfaz standalone de mecánica pública, categorías cerradas y caché local;
-  127 tests OK. No integrada al planner/runner, P4 incompleto.
-- 9B disponible; búsqueda real terminó SearchUnavailable: backend Docker Linux
-  no respondió tras intentar iniciar Docker Desktop. Ver docs/evidence/P4-public-mechanics.md.
-- Siguiente: recuperar backend existente y validar una respuesta real con fuentes.
-- Revisión 10 aceptada: 9/9 completo sin intención pendiente; cancelación viva
-  y latencia no medidas; carrera de llegada conserva bloqueo conservador.
-## Checkpoint — pruebas del runner
-- Revisión independiente y del orquestador aceptó 60023ce. Cinco pruebas de
-  integración con puente controlado; suite completa 123 OK. Sin cambios de runtime.
-- Carrera de llegada bloquea conservadoramente; cancelación viva y latencia
-  siguen sin demostrar. Último checkpoint vivo 9/9 completo; revisión principal aceptada.
-## Checkpoint Chat 10
-- Reacción de exploración implementada; 118 tests OK. Cancelación real y
-  latencia sin demostrar: muestra única completó 9/9 con ataque inmediato.
-- P1 detenido tras confirmar ausencia de tarea/petición; servicios existentes
-  activos, M4 detenido. Sin nueva meta. Ver docs/evidence/P3-dynamic-exploration.md.
-- La muestra quedó aceptada; no repetirla fuera del alcance vigente.
-## Registro histórico Chat 09
-La siguiente información describe el estado previo a Chat 10.
+Actualizado: 2026-10-31 15:40 -03:00 por Claude
+Referencia: rama codex/single-agent-plan, commit_ref b8af0a3; sin commit: ninguno.
+## Objetivo actual
+Un jugador normal (Tarin) con ejecución nativa OpenKore; ahora P4 (conocimiento web) y
+decidir el modelo que reemplaza al Qwen3.5 9B para objetivos e informes.
 ## Estado comprobado
-- Checkout D:/Ragnarok Agents/m4-continuous; WIP raíz/m3-worktree/m4-field preservado.
-- Una muestra de 90a65af: 30,641 s, 6 envíos, 6→8 kills, una ruta arrived,
-  dos recogidas, un rechazo target_too_far; cero muertes e inferencia de caza.
-- Monstruos visibles durante navigate (8/9 snapshots); no interrumpe por verlos,
-  termina la ruta antes de atacar. Rayos rectos e historial de intentos conservados.
-- Una propuesta real del 9B guardó hunt +1: checkpoint activo 8/9, sin acción
-  pendiente, historial conservado. Cero acciones de juego en esa propuesta.
-- P1 detenido; lectura final prt_fild08 (121,269), HP57/57, Zeny13.
-- MariaDB50024/login40760/char55704/map36528 iniciados con datos existentes;
-  quedan activos. Ollama preexistente, 9B cargado; M4 siguió detenido.
-- Evidencia raw: runtime/p1/evidence/p3-live-1793468925/. Sin cambios de código.
-## Decisiones y límites
-- No falsificar progreso, respawnear mobs ni borrar checkpoint para acelerar.
-- Usar información legítima del cliente; no introducir estado global al agente.
-- DB/puertos/GPU compartidos; no reiniciar servicios ni clientes M4.
-- Mantener modelo 9B, límites de recursos y transacciones inciertas sin replay.
-- Dos kills contra objetivos llamados M4 Poring; no demuestra spawns naturales,
-  cobertura general ni autonomía prolongada. No se crearon fixtures ni spawns.
-## Próxima acción histórica
-Chat 10: reacción a objetivos elegibles durante exploración con cancelación
-confirmada; no afectar viajes, transacciones ni recuperación de HP. Conservar
-8/9 y comprobar procesos/puertos primero. Nuevos chats: Terra 6.1 medio.
-El chat principal revisó run-result/planning-result y aceptó el alcance local;
-no se ha demostrado autonomía general ni spawns naturales.
+- Único relevo: este archivo. Checkout D:/Ragnarok Agents/m4-continuous; la raíz
+  (codex/web-search, WIP M2) no se implementa. WIP preservado en m3-worktree y m4-field.
+- P1–P3 hechos en su alcance: navegación, combate, loot, recuperación, portales,
+  NPC/tienda, metas persistentes, propuestas del 9B validadas, exploración. 127 tests OK.
+- P3: última meta 9/9, sin intención pendiente; cancelación viva y latencia sin medir.
+- P4 parcial: consulta standalone (inference/mechanics.py) con SearXNG activo en 8080;
+  dos muestras reales sin evidencia útil. No conectada al planner.
+- Servicios: MariaDB 50024, login 40760, char 55704, map 36528, Ollama, Docker/SearXNG.
+  Cliente P1 detenido; clientes m4-field no están corriendo.
+- Visitor en grupo local Observer (20: @jumpto, @hide); carga tras el último reinicio [por verificar].
+## Decisiones vigentes
+- rAthena pre-Renewal, versiones fijadas; OpenKore manual es el único ejecutor.
+- Solo portales caminables gratuitos; sin Kafra/pago. Sin premios, spawns ni progreso falso.
+- El agente usa solo información legítima del cliente; el modelo propone, el ejecutor valida.
+- Usuario: el 9B no basta para decidir e informar; se evaluará un reemplazo (p. ej. Gemini
+  gratis u otros). Hasta decidirlo no cambiar el modelo configurado.
+- Un chat orquestador y una sesión por objetivo, en este checkout; un solo escritor.
+## Incompleto / problemas / validaciones pendientes
+- P4: selección de consulta demasiado amplia; status ok no implica evidencia suficiente.
+- Selección de objetivo sin peligro; operación prolongada y spawns naturales sin demostrar.
+- "M4 Poring" = etiqueta de la caché compartida tables/monsters.txt; no editarla.
+- DB/puertos/GPU compartidos: no reiniciar servicios sin permiso; no ejecutar prepare_m4.py
+  con clientes m4-field vivos; transacciones inciertas sin replay.
+## Próxima acción
+Decidir con el usuario el modelo de reemplazo y evaluarlo con prompts reales grabados
+(metas, informe de estado, P4) antes de cambiar la configuración.
 ## Archivos relevantes
-- docs/evidence/P3-dynamic-exploration.md; agent/solo_cycle.py; bridge/lib/M1Explore.pm.
-- bridge/openkore/m1_bridge.pl; docs/evidence/P3-goal-boundary.md.
+- docs/CURRENT_STATE.md; docs/NATIVE_AGENT_PLAN.md; docs/USER_GUIDE.txt.
+- docs/evidence/P2*.md, P3-*.md, P4-public-mechanics.md; agent/solo_cycle.py.
+- bridge/openkore/m1_bridge.pl; bridge/lib/M1*.pm; inference/; config/m2-operating.json.
 Registro de chats: D:/Ragnarok Agents/.ai/chats/INDEX.md
