@@ -116,7 +116,7 @@ class Session:
 
 
 def ok(final):
-    return final['status'] in ('completed', 'rejected')
+    return final['status'] == 'completed'
 
 
 def main():

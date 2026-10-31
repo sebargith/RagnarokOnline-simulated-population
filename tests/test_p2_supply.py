@@ -7,7 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from scripts.p2_supply import buy_plan, decide
+from scripts.p2_supply import buy_plan, decide, ok
 
 # Recorded states exercised against the real Perl contract module. Inventory
 # mirrors Tarin's: Knife and Cotton Shirt equipped, Clover and Jellopy loot.
@@ -86,6 +86,11 @@ class SupplyContractTests(unittest.TestCase):
         if result.returncode:
             raise AssertionError(result.stderr)
         cls.data = json.loads(result.stdout)
+
+    def test_rejected_shop_or_travel_does_not_advance(self):
+        self.assertTrue(ok({'status': 'completed'}))
+        for status in ('rejected', 'failed', 'unknown', 'cancelled'):
+            self.assertFalse(ok({'status': status}))
 
     def test_admission_keeps_equipment_consumables_and_unowned_money(self):
         self.assertEqual(self.data['validate'], {
