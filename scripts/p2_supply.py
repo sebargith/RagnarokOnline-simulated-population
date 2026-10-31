@@ -27,6 +27,9 @@ SHOP = {'name': 'Fruit Gardener', 'map': 'prontera', 'npc': (104, 49), 'stand': 
 def decide(snap, shop=SHOP):
     """Need from observable state only: loot count, weight, healing and Zeny."""
     inv = snap.get('inventory') or []
+    if not snap.get('inventory_ready') or not inv:
+        # Never decide on a bag that has not been observed yet.
+        return {'go': False, 'sell': [], 'need_heal': 0, 'reasons': ['inventory_not_observed'], 'observed': {}}
     loot = {}
     for item in inv:
         if item.get('type') == ETC and not item.get('equipped'):
@@ -59,6 +62,7 @@ def buy_plan(snap, need, shop=SHOP):
 
 def view(snap):
     return {k: snap.get(k) for k in ('map', 'position', 'destination', 'zeny', 'weight', 'weight_max')} | {
+        'inventory_detail': snap.get('inventory') or [],
         'inventory': {i['name_id']: i['amount'] for i in snap.get('inventory') or []}}
 
 
@@ -80,13 +84,14 @@ class Session:
             elif kind in ('travel_hop', 'recovery', 'death', 'connection'):
                 self.events.append({'kind': kind, 'data': data})
 
-    def snap(self, fresh_after=None):
-        """Latest snapshot; with fresh_after (epoch ms), one emitted after it."""
+    def snap(self, fresh_after=None, inventory=False):
+        """Latest snapshot; with fresh_after (epoch ms), one emitted after it;
+        with inventory, one whose inventory has been received."""
         deadline = time.monotonic() + 10
         while time.monotonic() < deadline:
             latest = self.b.latest
             if latest and latest['data']['connected'] and self.b.next_serial is not None and \
-                    (fresh_after is None or latest['time_ms'] > fresh_after):
+                    (fresh_after is None or latest['time_ms'] > fresh_after) and                     (not inventory or (latest['data'].get('inventory_ready') and latest['data'].get('inventory'))):
                 return latest['data']
             self.pump()
         raise RuntimeError('No connected snapshot')
@@ -124,7 +129,9 @@ def main():
     summary = {}
     start = time.monotonic()
     try:
-        first = s.snap()
+        s.snap(inventory=True)
+        # Equipment and stackable lists arrive in separate packets: decide on a later snapshot.
+        first = s.snap(fresh_after=int(time.time() * 1000) + 1500, inventory=True)
         origin = {'map': first['map'], 'x': first['destination']['x'], 'y': first['destination']['y']}
         decision = decide(first)
         summary.update(start=view(first), decision=decision)

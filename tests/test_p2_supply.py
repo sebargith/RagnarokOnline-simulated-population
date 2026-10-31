@@ -120,7 +120,7 @@ class SupplyContractTests(unittest.TestCase):
 def snap(**o):
     inv = [{'name_id': 1201, 'amount': 1, 'type': 5, 'equipped': 1}, {'name_id': 2301, 'amount': 1, 'type': 4, 'equipped': 1},
         {'name_id': 705, 'amount': 2, 'type': 3, 'equipped': 0}, {'name_id': 909, 'amount': 5, 'type': 3, 'equipped': 0}]
-    return {'inventory': inv, 'zeny': 0, 'weight': 60, 'weight_max': 400} | o
+    return {'inventory': inv, 'inventory_ready': 1, 'zeny': 0, 'weight': 60, 'weight_max': 400} | o
 
 
 class SupplyPolicyTests(unittest.TestCase):
@@ -148,6 +148,11 @@ class SupplyPolicyTests(unittest.TestCase):
         inv = snap()['inventory'][:2]
         self.assertFalse(decide(snap(inventory=inv))['go'])
         self.assertTrue(decide(snap(inventory=inv, zeny=15))['go'])
+
+    def test_unobserved_inventory_never_decides(self):
+        for s in (snap(inventory=[]), snap(inventory_ready=0)):
+            d = decide(s)
+            self.assertEqual((d['go'], d['reasons']), (False, ['inventory_not_observed']))
 
     def test_buy_only_what_observed_zeny_affords(self):
         self.assertEqual(buy_plan({'zeny': 25}, 1), ([{'name_id': 512, 'amount': 1}], 15))
