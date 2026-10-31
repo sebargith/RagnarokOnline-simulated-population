@@ -4,6 +4,14 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Verified
 
+- **Research update, 2026-10-31:** reviewed OpenKore, openkore-ai-v3,
+  openkore-mcp, rust-ro-bot and Population Engine sources for reusable gameplay
+  execution. [Options and proposed single-character architecture](research/BOT_EXECUTION_OPTIONS.md).
+  Recommendation: native reactive OpenKore execution, bounded high-level LLM
+  goals and versioned web knowledge, starting with one normal level-1 character.
+  This is research/design only; no external project was installed or run and no
+  gameplay controller was changed. Chat 07 field work remains in its own checkout.
+
 - **Graphical map entry observed by the coordinator.** The user signed in as
   `Visitor`; the coordinator's screenshot confirms actual Prontera rendering
   at **152,180**. This is coordinator-observed evidence, not a new graphical
