@@ -118,3 +118,12 @@ class FieldTests(unittest.TestCase):
         c.data.return_value['map'] = 'prontera'
         c.home('peer')
         c.walk_to.assert_called_once_with('peer', 153, 180)
+
+    def test_reconnect_during_approach_cannot_authorize_old_target(self):
+        c = self.controller()
+        c.search_target = lambda actors: {'id': 'a', 'name': 'Poring', 'name_id': 1002}
+        c.approach = lambda *args: setattr(c.bridges['agent'], 'session', 'new-epoch')
+        c.submit = Mock()
+        with self.assertRaisesRegex(RuntimeError, 'epoch changed during approach'):
+            c.field_encounter(False)
+        c.submit.assert_not_called()

@@ -224,6 +224,12 @@ class FieldController(Continuous):
             if any(self.bridges[a].session != sessions[a] for a in actors):
                 raise RuntimeError('Encounter epoch changed; abandon target')
             self.approach(who, target)
+            # Navigation pumps observations: reconnect, HP or deadline may
+            # change during approach, after the checks above.
+            if any(self.bridges[a].session != sessions[a] for a in actors):
+                raise RuntimeError('Encounter epoch changed during approach; abandon target')
+            if time.monotonic() > deadline or any(not self.healthy(a) for a in actors):
+                raise RuntimeError('Combat deadline or low HP after approach: retreat')
             # Bridge checks the current actor and melee range again.
             request = self.submit(who, {'type': 'attack', 'target': target})
             self.wait(lambda: self.results.get((who, request), {}).get('status') in ('completed', 'rejected', 'unknown'), 7)
