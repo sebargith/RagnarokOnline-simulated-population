@@ -194,11 +194,17 @@ sub navigation_tick {
     }
     my $a = $pending->{action};
     my $evidence = nav_evidence();
+    if ($state eq 'done' && $evidence->{map} eq $a->{map} &&
+        M1Navigation::distance($evidence->{pos_to}, $a) == 0 &&
+        M1Navigation::distance($evidence->{position}, $a) > 1) {
+        $pending->{settle_since} //= time;
+    }
     # Task::getError asserts DONE; a running task has no error to read.
     my $error = $state eq 'done' ? $task->getError() : undef;
     my ($status, $reason) = M1Navigation::outcome($state, $error,
         {map => $evidence->{map}, dest_map => $a->{map}, pos_to => $evidence->{pos_to},
-         calc => $evidence->{position}, dest => {x => $a->{x}, y => $a->{y}}});
+         calc => $evidence->{position}, dest => {x => $a->{x}, y => $a->{y}},
+         settle_elapsed => defined($pending->{settle_since}) ? time - $pending->{settle_since} : undef});
     if ($status) {
         # Any non-arrival halts at the predicted cell instead of coasting on.
         stop_route() unless $status eq 'completed';

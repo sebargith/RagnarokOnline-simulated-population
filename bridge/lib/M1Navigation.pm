@@ -48,6 +48,10 @@ sub outcome {
     return ('unknown', 'map_changed') unless $obs->{map} eq $obs->{dest_map};
     return ('completed', 'arrived') if distance($obs->{pos_to}, $obs->{dest}) == 0 &&
         distance($obs->{calc}, $obs->{dest}) <= 1;
+    # Task::Route can finish as soon as pos_to matches while walking continues.
+    # Wait only for that precise case, and never infer arrival from pos_to alone.
+    return () if distance($obs->{pos_to}, $obs->{dest}) == 0 &&
+        defined($obs->{settle_elapsed}) && $obs->{settle_elapsed} < 5;
     return ('unknown', 'route_ended_off_target');
 }
 1;
