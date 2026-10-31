@@ -27,7 +27,7 @@ class Community:
             self.memories[who] = memory
             self.dialogues[who] = Dialogue(memory, operating, web, self.service, persona=profile['persona'])
 
-    def observe(self, who, event):
+    def observe(self, who, event, *, allow_dialogue=True):
         if event['agent_id'] != who:
             raise ValueError('Cross-identity observation')
         memory = self.memories[who]
@@ -38,7 +38,7 @@ class Community:
             data = event['data']
             memory.record(event['id'], 'reported_claim', {'speaker': data['speaker'], 'text': data['text'][:240], 'source': event['id']})
             prefix = 'M4:'+who+':'
-            if data['text'].startswith(prefix):
+            if allow_dialogue and data['text'].startswith(prefix):
                 question = data['text'][len(prefix):].strip()
                 self.dialogues[who].ask(question, event['session'], 'poring' if question == 'web poring' else None)
         elif event['kind'] == 'action_result':

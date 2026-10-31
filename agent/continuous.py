@@ -16,6 +16,11 @@ class StopRequested(Exception):
     pass
 
 
+class ResourceGuardError(Exception):
+    """Fatal resource guard; bypasses routine/trade RuntimeError recovery."""
+    pass
+
+
 class Continuous(Prototype):
     def __init__(self, root, runtime, run_id, duration=None):
         # Startup connects after owning m4.lock; caller starts existing profiles
@@ -34,6 +39,10 @@ class Continuous(Prototype):
         self.phase = 'starting'
         self.last_status = self.last_patrol = self.last_commands = 0
         self.inference_retry = 0
+        self.telemetry_valid = False
+        self.telemetry_failures = 0
+        self.telemetry_error = None
+        self.error = None
         self.suspended = True
         self.manual = deque(maxlen=8)
         self.counters = {'completed': 0, 'unknown': 0, 'rejected': 0, 'delivered_replies': 0, 'reconnections': 0, 'trade_completed': 0}
@@ -62,7 +71,7 @@ class Continuous(Prototype):
 
     def available(self, who):
         bridge = self.bridges[who]
-        if who in self.offline or not bridge.latest or time.monotonic()-self.last_send[who] < 1.15:
+        if not self.telemetry_valid or who in self.offline or not bridge.latest or time.monotonic()-self.last_send[who] < 1.15:
             return False
         data = bridge.latest['data']
         return (0 <= time.time()*1000-bridge.latest['time_ms'] <= 2500 and bridge.latest['session'] == bridge.session and data.get('connected')
@@ -101,7 +110,42 @@ class Continuous(Prototype):
         return {'run_id': self.run_id, 'pid': os.getpid(), 'updated': time.time(), 'running': True,
                 'elapsed_s': time.monotonic()-self.started, 'cycle': self.cycle, 'phase': self.phase,
                 'counters': self.counters, 'agents': agents, 'unresolved_trades': blocked,
-                'resources': list(self.resources), 'recent_replies': list(self.replies), 'event_count': self.event_count}
+                'resources': list(self.resources), 'recent_replies': list(self.replies), 'event_count': self.event_count,
+                'error': self.error,
+                'gpu_telemetry': {'valid': self.telemetry_valid, 'consecutive_failures': self.telemetry_failures, 'error': self.telemetry_error}}
+
+    def sample_resources(self):
+        sample = {'elapsed_s': time.monotonic()-self.started, **ram_sample(set())}
+        self.last_resource = time.monotonic()
+        if sample['ram_available'] < 2*1024**3:
+            raise ResourceGuardError('Unchanged M2 resource budget exceeded: available RAM below 2 GiB')
+        try:
+            gpu = subprocess.check_output(['nvidia-smi', '--query-gpu=memory.used', '--format=csv,noheader,nounits'], text=True, timeout=3, creationflags=subprocess.CREATE_NO_WINDOW)
+            used = int(gpu.strip())
+            if used < 0:
+                raise ValueError('Negative GPU usage')
+        except (subprocess.SubprocessError, OSError, ValueError) as error:
+            self.telemetry_valid = False
+            self.telemetry_failures += 1
+            self.telemetry_error = {'type': type(error).__name__, 'message': str(error)[:240]}
+            self.resources.append({**sample, 'gpu_used_mib': None, 'gpu_telemetry_error': self.telemetry_error})
+            self.note('gpu_telemetry_unavailable', attempt=self.telemetry_failures, error=self.telemetry_error)
+            if self.telemetry_failures >= 2:
+                raise ResourceGuardError('GPU telemetry unavailable after two consecutive probes: '+str(error)) from error
+        else:
+            self.resources.append({**sample, 'gpu_used_mib': used})
+            recovered = bool(self.telemetry_failures)
+            self.telemetry_failures = 0
+            self.telemetry_error = None
+            if used > 14336:
+                self.telemetry_valid = False
+                raise ResourceGuardError('Unchanged M2 resource budget exceeded: GPU usage above 14336 MiB')
+            if recovered:
+                self.note('gpu_telemetry_recovered')
+            self.telemetry_valid = True
+        finally:
+            # Schedule from probe completion, not from its potentially slow start.
+            self.last_resource = time.monotonic()
 
     def controls(self):
         stop = self.live/'stop.json'
@@ -160,6 +204,11 @@ class Continuous(Prototype):
         while time.monotonic() < end:
             self.controls()
             now = time.monotonic()
+            # On one failed probe, keep draining perceptions/results but admit
+            # no new actions/turns. Retry once after one second, then fail closed.
+            if now-self.last_resource >= (1 if self.telemetry_failures else 5):
+                self.sample_resources()
+                now = time.monotonic()
             for who in self.bridges:
                 if who in self.offline:
                     due, delay = self.connection_retry[who]
@@ -187,7 +236,7 @@ class Continuous(Prototype):
                     self.event_count += 1
                     self.raw.write(json.dumps(event)+'\n')
                     self.events.append(event)
-                    self.community.observe(who, event)
+                    self.community.observe(who, event, allow_dialogue=self.telemetry_valid)
                     db = self.journal(who)
                     if event['kind'] == 'snapshot' and event['data']['connected']:
                         # Preserve unknown outcomes, retire their authority only
@@ -223,14 +272,6 @@ class Continuous(Prototype):
                     self.inference_retry = 0
                     self.note('inference_circuit_reopened')
             self.background()
-            if now-self.last_resource >= 5:
-                sample = {'elapsed_s': now-self.started, **ram_sample(set())}
-                gpu = subprocess.check_output(['nvidia-smi', '--query-gpu=memory.used', '--format=csv,noheader,nounits'], text=True, timeout=3, creationflags=subprocess.CREATE_NO_WINDOW)
-                sample['gpu_used_mib'] = int(gpu.strip())
-                self.resources.append(sample)
-                self.last_resource = now
-                if sample['ram_available'] < 2*1024**3 or sample['gpu_used_mib'] > 14336:
-                    raise RuntimeError('Unchanged M2 resource budget exceeded')
             if now-self.last_status >= 1:
                 atomic_json(self.live/'status.json', self.snapshot_status())
                 self.last_status = now
@@ -291,8 +332,6 @@ class Continuous(Prototype):
             except (TimeoutError, OSError, ValueError, RuntimeError) as error:
                 # Unknown protocol work is never reissued; full login resync
                 # precedes a fresh routine goal. Ledger still blocks transfers.
-                if 'resource budget' in str(error):
-                    raise
                 self.phase = 'recovery_backoff'
                 self.note('routine_paused', error=str(error), backoff_s=backoff)
                 self.pump(backoff)
@@ -309,11 +348,23 @@ class Continuous(Prototype):
                     self.note('recovery_failed', error=str(recovery_error))
                 backoff = min(60, backoff*2)
 
+    def record_failure(self, error):
+        self.error = {'type': type(error).__name__, 'message': str(error)[:1024]}
+        self.note('fatal', error=self.error)
+
     def close(self):
         self.note('stopping', cycle=self.cycle)
         status = self.snapshot_status()
         status.update(phase='stopping')
         atomic_json(self.live/'status.json', status)
-        super().close()
-        status.update(running=False, phase='stopped', updated=time.time())
-        atomic_json(self.live/'status.json', status)
+        try:
+            super().close()
+        except BaseException as error:
+            cleanup_error = {'type': type(error).__name__, 'message': str(error)[:1024]}
+            if self.error is None:
+                self.error = cleanup_error
+            status['cleanup_error'] = cleanup_error
+            raise
+        finally:
+            status.update(running=False, phase='failed' if self.error else 'stopped', error=self.error, updated=time.time())
+            atomic_json(self.live/'status.json', status)

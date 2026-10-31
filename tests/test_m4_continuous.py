@@ -59,6 +59,7 @@ print "ok";
     def controller(self):
         controller = Continuous.__new__(Continuous)
         controller.offline = set()
+        controller.telemetry_valid = True
         controller.last_send = {'agent': 0}
         db = sqlite3.connect(':memory:')
         db.execute('CREATE TABLE live_intents(session TEXT,id TEXT,action TEXT,status TEXT,created REAL,retired INTEGER DEFAULT 0,PRIMARY KEY(session,id))')

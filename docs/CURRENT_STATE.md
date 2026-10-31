@@ -4,21 +4,53 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Verified
 
-- **Graphical startup configured and observed.** Local connection override,
+- **Graphical map entry observed by the coordinator.** The user signed in as
+  `Visitor`; the coordinator's screenshot confirms actual Prontera rendering
+  at **152,180**. This is coordinator-observed evidence, not a new graphical
+  test performed by this repair chat. Local connection override,
   `Play-Local.cmd`, ordinary `roplayer` account and `Visitor` character are
   prepared. The actual client rendered the local-server selection screen.
   Credentials stay in ignored `runtime/player-client/PLAYER_ACCOUNT.txt`.
-  User sign-in and graphical map entry remain pending; see the
-  [client evidence](evidence/PLAYER-client-downloads.md). The continuous
-  controller was started for this session; check live status before use.
+  [client setup evidence](evidence/PLAYER-client-downloads.md) records the earlier
+  startup stage. The user is actively playing; do not restart their client,
+  game servers or database for this repair.
 
-- **Graphical client assets downloaded, not yet connected.** Matching dated
+- **Focused GPU-telemetry/status repair, unit-verified and not reloaded.** Run
+  `950fec06e8fa45bcbcbe899a8ddd2889` ended at cycle 12 after `nvidia-smi
+  --query-gpu=memory.used --format=csv,noheader,nounits` exceeded its 3-second
+  timeout. Read-only inspection found its `fatal` then `stopping` records in
+  `runtime/m4/live/events.jsonl*`; the coordinator observed final status falsely
+  showing `running: false`, `phase: stopped` without a fatal cause.
+  The sampler now allows one retry after a one-second pause, retaining the
+  3-second timeout per probe. Failed/invalid telemetry is explicitly unknown;
+  new game actions and dialogue admissions pause while observations/results
+  continue draining between probes. A valid in-budget sample resumes admission;
+  a second consecutive failure stops with `phase: failed` and a typed error.
+  Fatal resource guards bypass trade/routine retry handlers, and cleanup
+  preserves the original fatal cause. RAM floor **2 GiB** and GPU ceiling
+  **14,336 MiB** are unchanged.
+- **Checks for this repair:** `python -m unittest discover -s tests -v` passed
+  **55 tests** (eight new mocked telemetry/status regressions); `python -m
+  compileall -q agent scripts/live_m4.py tests` and `git diff --check` passed.
+  Python was `D:/Ragnarok Agents/.venv/Scripts/python.exe`, working directory
+  `D:/Ragnarok Agents/m4-continuous`. Tests cover transient recovery, bounded
+  failure, polling while paused, invalid/missing tool output, unchanged resource
+  thresholds, paused chat, fatal status after cleanup and cleanup failure.
+  No real telemetry probe, gameplay trial, live controller start/stop, model
+  request, service restart or credential-file access was performed for this
+  repair. Initial restricted-temp-file checks required normal unit-test
+  filesystem permissions; the passing suite used mocked lifecycle/subprocess
+  calls and temporary state only. Coordinator-restarted run
+  `3ad42605f436403bb32ff970e2064faf` was left on the prior source.
+
+- **Graphical client assets prepared (earlier setup checks).** Matching dated
   EXEs, GRFs and supporting files are staged at
   `D:/Ragnarok Agents/runtime/player-client`. Archive/source hashes, PE32
   headers, direct DLL availability and Prontera map entries were checked.
   The initial download checks did not execute programs; graphical startup was
   subsequently observed as recorded above. [Download evidence](evidence/PLAYER-client-downloads.md).
-  Successful graphical login/map entry remains unverified.
+  Those setup checks alone did not establish map entry; the coordinator's
+  subsequent successful login/rendering observation is recorded above.
 
 - **Coordinator review of Chat 06, 2026-10-30:** accepted the continuous
   fixture runtime for its demonstrated functional scope. All seven frozen
@@ -173,11 +205,13 @@ Updated: 2026-10-30 (America/Santiago).
 
 ## Next action
 
-User: sign in at the graphical local-server screen with credentials in
-`runtime/player-client/PLAYER_ACCOUNT.txt` and select `Visitor`; then verify
-Prontera rendering and the nearby agents. `Play-Local.cmd` relaunches the client.
-The continuous controller was started and its fresh status showed `solo_hunt`,
-two cycles, no reported error. Use README's status/stop commands to manage it.
+Leave the user's active `Visitor` play session and the current controller
+untouched. The telemetry/status fix requires a later controller stop/start to
+load the new Python source; the existing `start` helper also refreshes the
+three headless agent clients. No game-server, database or graphical player-client
+restart is required. The running controller has not hot-reloaded this repair;
+check its status before assuming it remains active. `Play-Local.cmd` remains
+the player's launcher.
 SearXNG's offline Docker backend remains a separate outstanding service issue.
 Unresolved transfers must be reconciled,
 never bypassed by deleting state. Naturalness and one-hour stabilization remain

@@ -41,7 +41,7 @@ def run(args):
             pass
         except BaseException as error:
             if controller:
-                controller.note('fatal', error=str(error))
+                controller.record_failure(error)
             else:
                 atomic_json(live/'status.json', {'run_id': run_id, 'running': False, 'phase': 'failed', 'error': str(error), 'updated': time.time()})
             raise

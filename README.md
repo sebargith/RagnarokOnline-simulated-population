@@ -129,6 +129,12 @@ status age indicates an exited/hung process or a lifecycle operation, not proof
 of current connection. A second controller or direct M4 preparation fails its
 ownership lock while this controller runs.
 
+A GPU-telemetry failure pauses new actions and dialogue admissions, with one
+retry after one second (each probe still has a three-second timeout). If the
+retry fails, the controller fails closed. Fatal exits report `phase: failed`
+and a typed `error` in status; normal cleanup reports `phase: stopped`.
+RAM/GPU budgets remain unchanged.
+
 Alden alternates solo and explicitly coordinated Poring hunts with Bram,
 collects loot, and offers one Jellopy for ten Zeny every three successful hunts.
 Mira patrols two nearby cells and can converse. Unaffordable trades or missing
