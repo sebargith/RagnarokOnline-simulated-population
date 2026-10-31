@@ -9,7 +9,7 @@ import os
 from pathlib import Path
 import time
 
-from scripts.p1_hunt import PATROL, dist
+from scripts.p1_hunt import dist
 from scripts.p2_supply import SHOP, buy_plan, decide
 
 FINAL = {'completed', 'failed', 'cancelled', 'unknown', 'rejected'}
@@ -112,6 +112,11 @@ class SoloCycle:
         now = time.time() if now is None else now
         self.state['inflight'] = dict(action=copy.deepcopy(action), request_id=request_id,
             session=session, deadline=now + action['timeout_s'] + 12)
+        if getattr(self, '_exploration', None) == action:
+            visits = self.state.get('explore_visits', [])
+            self.state['explore_visits'] = (visits + [self._explore_origin,
+                {'map': action['map'], 'x': action['x'], 'y': action['y']}])[-24:]
+        self._exploration = None
         # Failure here prevents proposal. A crash after this write is uncertain.
         self.save()
 
@@ -167,6 +172,7 @@ class SoloCycle:
     def plan(self, snap, now=None):
         """Return one capability or None (wait/stopped). No game side effects."""
         s = self.state
+        self._exploration = None
         now = time.time() if now is None else now
         if s['status'] != 'active' or s['inflight']:
             return None
@@ -216,8 +222,29 @@ class SoloCycle:
                             return {'type': 'navigate', 'map': snap['map'], 'x': m['x'], 'y': m['y'], 'timeout_s': 25}
                         s['loot_spot'] = {'x': m['x'], 'y': m['y']}
                         return {'type': 'attack', 'target': m['id'], 'timeout_s': 45}
-                    x, y = PATROL[s['patrol'] % len(PATROL)]
-                    return {'type': 'navigate', 'map': snap['map'], 'x': x, 'y': y, 'timeout_s': 25}
+                    candidates = snap.get('explore_candidates')
+                    if not isinstance(candidates, list):
+                        self.block('exploration_candidates_unavailable'); return None
+                    avoid = s.get('avoid_route') or {}
+                    candidates = [p for p in candidates if isinstance(p, dict) and
+                        type(p.get('x')) is int and type(p.get('y')) is int and
+                        dist(p, snap['position']) > 1 and not
+                        (avoid.get('until', 0) > now and avoid.get('map') == snap['map'] and
+                         p['x'] == avoid.get('x') and p['y'] == avoid.get('y'))]
+                    if not candidates:
+                        self.block('exploration_no_reachable_candidate'); return None
+                    visits = [p for p in s.get('explore_visits', []) if p.get('map') == snap['map']]
+                    # Prefer the least recently covered area; deterministic ties
+                    # favor longer rays, then rotate according to completed routes.
+                    def score(p):
+                        nearest = min((dist(p, v) for v in visits), default=1000)
+                        return (nearest, dist(p, snap['position']))
+                    best = max(score(p) for p in candidates)
+                    choices = [p for p in candidates if score(p) == best]
+                    target = choices[s['patrol'] % len(choices)]
+                    action = {'type': 'navigate', 'map': snap['map'], **target, 'timeout_s': 25}
+                    self._exploration, self._explore_origin = action.copy(), {'map': snap['map'], **snap['position']}
+                    return action
             elif phase == 'to_shop':
                 stand = {'x': SHOP['stand'][0], 'y': SHOP['stand'][1]}
                 if snap['map'] == SHOP['map'] and dist(snap['position'], stand) <= 1:

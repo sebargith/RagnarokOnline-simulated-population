@@ -17,6 +17,7 @@ use Utils ();
 use Settings ();
 use M4RequestWindow;
 use M1Navigation;
+use M1Explore;
 use M1Combat;
 use M1Travel;
 use M1Supply;
@@ -126,6 +127,10 @@ sub snapshot {
             you_locked => $currentDeal{you_finalize} ? 1 : 0, other_locked => $currentDeal{other_finalize} ? 1 : 0};
         $s->{inventory_ready} = $char->inventory->isReady ? 1 : 0;
         $s->{field} = {width => $field->width, height => $field->height};
+        if ($cfg->{native_navigation} && !$pending && $recovery{phase} eq 'none' && !$char->{dead}) {
+            $s->{explore_candidates} = M1Explore::candidates($s->{position}, $field->width, $field->height,
+                sub { $field->isWalkable(@_) }, sub { $field->checkPathFree(@_) });
+        }
         my @inventory = map {{name => $_->{name}, name_id => 0 + $_->{nameID}, amount => 0 + $_->{amount},
             type => 0 + ($_->{type} // 0), equipped => $_->{equipped} ? 1 : 0}}
             @{$char->inventory->getItems};
