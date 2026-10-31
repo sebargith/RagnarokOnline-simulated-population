@@ -39,6 +39,10 @@ no bloquean la primera entrega.
   registro propio `runtime/p1/processes.json`. Cliente P1 detenido al terminar.
   [Evidencia y límites](evidence/P1a-native-navigation.md).
 - rAthena, MariaDB y Ollama con listeners; 8080 (SearXNG) sin listener.
+- Observador (pedido del usuario, 11:55): grupo local `Observer` (Id 20, solo
+  `@jumpto` y `@hide`) en `vendor/rathena/conf/import/groups.yml` (fuera de Git);
+  Visitor (`roplayer`) en ese grupo. Map-server reiniciado en orden (nuevo PID
+  46040); los 3 clientes m4-field se reconectaron solos. Revertir: `group_id=0`.
 - P1b implementada y probada en vivo: attack/take/respawn nativos y recuperación
   local. Tarin colocado (desconectado, sin recursos) en `prt_fild08`, guardado en
   Prontera; ahora nivel base 4 / job 2, cliente P1 detenido.

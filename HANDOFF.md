@@ -10,7 +10,8 @@ Un personaje normal desde nivel 1, ejecutor nativo OpenKore, 9B para objetivos y
 - P1a navegación; P1b attack/take/respawn y recuperación local (retirada, descanso). 61 tests OK.
 - Run final: 6/6 muertes, 3 recogidas, 0 muertes, regeneración natural en descanso. Sin inferencia.
 - Clientes m4-field agent/peer/third (30496/60476/43560, 8765–8767) vivos, sin tocar.
-- rAthena/MariaDB/Ollama arriba; SearXNG 8080 sin listener.
+- rAthena/MariaDB/Ollama arriba (map-server PID 46040 tras reinicio ordenado); SearXNG 8080 sin listener.
+- Visitor en grupo local Observer (Id 20: @jumpto, @hide) para mirar pruebas; conf/import/groups.yml fuera de Git.
 ## Cambios desde el último relevo
 - bridge/lib/M1Combat.pm; attack/take/respawn/recovery en bridge/openkore/m1_bridge.pl; scripts/p1_hunt.py.
 - tests/test_p1_combat.py; docs/evidence/P1b-native-combat.md; README/estado/guía.
