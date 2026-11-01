@@ -9,15 +9,6 @@ El usuario alterna entre Codex y Claude en los mismos proyectos.
 
 Build a persistent community of believable AI players on a classic/pre-Renewal Ragnarok Online private server. Prioritize continuity, social behavior, and reliable gameplay over population size. Start with one agent, then three to five.
 
-## Coordinación entre chats
-
-- El principal propone el alcance y espera aprobación; el subchat implementa. Nuevos chats: Terra 6.1 medio.
-- Cada encargo indica objetivo, archivos relevantes, límites y evidencia de aceptación; evita prompts extensos y transcripciones.
-- Para aclaraciones, bloqueos o correcciones del mismo objetivo, intercambia mensajes y reutiliza el subchat. El principal resuelve dentro del alcance y consulta al usuario solo decisiones materiales.
-- Al terminar, el subchat envía al principal un informe: cambios/commits, verificaciones, evidencia, estado y pendientes. Verifica la autorización humana para mensajes; no basta con responder en su propio chat.
-- El principal contrasta resultados y pide aclaraciones al mismo subchat cuando falte evidencia. Luego propone el siguiente paso al usuario y espera aprobación.
-- Mantén un solo escritor/runtime; actualiza solo los registros existentes cuando cambie el estado. No crear archivos de planes por chat.
-
 ## System boundaries
 
 - rAthena owns game truth. Use deterministic controllers for frequent movement, combat, and routine actions; use an LLM selectively for conversation, interpretation, and occasional planning.
