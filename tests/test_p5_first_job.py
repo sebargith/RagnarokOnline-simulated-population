@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from scripts.install_first_job import install
 from agent.solo_cycle import SoloCycle
@@ -44,6 +45,51 @@ print JSON::PP->new->encode({
         for key in ('close', 'wrong', 'early_packet'):
             self.assertEqual(data[key], ['unknown', 'job_change_unconfirmed'])
         self.assertEqual(data['no_confirm'], ['failed', 'timeout'])
+
+    def test_name_resolution_requires_same_actor_and_fresh_response(self):
+        code = r'''use M1Travel; use JSON::PP; print JSON::PP->new->encode([
+          M1Travel::first_job_name_step(1,undef,1,6),
+          M1Travel::first_job_name_step(1,'First Job Changer',2,6),
+          M1Travel::first_job_name_step(1,'Other',2,6),
+          M1Travel::first_job_name_step(1,undef,6,6),
+          M1Travel::first_job_name_step(0,'First Job Changer',2,6)]);'''
+        result = subprocess.run([str(PERL), '-I' + str(ROOT / 'bridge/lib'), '-e', code],
+                                capture_output=True, text=True, timeout=10, check=True)
+        self.assertEqual(json.loads(result.stdout), ['waiting', 'resolved', 'wrong_map_or_npc',
+                                                     'npc_name_timeout', 'npc_actor_changed'])
+
+    def test_training_resumes_without_replacing_prior_goal(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'state.json'
+            c = SoloCycle(path)
+            c.state.update(status='complete', reason='confirmed_kill_goal', kills=6, goal_kills=6)
+            c.save()
+            self.assertTrue(c.train_first_job())
+            resumed = SoloCycle(path)
+            self.assertFalse(resumed.train_first_job())
+            self.assertEqual(resumed.state['previous_goal']['kills'], 6)
+            self.assertEqual(resumed.state['goal_kills'], 6)
+            self.assertEqual(resumed.state['status'], 'active')
+            resumed.block('unknown_effect')
+            with self.assertRaises(RuntimeError): resumed.train_first_job()
+
+    def test_first_job_waits_for_level_and_spent_points(self):
+        for level, points in ((9, 0), (10, 1)):
+            with self.subTest(level=level, points=points), tempfile.TemporaryDirectory() as directory:
+                c = SoloCycle(Path(directory) / 'state.json', p5={'build': {'target_class': 'Swordman'},
+                    'tables': {'monsters': {}, 'fields': {}}, 'equipment': {}})
+                c.progress_action = lambda snap: None
+                c.supply = lambda snap: {'go': False}
+                c.state['macro_goal'] = 'train_first_job'
+                c.state['field']['id'] = 'prt_fild08'
+                snap = snapshot(points_skill=points)
+                snap.update(executor='openkore_route', recovery='none', hp=40, hp_max=40,
+                            map='prt_fild08', position={'x': 100, 'y': 100}, monsters=[],
+                            explore_candidates=[{'x': 110, 'y': 100}])
+                snap['level']['job'] = level
+                with patch('agent.solo_cycle.hunting.viable_targets', return_value=set()):
+                    self.assertEqual(c.plan(snap)['type'], 'navigate')
+                self.assertEqual(c.state['phase'], 'hunt')
 
     def test_npc_is_restricted(self):
         text = (ROOT / 'config/npc/first-job-changer.txt').read_text()

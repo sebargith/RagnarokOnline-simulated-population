@@ -54,6 +54,7 @@ $hooks = Plugins::addHooks(
     ['npc_talk', \&npc_text], ['npc_autotalk', \&npc_autotalk], ['packet/npc_sell_list', \&shop_sell_list], ['buy_result', \&shop_buy_result], ['packet/sell_result', \&shop_sell_result], ['packet/inventory_item_added', \&inventory_added], ['packet/stat_info', \&stat_info],
     ['packet_pre/stats_added', \&progress_stat_ack], ['packet/skill_update', \&progress_skill_ack],
     ['job_changed', \&first_job_changed],
+    ['npcNameUpdate', \&first_job_name_update],
     ['packet/equip_item', \&progress_equip_ack], ['packet/unequip_item', \&progress_unequip_ack],
     ['engaged_deal', \&trade_engaged], ['incoming_deal', \&trade_incoming],
     ['packet/deal_add_you', \&trade_added], ['packet/deal_finalize', \&trade_locked],
@@ -545,7 +546,7 @@ sub map_changed {
 sub cancel_talk { $messageSender->sendTalkCancel($pending->{npc_bin}) if connected() }
 
 sub talk_request {
-    my ($id, $a) = @_;
+    my ($id, $a, $resolved) = @_;
     my $first_job = $a->{type} eq 'first_job';
     my ($x, $y) = $first_job ? (153, 193) : ($a->{x}, $a->{y});
     my $at = sub { defined($_[0]) && !ref($_[0]) && $_[0] =~ /^\d{1,3}$/ };
@@ -558,6 +559,21 @@ sub talk_request {
         npc => $npc && $npc->{pos}, npc_name => $npc && $npc->{name}, map => $field->baseName,
         job_id => $char->{jobID}, job_level => $char->{lv_job}, points_skill => $char->{points_skill},
         pos => Utils::calcPosFromPathfinding($field, $char)};
+    if ($first_job && !$resolved) {
+        # Resolve a fresh server response for this exact actor, never a cached name.
+        my @at = grep { $_->{pos}{x} == 153 && $_->{pos}{y} == 193 } @{$npcsList->getItems};
+        if (@at != 1 || $field->baseName ne 'prontera') { result($id, 'rejected', 'npc_ambiguous_or_missing'); return }
+        my $why = M1Travel::validate_first_job_precheck($a, $ctx);
+        if ($why) { result($id, 'rejected', $why); return }
+        unless (Misc::isSafeActorQuery($npc->{ID}) == 1) { result($id, 'rejected', 'npc_query_unsafe'); return }
+        my $now = time;
+        $pending = {id => $id, action => $a, native => 'first_job_lookup', actor => $npc,
+            npc_bin => $npc->{ID}, started => $now, deadline => $now + 6, retry_at => $now + 2, attempts => 1};
+        $messageSender->sendGetPlayerInfo($npc->{ID});
+        $last_action = $now;
+        result($id, 'accepted', 'npc_name_requested'); return;
+    }
+    $ctx->{npc_name} = $resolved->{name} if $first_job && $resolved;
     my $reason = $first_job ? M1Travel::validate_first_job($a, $ctx) :
         $script ? M1Travel::validate_script($a, $ctx) : M1Travel::validate_talk($a, $ctx);
     if ($reason) { result($id, 'rejected', $reason); return }
@@ -571,6 +587,31 @@ sub talk_request {
     $last_action = $now;
     $messageSender->sendTalk($npc->{ID});
     result($id, 'accepted', 'talk_sent');
+}
+
+sub first_job_name_update {
+    my (undef, $args) = @_;
+    return unless $pending && ($pending->{native} // '') eq 'first_job_lookup';
+    my $actor = $args->{npc};
+    return unless $actor && $actor == $pending->{actor} && $actor->{ID} eq $pending->{npc_bin};
+    $pending->{resolved_name} = $actor->{name};
+}
+
+sub first_job_lookup_tick {
+    my $p = $pending;
+    my @at = grep { $_->{pos}{x} == 153 && $_->{pos}{y} == 193 } @{$npcsList->getItems};
+    my $same = $field->baseName eq 'prontera' && @at == 1 && $at[0] == $p->{actor} && $at[0]{ID} eq $p->{npc_bin};
+    my $step = M1Travel::first_job_name_step($same, $p->{resolved_name}, time, $p->{deadline});
+    if ($step eq 'resolved') {
+        my ($id, $a, $name) = ($p->{id}, $p->{action}, $p->{resolved_name});
+        undef $pending;
+        talk_request($id, $a, {name => $name}); return;
+    }
+    if ($step ne 'waiting') { finish('rejected', $step); return }
+    if ($p->{attempts} < 2 && time >= $p->{retry_at}) {
+        unless (Misc::isSafeActorQuery($p->{npc_bin}) == 1) { finish('rejected', 'npc_query_unsafe'); return }
+        $messageSender->sendGetPlayerInfo($p->{npc_bin}); $p->{attempts}++;
+    }
 }
 
 sub talk_finish {
@@ -1276,6 +1317,7 @@ sub tick {
     $quit = 1 if $stopping && time >= $stopping;
     my $native = $pending ? $pending->{native} // '' : '';
     if ($native eq 'travel') { travel_tick() if $ready }
+    elsif ($native eq 'first_job_lookup') { first_job_lookup_tick() if $ready }
     elsif ($native eq 'npc_talk') { talk_tick() if $ready }
     elsif ($native eq 'shop') { shop_tick() if $ready }
     elsif ($native eq 'progress') { progress_tick() if $ready }

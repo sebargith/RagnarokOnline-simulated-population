@@ -127,6 +127,22 @@ class SoloCycle:
         self.save()
         return True
 
+    def train_first_job(self):
+        """Resume one persistent macro goal without replacing confirmed history."""
+        s = self.state
+        if s.get('macro_goal') == 'train_first_job' and s['status'] == 'active':
+            return False
+        if (s.get('macro_goal') or s['status'] != 'complete' or s.get('reason') != 'confirmed_kill_goal'
+                or s.get('inflight') or s['phase'] != 'hunt'):
+            raise RuntimeError('Training requires a completed, resolved hunt checkpoint')
+        s['macro_goal'] = 'train_first_job'
+        s['macro_started_at'] = time.time()
+        s['previous_goal'] = {'goal_kills': s['goal_kills'], 'kills': s['kills'], 'reason': s['reason']}
+        s.update(status='active', failures=0)
+        s.pop('reason', None)
+        self.save()
+        return True
+
     def prepare(self, action, request_id, session, now=None):
         if self.state['inflight'] or self.state['status'] != 'active':
             raise RuntimeError('Cannot replace unresolved intent')
@@ -157,6 +173,14 @@ class SoloCycle:
         kind, reason = action['type'], result.get('reason', '')
         s['history'] = (s['history'] + [{**p, 'result': result}])[-24:]
         self._learn(p, result, now)
+        if s.get('macro_goal') == 'train_first_job':
+            if result['status'] in {'failed', 'rejected'}:
+                failure = {'type': kind, 'reason': reason}
+                if s.get('last_training_failure') == failure:
+                    self.block('two_identical_training_failures'); return True
+                s['last_training_failure'] = failure
+            elif result['status'] == 'completed':
+                s.pop('last_training_failure', None)
         if kind in PROGRESS and result['status'] in {'failed', 'rejected'}:
             # A refused or inadmissible point/equip step pauses the build policy
             # until the next level; it is not a hunting failure.
@@ -378,7 +402,7 @@ class SoloCycle:
                     if snap['map'] == field:
                         s['return_to'] = {'map': snap['map'], **snap['position']}
                     s['phase'] = 'to_shop'
-                elif s['kills'] >= s['goal_kills']:
+                elif s.get('macro_goal') != 'train_first_job' and s['kills'] >= s['goal_kills']:
                     s.update(status='complete', reason='confirmed_kill_goal'); self.save(); return None
                 elif snap['map'] != field:
                     s['phase'] = 'return'

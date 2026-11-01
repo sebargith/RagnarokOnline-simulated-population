@@ -1,5 +1,11 @@
 # Estado actual
 
+## P5.5 — entrenamiento preparado para muestra (2026-11-01)
+
+- Identificación del Job Changer solicita nombre al servidor para el actor exacto; cambios, nombre incorrecto o timeout se rechazan. Sin validación viva de esta corrección.
+- Meta persistente de entrenamiento y modo explícito sin inferencia usan build y campo existentes; pruebas locales cubren reanudación, requisitos y bloqueo de resultado incierto. La muestra en segundo plano aún no constituye evidencia de éxito.
+- Último estado verificado previo a la muestra: Nilo detenido en Prontera (153,192), Novice base2/job1; tutorial completo y ciclo 1/1 completo, sin inflight. Consultar resumen de la muestra antes de volver a iniciar al cliente.
+
 ## P5.5 — NPC cargado y negativa observada (2026-11-01)
 
 - Job Changer personalizado cargado tras confirmar cero jugadores; rAthena arrancó sin errores de parser observados. Nilo Job 1 viajó y recibió la negativa real del NPC; clase, EXP, puntos, Zeny e inventario sin cambios. [Evidencia](evidence/P5-first-job.md).

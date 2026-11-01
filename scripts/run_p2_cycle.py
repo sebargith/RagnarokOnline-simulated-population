@@ -284,6 +284,7 @@ class Runner:
             'running': running, 'pid': os.getpid(), 'updated': time.time(), 'reason': reason,
             'status': s['status'], 'phase': s['phase'], 'kills': s['kills'],
             'goal_kills': s['goal_kills'], 'inflight': s['inflight'],
+            'actions_sent': self.actions,
             'block_reason': s.get('reason'), 'resources': self.resources,
             'planning_result': self.planning_result, 'inference_calls': self.inference_calls,
             'field': s.get('field'), 'last_field_decision': (s.get('field_decisions') or [None])[-1],
@@ -414,9 +415,15 @@ def main():
     parser.add_argument('--max-actions', type=int, default=0)
     parser.add_argument('--pause-after-send', action='store_true', help='Disconnect after one proposal to verify restart recovery')
     parser.add_argument('--p5', action='store_true', help='Apply the build and choose hunting fields with the planner role')
+    parser.add_argument('--no-inference', action='store_true', help='Use only the already selected build and field')
+    parser.add_argument('--train-first-job', action='store_true', help='Resume the persistent first-class macro goal')
     parser.add_argument('--agent', choices=('p1', 'p5'), default='p1',
                         help='p1: Tarin (test bench); p5: the new novice, which first leaves the training grounds')
     args = parser.parse_args()
+    if args.no_inference and (args.command != 'run' or args.agent != 'p5' or not args.p5 or args.intent is not None):
+        parser.error('--no-inference requires run --agent p5 --p5 without intent')
+    if args.train_first_job and not args.no_inference:
+        parser.error('--train-first-job requires --no-inference')
     if args.intent is not None and (args.command != 'run' or not 1 <= len(args.intent) <= 400):
         parser.error('--intent requires run and 1..400 characters')
     if args.agent == 'p5' and (args.intent is not None or args.command in ('set-goal', 'reconcile-navigation') or
@@ -437,8 +444,8 @@ def main():
         state['status_age_s'] = round(time.time()-state['updated'], 1) if 'updated' in state else None
         print(json.dumps(state))
         return
-    if not 1 <= args.seconds <= 3600 or not 0 <= args.max_actions <= 100:
-        parser.error('seconds must be 1..3600 and max-actions 0..100')
+    if not 1 <= args.seconds <= 3600 or not 0 <= args.max_actions <= 150:
+        parser.error('seconds must be 1..3600 and max-actions 0..150')
     directory.mkdir(parents=True, exist_ok=True)
     with exclusive(base/'cycle.lock'):
         if args.command == 'set-goal' and (args.target_kills is None or not (directory/'state.json').exists()):
@@ -499,6 +506,20 @@ def main():
                               'kills': cycle.state['kills'], 'status': cycle.state['status']}))
             return
         lesson = Tutorial(directory/'tutorial.json', identity) if args.agent == 'p5' else None
+        if args.no_inference:
+            if not lesson or lesson.state['status'] != 'complete':
+                raise RuntimeError('No-inference mode requires a completed tutorial')
+            stored = read_build(directory/'build.json')
+            builds = build_policy.load_builds()
+            build_id = stored and stored.get('build_id')
+            destination = lesson.state.get('destination') or {}
+            if (not stored or stored.get('identity') != identity or build_id not in builds or
+                    builds[build_id]['target_class'] != destination.get('job', '').replace('Swordsman', 'Swordman') or
+                    not cycle.state['field'].get('id') or not cycle.state.get('return_to')):
+                raise RuntimeError('No-inference mode requires a matching saved build, destination and field')
+            p5['build'] = builds[build_id]
+            if args.train_first_job:
+                cycle.train_first_job()
         if lesson and lesson.state['status'] == 'blocked':
             print(json.dumps({'tutorial': lesson.state})); return
         if cycle.state['status'] != 'active' and args.intent is None:
@@ -507,7 +528,7 @@ def main():
         end = time.monotonic() + args.seconds
         try:
             planner, p5_planning = None, None
-            if args.intent is not None or p5:
+            if not args.no_inference and (args.intent is not None or p5):
                 from inference.roles import build_role
                 service = build_role('planner')  # cloud primary, local fallback, explicit errors
             actions = args.max_actions
@@ -527,7 +548,7 @@ def main():
                 args.seconds = left
             if args.intent is not None:
                 planner = GoalPlanner(service, directory/'state.json')
-            if p5:
+            if p5 and not args.no_inference:
                 destination = lesson.state.get('destination') if lesson else None
                 target_class = destination and destination['job'].replace('Swordsman', 'Swordman')
                 p5_planning = P5Planning(cycle, service, directory, target_class)
