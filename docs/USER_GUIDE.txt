@@ -70,7 +70,9 @@ CÓMO CONTINUAR AHORA
 - [HECHO] Chat 10: reacción implementada, 118 tests OK; muestra única 9/9
   con ataque inmediato, sin observar cancelación real ni medir su latencia.
 - [REVISADO] Chat 10 aceptado, 123 tests; 9/9 completo sin intención pendiente.
-- [SIGUIENTE] P5 paso 4 en vivo tras corregir los stats iniciales (ver HANDOFF). Hechos: P5.1–P5.3.
+- [SIGUIENTE] Chat 12: resolver build/destino Acolyte y validar P5.4 en vivo.
+  Stats iniciales 1 + 48 son correctos para 20130807; el diagnóstico anterior se corrigió.
+  Hechos registrados: P5.1–P5.3; P5.4 implementado, pendiente de prueba viva.
 - [HISTÓRICO] P5 paso 1: adaptador de modelos (planner/chat) y evaluación de
   candidatos con prompts reales. Ver P5 en docs/NATIVE_AGENT_PLAN.md.
 - [PENDIENTE] Mejorar selección y evidencia útil de la consulta pública.

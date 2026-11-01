@@ -7,14 +7,16 @@
   éxito solo con el warp del servidor), `config/p5-tutorial.json` desde `novice.txt` (22 preguntas),
   `agent/tutorial.py`, `DestinationPlanner` (solo Izlude/Swordsman y Prontera/Acolyte; resto
   `no_supply_route`) y `run_p2_cycle.py run --agent p5 --p5`. Suite: 207 OK.
-- **Defecto a corregir antes del vivo (revisión del orquestador):** el servidor se compiló con
-  PACKETVER 20130807 (`vendor/rathena/src/custom/defines_pre.hpp`); con ese protocolo `char_make`
-  exige stats elegidos 1–9 con STR+INT=AGI+LUK=VIT+DEX=10 y deja 0 puntos libres
-  (`src/char/char.cpp`). `prepare_p5.py` usa stats a 1 + 48 puntos (regla PACKETVER ≥ 20151001):
-  no es un personaje que este servidor cree. Además falta una build `novice-acolyte` si se ofrece
-  Prontera/Acolyte. Nilo no existe todavía; no hay nada que deshacer.
-- Servicios del juego parados (solo SearXNG 8080 y Ollama 11434). `runtime/processes.json` conserva
-  PIDs de procesos ya inexistentes; revisar antes de `m1.py start`. Arrancar requiere permiso del usuario.
+- **Corrección del relevo, verificada por Codex:** no hay defecto de stats iniciales.
+  PACKETVER 20130807 usa la rama >=20120307 de `char_clif.cpp` (stats a 1), y
+  `char.cpp` toma `start_status_points=48`. Pares de stats/0 puntos corresponden
+  solo a PACKETVER <20120307. No aplicar el cambio propuesto por el relevo anterior.
+- Revisión independiente: `prepare_p5.py` repone items si un personaje existente queda
+  sin inventario; vincular equipo inicial solo a creación nueva antes de ejecutar prepare.
+- Sigue faltando la build `novice-acolyte` si se ofrece Prontera/Acolyte.
+- Último estado registrado por Claude: juego parado; SearXNG/Ollama disponibles.
+  Verificar procesos/puertos antes de arrancar servicios existentes; autorización rutinaria vigente.
+- Siguiente: Chat 12, coherencia del perfil/destinos y prueba acotada de P5.4 en vivo.
 
 ## P5 paso 3 — campos de caza según nivel y peligro (2026-11-01)
 
