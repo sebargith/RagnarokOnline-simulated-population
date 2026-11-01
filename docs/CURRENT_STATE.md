@@ -1,5 +1,15 @@
 # Estado actual
 
+## P5.5 — campo por nivel durante el entrenamiento (2026-11-01, Claude)
+
+- `01c4cd5`: `--train-first-job` sin `--no-inference` usa `P5Planning`. El campo se decide otra vez con `level_up`, `field_unsafe` y `periodic_review`; una petición cada vez y la caza sigue mientras tanto. Si el planner falla o vence, se mantiene el campo. Cada decisión guarda `facts`, motivo y `served_by`. `run_p5_background.py` usa el planner por defecto; `--no-inference` mantiene el modo anterior. Suite: 240 OK.
+- En vivo, 870 s y 83 acciones, salida 0 por `time_budget`:
+  - Groq pasó de prt_fild08 a prt_fild06 (puesta al día de nivel 2 a 7) y, en la subida real a Base 8, de prt_fild06 a prt_fild05;
+  - 2 inferencias, 113→134 kills, sin muertes, retiradas ni resultados `unknown`.
+  - [Evidencia y límites](evidence/P5-field-by-level.md).
+- Estado al terminar: checkpoint `active/hunt`, sin acción en vuelo, Base 8 (57/200) / Job 6, Zeny 950, en prt_fild05 (130,298). El cliente 31704 sigue vivo y ocioso.
+- No se ha visto en vivo el respaldo Gemma, un vencimiento, `field_unsafe` ni `periodic_review`. Las ventas frecuentes consumen mucho tiempo.
+
 ## Relevo a Claude — entrenamiento activo (2026-11-01)
 
 - Código de referencia `f712bf0`. Lectura 2026-11-01 11:35:05 -03: Base7/Job6, kills107, HP74/78, Zeny416, prt_fild08 {'x': 62, 'y': 343}; fase hunt, cero inferencias.

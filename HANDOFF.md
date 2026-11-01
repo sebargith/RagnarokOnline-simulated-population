@@ -1,6 +1,6 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-11-01 por Codex; relevo solicitado por usuario en chat 14.
-Referencia: codex/single-agent-plan, código f712bf0; documentos en commit siguiente.
+Actualizado: 2026-11-01 por Claude (campo por nivel en el entrenamiento).
+Referencia: codex/single-agent-plan, código 01c4cd5; documentos en commit siguiente.
 ## Objetivo actual
 Nilo entrena legítimamente hasta Job10 y primera clase con NPC gratuito en Prontera.
 ## Estado comprobado (muestra, no estado permanente)
@@ -16,6 +16,11 @@ Nilo entrena legítimamente hasta Job10 y primera clase con NPC gratuito en Pron
 - Tutorial completo. goal_kills=1 es histórico: train-first-job sigue hasta clase,
   no se detiene al superar una kill. No resetearlo ni reenviar inflight.
 ## Avances
+- 01c4cd5: train_first_job con planner de campo por defecto (level_up, campo inseguro, 30 min);
+  --no-inference conserva el modo determinista. Suite 240 OK. En vivo, 870 s: Groq
+  prt_fild08→prt_fild06 (puesta al día de nivel 2 a 7) y prt_fild06→prt_fild05 en la subida real
+  a Base 8; kills 113→134, sin incidencias. Ver docs/evidence/P5-field-by-level.md.
+  Final: active/hunt, sin inflight, Base8/Job6, Zeny950, prt_fild05; cliente 31704 ocioso.
 - Job Changer para seis primeras clases, Job>=10 y puntos gastados; sin extras.
 - NPC cargado y rechazo Job1 observado. Éxito real/identidad aún sin validar en elegible.
 - 4b05449 entrenamiento reanudable/no-inference; d233b46 ejecución larga/reúso cliente.
@@ -29,11 +34,13 @@ Nilo entrena legítimamente hasta Job10 y primera clase con NPC gratuito en Pron
 - Prueba larga resume-4 terminada por el guardián de RAM; reanudar requiere RAM libre ≥ 2 GiB.
 ## Decisiones vigentes
 - No interrumpir entrenamiento ni Visitor. No tocar otros clientes/servicios ni secretos.
-- Ejecución determinista sin modelos; revisar al final, sin monitor LLM/polling continuo.
+- Entrenamiento con planner de campo (pocas llamadas); --no-inference para pruebas deterministas. Sin monitor LLM/polling continuo.
 - Groq planner y Gemma4 12B respaldo/chat se conservan para uso normal.
 - Principal revisa informes y propone siguiente alcance para aprobación del usuario.
 ## Próxima acción
-Leer resumen/status/state actuales ANTES de operar. Resume-4 ya terminó; contrastar resultados y conciliar incertidumbres sin replay antes de reanudar.
+Leer resumen/status/state actuales ANTES de operar (último: runtime/p5/evidence/field-by-level-1/summary.json).
+Reanudar con run_p5_background.py --reuse-client (planner por defecto). Pendiente: Job10 y cambio de clase,
+ventas frecuentes, Gemma/vencimiento en vivo.
 ## Archivos relevantes
 scripts/run_p5_background.py; scripts/run_p2_cycle.py; agent/solo_cycle.py.
 docs/CURRENT_STATE.md; docs/USER_GUIDE.txt; docs/evidence/P5-first-job.md.
