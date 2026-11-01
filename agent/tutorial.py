@@ -118,6 +118,70 @@ class Tutorial:
         self.state.update(status='blocked', reason=reason)
         self.save()
 
+    def recover_receptionist_navigation(self, observations, ready, now_ms):
+        """Recover only the recorded clean rejection at Nilo's receptionist."""
+        s = self.state
+        if (s.get('identity') != 'Nilo' or s.get('status') != 'blocked' or
+                s.get('reason') != 'two_consecutive_action_failures' or s.get('failures') != 2 or
+                s.get('step') != 1 or s.get('instance') != 2 or s.get('phase') != 'tutorial' or
+                s.get('inflight') is not None or s.get('destination') is not None):
+            raise RuntimeError('Not the known receptionist block')
+        step = self.current()
+        if step.get('id') != 'receptionist' or step.get('map') != 'new_2-2':
+            raise RuntimeError('Unexpected tutorial step')
+        history = s.get('history', [])
+        if len(history) < 3:
+            raise RuntimeError('Incomplete history')
+        travel, *rejected = history[-3:]
+        if (travel.get('step') != 0 or travel.get('action', {}).get('type') != 'travel' or
+                travel.get('result', {}).get('status') != 'completed' or
+                travel.get('result', {}).get('reason') != 'arrived' or
+                travel.get('result', {}).get('request_id') != travel.get('request_id')):
+            raise RuntimeError('Missing completed travel')
+        expected = {'type': 'navigate', 'map': step['map'], **step['stand'], 'timeout_s': 40}
+        ids = []
+        for h in rejected:
+            result = h.get('result', {})
+            if (h.get('step') != 1 or h.get('action') != expected or not h.get('session') or
+                    not h.get('request_id') or result.get('request_id') != h['request_id'] or
+                    result.get('status') != 'rejected' or result.get('reason') != 'already_at_destination'):
+                raise RuntimeError('Navigation history is not conclusive')
+            ids.append(h['request_id'])
+        if len(set(ids)) != 2 or rejected[0]['session'] != rejected[1]['session']:
+            raise RuntimeError('Navigation history is ambiguous')
+        if len(observations) != 2 or not ready:
+            raise RuntimeError('Missing observations')
+        a, b = observations
+        if (not a.get('session') or a['session'] != b.get('session') or
+                a['session'] == rejected[0]['session'] or ready.get('session') != a['session'] or
+                ready.get('data', {}).get('pending_request_id', 'missing') is not None or
+                b['time_ms'] - a['time_ms'] < 1000 or now_ms - a['time_ms'] > 5000 or
+                not 0 <= now_ms - b['time_ms'] <= 2500 or ready['time_ms'] > a['time_ms']):
+            raise RuntimeError('Session or observation timing invalid')
+        for event in observations:
+            snap = event['data']
+            if (not snap.get('connected') or not snap.get('inventory_ready') or snap.get('name') != 'Nilo' or
+                    snap.get('executor') != 'openkore_route' or snap.get('dead') or
+                    snap.get('map') != step['map'] or snap.get('recovery') != 'none' or
+                    'native_task' not in snap or snap['native_task'] is not None or
+                    'navigation' not in snap or snap['navigation'] is not None or
+                    not isinstance(snap.get('ai_queue'), list) or
+                    any(x in snap['ai_queue'] for x in ('move', 'route', 'mapRoute')) or
+                    not snap.get('position') or not snap.get('destination') or
+                    dist(snap['position'], snap['destination']) > 0 or
+                    dist(snap['position'], step['stand']) > STAND_RANGE or
+                    not any(n.get('x') == step['x'] and n.get('y') == step['y'] for n in snap.get('npcs', []))):
+                raise RuntimeError('Character is not stationary beside receptionist')
+        if a['data']['position'] != b['data']['position']:
+            raise RuntimeError('Position changed')
+        s['recoveries'] = s.get('recoveries', []) + [{'kind': 'receptionist_navigation_rejections',
+            'request_ids': ids, 'prior_session': rejected[0]['session'], 'session': b['session'],
+            'map': b['data']['map'], 'position': b['data']['position'],
+            'observed_at_ms': [a['time_ms'], b['time_ms']]}]
+        s.update(status='active', failures=0, observe_after=b['time_ms'])
+        s.pop('reason', None)
+        self.save()
+
     def interruptible(self, snap, now=None):
         return False
 

@@ -318,6 +318,57 @@ class TutorialTests(unittest.TestCase):
         self.assertIn('Utils::calcPosFromPathfinding($field, $char)', snapshot)
         self.assertIn('$position->{y}', snapshot)
 
+    def test_openkore_position_at_rest_and_during_motion(self):
+        perl = VENDOR/'strawberry-perl/perl/bin/perl.exe'
+        code = r'''use Utils; use JSON::PP; use Time::HiRes ();
+my $t = Time::HiRes::time(); my $a = {pos=>{x=>100,y=>17}, pos_to=>{x=>100,y=>27},
+    time_move=>$t, solution_calc_time=>$t, walk_speed=>1,
+    solution=>[map {{x=>100,y=>$_}} 17..27]};
+print JSON::PP->new->encode([
+    Utils::calcPosFromPathfinding(undef, {pos=>{x=>100,y=>27},pos_to=>{x=>100,y=>27}}),
+    Utils::calcPosFromPathfinding(undef, $a, 5.4, 0)]);'''
+        result = subprocess.run([perl, '-I'+str(VENDOR/'openkore/src'),
+                                 '-I'+str(VENDOR/'openkore/src/deps'), '-e', code],
+                                capture_output=True, text=True, timeout=10, check=True)
+        self.assertEqual(json.loads(result.stdout), [{'x': 100, 'y': 27}, {'x': 100, 'y': 22}])
+
+    def test_recover_only_known_receptionist_rejections(self):
+        self.t.state.update(step=1, instance=2, status='blocked', reason='two_consecutive_action_failures', failures=2)
+        action = {'type': 'navigate', 'map': 'new_2-2', 'x': 100, 'y': 27, 'timeout_s': 40}
+        self.t.state['history'] = [
+            {'step': 0, 'action': {'type': 'travel'}, 'request_id': 'c1', 'result':
+             {'request_id': 'c1', 'status': 'completed', 'reason': 'arrived'}},
+            *[{'step': 1, 'action': copy.deepcopy(action), 'request_id': rid, 'session': 'old',
+               'result': {'request_id': rid, 'status': 'rejected', 'reason': 'already_at_destination'}}
+              for rid in ('c2', 'c3')]]
+        snap = nilo(map='new_2-2', position={'x': 100, 'y': 27}, destination={'x': 100, 'y': 27},
+                    connected=True, inventory_ready=True, dead=False, native_task=None, navigation=None,
+                    ai_queue=[], npcs=[{'x': 100, 'y': 29}])
+        events = [{'session': 'new', 'time_ms': t, 'data': copy.deepcopy(snap)} for t in (10000, 11000)]
+        ready = {'session': 'new', 'time_ms': 9999, 'data': {'pending_request_id': None}}
+        original = copy.deepcopy(self.t.state)
+        for kind in ('identity', 'map', 'cause', 'stale', 'task', 'movement', 'inflight', 'uncertain', 'pending', 'session'):
+            with self.subTest(kind=kind):
+                self.t.state = copy.deepcopy(original)
+                obs, rd, now = copy.deepcopy(events), copy.deepcopy(ready), 11500
+                if kind == 'identity': obs[0]['data']['name'] = 'Other'
+                if kind == 'map': obs[0]['data']['map'] = 'prontera'
+                if kind == 'cause': self.t.state['reason'] = 'npc_script:unknown/x'
+                if kind == 'stale': now = 20000
+                if kind == 'task': obs[1]['data']['native_task'] = {'id': 'x'}
+                if kind == 'movement': obs[1]['data']['destination']['y'] = 28
+                if kind == 'inflight': self.t.state['inflight'] = {'request_id': 'x'}
+                if kind == 'uncertain': self.t.state['history'][-1]['result']['status'] = 'unknown'
+                if kind == 'pending': rd['data']['pending_request_id'] = 'x'
+                if kind == 'session': obs[1]['session'] = 'other'
+                with self.assertRaises(RuntimeError): self.t.recover_receptionist_navigation(obs, rd, now)
+        self.t.state = copy.deepcopy(original)
+        self.t.recover_receptionist_navigation(events, ready, 11500)
+        self.assertEqual(self.t.state['history'], original['history'])
+        self.assertEqual(self.t.state['step'], 1)
+        self.assertEqual(self.t.plan(snap)['type'], 'npc_script')
+        self.assertEqual(self.t.state['recoveries'][0]['request_ids'], ['c2', 'c3'])
+
     def test_full_path_to_the_chosen_town(self):
         gifts = self.walk_to_decision()
         opts = tutorial.destinations(nilo(), SCRIPT, TABLES, BUILDS)

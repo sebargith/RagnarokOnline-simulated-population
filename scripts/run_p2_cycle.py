@@ -405,7 +405,7 @@ class Runner:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('run', 'status', 'set-goal', 'reconcile-navigation'))
+    parser.add_argument('command', choices=('run', 'status', 'set-goal', 'reconcile-navigation', 'recover-receptionist'))
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('--seconds', type=int, default=180)
     parser.add_argument('--goal-kills', type=int, default=6, help='Only used when creating a new checkpoint')
@@ -422,6 +422,8 @@ def main():
     if args.agent == 'p5' and (args.intent is not None or args.command in ('set-goal', 'reconcile-navigation') or
                                (args.command == 'run' and not args.p5)):
         parser.error('--agent p5 supports run --p5 and status')
+    if args.command == 'recover-receptionist' and args.agent != 'p5':
+        parser.error('recover-receptionist requires --agent p5')
     base = args.runtime/args.agent
     directory = base/'cycle'
     identity = json.loads((base/'identity.json').read_text(encoding='utf-8'))['name'] if args.agent == 'p5' else 'Tarin'
@@ -445,6 +447,25 @@ def main():
             'tables': {'monsters': hunting.load_monsters(), 'fields': hunting.load_fields()},
             'equipment': build_policy.load_equipment(), 'build': None}
         cycle = SoloCycle(directory/'state.json', args.goal_kills, p5 or None, identity)
+        if args.command == 'recover-receptionist':
+            lesson = Tutorial(directory/'tutorial.json', identity)
+            bridge = Bridge(bridge_config)
+            observations, ready = [], None
+            try:
+                deadline = time.monotonic() + 12
+                while time.monotonic() < deadline and len(observations) < 2:
+                    bridge.poll(.1)
+                    for event in bridge.drain():
+                        if event['kind'] == 'ready':
+                            ready = event
+                        if event['kind'] == 'snapshot' and event['data'].get('connected') and ready:
+                            if not observations or event['time_ms'] - observations[0]['time_ms'] >= 1000:
+                                observations.append(event)
+                lesson.recover_receptionist_navigation(observations, ready, int(time.time()*1000))
+                print(json.dumps({'status': lesson.state['status'], 'recovery': lesson.state['recoveries'][-1]}))
+            finally:
+                bridge.close()
+            return
         if args.command == 'reconcile-navigation':
             bridge = Bridge(bridge_config)
             observations, ready = [], None
