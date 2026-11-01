@@ -1,5 +1,6 @@
 """One bounded no-inference P5 sample, with durable summary and safe cleanup."""
 import argparse
+import ctypes
 import json
 import os
 import subprocess
@@ -45,32 +46,53 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('--summary', required=True, type=Path)
+    parser.add_argument('--seconds', type=int, default=600)
+    parser.add_argument('--max-actions', type=int, default=150)
+    parser.add_argument('--reuse-client', action='store_true')
     args = parser.parse_args()
+    if not 30 <= args.seconds <= 3600 or not 1 <= args.max_actions <= 600:
+        parser.error('seconds must be 30..3600 and max-actions 1..600')
     runtime = args.runtime.resolve()
     base = runtime / 'p5'
     args.summary.parent.mkdir(parents=True, exist_ok=True)
     summary = {'phase': 'starting', 'pid': os.getpid(), 'inference_calls': 0, 'client_owned': False, 'started': time.time(),
-               'max_seconds': 600, 'max_actions': 150}
+               'max_seconds': args.seconds, 'max_actions': args.max_actions}
     atomic_json(args.summary, summary)
     with exclusive(base / 'background.lock'):
         try:
             bind_runtime(runtime)
-            if (base / 'processes.json').exists() or not m1.available(8771):
-                raise RuntimeError('Nilo client already present or bridge port occupied')
             # Check controller ownership before starting a client; the runner takes this lock itself.
             with exclusive(base / 'cycle.lock'):
-                prepare_p5.start(runtime)
-            summary['client_owned'] = True
+                if args.reuse_client:
+                    registry = json.loads((base / 'processes.json').read_text())
+                    info = registry['p5-novice']
+                    handle = ctypes.windll.kernel32.OpenProcess(0x1000, False, info['pid'])
+                    if not handle:
+                        raise RuntimeError('Registered client is not running')
+                    try:
+                        buf, size = ctypes.create_unicode_buffer(32768), ctypes.c_ulong(32768)
+                        if not ctypes.windll.kernel32.QueryFullProcessImageNameW(handle, 0, buf, ctypes.byref(size)) or os.path.normcase(buf.value) != os.path.normcase(info['exe']):
+                            raise RuntimeError('Registered client identity changed')
+                    finally:
+                        ctypes.windll.kernel32.CloseHandle(handle)
+                    if m1.available(8771):
+                        raise RuntimeError('Registered client bridge unavailable')
+                    summary['client_reused'] = True
+                else:
+                    if (base / 'processes.json').exists() or not m1.available(8771):
+                        raise RuntimeError('Nilo client already present or bridge port occupied')
+                    prepare_p5.start(runtime)
+                    summary['client_owned'] = True
             registry = json.loads((base / 'processes.json').read_text())
             summary['client_pid'] = registry['p5-novice']['pid']
             summary['phase'] = 'running'
             atomic_json(args.summary, summary)
-            remaining = min(570, int(590 - (time.time() - summary['started'])))
+            remaining = min(args.seconds - 30, int(args.seconds - 10 - (time.time() - summary['started'])))
             if remaining < 10:
                 raise RuntimeError('Insufficient time remaining in the sample budget')
             command = [sys.executable, str(ROOT / 'scripts/run_p2_cycle.py'), 'run', '--runtime', str(runtime),
                        '--agent', 'p5', '--p5', '--no-inference', '--train-first-job',
-                       '--seconds', str(remaining), '--max-actions', '150']
+                       '--seconds', str(remaining), '--max-actions', str(args.max_actions)]
             summary['command'] = command
             atomic_json(args.summary, summary)
             result = subprocess.run(command, cwd=ROOT, timeout=remaining + 8)

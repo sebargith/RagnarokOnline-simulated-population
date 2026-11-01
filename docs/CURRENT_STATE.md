@@ -1,5 +1,10 @@
 # Estado actual
 
+## P5.5 — primera muestra de entrenamiento (2026-11-01)
+
+- Muestra determinista agotó presupuesto: base3/job2, 11 kills acumuladas, 52 acciones, cero inferencias. La navegación c_52 quedó pendiente al cierre; se consultó su resultado retenido (arrived) y se concilió sin repetirla. El cliente Nilo siguió activo.
+- Continuación autorizada por el usuario hasta una hora, para observar en juego. Consultar resumen y checkpoint antes de operar; no reiniciar servicios ni otros clientes.
+
 ## P5.5 — entrenamiento preparado para muestra (2026-11-01)
 
 - Identificación del Job Changer solicita nombre al servidor para el actor exacto; cambios, nombre incorrecto o timeout se rechazan. Sin validación viva de esta corrección.

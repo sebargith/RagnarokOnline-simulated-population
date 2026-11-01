@@ -444,8 +444,8 @@ def main():
         state['status_age_s'] = round(time.time()-state['updated'], 1) if 'updated' in state else None
         print(json.dumps(state))
         return
-    if not 1 <= args.seconds <= 3600 or not 0 <= args.max_actions <= 150:
-        parser.error('seconds must be 1..3600 and max-actions 0..150')
+    if not 1 <= args.seconds <= 3600 or not 0 <= args.max_actions <= 600:
+        parser.error('seconds must be 1..3600 and max-actions 0..600')
     directory.mkdir(parents=True, exist_ok=True)
     with exclusive(base/'cycle.lock'):
         if args.command == 'set-goal' and (args.target_kills is None or not (directory/'state.json').exists()):
