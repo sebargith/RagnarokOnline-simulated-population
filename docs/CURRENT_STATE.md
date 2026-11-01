@@ -1,11 +1,11 @@
 # Estado actual
 
-## P5.5 — Job Changer preparado, pendiente de validación (2026-11-01)
+## P5.5 — NPC cargado y negativa observada (2026-11-01)
 
-- Regla aprobada: NPC gratuito para las seis primeras clases clásicas; Novice normal Job 10 y puntos de habilidad gastados. Reemplaza las quests, no las prueba.
-- Fuente y configuración instaladas de forma idempotente para el próximo arranque; el map-server activo no fue recargado. Consola deshabilitada. No hay muestra en vivo ni cambio real confirmado.
-- Puente restringido y política de viaje implementados, con resultado confirmado únicamente por evento de clase y bloqueo ante incertidumbre. Validados en pruebas locales, no en servidor. El ciclo actual completo 1/1 no se reactiva automáticamente; entrenamiento acotado a Job 10 pendiente.
-- Nilo permanece detenido y sin cambios conocidos desde P5.4. Siguiente: revisar carga controlada del NPC y pruebas reales sin alterar personajes ni interrumpir usuarios; después decidir entrenamiento reanudable.
+- Job Changer personalizado cargado tras confirmar cero jugadores; rAthena arrancó sin errores de parser observados. Nilo Job 1 viajó y recibió la negativa real del NPC; clase, EXP, puntos, Zeny e inventario sin cambios. [Evidencia](evidence/P5-first-job.md).
+- Límite: OpenKore observó nombre vacío en ese NPC; el validador `first_job` exige el nombre y podría rechazar a un elegible. Falta identificación segura y cambio real. Entrenamiento reanudable a Job 10 pendiente.
+- Nilo detenido en prontera (153,192), base2/job1; tutorial completo y ciclo 1/1 completo, sin inflight. Servicios de servidor y Ollama activos.
+- Siguiente: revisar resolución segura de identidad del NPC y plan de validación del cambio sin fabricar requisitos.
 
 ## P5.4 — tutorial y primera kill observados (2026-11-01)
 

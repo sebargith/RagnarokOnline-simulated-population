@@ -19,7 +19,7 @@ El usuario aprobó este camino:
 
 ESTADO REAL
 -----------
-- [EN PRUEBA] Job Changer gratuito para seis primeras clases: código preparado, sin carga ni validación en vivo; falta entrenamiento reanudable hacia Job 10.
+- [EN PRUEBA] Job Changer gratuito para seis primeras clases: cargado y negativa por Job bajo observada; falta resolver identidad del NPC y entrenamiento reanudable hacia Job 10.
 - [HECHO] Servidor, conexión OpenKore, memoria y conversación funcional.
 - [DEMOSTRADO] Tres identidades en una demo controlada: combate, loot,
   cooperación y comercio fijo, con runtime continuo y recuperación de transferencias.

@@ -118,4 +118,4 @@ Upstream links are discovery sources. Record the revisions actually tested in mi
 
 ## Approved first-job rule
 
-The server may use the project-owned free First Job Changer in Prontera instead of the official first-job quests. It offers only the six classic first classes to a normal Novice at Job 10 with no unspent skill points. This is a custom server rule, not verification of official quests. The restricted bot action requires the matching server job-change event; unresolved results block replay. Installation is staged, not yet loaded or validated in a live server.
+The server may use the project-owned free First Job Changer in Prontera instead of the official first-job quests. It offers only the six classic first classes to a normal Novice at Job 10 with no unspent skill points. This is a custom server rule, not verification of official quests. The restricted bot action requires the matching server job-change event; unresolved results block replay. The NPC was loaded and its low-level refusal observed live. OpenKore reported an empty NPC name, so the restricted action cannot yet reliably identify it; successful changes remain unverified.
