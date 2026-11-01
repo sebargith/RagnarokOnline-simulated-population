@@ -182,6 +182,86 @@ class Tutorial:
         s.pop('reason', None)
         self.save()
 
+    def reconcile_receptionist_warp(self, observations, ready, now_ms):
+        """Reconcile Nilo's recorded receptionist warp, never replay the NPC."""
+        s = self.state
+        if (s.get('identity') != 'Nilo' or s.get('status') != 'blocked' or
+                s.get('reason') != 'reward_mismatch:receptionist' or s.get('step') != 1 or
+                s.get('instance') != 2 or s.get('phase') != 'tutorial' or
+                s.get('inflight') is not None or s.get('destination') is not None):
+            raise RuntimeError('Not the known receptionist mismatch')
+        step = self.current()
+        history, done = s.get('history', []), s.get('steps_done', [])
+        if not history or not done:
+            raise RuntimeError('Missing terminal evidence')
+        h, record = history[-1], done[-1]
+        r, action = h.get('result', {}), h.get('action', {})
+        ev = r.get('evidence') or {}
+        expected_action = {'type': 'npc_script', 'x': 100, 'y': 29, 'choices': ['Apply for training.'],
+                           'name_reply': 1, 'timeout_s': 60, 'expect': {'map': 'new_1-2', 'x': 100, 'y': 70}}
+        old_session = h.get('session')
+        recovery = s.get('recoveries', [])
+        if (step.get('id') != 'receptionist' or step.get('rewards') != {} or
+                h.get('step') != 1 or h.get('request_id') != 'c_1' or not old_session or
+                not recovery or recovery[-1].get('session') != old_session or action != expected_action or
+                r.get('request_id') != 'c_1' or r.get('status') != 'completed' or r.get('reason') != 'warped' or
+                ev.get('npc') != 'Receptionist#nv2' or ev.get('chosen') != ['Apply for training.'] or
+                ev.get('name_sent') != 1 or ev.get('warped', {}).get('map') != 'new_1-2' or
+                (ev.get('warped', {}).get('x'), ev.get('warped', {}).get('y')) != (100, 70) or
+                (ev.get('before') or {}).get('map') != 'new_2-2' or
+                (ev.get('after') or {}).get('map') != 'new_1-2' or
+                (ev.get('before') or {}).get('inventory') != '1201:1,2301:1' or
+                (ev.get('after') or {}).get('inventory') != '' or
+                (ev.get('before') or {}).get('zeny') != 0 or (ev.get('after') or {}).get('zeny') != 0 or
+                (ev.get('before') or {}).get('exp') != '1,0,1,0' or
+                (ev.get('after') or {}).get('exp') != '1,0,1,0' or
+                record.get('step') != 'receptionist' or record.get('items') != {'1201': -1, '2301': -1} or
+                record.get('warp') != ev.get('warped')):
+            raise RuntimeError('Terminal evidence does not match known warp')
+        if len(observations) != 2 or not ready:
+            raise RuntimeError('Missing observations')
+        a, b = observations
+        if (not a.get('session') or a['session'] != b.get('session') or a['session'] == old_session or
+                ready.get('session') != a['session'] or ready.get('data', {}).get('pending_request_id', 'missing') is not None or
+                ready.get('time_ms', now_ms + 1) > a['time_ms'] or b['time_ms'] - a['time_ms'] < 1000 or
+                now_ms - a['time_ms'] > 5000 or not 0 <= now_ms - b['time_ms'] <= 2500):
+            raise RuntimeError('Session or observation timing invalid')
+        for e in observations:
+            d = e['data']
+            items = d.get('inventory')
+            if (not d.get('connected') or d.get('name') != 'Nilo' or d.get('executor') != 'openkore_route' or
+                    d.get('dead') or d.get('map') != 'new_1-2' or not d.get('inventory_ready') or
+                    d.get('inventory_truncated') != 0 or not isinstance(items, list) or
+                    d.get('zeny') != 0 or d.get('recovery') != 'none' or
+                    'native_task' not in d or d['native_task'] is not None or
+                    'navigation' not in d or d['navigation'] is not None or
+                    not isinstance(d.get('ai_queue'), list) or d['ai_queue'] or
+                    d.get('position') != {'x': 100, 'y': 70} or d.get('destination') != d.get('position') or
+                    d.get('level') != {'base': 1, 'job': 1, 'exp': 0, 'job_exp': 0,
+                                       'exp_max': d.get('level', {}).get('exp_max'),
+                                       'job_exp_max': d.get('level', {}).get('job_exp_max')}):
+                raise RuntimeError('Incomplete or unsafe current observation')
+            totals = {}
+            for item in items:
+                key = str(item.get('name_id'))
+                amount = item.get('amount')
+                if type(amount) is not int or amount <= 0:
+                    raise RuntimeError('Invalid inventory observation')
+                totals[key] = totals.get(key, 0) + amount
+            if totals != {'1201': 1, '2301': 1}:
+                raise RuntimeError('Unexpected inventory effects')
+        if a['data']['inventory'] != b['data']['inventory']:
+            raise RuntimeError('Inventory changed between observations')
+        s['reconciliations'] = s.get('reconciliations', []) + [{
+            'kind': 'receptionist_warp_inventory', 'request_id': h['request_id'], 'original_session': old_session,
+            'session': b['session'], 'observed_at_ms': [a['time_ms'], b['time_ms']],
+            'map': b['data']['map'], 'position': b['data']['position'], 'inventory': {'1201': 1, '2301': 1},
+            'zeny': 0, 'disposition': 'warp_observed_inventory_reconciled'}]
+        s.update(status='active', failures=0, observe_after=b['time_ms'])
+        s.pop('reason', None)
+        self.advance({'step': 'receptionist_reconciliation', 'request_id': h['request_id'],
+                      'original_session': old_session, 'observed_session': b['session']})
+
     def interruptible(self, snap, now=None):
         return False
 

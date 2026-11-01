@@ -70,6 +70,17 @@ my %o = (
     failed => [M1Travel::script_outcome('failed', 'unexpected_menu', $e, undef)],
     closed => [M1Travel::script_outcome('completed', 'conversation_closed', undef, undef)],
 );
+my $ws = {};
+my $obs = {inventory_ready => 0, map => 'new_1-2', inventory => undef, zeny => 0, exp => '1,0,1,0'};
+my @settle;
+push @settle, M1Travel::stable_warp_snapshot($ws, $obs, 1, 10);
+$obs->{inventory_ready} = 1; $obs->{inventory} = '1201:1';
+push @settle, M1Travel::stable_warp_snapshot($ws, $obs, 2, 10);
+$obs->{inventory} = '1201:1,2301:1';
+push @settle, M1Travel::stable_warp_snapshot($ws, $obs, 3, 10);
+push @settle, M1Travel::stable_warp_snapshot($ws, $obs, 3.5, 10);
+push @settle, M1Travel::stable_warp_snapshot($ws, $obs, 4, 10);
+push @settle, M1Travel::stable_warp_snapshot($ws, $obs, 10, 10);
 my $walk = sub { my ($m, $x, $y) = @_; {map => $m, x => $x, y => $y, cost => 0, steps => '', enabled => 1} };
 my %lut = (
     'new_1-2 73 106' => {source => {map => 'new_1-2', x => 73, y => 106}, dest => {'new_1-2 41 172' => $walk->('new_1-2', 41, 172)}},
@@ -95,7 +106,7 @@ my %l = (
     elsewhere => $s->(warped => {map => 'new_1-2', x => 100, y => 70}),
     not_taken => $s->(enter_elapsed => 6),
 );
-print JSON::PP->new->canonical->encode({validate => \%v, dialog => \%d, outcome => \%o, portals => $portals,
+print JSON::PP->new->canonical->encode({validate => \%v, dialog => \%d, outcome => \%o, settle => \@settle, portals => $portals,
     portal => \%p, leg => \%l});
 '''
 
@@ -135,6 +146,7 @@ class ContractTests(unittest.TestCase):
         self.assertEqual(o['no_warp'], ['failed', 'warp_not_observed'])
         self.assertEqual(o['failed'], ['failed', 'unexpected_menu'])
         self.assertEqual(o['closed'], ['completed', 'conversation_closed'])
+        self.assertEqual(self.data['settle'], ['waiting', 'waiting', 'waiting', 'waiting', 'stable', 'timeout'])
 
     def test_same_map_portal(self):
         self.assertEqual(self.data['portals'], {'new_1-2 73 106': {'x': 41, 'y': 172}})
@@ -369,6 +381,55 @@ print JSON::PP->new->encode([
         self.assertEqual(self.t.plan(snap)['type'], 'npc_script')
         self.assertEqual(self.t.state['recoveries'][0]['request_ids'], ['c2', 'c3'])
 
+    def test_reconcile_receptionist_warp_preserves_result_and_rejects_uncertainty(self):
+        self.t.state.update(step=1, instance=2, status='blocked', reason='reward_mismatch:receptionist',
+                            recoveries=[{'session': 'old'}])
+        warp = {'map': 'new_1-2', 'x': 100, 'y': 70, 'elapsed_ms': 4661}
+        before = {'map': 'new_2-2', 'zeny': 0, 'inventory': '1201:1,2301:1', 'exp': '1,0,1,0'}
+        after = {'map': 'new_1-2', 'zeny': 0, 'inventory': '', 'exp': '1,0,1,0'}
+        action = {'type': 'npc_script', 'x': 100, 'y': 29, 'choices': ['Apply for training.'],
+                  'name_reply': 1, 'timeout_s': 60, 'expect': {'map': 'new_1-2', 'x': 100, 'y': 70}}
+        ev = {'npc': 'Receptionist#nv2', 'chosen': ['Apply for training.'], 'name_sent': 1,
+              'warped': warp, 'before': before, 'after': after}
+        self.t.state['history'] = [{'step': 1, 'action': action, 'request_id': 'c_1', 'session': 'old',
+                                    'result': {'request_id': 'c_1', 'status': 'completed', 'reason': 'warped', 'evidence': ev}}]
+        self.t.state['steps_done'] = [{'step': 'receptionist', 'items': {'1201': -1, '2301': -1}, 'warp': warp}]
+        items = [{'name_id': 1201, 'amount': 1}, {'name_id': 2301, 'amount': 1}]
+        snap = nilo(map='new_1-2', position={'x': 100, 'y': 70}, destination={'x': 100, 'y': 70},
+                    connected=True, inventory_ready=True, inventory_truncated=0, inventory=items, dead=False,
+                    native_task=None, navigation=None, ai_queue=[], zeny=0)
+        events = [{'session': 'new', 'time_ms': t, 'data': copy.deepcopy(snap)} for t in (10000, 11000)]
+        ready = {'session': 'new', 'time_ms': 9999, 'data': {'pending_request_id': None}}
+        original = copy.deepcopy(self.t.state)
+        for kind in ('identity', 'map', 'cause', 'stale', 'task', 'movement', 'inflight', 'history',
+                     'pending', 'session', 'inventory', 'truncated', 'zeny', 'unstable', 'warp', 'exp'):
+            with self.subTest(kind=kind):
+                self.t.state = copy.deepcopy(original)
+                obs, rd, now = copy.deepcopy(events), copy.deepcopy(ready), 11500
+                if kind == 'identity': obs[0]['data']['name'] = 'Other'
+                if kind == 'map': obs[0]['data']['map'] = 'prontera'
+                if kind == 'cause': self.t.state['reason'] = 'other'
+                if kind == 'stale': now = 20000
+                if kind == 'task': obs[1]['data']['native_task'] = {'id': 'x'}
+                if kind == 'movement': obs[1]['data']['destination']['y'] = 71
+                if kind == 'inflight': self.t.state['inflight'] = {'request_id': 'x'}
+                if kind == 'history': self.t.state['history'][-1]['result']['status'] = 'unknown'
+                if kind == 'pending': rd['data']['pending_request_id'] = 'x'
+                if kind == 'session': obs[1]['session'] = 'other'
+                if kind == 'inventory': obs[1]['data']['inventory'].append({'name_id': 501, 'amount': 1})
+                if kind == 'truncated': obs[1]['data']['inventory_truncated'] = 1
+                if kind == 'zeny': obs[1]['data']['zeny'] = 1
+                if kind == 'unstable': obs[1]['data']['inventory'].reverse()
+                if kind == 'warp': self.t.state['history'][-1]['result']['evidence']['warped']['x'] = 99
+                if kind == 'exp': obs[1]['data']['level']['exp'] = 1
+                with self.assertRaises(RuntimeError): self.t.reconcile_receptionist_warp(obs, rd, now)
+        self.t.state = copy.deepcopy(original)
+        self.t.reconcile_receptionist_warp(events, ready, 11500)
+        self.assertEqual(self.t.state['history'], original['history'])
+        self.assertEqual(self.t.state['steps_done'][0], original['steps_done'][0])
+        self.assertEqual((self.t.state['step'], self.t.state['status']), (2, 'active'))
+        self.assertEqual(self.t.plan(snap)['type'], 'portal')
+
     def test_full_path_to_the_chosen_town(self):
         gifts = self.walk_to_decision()
         opts = tutorial.destinations(nilo(), SCRIPT, TABLES, BUILDS)
@@ -402,6 +463,17 @@ print JSON::PP->new->encode([
         self.act(self.npc('receptionist'), status='unknown', reason='unexpected_warp',
                  ev=evidence(warped={'map': 'prontera', 'x': 1, 'y': 1}))
         self.assertEqual((other.state['status'], other.state['reason']), ('blocked', 'npc_script:unknown/unexpected_warp'))
+
+    def test_unconfirmed_inventory_after_warp_blocks_without_advancing(self):
+        self.act(nilo())
+        action = self.t.plan(self.npc('receptionist'))
+        self.t.prepare(action, 'warp', 'boot:1')
+        self.t.result({'request_id': 'warp', 'status': 'unknown', 'reason': 'warp_inventory_unconfirmed',
+                       'evidence': {'warped': {'map': 'new_1-2', 'x': 100, 'y': 70},
+                                    'observation_complete': 0, 'after': {'inventory': None}}})
+        self.assertEqual((self.t.state['status'], self.t.state['step'], self.t.state['reason']),
+                         ('blocked', 1, 'npc_script:unknown/warp_inventory_unconfirmed'))
+        self.assertEqual(self.t.state['history'][-1]['result']['evidence']['warped']['map'], 'new_1-2')
 
     def test_failed_dialog_retries_once_then_blocks_and_wrong_places_block(self):
         self.act(nilo())

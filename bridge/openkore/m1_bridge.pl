@@ -525,8 +525,10 @@ sub travel_tick {
 
 # P2a dialog: continue, pre-declared exact menu labels and closing only.
 sub talk_snapshot {
+    my $ready = $char->inventory->isReady ? 1 : 0;
     return {map => $field->baseName, zeny => 0 + ($char->{zeny} // 0),
-        inventory => join(',', sort map { "$_->{nameID}:$_->{amount}" } @{$char->inventory->getItems}),
+        inventory_ready => $ready,
+        inventory => $ready ? join(',', sort map { "$_->{nameID}:$_->{amount}" } @{$char->inventory->getItems}) : undef,
         exp => join(',', map { 0 + ($char->{$_} // 0) } qw(lv exp lv_job exp_job))};
 }
 
@@ -546,6 +548,7 @@ sub talk_request {
     my ($npc) = $at->($a->{x}) && $at->($a->{y}) ?
         grep { $_->{pos}{x} == $a->{x} && $_->{pos}{y} == $a->{y} } @{$npcsList->getItems} : ();
     my $script = $a->{type} eq 'npc_script';
+    if (!$char->inventory->isReady) { result($id, 'rejected', 'inventory_not_ready'); return }
     my $ctx = {manual_ai => $cfg->{native_navigation} && AI::state() == AI::MANUAL(),
         hp => $char->{hp}, recovering => $recovery{phase} ne 'none', talking => %talk ? 1 : 0,
         npc => $npc && $npc->{pos}, pos => Utils::calcPosFromPathfinding($field, $char)};
@@ -565,7 +568,13 @@ sub talk_request {
 sub talk_finish {
     my ($status, $reason) = @_;
     my $p = $pending;
-    my $after = talk_snapshot();
+    my $after = $p->{stable_after} || talk_snapshot();
+    if (!$after->{inventory_ready} || ($p->{warped} && !$p->{stable_after})) {
+        finish('unknown', $p->{warped} ? 'warp_inventory_unconfirmed' : 'inventory_unconfirmed', {warped => $p->{warped},
+            observation_complete => 0, before => $p->{before}, after => $after,
+            chosen => $p->{chosen}, name_sent => $p->{name_sent}, pages => $p->{pages}, npc => $p->{npc_name}});
+        return;
+    }
     my ($final, $why, $changed) = M1Travel::talk_outcome($status, $reason, $p->{before}, $after);
     if ($p->{script}) {
         ($final, $why) = M1Travel::script_outcome($status, $reason, $p->{expect}, $p->{warped});
@@ -575,7 +584,7 @@ sub talk_finish {
         menus => $p->{menus}, chosen => $p->{chosen}, pages => $p->{pages},
         autotalk_suppressed => $p->{autotalk_suppressed} // 0, npc_task_left => AI::inQueue('NPC') ? 1 : 0,
         dialog_result => $final eq $status ? undef : "$status/$reason", changed => $changed,
-        before => $p->{before}, after => $after});
+        observation_complete => 1, before => $p->{before}, after => $after});
 }
 
 sub talk_tick {
@@ -584,7 +593,12 @@ sub talk_tick {
     if ($p->{warped}) {
         # The server moved us: the dialog is over, whatever page it was on.
         AI::clear(qw/move route mapRoute/);
-        talk_finish('completed', 'conversation_closed'); return;
+        my $after = talk_snapshot();
+        my $state = ($p->{warp_observation} ||= {});
+        my $observation = M1Travel::stable_warp_snapshot($state, $after, $now, $p->{deadline});
+        if ($observation eq 'stable') { $p->{stable_after} = $after; talk_finish('completed', 'conversation_closed') }
+        elsif ($observation eq 'timeout') { talk_finish('unknown', 'warp_inventory_unconfirmed') }
+        return;
     }
     if ($p->{await_warp}) {
         return if $now < $p->{await_warp};

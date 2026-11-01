@@ -224,6 +224,23 @@ sub script_outcome {
     ($status, $reason);
 }
 
+# A post-warp inventory must be ready and unchanged for a full second. The
+# caller owns the action deadline; a missing observation is never empty stock.
+sub stable_warp_snapshot {
+    my ($state, $snapshot, $now, $deadline) = @_;
+    return 'timeout' if $now >= $deadline;
+    unless ($snapshot->{inventory_ready}) {
+        delete $state->{candidate}; delete $state->{since};
+        return 'waiting';
+    }
+    my $key = join("\x1e", map { defined $snapshot->{$_} ? $snapshot->{$_} : '' } qw(map inventory zeny exp));
+    if (!defined $state->{candidate} || $state->{candidate} ne $key) {
+        $state->{candidate} = $key; $state->{since} = $now;
+        return 'waiting';
+    }
+    return $now - $state->{since} >= 1 ? 'stable' : 'waiting';
+}
+
 # Same-map walk portals (the tutorial castle's inner doors): source cell to landing.
 sub same_map_portals {
     my ($lut) = @_;
