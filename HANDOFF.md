@@ -8,3 +8,4 @@ Actualizado: 2026-11-01 por Codex. Rama `codex/single-agent-plan`.
 - La muestra usa proceso local limitado, sin monitor ni llamadas a modelos. El principal revisa resultados y propone siguiente alcance; no iniciar otro hito.
 
 - Muestra anterior agotó tiempo: Nilo base3/job2, 11 kills, cero inferencias. c_52 navegación llegó, resultado consultado y conciliado sin replay; entrenamiento sigue activo sin inflight. Se prepara continuación de hasta una hora con cliente existente.
+- Continuación llegó a base5/job4 y 37 kills; c_158 terminó fuera de destino. Se verificó reposo, reinició solo cliente Nilo y se concilió sin replay. Reanudado sin inferencia; resumen runtime/p5/evidence/train-first-job-resume-2-summary.json. Visitor observado cerca; no tocar su cliente.
