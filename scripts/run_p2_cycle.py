@@ -3,6 +3,9 @@
 Requires the separate P1 client already running. Does not restart any service.
 The checkpoint survives this process; uncertain intents are queried, never sent
 again. Result loss blocks the goal, rather than guessing a purchase or kill.
+With --p5 the same loop also applies the stored build (stats, skills, gear),
+attacks only viable monsters and asks the planner role for a hunting field when
+one is due; a failed or late answer keeps the current field.
 """
 import argparse
 import json
@@ -18,12 +21,108 @@ from agent.live_io import RingLog, atomic_json, exclusive
 from agent.solo_cycle import SoloCycle, FINAL
 from bridge.client import Bridge
 from scripts.bench_m2 import ram_sample
-from agent.goal_planner import GoalPlanner, apply_proposal_locked
+from agent.goal_planner import (GoalPlanner, apply_proposal_locked, BuildPlanner, FieldPlanner,
+                                apply_build, read_build, build_facts)
+from agent import build_policy, hunting
+FRESH_MS = 2500
+
+
+class P5Planning:
+    """Build choice (once, when none is stored) and hunting-field decisions.
+    One planner request at a time; gameplay continues while it is pending, and a
+    decision is applied only to an idle hunting cycle with fresh own perception."""
+    def __init__(self, cycle, service, directory):
+        self.cycle, self.identity = cycle, cycle.state['identity']
+        self.build_path, self.build_lock = directory/'build.json', directory/'build.lock'
+        self.builds = build_policy.load_builds()
+        self.build_planner, self.field_planner = BuildPlanner(service, self.builds), FieldPlanner(service)
+        self.pending, self.ready, self.calls, self.build_tried = None, None, 0, False
+        stored = read_build(self.build_path)
+        cycle.p5['build'] = stored and self.builds[stored['build_id']]
+        self.build_id = stored and stored['build_id']
+
+    def tick(self, latest, note):
+        for _ in range(2):  # A settled build choice may be followed by a field request.
+            if not self.pending and not self.ready:
+                self.request(latest['data'])
+            if not self.pending:
+                break
+            kind, info = self.pending
+            result = (self.build_planner if kind == 'build' else self.field_planner).poll()
+            if result is None:
+                return
+            self.pending = None
+            note(kind + '_proposal', result)
+            if kind == 'field':
+                self.ready = (result, info)
+                break
+            self.apply_build(result, latest, note)
+        if self.ready:
+            self.apply_field(latest, note)
+
+    def request(self, snap):
+        if 'progress' not in snap or snap.get('name') != self.identity:
+            return
+        if self.build_id is None and not self.build_tried:
+            self.build_tried = True
+            self.build_planner.request(snap, None)
+            self.calls += 1
+            self.pending = ('build', None)
+            return
+        current = self.cycle.state['field']['id']
+        why = snap.get('map') == current and self.cycle.field_due(snap)
+        if why:
+            opts, mood = hunting.options(snap, current, self.cycle.p5['tables'], self.cycle.p5['equipment'],
+                                         self.cycle.state['outcomes'], self.identity, time.time())
+            facts = {**{k: v for k, v in build_facts(snap).items() if k in ('level', 'job', 'stats')},
+                     'hp_max': snap['hp_max'], 'build': self.build_id}
+            self.field_planner.request(facts, opts, current, mood, why)
+            self.calls += 1
+            self.pending = ('field', {'why': why, 'mood': mood, 'options': [(o['field_id'], o['score']) for o in opts]})
+
+    def apply_build(self, result, latest, note):
+        if result['status'] != 'proposed':
+            note('build_result', result); return
+        record = apply_build(self.build_path, self.build_lock, result, latest, self.identity)
+        self.build_id = record['build_id']
+        self.cycle.p5['build'] = self.builds[self.build_id]
+        note('build_result', record)
+
+    def apply_field(self, latest, note):
+        c, snap = self.cycle, latest['data']
+        s = c.state
+        if s['status'] != 'active':
+            self.ready = None; return  # The cycle stopped; the next run decides again.
+        if (s['inflight'] or s['phase'] != 'hunt' or not 0 <= time.time()*1000 - latest['time_ms'] <= FRESH_MS or
+                not snap.get('connected') or snap.get('dead') or snap.get('native_task') or snap.get('map') != s['field']['id']):
+            return  # Wait for an idle hunting cycle.
+        result, info = self.ready
+        self.ready, current = None, s['field']['id']
+        record = {'trigger': info['why'], 'temperament': info['mood'], 'options': info['options'], 'previous': current,
+                  'served_by': result.get('served_by'), 'degraded': result.get('degraded'), 'time': time.time()}
+        chosen = None
+        if result['status'] == 'proposed':
+            # Validate again against fresh perception: the option must still be offered.
+            opts, _ = hunting.options(snap, current, c.p5['tables'], c.p5['equipment'], s['outcomes'],
+                                      self.identity, time.time())
+            chosen = next((o for o in opts if o['field_id'] == result['proposal']['field_id']), None)
+            record['reason'] = result['proposal']['reason']
+            record['proposed'] = result['proposal']['field_id']
+        else:
+            record['reason'] = result.get('reason')
+        if chosen is None:
+            record['decision'] = 'kept_on_failure' if result['status'] != 'proposed' else 'rejected_not_offered'
+            c.set_field(current, None, record | {'field_id': current}, snap['level']['base'])
+        else:
+            record['decision'] = 'keep' if chosen['current'] else 'change'
+            record['entry'] = chosen['entry']
+            c.set_field(chosen['field_id'], chosen['entry'], record | {'field_id': chosen['field_id']}, snap['level']['base'])
+        note('field_result', record)
 
 
 class Runner:
-    def __init__(self, cycle, bridge, directory, planner=None, intent=None):
-        self.cycle, self.b, self.directory = cycle, bridge, directory
+    def __init__(self, cycle, bridge, directory, planner=None, intent=None, p5=None):
+        self.cycle, self.b, self.directory, self.p5 = cycle, bridge, directory, p5
         self.ready = None
         self.last_send, self.last_query, self.last_status = 0, 0, 0
         self.last_resource = 0
@@ -65,6 +164,19 @@ class Runner:
         self.planning_result = result
         self.note('planning_result', result)
 
+    def p5_tick(self):
+        latest = self.b.latest
+        if (not self.p5 or self.cycle.state['status'] != 'active' or not latest or self.b.session != latest['session']
+                or not latest['data'].get('connected') or not 0 <= time.time()*1000 - latest['time_ms'] <= FRESH_MS):
+            return
+        before = self.p5.calls
+        try:
+            self.p5.tick(latest, self.note)
+        except (ValueError, RuntimeError, OSError, KeyError) as error:
+            self.p5.pending = self.p5.ready = None
+            self.note('p5_error', {'reason': f'{type(error).__name__}: {error}'})
+        self.inference_calls += self.p5.calls - before
+
     def note(self, kind, data):
         self.log.write(json.dumps({'time': time.time(), 'kind': kind, 'data': data})+'\n')
 
@@ -98,6 +210,7 @@ class Runner:
             'goal_kills': s['goal_kills'], 'inflight': s['inflight'],
             'block_reason': s.get('reason'), 'resources': self.resources,
             'planning_result': self.planning_result, 'inference_calls': self.inference_calls,
+            'field': s.get('field'), 'last_field_decision': (s.get('field_decisions') or [None])[-1],
             'observed': {k: latest['data'].get(k) for k in
                 ('map', 'position', 'hp', 'hp_max', 'level', 'recovery', 'zeny')} if latest else None})
 
@@ -124,6 +237,7 @@ class Runner:
             while time.monotonic() < end:
                 self.pump()
                 self.planning_tick()
+                self.p5_tick()
                 if self.cycle.state['status'] != 'active' and self.planning_done:
                     reason = self.cycle.state['status']; break
                 if self.cycle.state['status'] != 'active':
@@ -223,6 +337,7 @@ def main():
     parser.add_argument('--intent', help='One bounded player intention for the local 9B (max 400 characters)')
     parser.add_argument('--max-actions', type=int, default=0)
     parser.add_argument('--pause-after-send', action='store_true', help='Disconnect after one proposal to verify restart recovery')
+    parser.add_argument('--p5', action='store_true', help='Apply the build and choose hunting fields with the planner role')
     args = parser.parse_args()
     if args.intent is not None and (args.command != 'run' or not 1 <= len(args.intent) <= 400):
         parser.error('--intent requires run and 1..400 characters')
@@ -239,7 +354,10 @@ def main():
     with exclusive(args.runtime/'p1/cycle.lock'):
         if args.command == 'set-goal' and (args.target_kills is None or not (directory/'state.json').exists()):
             parser.error('set-goal requires --target-kills and an existing checkpoint')
-        cycle = SoloCycle(directory/'state.json', args.goal_kills)
+        p5 = args.p5 and args.command == 'run' and {
+            'tables': {'monsters': hunting.load_monsters(), 'fields': hunting.load_fields()},
+            'equipment': build_policy.load_equipment(), 'build': None}
+        cycle = SoloCycle(directory/'state.json', args.goal_kills, p5 or None)
         if args.command == 'reconcile-navigation':
             bridge = Bridge(args.runtime/'p1/openkore/solo/bridge.json')
             observations, ready = [], None
@@ -270,12 +388,15 @@ def main():
         bridge = Bridge(args.runtime/'p1/openkore/solo/bridge.json')
         service = None
         try:
-            planner = None
-            if args.intent is not None:
+            planner, p5_planning = None, None
+            if args.intent is not None or p5:
                 from inference.roles import build_role
                 service = build_role('planner')  # cloud primary, local fallback, explicit errors
+            if args.intent is not None:
                 planner = GoalPlanner(service, directory/'state.json')
-            print(json.dumps(Runner(cycle, bridge, directory, planner, args.intent).run(
+            if p5:
+                p5_planning = P5Planning(cycle, service, directory)
+            print(json.dumps(Runner(cycle, bridge, directory, planner, args.intent, p5_planning).run(
                 args.seconds, args.max_actions, args.pause_after_send)))
         finally:
             bridge.close()

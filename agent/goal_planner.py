@@ -235,3 +235,79 @@ def apply_build(path, lock, envelope, observation, identity, now_ms=None):
         if proposal['type'] == 'choose_build':
             atomic_json(path, record)
         return record
+
+
+# P5 hunting-field macro-goal: the planner picks one id from code-validated options.
+FIELD_SCHEMA = {'type': 'object', 'additionalProperties': False,
+    'properties': {'field_id': {'type': 'string', 'enum': []},
+                   'reason': {'type': 'string', 'minLength': 1, 'maxLength': 200}},
+    'required': ['field_id', 'reason']}
+OPTION_FACTS = ('field_id', 'current', 'hops', 'monsters', 'rare_threats', 'viable_share',
+                'exp_per_hit', 'danger', 'unsafe', 'history')
+
+
+def field_prompt_option(option):
+    """What the planner sees of an option: public monster facts and own history."""
+    out = {k: option[k] for k in OPTION_FACTS}
+    out['monsters'] = [{k: m[k] for k in ('name', 'level', 'share', 'aggressive', 'hits', 'hp_loss', 'viable', 'base_exp')}
+                       for m in option['monsters']]
+    return out
+
+
+def validate_field(value, options):
+    if not isinstance(value, dict) or set(value) != {'field_id', 'reason'}:
+        raise ValueError('Invalid field fields')
+    reason = value['reason']
+    if type(reason) is not str or not 1 <= len(reason) <= 200:
+        raise ValueError('Invalid reason')
+    if value['field_id'] not in {o['field_id'] for o in options}:
+        raise ValueError('Field is not a validated option')
+    return dict(value)
+
+
+class FieldPlanner:
+    """One bounded request; a failed or late answer keeps the current field."""
+    def __init__(self, service, deadline_s=100):
+        if not 0 < deadline_s <= 100:
+            raise ValueError('Invalid deadline')
+        self.service, self.deadline_s = service, deadline_s
+        self.pending = None
+
+    def request(self, facts, options, current, mood, why):
+        if self.pending:
+            raise RuntimeError('One planning request at a time')
+        if not any(o['field_id'] == current for o in options):
+            raise ValueError('Current field must be an option')
+        from agent.hunting import TEMPERAMENTS
+        messages = [{'role': 'system', 'content': (
+            'You choose where a pre-Renewal Ragnarok Online character hunts. Pick one field_id from the '
+            'options (the current one keeps it) and give a short reason based only on the facts. Options are '
+            'already checked as reachable and safe; hits and hp_loss are estimates per kill, history is the '
+            "character's own record. Its temperament: " + TEMPERAMENTS[mood] + ' Return only JSON. You cannot '
+            'move, fight or execute game actions; deterministic code travels and hunts.')},
+            {'role': 'user', 'content': json.dumps({'trigger': why, 'character': facts, 'current_field': current,
+                                                    'options': [field_prompt_option(o) for o in options]})}]
+        schema = json.loads(json.dumps(FIELD_SCHEMA))
+        schema['properties']['field_id']['enum'] = [o['field_id'] for o in options]
+        future = self.service.submit('field-goal', messages, 41, cold=True, response_format=schema)
+        self.pending = {'future': future, 'current': current, 'options': options,
+                        'deadline': time.monotonic()+self.deadline_s}
+
+    def poll(self):
+        p = self.pending
+        if not p:
+            return None
+        keep = {'status': 'kept', 'field_id': p['current']}
+        if time.monotonic() >= p['deadline']:
+            self.pending = None
+            return {**keep, 'reason': 'planning_deadline'}
+        if not p['future'].done():
+            return None
+        self.pending = None
+        try:
+            result = p['future'].result()
+            proposal = validate_field(json.loads(result['content']), p['options'])
+        except Exception:
+            return {**keep, 'reason': 'invalid_or_failed_inference'}
+        return {'status': 'proposed', 'proposal': proposal, 'current': p['current'],
+                'served_by': result.get('served_by'), 'degraded': result.get('degraded')}

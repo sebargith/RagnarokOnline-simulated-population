@@ -2,6 +2,10 @@
 
 No bridge IO or model calls here. A checkpointed intent is never proposed twice.
 Only its matching terminal result can advance confirmed progress.
+With a P5 context (agent.hunting tables, equipment and the chosen build) the
+cycle also spends stat/skill points and equips by the local build policy,
+attacks only viable monsters, hunts in the field chosen through set_field and
+keeps its own outcome history (kills, retreats, deaths, hunting time).
 """
 import copy
 import json
@@ -9,17 +13,22 @@ import os
 from pathlib import Path
 import time
 
+from agent import build_policy, hunting
 from scripts.p1_hunt import dist
 from scripts.p2_supply import SHOP, buy_plan, decide
 
 FINAL = {'completed', 'failed', 'cancelled', 'unknown', 'rejected'}
 SUCCESS = {'attack': 'killed', 'take': 'picked_up', 'navigate': 'arrived',
-           'travel': 'arrived', 'npc_sell': 'sold', 'npc_buy': 'bought'}
+           'travel': 'arrived', 'npc_sell': 'sold', 'npc_buy': 'bought',
+           'stat_up': 'stat_raised', 'skill_up': 'skill_raised', 'equip': 'equipped', 'unequip': 'unequipped'}
+PROGRESS = {'stat_up', 'skill_up', 'equip', 'unequip'}
+HUNTING = {'attack', 'take', 'navigate'}
+FIELD_REVIEW_S = 1800
 
 
 class SoloCycle:
-    def __init__(self, path, goal_kills=6):
-        self.path = Path(path)
+    def __init__(self, path, goal_kills=6, p5=None):
+        self.path, self.p5 = Path(path), p5
         if self.path.exists():
             self.state = json.loads(self.path.read_text(encoding='utf-8'))
             if self.state.get('version') != 1 or self.state.get('identity') != 'Tarin':
@@ -32,6 +41,11 @@ class SoloCycle:
                 failures=0, skip={}, patrol=0, loot_until=0, loot_spot=None,
                 return_to={'map': 'prt_fild08', 'x': 170, 'y': 365}, observe_after=0)
             self.save()
+        # Older checkpoints hunted only prt_fild08; that stays the field until a decision.
+        self.state.setdefault('field', {'id': self.state['return_to']['map'], 'decided_level': None,
+                                        'decided_at': 0, 'retreats_at_decision': 0})
+        self.state.setdefault('outcomes', {'monsters': {}, 'fields': {}})
+        self.state.setdefault('field_decisions', [])
 
     def save(self):
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -111,13 +125,18 @@ class SoloCycle:
             raise RuntimeError('Cannot replace unresolved intent')
         now = time.time() if now is None else now
         self.state['inflight'] = dict(action=copy.deepcopy(action), request_id=request_id,
-            session=session, deadline=now + action['timeout_s'] + 12)
+            session=session, deadline=now + action['timeout_s'] + 12, prepared_at=now)
         if getattr(self, '_exploration', None) == action:
             self.state['inflight']['exploration'] = True
             visits = self.state.get('explore_visits', [])
             self.state['explore_visits'] = (visits + [self._explore_origin,
                 {'map': action['map'], 'x': action['x'], 'y': action['y']}])[-24:]
         self._exploration = None
+        if action['type'] == 'attack' and getattr(self, '_target_mob', None) is not None:
+            self.state['inflight']['target_mob'] = self._target_mob
+        if action['type'] in PROGRESS:
+            self.state['inflight']['levels'] = self._levels
+        self._target_mob = None
         # Failure here prevents proposal. A crash after this write is uncertain.
         self.save()
 
@@ -130,6 +149,13 @@ class SoloCycle:
         s['observe_after'] = observed_after
         kind, reason = action['type'], result.get('reason', '')
         s['history'] = (s['history'] + [{**p, 'result': result}])[-24:]
+        self._learn(p, result, now)
+        if kind in PROGRESS and result['status'] in {'failed', 'rejected'}:
+            # A refused or inadmissible point/equip step pauses the build policy
+            # until the next level; it is not a hunting failure.
+            s.update(inflight=None, build_pause=p.get('levels'))
+            self.save()
+            return True
         if result['status'] == 'completed' and reason == SUCCESS[kind]:
             s['inflight'], s['failures'] = None, 0
             if kind == 'attack':
@@ -160,6 +186,66 @@ class SoloCycle:
         else:
             self.save()
         return True
+
+    def _record(self, group, key):
+        return self.state['outcomes'][group].setdefault(str(key), {})
+
+    def _learn(self, p, result, now):
+        """Own outcome history: kills and retreats per monster and field, hunting time."""
+        kind, field = p['action']['type'], self.state['field']['id']
+        if kind not in HUNTING or self.state['phase'] not in {'hunt', 'loot'}:
+            return
+        f = self._record('fields', field)
+        f['hunt_s'] = round(f.get('hunt_s', 0) + max(0, min(now - p.get('prepared_at', now), p['action']['timeout_s'] + 12)), 1)
+        if kind != 'attack' or p.get('target_mob') is None:
+            return
+        m = self._record('monsters', p['target_mob'])
+        if result['status'] == 'completed' and result.get('reason') == 'killed':
+            for r in (m, f):
+                r['kills'] = r.get('kills', 0) + 1
+        elif result.get('reason') == 'retreat_low_hp':
+            for r in (m, f):
+                r['retreats'] = r.get('retreats', 0) + 1
+
+    def _death(self, now):
+        f = self._record('fields', self.state['field']['id'])
+        f.update(deaths=f.get('deaths', 0) + 1, last_death=now)
+        last = (self.state['history'] or [{}])[-1]
+        if last.get('target_mob') is not None and last['action']['type'] == 'attack':
+            m = self._record('monsters', last['target_mob'])
+            m['deaths'] = m.get('deaths', 0) + 1
+
+    def field_due(self, snap, now=None):
+        """Why a new hunting-field decision is due, or None."""
+        s, now = self.state, time.time() if now is None else now
+        if not self.p5 or s['status'] != 'active' or s['inflight'] or s['phase'] != 'hunt':
+            return None
+        f = s['field']
+        retreats = s['outcomes']['fields'].get(f['id'], {}).get('retreats', 0)
+        if f['decided_level'] is None:
+            return 'no_decision'
+        if snap['level']['base'] > f['decided_level']:
+            return 'level_up'
+        if retreats - f.get('retreats_at_decision', 0) >= 3:
+            return 'field_unsafe'
+        if now - f['decided_at'] >= FIELD_REVIEW_S:
+            return 'periodic_review'
+        return None
+
+    def set_field(self, field_id, entry, record, level, now=None):
+        """Apply a validated decision (or a keep). A new field is reached by the
+        return phase, which travels to the entry spot and then hunts there."""
+        s, now = self.state, time.time() if now is None else now
+        if s['status'] != 'active' or s['inflight'] or s['phase'] != 'hunt':
+            raise RuntimeError('A field change requires an idle hunting cycle')
+        if field_id != s['field']['id']:
+            if not entry:
+                raise ValueError('A new field needs an entry spot')
+            s['return_to'] = {'map': field_id, 'x': entry['x'], 'y': entry['y']}
+        s['field'] = {'id': field_id, 'decided_level': level, 'decided_at': now,
+                      'retreats_at_decision': s['outcomes']['fields'].get(field_id, {}).get('retreats', 0)}
+        s['field_decisions'] = (s['field_decisions'] + [record])[-24:]
+        self.save()
 
     def interruptible(self, snap, now=None):
         """Only an explicitly marked exploration route can be interrupted."""
@@ -208,6 +294,18 @@ class SoloCycle:
         self.save()
         return True
 
+    def progress_action(self, snap):
+        """Next stat/skill/equip step of the chosen build, unless paused at this level."""
+        build = self.p5 and self.p5.get('build')
+        if not build or 'progress' not in snap:
+            return None
+        levels = [snap['level']['base'], snap['level']['job']]
+        if self.state.get('build_pause') == levels:
+            return None
+        action, why = build_policy.next_action(snap, build, self.p5['equipment'])
+        self._levels, self.build_why = levels, why
+        return action
+
     @staticmethod
     def supply(snap):
         need = decide(snap)
@@ -220,7 +318,7 @@ class SoloCycle:
     def plan(self, snap, now=None):
         """Return one capability or None (wait/stopped). No game side effects."""
         s = self.state
-        self._exploration = None
+        self._exploration = self._target_mob = None
         now = time.time() if now is None else now
         if s['status'] != 'active' or s['inflight']:
             return None
@@ -231,6 +329,8 @@ class SoloCycle:
         if snap.get('inventory_truncated', True):
             self.block('incomplete_inventory'); return None
         if snap.get('dead'):
+            if self.p5:
+                self._death(now)
             self.block('character_dead'); return None
         if snap.get('recovery') == 'exhausted':
             self.block('recovery_exhausted'); return None
@@ -248,19 +348,26 @@ class SoloCycle:
                     return None
                 s['phase'] = 'hunt'
             elif phase == 'hunt':
+                field = s['field']['id']
+                grow = self.progress_action(snap)
+                if grow:
+                    return grow
                 need = self.supply(snap)
                 if need['go']:
-                    if snap['map'] == 'prt_fild08':
+                    if snap['map'] == field:
                         s['return_to'] = {'map': snap['map'], **snap['position']}
                     s['phase'] = 'to_shop'
                 elif s['kills'] >= s['goal_kills']:
                     s.update(status='complete', reason='confirmed_kill_goal'); self.save(); return None
-                elif snap['map'] != 'prt_fild08':
+                elif snap['map'] != field:
                     s['phase'] = 'return'
                 else:
                     s['skip'] = {k: v for k, v in s['skip'].items() if v > now}
                     avoid = s.get('avoid_route') or {}
-                    monsters = sorted((m for m in snap['monsters'] if m.get('eligible', 1) == 1 and m['id'] not in s['skip'] and not
+                    allowed = hunting.viable_targets(snap, self.p5['tables'], self.p5['equipment'], s['outcomes']) \
+                        if self.p5 else None
+                    monsters = sorted((m for m in snap['monsters'] if m.get('eligible', 1) == 1 and m['id'] not in s['skip'] and
+                        (allowed is None or m.get('name_id') in allowed) and not
                         (avoid.get('until', 0) > now and avoid.get('map') == snap['map'] and
                          m['x'] == avoid.get('x') and m['y'] == avoid.get('y'))),
                                       key=lambda m: dist(m, snap['position']))
@@ -269,6 +376,7 @@ class SoloCycle:
                         if dist(m, snap['position']) > 14:
                             return {'type': 'navigate', 'map': snap['map'], 'x': m['x'], 'y': m['y'], 'timeout_s': 25}
                         s['loot_spot'] = {'x': m['x'], 'y': m['y']}
+                        self._target_mob = m.get('name_id')
                         return {'type': 'attack', 'target': m['id'], 'timeout_s': 45}
                     candidates = snap.get('explore_candidates')
                     if not isinstance(candidates, list):
