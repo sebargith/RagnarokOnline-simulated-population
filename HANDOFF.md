@@ -20,3 +20,10 @@ Mantener Groq planner y Gemma 4 12B respaldo/chat; no alterar personajes ajenos.
   base2/job1, Zeny0. MariaDB/rAthena y Ollama heredados activos; otros sin tocar.
 - Evidencia: docs/evidence/P5-tutorial-exit.md. El chat principal revisará y pedirá
   aprobación para cualquier siguiente alcance. No iniciar el cambio de clase.
+
+## Revisión del principal
+- Checkpoints leídos: tutorial completo paso9 y ciclo1/1, ambos sin inflight.
+- Eventos confirman c_37 cancelled, c_38 navigation_cancelled y c_39 killed.
+- P5.4 aceptado para este recorrido; especie/origen del objetivo no acreditado
+  solo por nombre. Siguiente propuesto: P5.5 (Job10 y primera clase), pendiente
+  de aprobación del usuario. No se inició implementación ni otro runner.
