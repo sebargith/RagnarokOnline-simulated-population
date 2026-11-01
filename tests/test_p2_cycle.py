@@ -37,6 +37,31 @@ class CycleTests(unittest.TestCase):
         self.c.result(result, now=101)
         return result
 
+    def test_quiet_attack_reconciliation_never_claims_or_replays_kill(self):
+        self.c.state['macro_goal'] = 'train_first_job'
+        action = {'type': 'attack', 'target': '01000000', 'timeout_s': 45}
+        self.c.prepare(action, 'c_1', 'boot:1', now=100)
+        result = {'request_id': 'c_1', 'status': 'unknown', 'reason': 'attack_ended',
+                  'evidence': {'hits': 0, 'damage_dealt': 0}}
+        self.c.result(result, now=101)
+        snap = snapshot(position={'x': 170, 'y': 250}, destination={'x': 170, 'y': 250}, ai_queue=[])
+        observations = [{'session': 'boot:1', 'time_ms': t, 'data': copy.deepcopy(snap)} for t in (10000, 11000)]
+        bad = copy.deepcopy(observations)
+        bad[1]['data']['native_task'] = {'kind': 'attack'}
+        with self.assertRaises(RuntimeError): self.c.reconcile_quiet_attack(bad, 11000)
+        bad = copy.deepcopy(observations)
+        bad[1]['session'] = 'other:1'
+        with self.assertRaises(RuntimeError): self.c.reconcile_quiet_attack(bad, 11000)
+        self.c.state['history'][-1]['result']['evidence']['hits'] = 1
+        with self.assertRaises(RuntimeError): self.c.reconcile_quiet_attack(observations, 11000)
+        self.c.state['history'][-1]['result']['evidence']['hits'] = 0
+        self.c.reconcile_quiet_attack(observations, 11000)
+        self.assertEqual(self.c.state['kills'], 0)
+        self.assertEqual(self.c.state['retired_attack_targets'], ['01000000'])
+        self.assertEqual(self.c.state['history'][-1]['result']['status'], 'unknown')
+        self.assertIsNone(self.c.state['inflight'])
+        self.assertEqual(self.c.state['status'], 'active')
+
     def test_new_goal_preserves_history_and_is_idempotent(self):
         self.c.state.update(status='complete', kills=1, reason='confirmed_kill_goal', history=[{'old': 1}])
         self.c.save()

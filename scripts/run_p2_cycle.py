@@ -208,6 +208,29 @@ class Runner:
         self.planner, self.intent = planner, intent
         self.planning_requested, self.planning_done = False, planner is None
         self.inference_calls, self.planning_result = 0, None
+        self.quiet_observations, self.quiet_started = [], None
+
+    def reconcile_quiet_tick(self):
+        s, event = self.cycle.state, self.b.latest
+        if (s.get('macro_goal') != 'train_first_job' or s.get('reason') != 'attack:unknown/attack_ended'):
+            return False
+        self.quiet_started = self.quiet_started or time.monotonic()
+        if time.monotonic() - self.quiet_started > 5:
+            self.note('attack_reconciliation_failed', {'reason': 'observation_timeout'})
+            return False
+        if event and 0 <= time.time()*1000 - event['time_ms'] <= FRESH_MS:
+            if not self.quiet_observations or event['time_ms'] - self.quiet_observations[0]['time_ms'] >= 1000:
+                self.quiet_observations.append(event)
+        if len(self.quiet_observations) < 2:
+            return True
+        try:
+            self.cycle.reconcile_quiet_attack(self.quiet_observations, int(time.time()*1000))
+            self.note('attack_reconciliation', self.cycle.state['reconciliations'][-1])
+        except (RuntimeError, KeyError) as error:
+            self.note('attack_reconciliation_failed', {'reason': str(error)})
+            return False
+        self.quiet_observations, self.quiet_started = [], None
+        return True
 
     def planning_tick(self):
         if self.planning_done:
@@ -315,6 +338,8 @@ class Runner:
                 self.pump()
                 self.planning_tick()
                 self.p5_tick()
+                if self.cycle.state['status'] == 'blocked' and self.reconcile_quiet_tick():
+                    continue
                 if self.cycle.state['status'] != 'active' and self.planning_done:
                     reason = self.cycle.state['status']; break
                 if self.cycle.state['status'] != 'active':

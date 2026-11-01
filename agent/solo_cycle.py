@@ -127,6 +127,50 @@ class SoloCycle:
         self.save()
         return True
 
+    def reconcile_quiet_attack(self, observations, now_ms):
+        """Retire one ended attack without claiming its effects or replaying its actor."""
+        s, p = self.state, self.state.get('inflight')
+        if (s.get('macro_goal') != 'train_first_job' or s.get('status') != 'blocked' or
+                s.get('reason') != 'attack:unknown/attack_ended' or not p or p['action'].get('type') != 'attack'):
+            raise RuntimeError('Not a reconcilable attack')
+        matches = [h for h in s['history'] if h.get('request_id') == p['request_id'] and
+                   h.get('session') == p['session'] and h.get('result', {}).get('status') == 'unknown' and
+                   h['result'].get('reason') == 'attack_ended']
+        if len(matches) != 1 or len(observations) != 2:
+            raise RuntimeError('Missing terminal evidence or observations')
+        evidence = matches[0]['result'].get('evidence') or {}
+        if evidence.get('hits') != 0 or evidence.get('damage_dealt') != 0:
+            raise RuntimeError('Attack had observed effects')
+        if s.get('quiet_attack_streak', 0) >= 1:
+            raise RuntimeError('Repeated unconfirmed attack')
+        a, b = observations
+        if (a['session'] != p['session'] or b['session'] != p['session'] or
+                b['time_ms'] - a['time_ms'] < 1000 or now_ms - a['time_ms'] > 5000 or
+                not 0 <= now_ms - b['time_ms'] <= 2500):
+            raise RuntimeError('Observations not fresh in the original session')
+        for event in observations:
+            snap = event['data']
+            if (not snap.get('connected') or snap.get('name') != s['identity'] or snap.get('dead') or
+                    snap.get('executor') != 'openkore_route' or snap.get('recovery') != 'none' or
+                    'native_task' not in snap or snap.get('native_task') or not isinstance(snap.get('ai_queue'), list) or
+                    any(x in snap['ai_queue'] for x in ('attack', 'take', 'move', 'route', 'mapRoute', 'NPC')) or
+                    not snap.get('position') or not snap.get('destination') or
+                    dist(snap['position'], snap['destination']) > 1):
+                raise RuntimeError('Character is not stationary and idle')
+        if a['data']['map'] != b['data']['map'] or a['data']['position'] != b['data']['position']:
+            raise RuntimeError('Character moved')
+        retired = s.setdefault('retired_attack_targets', [])
+        if len(retired) >= 128:
+            raise RuntimeError('Retired target limit reached')
+        retired.append(p['action']['target'])
+        s['quiet_attack_streak'] = s.get('quiet_attack_streak', 0) + 1
+        s['reconciliations'] = (s.get('reconciliations', []) + [{
+            'request_id': p['request_id'], 'session': p['session'], 'target': p['action']['target'],
+            'disposition': 'retired_unknown_no_kill', 'observed_at_ms': b['time_ms']}])[-24:]
+        s.update(status='active', inflight=None, observe_after=b['time_ms'])
+        s.pop('reason', None)
+        self.save()
+
     def train_first_job(self):
         """Resume one persistent macro goal without replacing confirmed history."""
         s = self.state
@@ -190,6 +234,7 @@ class SoloCycle:
         if result['status'] == 'completed' and reason == SUCCESS[kind]:
             s['inflight'], s['failures'] = None, 0
             if kind == 'attack':
+                s['quiet_attack_streak'] = 0
                 s['kills'] += 1
                 s.update(phase='loot', loot_until=now + 2)
             elif kind == 'npc_sell':
@@ -293,7 +338,8 @@ class SoloCycle:
             snap.get('hp_max', 0) > 0 and snap['hp'] * 100 >= snap['hp_max'] * 60 and
             snap.get('map') == p['action']['map'] and
             snap.get('native_task') == {'id': p['request_id'], 'kind': 'navigation'} and
-            any(m.get('eligible') == 1 and s['skip'].get(m.get('id'), 0) <= now and
+            any(m.get('eligible') == 1 and m.get('id') not in s.get('retired_attack_targets', []) and
+                s['skip'].get(m.get('id'), 0) <= now and
                 not ((s.get('avoid_route') or {}).get('until', 0) > now and
                      (s.get('avoid_route') or {}).get('map') == snap['map'] and
                      m.get('x') == (s.get('avoid_route') or {}).get('x') and
@@ -412,6 +458,7 @@ class SoloCycle:
                     allowed = hunting.viable_targets(snap, self.p5['tables'], self.p5['equipment'], s['outcomes']) \
                         if self.p5 else None
                     monsters = sorted((m for m in snap['monsters'] if m.get('eligible', 1) == 1 and m['id'] not in s['skip'] and
+                        m['id'] not in s.get('retired_attack_targets', []) and
                         (allowed is None or m.get('name_id') in allowed) and not
                         (avoid.get('until', 0) > now and avoid.get('map') == snap['map'] and
                          m['x'] == avoid.get('x') and m['y'] == avoid.get('y'))),
