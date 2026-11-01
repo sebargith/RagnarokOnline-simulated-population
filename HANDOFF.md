@@ -24,8 +24,9 @@ No tocar personajes ajenos, fixtures, spawns, GM ni recolocaciones.
 ## Revisión principal y siguiente paso
 - Informe de cierre solicitado y recogido del chat 12; estado bloqueado verificado
   leyendo tutorial.json: paso 1, inflight=null, c_1 completo y c_2/c_3 rechazados.
-- Plan Chat 13 en docs/NEXT_CHAT_PLAN.txt: recuperación restringida y validación
+- Chat 13 propuesto en la conversación: recuperación restringida y validación
   viva del snapshot/tutorial; PENDIENTE DE APROBACIÓN del usuario, no iniciado.
-- Flujo nuevo: subchat informa al cerrar; principal revisa y planifica siguiente
+- Flujo: subchat envía mensaje de cierre al principal; este revisa y propone siguiente
   alcance con preguntas necesarias; usuario aprueba antes de ejecutarlo.
 - No repetir muestras tras dos fallos iguales sin resolución fundamentada.
+- Aclaración del usuario: no crear archivos de planes por chat; propuesta en conversación.

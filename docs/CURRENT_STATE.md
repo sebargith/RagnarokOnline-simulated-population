@@ -12,7 +12,7 @@
   (100,27). Checkpoint bloqueado e historial conservados. Servicios de juego activos.
 - Revisión principal: checkpoint leído confirma paso 1 bloqueado, inflight=null
   e historial de c_1 completada y c_2/c_3 rechazadas. Informe de cierre recibido.
-- Siguiente: [plan Chat 13](NEXT_CHAT_PLAN.txt), recuperación restringida y validación
+- Siguiente propuesto en el chat principal: recuperación restringida y validación
   de snapshot/tutorial. Pendiente de aprobación del usuario; no iniciado.
 
 

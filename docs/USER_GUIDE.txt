@@ -71,7 +71,7 @@ CÓMO CONTINUAR AHORA
   con ataque inmediato, sin observar cancelación real ni medir su latencia.
 - [REVISADO] Chat 10 aceptado, 123 tests; 9/9 completo sin intención pendiente.
 - [PENDIENTE DE APROBACIÓN] Chat 13: recuperación segura y validación del tutorial.
-  Alcance preparado en docs/NEXT_CHAT_PLAN.txt; no iniciado.
+  Alcance resumido en el chat principal; no iniciado. No crear documentos por chat.
   Stats iniciales 1 + 48 son correctos para 20130807; el diagnóstico anterior se corrigió.
   Hechos registrados: P5.1–P5.3; P5.4 incompleto: una muestra llegó al
   primer portal y quedó bloqueada por posición antigua. Corrección probada solo
@@ -85,7 +85,9 @@ CÓMO CONTINUAR AHORA
 - Configuración de nuevos chats: Terra 6.1, razonamiento medio
   (gpt-6.1-terra / medium), por instrucción del usuario.
 - Flujo vigente (2026-11-01): cada subchat entrega al terminar un informe al
-  principal (cambios, commits, pruebas, evidencia, checkpoint y pendientes).
+  principal mediante mensaje entre chats (cambios, commits, pruebas, evidencia,
+  checkpoint y pendientes), usando la autorización del usuario y la herramienta
+  de mensajes. No basta con dejar un informe solo en su propia conversación.
   El principal lo recoge, revisa y prepara el siguiente alcance con preguntas
   solo si hacen falta. El usuario aprueba el siguiente paso ANTES de iniciarlo.
   Dentro del alcance aprobado siguen vigentes las autorizaciones rutinarias.
