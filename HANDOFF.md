@@ -21,3 +21,9 @@ y Gemma 4 12B respaldo/chat; no alterar personajes ajenos ni recursos.
   No se tocó ningún otro cliente. 215 tests OK. Ver evidencia y estado.
 - Siguiente: el chat principal evalúa la discrepancia y solicita aprobación del
   usuario para el siguiente alcance. No asumir P5.4 completo ni iniciar P5.5.
+
+## Revisión principal del cierre
+- El código confirma captura de inventario inmediata al warp, sin readiness.
+- Propuesta pendiente de aprobación: reutilizar Chat 13 para captura posterior
+  lista/estable con plazo y conciliación específica sin repetir la recepcionista.
+- No se inició esa corrección ni otra muestra. Alcance explicado en conversación.
