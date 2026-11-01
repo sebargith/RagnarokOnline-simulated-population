@@ -19,6 +19,13 @@ El usuario aprobó este camino:
 
 ESTADO REAL
 -----------
+- [EN CURSO / RELEVO A CLAUDE] Nilo entrena sin inferencia: Base7/Job6, kills107, HP74/78, Zeny416, prt_fild08 {'x': 62, 'y': 343}.
+  Muestra de 2026-11-01 11:35:05 -03; no estado final. Wrapper2564/runner69208/cliente31704.
+  Resumen: D:\Ragnarok Agents\runtime\p5\evidence\train-first-job-resume-4-summary.json.
+  Leer resumen y cycle/status.json + state.json antes de operar. No tocar a Visitor
+  ni repetir acciones pendientes; dejar correr si sigue activo. Límite3570s/600acciones.
+- [LÍMITE] Se corrigieron bloqueos de navegación/ataque y hubo reanudaciones manuales;
+  entrenamiento largo sin intervención y cambio real a Swordman aún no demostrados.
 - [EN PRUEBA] Job Changer gratuito para seis primeras clases: cargado y negativa por Job bajo observada; identificación y entrenamiento reanudable implementados; prueba limitada aún pendiente de revisión.
 - [HECHO] Servidor, conexión OpenKore, memoria y conversación funcional.
 - [DEMOSTRADO] Tres identidades en una demo controlada: combate, loot,

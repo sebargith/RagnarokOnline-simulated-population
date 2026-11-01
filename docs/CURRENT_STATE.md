@@ -1,5 +1,26 @@
 # Estado actual
 
+## Relevo a Claude — entrenamiento activo (2026-11-01)
+
+- Código de referencia `f712bf0`. Lectura 2026-11-01 11:35:05 -03: Base7/Job6, kills107, HP74/78, Zeny416, prt_fild08 {'x': 62, 'y': 343}; fase hunt, cero inferencias.
+- Checkpoint activo; acción pendiente en esa muestra: c_268 attack. Estos datos pueden cambiar.
+- Wrapper2564, runner69208 y cliente31704 verificados activos a las 11:33:58 -03.
+  Límite de la ejecución actual: 3570 s/600 acciones; resumen `runtime/p5/evidence/train-first-job-resume-4-summary.json`.
+  Leer también `runtime/p5/cycle/status.json` y `state.json` antes de cualquier operación.
+- No interrumpir a Nilo/Visitor ni reenviar peticiones. El usuario observa en juego;
+  no mantener un modelo vigilando. Si ya terminó, evaluar resumen/checkpoint primero.
+- Cambios publicados: 4b05449 meta persistente/no-inference; d233b46 muestra larga y
+  reutilización de cliente; 77ce3db navegación cercana; 9514703 conciliación estricta
+  de ataque unknown sin atribuir kill; f712bf0 deduplicación y contradicciones.
+- c_227 concilió cero golpes observados sin replay ni kill añadida; actor excluido.
+  Hubo varios bloqueos/reanudaciones manuales: estabilidad prolongada no demostrada.
+- Pruebas registradas: 227 suite antes de últimos arreglos; después 18 ciclo, 5 runner,
+  7 first-job, 2 navegación y sintaxis Perl para sus cambios. No afirmar suite final completa.
+- Job Changer cargado y negativa real Job1 comprobada. Resolución de identidad y
+  cambio exitoso aún sin observar con un elegible. Tutorial completo ya demostrado.
+- Siguiente: Claude lee estado fresco, preserva el proceso activo y revisa al terminar;
+  nuevo alcance tras evaluación/aprobación. Ver [relevo](../HANDOFF.md).
+
 ## P5.5 — primera muestra de entrenamiento (2026-11-01)
 
 - Muestra determinista agotó presupuesto: base3/job2, 11 kills acumuladas, 52 acciones, cero inferencias. La navegación c_52 quedó pendiente al cierre; se consultó su resultado retenido (arrived) y se concilió sin repetirla. El cliente Nilo siguió activo.
