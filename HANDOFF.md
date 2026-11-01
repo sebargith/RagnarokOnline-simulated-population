@@ -2,28 +2,21 @@
 Actualizado: 2026-11-01 por Codex. Rama `codex/single-agent-plan`.
 
 ## Objetivo y límites
-P5.4 incompleto; no iniciar P5.5. Un escritor/runtime. Mantener Groq planner
-y Gemma 4 12B respaldo/chat; no alterar personajes ajenos ni recursos.
+P5.4 observado de extremo a extremo en una muestra; no iniciar P5.5. Un escritor/runtime.
+Mantener Groq planner y Gemma 4 12B respaldo/chat; no alterar personajes ajenos.
 
 ## Estado verificado
-- Recuperación restringida implementada para los dos rechazos de navegación
-  de Nilo; conserva historia y exige sesión nueva y observaciones estables.
-- Snapshot vivo de Nilo en new_2-2 (100,27), recepcionista visible; recuperación
-  registrada en `runtime/p5/cycle/tutorial.json`, sin adelantar paso.
-- Muestra 480 s/100 acciones: una acción `npc_script`, opción de entrenamiento
-  y warp confirmado a new_1-2 (100,70). Bloqueó `reward_mismatch:receptionist`:
-  al warp inventario leído vacío, luego snapshot listo mostró Knife y Cotton
-  equipados. No repetir diálogo ni editar el checkpoint; efecto requiere revisión.
-- Checkpoint bloqueado paso 1, inflight=null, resultado e historial conservados.
-  Nilo detenido tras observar sin petición, tarea ni navegación, con posición
-  igual al destino y cola vacía.
-- MariaDB y servidores de juego preexistentes siguen activos; Ollama activo.
-  No se tocó ningún otro cliente. 215 tests OK. Ver evidencia y estado.
-- Siguiente: el chat principal evalúa la discrepancia y solicita aprobación del
-  usuario para el siguiente alcance. No asumir P5.4 completo ni iniciar P5.5.
-
-## Revisión principal del cierre
-- El código confirma captura de inventario inmediata al warp, sin readiness.
-- Propuesta pendiente de aprobación: reutilizar Chat 13 para captura posterior
-  lista/estable con plazo y conciliación específica sin repetir la recepcionista.
-- No se inició esa corrección ni otra muestra. Alcance explicado en conversación.
+- Puente espera inventario listo y estable un segundo tras warp; timeout conserva
+  warp y devuelve unknown si observación incompleta. 216 tests OK, Perl sintaxis OK.
+- Conciliación específica de c_1: dos snapshots de sesión nueva, inventario completo,
+  Zeny/EXP y posición coherentes; conserva resultado original y no repite diálogo.
+  La lectura posterior no demuestra todos los estados intermedios.
+- Una muestra: tutorial completo, Hanson trasladó a Izlude; Groq eligió Swordsman,
+  build novice-swordman y campo prt_fild08. 11 acciones tutorial + 29 ciclo;
+  kill y loot confirmados, meta 1/1. El nombre «M4 Poring» es alias de caché;
+  evidencia previa sitúa fixture de recompensa en Prontera, no en este campo.
+- Checkpoints tutorial y ciclo completos, inflight=null, historia conservada.
+  Nilo detenido tras snapshot sin petición/tarea; prt_fild08 (336,211), HP38/46,
+  base2/job1, Zeny0. MariaDB/rAthena y Ollama heredados activos; otros sin tocar.
+- Evidencia: docs/evidence/P5-tutorial-exit.md. El chat principal revisará y pedirá
+  aprobación para cualquier siguiente alcance. No iniciar el cambio de clase.

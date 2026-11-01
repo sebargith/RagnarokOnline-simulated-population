@@ -1,6 +1,6 @@
 # P5.4 — muestra del tutorial (2026-11-01)
 
-P5.4 sigue **incompleto**. Una sola muestra, detenida automáticamente tras dos
+Estado histórico de la primera muestra: P5.4 estaba **incompleto**. Una muestra, detenida automáticamente tras dos
 rechazos iguales; no se repitió. Nilo, cuenta 2000031 / char 150007, era inexistente
 antes de `prepare`. Se creó en `new_2-1` (53,111), nivel 1, 48 puntos; la
 repetición conservó Knife 1201 y Cotton Shirt 2301, equipados. Los casos de
@@ -72,4 +72,46 @@ el alias Python del sistema mostró error de instalación. Servicios de juego y
 MariaDB existentes ya escuchaban; solo se inició Nilo. Antes de detenerlo una
 lectura confirmó pending_request_id=null, native_task=null, navigation=null,
 cola vacía, posición igual al destino y recuperación none. Ollama seguía activo. El cambio
-no se probó en movimiento vivo; P5.4 sigue incompleto.
+no se probó en movimiento vivo; P5.4 seguía incompleto en ese momento.
+
+## Conciliación y continuación (2026-11-01)
+
+El puente captura readiness y espera una observación de inventario, mapa, Zeny y
+EXP lista y estable durante un segundo después de warp; conserva el plazo de la
+acción. Si vence, devuelve `unknown/warp_inventory_unconfirmed`, con el warp y
+`observation_complete=0`, sin convertir la ausencia de lectura en inventario vacío.
+Antes del diálogo exige inventario listo. La conciliación es específica del c_1
+registrado: compara opción, nombre, sesión, warp y estado previo; exige dos
+snapshots completos de sesión nueva, separados 1023 ms, sin tarea/movimiento,
+con inventario Knife/Cotton, Zeny y EXP coherentes. Conserva el resultado
+original y añade conciliación; no vuelve a hablar con la recepcionista. Dos
+lecturas posteriores coherentes no prueban todos los estados intermedios.
+
+`python scripts/run_p2_cycle.py reconcile-receptionist-warp --runtime ../runtime
+--agent p5` concilió en new_1-2 (100,70). Una muestra `python scripts/run_p2_cycle.py
+run --runtime ../runtime --agent p5 --p5 --seconds 480 --max-actions 100
+--goal-kills 1` completó tutorial en 11 acciones y ciclo en 29, con 1/1 kill y
+sin inflight. Helper y Bruce cerraron diálogos; Entrance Guard, Test Examiner y
+Hanson terminaron warps con `observation_complete=1`, inventario listo y premios
+esperados. Groq eligió Swordsman/Izlude, build novice-swordman y prt_fild08.
+Repartió stats, equipó, vendió los ítems del tutorial sin Zeny y viajó al campo;
+canceló navegación ante un monstruo y confirmó una kill y una recogida.
+
+La víctima figura como «M4 Poring»; la evidencia previa de P1b indica que la
+caché compartida usa ese nombre para especie 1002 y el fixture de recompensa
+está en Prontera. Hay spawn normal de Poring en prt_fild08; el resultado de
+ataque de esta muestra registra nombre pero no ID de especie, por lo que no
+prueba por sí solo la procedencia del spawn. No se crearon ni alteraron spawns.
+P5.4 se considera observado para este recorrido, con ese límite; no demuestra
+comportamiento general ni cambio de clase.
+
+`D:/Ragnarok Agents/.venv/Scripts/python.exe -m unittest discover -s tests`: 216 OK;
+`-m unittest discover -s tests -p test_p5_tutorial.py`: 25 OK tras añadir la prueba
+de bloqueo por inventario incierto; sintaxis Perl `-c`
+con src, src/deps y bridge/lib: OK. Snapshot final: prt_fild08 (336,211), HP38/46,
+base2/job1, Zeny0, inventory_ready=1, sin petición/tarea/navegación y cola vacía.
+Nilo detenido. MariaDB PID22600, login40216, char12516, map31736 y Ollama51096
+ya activos; GPU antes 2270/16384 MiB. No se reiniciaron servicios ni otros clientes.
+Checkpoint y resultados: `runtime/p5/cycle/tutorial.json`, `state.json`,
+`events.jsonl`, fuera de Git. Una impresión inicial de evidencia falló por la
+codificación de consola; se repitió con JSON ASCII y no modificó datos.

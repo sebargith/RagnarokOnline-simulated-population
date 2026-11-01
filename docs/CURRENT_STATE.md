@@ -1,17 +1,17 @@
 # Estado actual
 
-## P5.4 — recepcionista completada, conciliación bloqueada (2026-11-01)
+## P5.4 — tutorial y primera kill observados (2026-11-01)
 
-- Recuperación específica de dos rechazos, con historial intacto y dos snapshots
-  frescos y estables de sesión nueva. Snapshot real new_2-2 (100,27).
-- Una acción de diálogo: elección de entrenamiento y warp confirmado por el
-  puente a new_1-2 (100,70). `reward_mismatch:receptionist`: captura inmediata
-  al warp observó inventario vacío; snapshot posterior listo mostró Knife y
-  Cotton equipados. Esto sugiere recarga transitoria, no prueba por sí solo la
-  ausencia de todos los efectos. No se repitió ni se adelantó el paso.
-- Checkpoint bloqueado paso 1, inflight=null; Nilo detenido tras lectura sin
-  petición ni tarea. 215 tests OK. [Evidencia](evidence/P5-tutorial-exit.md).
-- P5.4 incompleto. El principal revisa y propone siguiente alcance para aprobación.
+- Conciliación específica de la recepcionista con dos snapshots frescos completos;
+  resultado original conservado. El puente espera inventario estable tras warp o
+  bloquea por incertidumbre. 216 tests OK y sintaxis Perl OK.
+- Una muestra: tutorial completo, destino Swordsman/Izlude, build novice-swordman,
+  campo prt_fild08 y kill 1/1; 11 acciones tutorial y 29 ciclo. Nombre del objetivo
+  «M4 Poring» corresponde al alias compartido de Poring; el resultado no incluye
+  ID de especie. [Evidencia y límites](evidence/P5-tutorial-exit.md).
+- Nilo detenido, checkpoints completos sin inflight; snapshot prt_fild08 (336,211),
+  HP38/46, base2/job1. Sin petición ni tarea al detenerlo. Servicios heredados activos.
+- El principal evaluará el siguiente alcance; no iniciar P5.5 sin aprobación.
 
 
 ## P5 paso 4 — estado histórico previo a la prueba en vivo (2026-11-01)
