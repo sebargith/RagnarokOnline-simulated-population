@@ -33,6 +33,8 @@ my %o = (
     arrived => [M1Navigation::outcome('done', undef, $at)],
     coasting => [M1Navigation::outcome('done', undef, {%$at, calc => {x => 150, y => 186}})],
     settling => [M1Navigation::outcome('done', undef, {%$at, calc => {x => 150, y => 186}, settle_elapsed => 1})],
+    near_moving => [M1Navigation::outcome('done', undef, {%$at, pos_to => {x => 155, y => 191}, calc => {x => 150, y => 186}, settle_elapsed => 1})],
+    near_stopped => [M1Navigation::outcome('done', undef, {%$at, pos_to => {x => 155, y => 191}, calc => {x => 155, y => 191}})],
     settled_timeout => [M1Navigation::outcome('done', undef, {%$at, calc => {x => 150, y => 186}, settle_elapsed => 5})],
     short => [M1Navigation::outcome('done', undef, {%$at, pos_to => {x => 154, y => 191}})],
     map_changed => [M1Navigation::outcome('done', undef, {%$at, map => 'prt_fild08'})],
@@ -72,7 +74,8 @@ class NavigationContractTests(unittest.TestCase):
         self.assertEqual(self.data['outcome'], {
             'running': [], 'arrived': ['completed', 'arrived'],
             'coasting': ['unknown', 'route_ended_off_target'],
-            'settling': [], 'settled_timeout': ['unknown', 'route_ended_off_target'],
+            'settling': [], 'near_moving': [], 'near_stopped': ['failed', 'route_ended_near_target'],
+            'settled_timeout': ['unknown', 'route_ended_off_target'],
             'short': ['unknown', 'route_ended_off_target'],
             'map_changed': ['unknown', 'map_changed'],
             'too_long': ['failed', 'timeout'], 'no_route': ['failed', 'unreachable'],

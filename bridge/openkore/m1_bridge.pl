@@ -214,7 +214,7 @@ sub navigation_tick {
     my $a = $pending->{action};
     my $evidence = nav_evidence();
     if ($state eq 'done' && $evidence->{map} eq $a->{map} &&
-        M1Navigation::distance($evidence->{pos_to}, $a) == 0 &&
+        M1Navigation::distance($evidence->{pos_to}, $a) <= 1 &&
         M1Navigation::distance($evidence->{position}, $a) > 1) {
         $pending->{settle_since} //= time;
     }
