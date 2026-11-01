@@ -10,8 +10,10 @@
   213 tests OK y sintaxis Perl OK; cambio aún sin prueba viva. [Evidencia](evidence/P5-tutorial-exit.md).
 - Nilo detenido, sin tarea ni petición pendientes al cierre; guardado en `new_2-2`
   (100,27). Checkpoint bloqueado e historial conservados. Servicios de juego activos.
-- Siguiente: revisar recuperación segura explícita del bloqueo y validar el snapshot
-  corregido antes de continuar el tutorial, sin repetir resultados inciertos.
+- Revisión principal: checkpoint leído confirma paso 1 bloqueado, inflight=null
+  e historial de c_1 completada y c_2/c_3 rechazadas. Informe de cierre recibido.
+- Siguiente: [plan Chat 13](NEXT_CHAT_PLAN.txt), recuperación restringida y validación
+  de snapshot/tutorial. Pendiente de aprobación del usuario; no iniciado.
 
 
 ## P5 paso 4 — salida del tutorial por NPC, sin prueba en vivo (2026-11-01)

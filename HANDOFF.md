@@ -21,7 +21,11 @@ No tocar personajes ajenos, fixtures, spawns, GM ni recolocaciones.
   Ollama ya escuchaba. Procesos y puertos deben verificarse antes de tocarlos.
 - [Evidencia](docs/evidence/P5-tutorial-exit.md); [estado](docs/CURRENT_STATE.md).
 
-## Siguiente acción
-Revisar recuperación explícita y segura del bloqueo y validar la corrección de
-snapshot antes de continuar el tutorial; conservar historial e intenciones.
-No repetir muestras tras dos fallos iguales sin resolución fundamentada.
+## Revisión principal y siguiente paso
+- Informe de cierre solicitado y recogido del chat 12; estado bloqueado verificado
+  leyendo tutorial.json: paso 1, inflight=null, c_1 completo y c_2/c_3 rechazados.
+- Plan Chat 13 en docs/NEXT_CHAT_PLAN.txt: recuperación restringida y validación
+  viva del snapshot/tutorial; PENDIENTE DE APROBACIÓN del usuario, no iniciado.
+- Flujo nuevo: subchat informa al cerrar; principal revisa y planifica siguiente
+  alcance con preguntas necesarias; usuario aprueba antes de ejecutarlo.
+- No repetir muestras tras dos fallos iguales sin resolución fundamentada.

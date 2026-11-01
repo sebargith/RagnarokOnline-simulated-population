@@ -70,7 +70,8 @@ CÓMO CONTINUAR AHORA
 - [HECHO] Chat 10: reacción implementada, 118 tests OK; muestra única 9/9
   con ataque inmediato, sin observar cancelación real ni medir su latencia.
 - [REVISADO] Chat 10 aceptado, 123 tests; 9/9 completo sin intención pendiente.
-- [SIGUIENTE] Revisar recuperación segura del bloqueo P5.4 y validar el snapshot corregido.
+- [PENDIENTE DE APROBACIÓN] Chat 13: recuperación segura y validación del tutorial.
+  Alcance preparado en docs/NEXT_CHAT_PLAN.txt; no iniciado.
   Stats iniciales 1 + 48 son correctos para 20130807; el diagnóstico anterior se corrigió.
   Hechos registrados: P5.1–P5.3; P5.4 incompleto: una muestra llegó al
   primer portal y quedó bloqueada por posición antigua. Corrección probada solo
@@ -83,10 +84,11 @@ CÓMO CONTINUAR AHORA
 - Mantén un único chat de implementación activo; el relevo sigue en HANDOFF.md.
 - Configuración de nuevos chats: Terra 6.1, razonamiento medio
   (gpt-6.1-terra / medium), por instrucción del usuario.
-- Preferencia permanente: el chat principal organiza nuevos chats de alcance
-  concreto, delega y revisa. Se procede con pasos rutinarios reversibles y con
-  autorizaciones ya dadas sin preguntas repetidas; las decisiones materiales
-  nuevas mantienen su autorización aplicable.
+- Flujo vigente (2026-11-01): cada subchat entrega al terminar un informe al
+  principal (cambios, commits, pruebas, evidencia, checkpoint y pendientes).
+  El principal lo recoge, revisa y prepara el siguiente alcance con preguntas
+  solo si hacen falta. El usuario aprueba el siguiente paso ANTES de iniciarlo.
+  Dentro del alcance aprobado siguen vigentes las autorizaciones rutinarias.
 
 PASOS DEL CAMINO Y PROMPTS PARA MÁS ADELANTE
 -------------------------------------------
