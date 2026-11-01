@@ -1,22 +1,20 @@
 # Estado actual
 
-## P5.4 — muestra detenida, posición corregida sin validación viva (2026-11-01)
+## P5.4 — recepcionista completada, conciliación bloqueada (2026-11-01)
 
-- Nilo creado normalmente en `new_2-1`; reejecución conserva equipo. Pruebas de
-  inventario vacío/interrupción simuladas. Stats 1 y 48 puntos siguen correctos.
-- Una muestra: portal `new_2-1` → `new_2-2` confirmado; dos rechazos iguales
-  `already_at_destination`, bloqueo en recepcionista. No hay NPC, destino ni kill.
-- Snapshot usaba origen antiguo de movimiento; se ajustó al cálculo de OpenKore.
-  213 tests OK y sintaxis Perl OK; cambio aún sin prueba viva. [Evidencia](evidence/P5-tutorial-exit.md).
-- Nilo detenido, sin tarea ni petición pendientes al cierre; guardado en `new_2-2`
-  (100,27). Checkpoint bloqueado e historial conservados. Servicios de juego activos.
-- Revisión principal: checkpoint leído confirma paso 1 bloqueado, inflight=null
-  e historial de c_1 completada y c_2/c_3 rechazadas. Informe de cierre recibido.
-- Siguiente propuesto en el chat principal: recuperación restringida y validación
-  de snapshot/tutorial. Pendiente de aprobación del usuario; no iniciado.
+- Recuperación específica de dos rechazos, con historial intacto y dos snapshots
+  frescos y estables de sesión nueva. Snapshot real new_2-2 (100,27).
+- Una acción de diálogo: elección de entrenamiento y warp confirmado por el
+  puente a new_1-2 (100,70). `reward_mismatch:receptionist`: captura inmediata
+  al warp observó inventario vacío; snapshot posterior listo mostró Knife y
+  Cotton equipados. Esto sugiere recarga transitoria, no prueba por sí solo la
+  ausencia de todos los efectos. No se repitió ni se adelantó el paso.
+- Checkpoint bloqueado paso 1, inflight=null; Nilo detenido tras lectura sin
+  petición ni tarea. 215 tests OK. [Evidencia](evidence/P5-tutorial-exit.md).
+- P5.4 incompleto. El principal revisa y propone siguiente alcance para aprobación.
 
 
-## P5 paso 4 — salida del tutorial por NPC, sin prueba en vivo (2026-11-01)
+## P5 paso 4 — estado histórico previo a la prueba en vivo (2026-11-01)
 
 - `d64b41e`: `scripts/prepare_p5.py` (Nilo, cuenta 2000031, puerto 8771, `runtime/p5/`, solo INSERT;
   aún no ejecutado), `npc_script` en el puente (etiquetas declaradas, único texto el nombre propio,

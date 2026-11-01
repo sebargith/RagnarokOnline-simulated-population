@@ -44,3 +44,32 @@ siguen activos; cliente Nilo detenido. Ollama ya escuchaba en 11434. GPU al inic
 cambios. El cambio del snapshot afecta a observaciones generales del puente y
 requiere validación viva. No reiniciar ni borrar el checkpoint para ocultar los
 rechazos; revisar una recuperación explícita y segura antes de continuar.
+
+## Recuperación y segunda muestra (2026-11-01)
+
+El comando `python scripts/run_p2_cycle.py recover-receptionist --runtime ../runtime --agent p5`
+exigió los rechazos originales y dos snapshots de una sesión nueva, separados
+1025 ms, en new_2-2 (100,27), sin movimiento ni tarea, y preservó el historial.
+La posición en reposo coincide con el guardado previo; no verifica interpolación
+viva durante movimiento. El cálculo de OpenKore en reposo y movimiento se probó
+con un recorrido simulado; el controlador pasa de travel a npc_script en tests.
+`bridge_steps` también recibe la posición calculada; no se ha probado en vivo.
+
+Se ejecutó la misma muestra `run --runtime ../runtime --agent p5 --p5 --seconds 480
+--max-actions 100 --goal-kills 1`: terminó tras una acción, sin inferencias, con
+`reward_mismatch:receptionist`. El servidor confirmó warp a new_1-2 (100,70)
+y la opción Apply for training. El resultado incluyó inventario vacío justo
+al warp frente a Knife y Cotton antes; una lectura posterior con inventory_ready
+mostró ambos equipados. `talk_tick` finaliza inmediatamente al detectar warp y
+`talk_snapshot` no espera inventory_ready: explicación consistente, no prueba de
+que no existieran otros efectos. No se repitió el diálogo ni se alteró el paso.
+Resultado y checkpoint: `runtime/p5/cycle/tutorial.json`, eventos en
+`runtime/p5/cycle/events.jsonl`, fuera de Git. No hubo decisión, campo ni kill.
+
+`python -m unittest discover -s tests`: 215 OK con el Python del proyecto y Perl
+local, fuera del aislamiento. Un intento aislado quedó sin salida y se interrumpió;
+el alias Python del sistema mostró error de instalación. Servicios de juego y
+MariaDB existentes ya escuchaban; solo se inició Nilo. Antes de detenerlo una
+lectura confirmó pending_request_id=null, native_task=null, navigation=null,
+cola vacía, posición igual al destino y recuperación none. Ollama seguía activo. El cambio
+no se probó en movimiento vivo; P5.4 sigue incompleto.
