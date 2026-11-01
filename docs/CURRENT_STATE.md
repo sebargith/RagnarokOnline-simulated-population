@@ -1,3 +1,5 @@
+> Preflight 2026-11-01: no se lanzó nueva ejecución; GPU 14991–15130 MiB supera límite 14336 MiB. RAM libre 2,83 GiB. Cliente, puerto y locks no confirmados desde este entorno. Repetir preflight al retomar.
+
 # Estado actual
 
 ## P5.5 — campo por nivel durante el entrenamiento (2026-11-01, Claude)

@@ -1,6 +1,10 @@
 # Relevo — Ragnarok Agents
 Actualizado: 2026-11-01 por Claude (campo por nivel en el entrenamiento).
 Referencia: codex/single-agent-plan, código 01c4cd5; documentos en commit siguiente.
+## Preflight 2026-11-01
+- No se lanzó otra ejecución: GPU 14991–15130 MiB, sobre el límite 14336 MiB; RAM libre 2,83 GiB. No se tocaron procesos.
+- El estado de la muestra anterior no es una observación actual; proceso 31704, puerto y locks no quedaron confirmados desde este entorno.
+- Al retomar: comprobar recursos, controlador, identidad/puerto/locks y checkpoint fresco antes de lanzar.
 ## Objetivo actual
 Nilo entrena legítimamente hasta Job10 y primera clase con NPC gratuito en Prontera.
 ## Estado comprobado (muestra, no estado permanente)
