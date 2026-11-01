@@ -1,55 +1,42 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-11-01 por Claude (P5 paso 3, campos de caza)
-Referencia: rama codex/single-agent-plan; código en 586de19 + 6553c7e, docs en el último commit.
+Actualizado: 2026-11-01 por Claude (relevo a Codex)
+Referencia: rama codex/single-agent-plan, commit_ref d64b41e; este relevo en el commit siguiente.
 ## Objetivo actual
-P5: un novato nuevo de nivel 1 decide solo cómo progresar hasta primera clase; luego
-comunidad. Dos funciones de modelo: planner inteligente (nube) y chat local.
+P5: un novato nuevo de nivel 1 decide solo cómo progresar hasta primera clase; luego comunidad.
+Planner Groq gpt-oss-120b (respaldo Gemma 4 12B local); chat Gemma 4 12B local.
 ## Estado comprobado
-- Único relevo: este archivo. Checkout D:/Ragnarok Agents/m4-continuous; la raíz
-  (codex/web-search, WIP M2) no se implementa. WIP preservado en m3-worktree y m4-field.
-- P1–P3 hechos en su alcance: navegación, combate, loot, recuperación, portales,
-  NPC/tienda, metas persistentes, propuestas del 9B validadas, exploración. 127 tests OK.
-- P3: última meta 9/9, sin intención pendiente; cancelación viva y latencia sin medir.
-- P4 parcial: consulta standalone (inference/mechanics.py) con SearXNG activo en 8080;
-  dos muestras reales sin evidencia útil. No conectada al planner.
-- P5 paso 1 hecho: inference/openai_compat.py + inference/roles.py + config/model-roles.json
-  (planner/chat, respaldo local, claves por entorno o runtime/secrets/model-keys.env).
-  Banco fixtures/p5-planner-bench.json; evaluación en docs/evidence/P5-model-eval.md:
-  Groq gpt-oss mejor (96 %, ~0,8 s); Gemma 4 12B local 85 %; 9B 77 %; 9B think inviable; Gemini gratis con 503/429.
-- Decisión aplicada (4fb70b1): planner groq-gpt-oss + respaldo gemma4-12b; chat gemma4-12b-chat
-  local (ctx 8192, temp 0,7). 9B solo historial. Consumidores conectados a las funciones. 149 tests OK.
-  Claves en runtime/secrets/model-keys.env (rellenadas por el usuario; no leer valores).
-- P5 paso 2 hecho: stat_up/skill_up/equip/unequip en el puente (M1Progress.pm), con éxito solo por
-  el paquete del servidor; agent/build_policy.py, config/p5-builds.json, config/p5-equipment.json,
-  BuildPlanner en goal_planner.py. 166 tests OK. En vivo: Groq eligió novice-swordman; STR 5→11,
-  NV_BASIC 0→2, Knife desequipado y reequipado, 10/10 confirmadas. Ver docs/evidence/P5-stats-equipment.md.
-  Build de Tarin en runtime/p1/cycle/build.json.
-- P5 paso 3 hecho: config/p5-monsters.json + config/p5-fields.json (scripts/build_p5_hunting.py, reproducible),
-  agent/hunting.py (peligro, viables, opciones, temperamento + semilla), FieldPlanner, SoloCycle con field/outcomes
-  y build en el ciclo; `run_p2_cycle.py run --p5`. 188 tests OK. En vivo: Groq eligió prt_fild06, travel 64 s,
-  5 kills, venta y vuelta a prt_fild06; checkpoint complete 14/14, campo prt_fild06. Ver docs/evidence/P5-hunting-fields.md.
-- Servicios (PIDs): MariaDB 50024, login 40760, char 55704, map 36528 (puertos 3306/6900/6121/5121), Ollama, Docker/SearXNG.
-  Cliente P1 detenido; clientes m4-field no están corriendo.
-- Visitor en grupo local Observer (20: @jumpto, @hide); carga tras el último reinicio [por verificar].
+- Único relevo: este archivo. Checkout D:/Ragnarok Agents/m4-continuous; la raíz (codex/web-search,
+  WIP M2) no se implementa. WIP preservado en m3-worktree y m4-field.
+- P1–P3 en su alcance; P4 parcial (consulta standalone, sin evidencia útil, no conectada).
+- P5.1 modelos (inference/roles.py, config/model-roles.json; claves en runtime/secrets/model-keys.env,
+  rellenadas por el usuario, nunca leer ni imprimir valores). Evaluación: docs/evidence/P5-model-eval.md.
+- P5.2 stats/habilidades/equipo con confirmación del servidor; P5.3 campos por nivel y peligro,
+  build y campo dentro de run_p2_cycle --p5 (Tarin: prt_fild06, 14/14). Evidencias P5-*.md.
+- P5.4 implementado (d64b41e, 207 tests OK) sin prueba en vivo: tutorial completo por NPC para Nilo
+  (cuenta 2000031, puerto 8771), destino Izlude/Swordsman o Prontera/Acolyte elegido por el planner.
+- Servicios del juego PARADOS (solo SearXNG 8080 y Ollama 11434). runtime/processes.json tiene PIDs
+  muertos. Tarin y Nilo sin cliente. Visitor en grupo local Observer (20: @jumpto, @hide).
 ## Decisiones vigentes
-- rAthena pre-Renewal, versiones fijadas; OpenKore manual es el único ejecutor.
-- Solo portales caminables gratuitos; sin Kafra/pago. Sin premios, spawns ni progreso falso.
-- El agente usa solo información legítima del cliente; el modelo propone, el ejecutor valida.
-- Usuario: el 9B no basta; P5 usa planner Groq gpt-oss (respaldo Gemma 4 12B) y chat
-  Gemma 4 12B local. Ver docs/evidence/P5-model-eval.md y plan P5.
-- Un chat orquestador y una sesión por objetivo, en este checkout; un solo escritor.
+- rAthena pre-Renewal, PACKETVER 20130807, versiones fijadas; OpenKore manual único ejecutor.
+- Solo portales caminables gratuitos; sin Kafra/pago. Sin premios, spawns, recolocaciones ni @ para bots.
+- El agente usa solo información legítima (cliente, tablas públicas generadas); el modelo propone y
+  el código valida. Lecturas SQL solo como auditoría de evidencia, nunca como entrada del agente.
+- Chat orquestador + una sesión por objetivo, en este checkout; un solo escritor.
 ## Incompleto / problemas / validaciones pendientes
-- P4: selección de consulta demasiado amplia; status ok no implica evidencia suficiente.
-- Peligro estimado (no fórmula exacta); en vivo sin retirada, muerte, subida de nivel ni reparto en el runner.
-- Operación prolongada sin demostrar. ComfyUI del usuario puede ocupar la GPU (>14 GiB corta el runner).
-- "M4 Poring" = etiqueta de la caché compartida tables/monsters.txt; no editarla.
-- DB/puertos/GPU compartidos: no reiniciar servicios sin permiso; no ejecutar prepare_m4.py
-  con clientes m4-field vivos; transacciones inciertas sin replay.
+- DEFECTO P5.4: prepare_p5.py crea stats a 1 + 48 puntos (regla PACKETVER ≥ 20151001). Este servidor
+  (20130807) exige stats 1–9 con STR+INT=AGI+LUK=VIT+DEX=10 y 0 puntos (src/char/char.cpp char_make).
+  Corregir antes de crear a Nilo; elegir el reparto inicial (p. ej. por la build) y documentarlo.
+- Falta build novice-acolyte si se ofrece Prontera/Acolyte (o limitar a Izlude).
+- Sin ver en vivo: subida de nivel y reparto en el runner, retiradas/muertes en P5, cambio de campo.
+- P4 sin calidad suficiente; operación prolongada sin demostrar; ComfyUI puede ocupar la GPU.
+- No editar vendor/openkore/tables/monsters.txt ("M4 Poring" es su etiqueta para 1002).
 ## Próxima acción
-Revisión del orquestador del paso 3; luego P5 paso 4 (salir de la zona de entrenamiento por NPC). Pendiente aparte: revisión
-humana del chat con Gemma.
+1) Corregir el defecto de stats (y la build de Acolyte) con pruebas. 2) Pedir permiso al usuario para
+arrancar los servicios (revisar processes.json antes de m1.py start). 3) Prueba en vivo de P5.4:
+crear Nilo, tutorial completo, destino, build, campo y ≥1 kill, con evidencia en
+docs/evidence/P5-tutorial-exit.md. Después P5 paso 5 (cambio de clase en Job 10).
 ## Archivos relevantes
-- docs/CURRENT_STATE.md; docs/NATIVE_AGENT_PLAN.md; docs/USER_GUIDE.txt.
-- docs/evidence/P2*.md, P3-*.md, P4-public-mechanics.md; agent/solo_cycle.py.
-- bridge/openkore/m1_bridge.pl; bridge/lib/M1*.pm; inference/; config/m2-operating.json.
+- docs/CURRENT_STATE.md; docs/NATIVE_AGENT_PLAN.md (sección P5); docs/USER_GUIDE.txt.
+- scripts/prepare_p5.py; config/p5-tutorial.json; agent/tutorial.py; agent/goal_planner.py; agent/solo_cycle.py.
+- bridge/openkore/m1_bridge.pl; bridge/lib/M1*.pm; config/p5-*.json; scripts/run_p2_cycle.py.
 Registro de chats: D:/Ragnarok Agents/.ai/chats/INDEX.md

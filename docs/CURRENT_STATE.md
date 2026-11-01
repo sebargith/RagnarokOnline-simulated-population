@@ -1,5 +1,21 @@
 # Estado actual
 
+## P5 paso 4 — salida del tutorial por NPC, sin prueba en vivo (2026-11-01)
+
+- `d64b41e`: `scripts/prepare_p5.py` (Nilo, cuenta 2000031, puerto 8771, `runtime/p5/`, solo INSERT;
+  aún no ejecutado), `npc_script` en el puente (etiquetas declaradas, único texto el nombre propio,
+  éxito solo con el warp del servidor), `config/p5-tutorial.json` desde `novice.txt` (22 preguntas),
+  `agent/tutorial.py`, `DestinationPlanner` (solo Izlude/Swordsman y Prontera/Acolyte; resto
+  `no_supply_route`) y `run_p2_cycle.py run --agent p5 --p5`. Suite: 207 OK.
+- **Defecto a corregir antes del vivo (revisión del orquestador):** el servidor se compiló con
+  PACKETVER 20130807 (`vendor/rathena/src/custom/defines_pre.hpp`); con ese protocolo `char_make`
+  exige stats elegidos 1–9 con STR+INT=AGI+LUK=VIT+DEX=10 y deja 0 puntos libres
+  (`src/char/char.cpp`). `prepare_p5.py` usa stats a 1 + 48 puntos (regla PACKETVER ≥ 20151001):
+  no es un personaje que este servidor cree. Además falta una build `novice-acolyte` si se ofrece
+  Prontera/Acolyte. Nilo no existe todavía; no hay nada que deshacer.
+- Servicios del juego parados (solo SearXNG 8080 y Ollama 11434). `runtime/processes.json` conserva
+  PIDs de procesos ya inexistentes; revisar antes de `m1.py start`. Arrancar requiere permiso del usuario.
+
 ## P5 paso 3 — campos de caza según nivel y peligro (2026-11-01)
 
 - Tablas públicas generadas y reproducibles: 214 monstruos (`config/p5-monsters.json`) y 144 campos
