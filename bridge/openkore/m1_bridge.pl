@@ -53,6 +53,7 @@ $hooks = Plugins::addHooks(
     ['packet_attack', \&combat], ['monster_disappeared', \&monster_gone],
     ['npc_talk', \&npc_text], ['npc_autotalk', \&npc_autotalk], ['packet/npc_sell_list', \&shop_sell_list], ['buy_result', \&shop_buy_result], ['packet/sell_result', \&shop_sell_result], ['packet/inventory_item_added', \&inventory_added], ['packet/stat_info', \&stat_info],
     ['packet_pre/stats_added', \&progress_stat_ack], ['packet/skill_update', \&progress_skill_ack],
+    ['job_changed', \&first_job_changed],
     ['packet/equip_item', \&progress_equip_ack], ['packet/unequip_item', \&progress_unequip_ack],
     ['engaged_deal', \&trade_engaged], ['incoming_deal', \&trade_incoming],
     ['packet/deal_add_you', \&trade_added], ['packet/deal_finalize', \&trade_locked],
@@ -302,7 +303,8 @@ sub native_tick {
             target_dead => $p->{target_dead} || ($old && $old->{dead}) || ($m && $m->{dead}) ? 1 : 0,
             dmg_from_you => $dmg // 0, gave_up => $m && ($m->{attack_failed} // 0) >= $p->{started} ? 1 : 0,
             target_visible => $m ? 1 : 0});
-        @$evidence{qw(target_name first_hit_ms hits damage_dealt)} = ($p->{name}, $p->{first_hit_ms}, $p->{hits}, $p->{damage});
+        @$evidence{qw(target_name target_name_id first_hit_ms hits damage_dealt)} =
+            ($p->{name}, $p->{name_id}, $p->{first_hit_ms}, $p->{hits}, $p->{damage});
     } else {
         my $item = $itemsList->getByID($p->{target_bin});
         $p->{gone_at} //= time unless $item;
@@ -544,22 +546,28 @@ sub cancel_talk { $messageSender->sendTalkCancel($pending->{npc_bin}) if connect
 
 sub talk_request {
     my ($id, $a) = @_;
+    my $first_job = $a->{type} eq 'first_job';
+    my ($x, $y) = $first_job ? (153, 193) : ($a->{x}, $a->{y});
     my $at = sub { defined($_[0]) && !ref($_[0]) && $_[0] =~ /^\d{1,3}$/ };
-    my ($npc) = $at->($a->{x}) && $at->($a->{y}) ?
-        grep { $_->{pos}{x} == $a->{x} && $_->{pos}{y} == $a->{y} } @{$npcsList->getItems} : ();
+    my ($npc) = $at->($x) && $at->($y) ?
+        grep { $_->{pos}{x} == $x && $_->{pos}{y} == $y } @{$npcsList->getItems} : ();
     my $script = $a->{type} eq 'npc_script';
     if (!$char->inventory->isReady) { result($id, 'rejected', 'inventory_not_ready'); return }
     my $ctx = {manual_ai => $cfg->{native_navigation} && AI::state() == AI::MANUAL(),
         hp => $char->{hp}, recovering => $recovery{phase} ne 'none', talking => %talk ? 1 : 0,
-        npc => $npc && $npc->{pos}, pos => Utils::calcPosFromPathfinding($field, $char)};
-    my $reason = $script ? M1Travel::validate_script($a, $ctx) : M1Travel::validate_talk($a, $ctx);
+        npc => $npc && $npc->{pos}, npc_name => $npc && $npc->{name}, map => $field->baseName,
+        job_id => $char->{jobID}, job_level => $char->{lv_job}, points_skill => $char->{points_skill},
+        pos => Utils::calcPosFromPathfinding($field, $char)};
+    my $reason = $first_job ? M1Travel::validate_first_job($a, $ctx) :
+        $script ? M1Travel::validate_script($a, $ctx) : M1Travel::validate_talk($a, $ctx);
     if ($reason) { result($id, 'rejected', $reason); return }
     AI::clear(qw/move route mapRoute/);
     my $now = time;
     $pending = {id => $id, action => $a, native => 'npc_talk', npc_bin => $npc->{ID}, npc_name => $npc->{name},
-        choices => [@{$a->{choices}}], chosen => [], menus => [], transcript => [], pages => 0,
+        choices => $first_job ? [$a->{job}, 'Confirm'] : [@{$a->{choices}}], chosen => [], menus => [], transcript => [], pages => 0,
         before => talk_snapshot(), acted => $now, started => $now, progress => 0, deadline => $now + $a->{timeout_s},
-        $script ? (script => 1, expect => $a->{expect}, name_reply => $a->{name_reply}, name_sent => 0) : ()};
+        $script ? (script => 1, expect => $a->{expect}, name_reply => $a->{name_reply}, name_sent => 0) : (),
+        $first_job ? (first_job => 1, expected_job => M1Travel::first_job_id($a->{job})) : ()};
     $last_action = $now;
     $messageSender->sendTalk($npc->{ID});
     result($id, 'accepted', 'talk_sent');
@@ -569,6 +577,13 @@ sub talk_finish {
     my ($status, $reason) = @_;
     my $p = $pending;
     my $after = $p->{stable_after} || talk_snapshot();
+    if ($p->{first_job}) {
+        my ($final, $why) = M1Travel::first_job_outcome(scalar(@{$p->{chosen}}) >= 2,
+            $p->{expected_job}, $p->{observed_job}, $reason);
+        finish($final, $why, {expected_job => $p->{expected_job}, observed_job => $p->{observed_job},
+            chosen => $p->{chosen}, before => $p->{before}, after => $after, npc => $p->{npc_name}});
+        return;
+    }
     if (!$after->{inventory_ready} || ($p->{warped} && !$p->{stable_after})) {
         finish('unknown', $p->{warped} ? 'warp_inventory_unconfirmed' : 'inventory_unconfirmed', {warped => $p->{warped},
             observation_complete => 0, before => $p->{before}, after => $after,
@@ -590,6 +605,7 @@ sub talk_finish {
 sub talk_tick {
     my $p = $pending;
     my $now = time;
+    if ($p->{first_job} && defined $p->{observed_job}) { talk_finish('completed', 'job_packet'); return }
     if ($p->{warped}) {
         # The server moved us: the dialog is over, whatever page it was on.
         AI::clear(qw/move route mapRoute/);
@@ -608,6 +624,9 @@ sub talk_tick {
         # Like OpenKore's TalkNPC: acknowledge the close button after a short wait.
         return if $now < $p->{closing};
         cancel_talk();
+        if ($p->{first_job} && @{$p->{chosen}} >= 2 && !defined $p->{observed_job} && $now < $p->{deadline}) {
+            $p->{closing} = $p->{deadline}; return;
+        }
         # close2 + warp: the script warps only after the close is acknowledged.
         if ($p->{expect}) { $p->{await_warp} = $now + 5; return }
         talk_finish(@{$p->{close_result}}); return;
@@ -638,6 +657,12 @@ sub talk_tick {
         $messageSender->sendTalkResponse($p->{npc_bin}, $status);
     } elsif ($act eq 'close') { $p->{closing} = $now + .5; $p->{close_result} = [$status, $reason] }
     else { cancel_talk(); talk_finish($status, $reason) }
+}
+
+sub first_job_changed {
+    my (undef, $args) = @_;
+    return unless $pending && $pending->{first_job};
+    $pending->{observed_job} = 0 + $args->{new_job} if defined $args->{new_job};
 }
 
 # P2b shops: talk -> buy/sell list from the server -> one bulk packet -> the
@@ -985,7 +1010,7 @@ sub request {
     }
     if ($pending) { result($id, 'rejected', 'busy'); return }
     if (time - $last_action < 1) { result($id, 'rejected', 'rate_limited'); return }
-    if ($cfg->{native_navigation} && $a->{type} =~ /^(navigate|travel|portal|npc_talk|npc_script|npc_sell|npc_buy|attack|take)$/ && $recovery{phase} ne 'none') {
+    if ($cfg->{native_navigation} && $a->{type} =~ /^(navigate|travel|portal|npc_talk|npc_script|first_job|npc_sell|npc_buy|attack|take)$/ && $recovery{phase} ne 'none') {
         result($id, 'rejected', 'recovering'); return;
     }
     if ($a->{type} eq 'navigate') {
@@ -1007,6 +1032,7 @@ sub request {
     }
     if ($a->{type} eq 'travel') { travel_request($id, $a); return }
     if ($a->{type} eq 'npc_talk') { talk_request($id, $a); return }
+    if ($cfg->{native_navigation} && $a->{type} eq 'first_job') { talk_request($id, $a); return }
     if ($cfg->{native_navigation} && $a->{type} eq 'npc_script') { talk_request($id, $a); return }
     if ($cfg->{native_navigation} && $a->{type} eq 'portal') { portal_request($id, $a); return }
     if ($a->{type} =~ /^npc_(sell|buy)$/) { shop_request($id, $a); return }

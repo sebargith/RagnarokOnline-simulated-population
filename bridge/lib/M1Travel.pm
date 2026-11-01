@@ -140,6 +140,30 @@ sub validate_talk {
     talk_context($ctx);
 }
 
+# Only the approved first-job NPC and its six fixed destinations are exposed.
+my %FIRST_JOB = (Swordman => 1, Mage => 2, Archer => 3, Acolyte => 4, Merchant => 5, Thief => 6);
+sub first_job_id { $FIRST_JOB{$_[0] // ''} }
+sub validate_first_job {
+    my ($a, $ctx) = @_;
+    return 'invalid_first_job' unless join(',', sort keys %$a) eq 'job,timeout_s,type' &&
+        defined($a->{job}) && !ref($a->{job}) && first_job_id($a->{job}) &&
+        defined($a->{timeout_s}) && !ref($a->{timeout_s}) && $a->{timeout_s} =~ /^\d{1,3}$/;
+    return 'invalid_timeout' if $a->{timeout_s} < 10 || $a->{timeout_s} > 60;
+    return 'wrong_map_or_npc' unless ($ctx->{map} // '') eq 'prontera' && ($ctx->{npc_name} // '') eq 'First Job Changer';
+    return 'not_eligible' unless defined($ctx->{job_id}) && $ctx->{job_id} == 0 &&
+        defined($ctx->{job_level}) && $ctx->{job_level} >= 10 &&
+        defined($ctx->{points_skill}) && $ctx->{points_skill} == 0;
+    talk_context($ctx);
+}
+
+# A matching own-character job-change packet is the only success evidence.
+sub first_job_outcome {
+    my ($selected, $expected, $observed, $reason) = @_;
+    return ('completed', 'job_changed') if $selected && defined($observed) && $observed == $expected;
+    return ('unknown', 'job_change_unconfirmed') if $selected || defined($observed);
+    return ('failed', $reason);
+}
+
 # npc_script: a pre-declared tutorial dialog. The only text it may type is the
 # character's own name (name_reply 1; the plugin supplies it, never the caller),
 # and an optional expect {map, x, y} names the one warp that completes it.

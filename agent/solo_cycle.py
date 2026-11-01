@@ -20,6 +20,7 @@ from scripts.p2_supply import SHOP, buy_plan, decide
 FINAL = {'completed', 'failed', 'cancelled', 'unknown', 'rejected'}
 SUCCESS = {'attack': 'killed', 'take': 'picked_up', 'navigate': 'arrived',
            'travel': 'arrived', 'npc_sell': 'sold', 'npc_buy': 'bought',
+           'first_job': 'job_changed',
            'stat_up': 'stat_raised', 'skill_up': 'skill_raised', 'equip': 'equipped', 'unequip': 'unequipped'}
 PROGRESS = {'stat_up', 'skill_up', 'equip', 'unequip'}
 HUNTING = {'attack', 'take', 'navigate'}
@@ -172,13 +173,16 @@ class SoloCycle:
             elif kind == 'npc_buy':
                 s['phase'] = 'return'
             elif kind == 'travel':
-                s['phase'] = 'sell' if s['phase'] == 'to_shop' else 'hunt'
+                if s['phase'] != 'to_first_job':
+                    s['phase'] = 'sell' if s['phase'] == 'to_shop' else 'hunt'
+            elif kind == 'first_job':
+                s.update(status='complete', reason='server_confirmed_first_job')
             elif kind == 'navigate':
                 s['patrol'] += 1
             self.save()
             return True
         # Unknown effects, all shop/travel errors and cancellation need review.
-        if result['status'] in {'unknown', 'cancelled', 'completed'} or kind in {'npc_buy', 'npc_sell', 'travel'}:
+        if result['status'] in {'unknown', 'cancelled', 'completed'} or kind in {'npc_buy', 'npc_sell', 'travel', 'first_job'}:
             self.block(f'{kind}:{result["status"]}/{reason}')
             return True
         s['inflight'] = None
@@ -358,6 +362,15 @@ class SoloCycle:
                 grow = self.progress_action(snap)
                 if grow:
                     return grow
+                build = self.p5 and self.p5.get('build')
+                progress = snap.get('progress') or {}
+                target = build and build.get('target_class')
+                if (target in {'Swordman', 'Mage', 'Archer', 'Acolyte', 'Merchant', 'Thief'} and
+                        progress.get('job_id') == 0 and snap['level']['job'] >= 10 and
+                        progress.get('points_skill') == 0):
+                    s['phase'] = 'to_first_job'
+                    self.save()
+                    continue
                 if field is None:
                     return None  # A new character waits for its first field decision.
                 need = self.supply(snap)
@@ -409,6 +422,17 @@ class SoloCycle:
                     action = {'type': 'navigate', 'map': snap['map'], **target, 'timeout_s': 25}
                     self._exploration, self._explore_origin = action.copy(), {'map': snap['map'], **snap['position']}
                     return action
+            elif phase == 'to_first_job':
+                build = self.p5 and self.p5.get('build')
+                progress = snap.get('progress') or {}
+                target = build and build.get('target_class')
+                if (target not in {'Swordman', 'Mage', 'Archer', 'Acolyte', 'Merchant', 'Thief'} or
+                        progress.get('job_id') != 0 or snap['level']['job'] < 10 or progress.get('points_skill') != 0):
+                    self.block('first_job_preconditions_changed'); return None
+                stand = {'x': 153, 'y': 192}
+                if snap['map'] != 'prontera' or dist(snap['position'], stand) > 1:
+                    return {'type': 'travel', 'map': 'prontera', **stand, 'timeout_s': 150}
+                return {'type': 'first_job', 'job': target, 'timeout_s': 40}
             elif phase == 'to_shop':
                 stand = {'x': SHOP['stand'][0], 'y': SHOP['stand'][1]}
                 if snap['map'] == SHOP['map'] and dist(snap['position'], stand) <= 1:

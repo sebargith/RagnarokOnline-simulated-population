@@ -1,0 +1,22 @@
+// Approved server rule: replace the six classic first-job quests.
+// No fee, items, platinum skills or optional bonuses.
+prontera,153,193,6	script	First Job Changer	123,{
+	mes "[First Job Changer]";
+	if (Class != Job_Novice || JobLevel < 10 || SkillPoint != 0) {
+		mes "Only a Novice at Job Level 10 with no unspent skill points may change.";
+		close;
+	}
+	mes "Choose your first class. This is free.";
+	next;
+	.@choice = select("Swordman:Mage:Archer:Acolyte:Merchant:Thief:Cancel");
+	if (.@choice == 7) close;
+	setarray .@jobs[0], Job_Swordman, Job_Mage, Job_Archer, Job_Acolyte, Job_Merchant, Job_Thief;
+	mes "[First Job Changer]";
+	mes "Confirm your choice?";
+	next;
+	if (select("Confirm:Cancel") != 1) close;
+	// Check again at the point of mutation, including the selected index.
+	if (Class != Job_Novice || JobLevel < 10 || SkillPoint != 0 || .@choice < 1 || .@choice > 6) close;
+	jobchange .@jobs[.@choice - 1];
+	close;
+}

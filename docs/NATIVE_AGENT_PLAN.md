@@ -152,8 +152,8 @@ elige "cazar 0–3 más", "pedir ayuda" o "seguir", y eso no es progreso autóno
 
 Principios:
 - El código ejecuta y valida; el modelo elige estrategia entre macro-metas
-  validadas (campo de caza, abastecerse, repartir puntos, equiparse, ir a la
-  prueba de clase). Precondiciones y resultados se comprueban con el estado actual.
+  validadas (campo de caza, abastecerse, repartir puntos, equiparse, ir al
+  Job Changer). Precondiciones y resultados se comprueban con el estado actual.
 - Dos funciones de modelo con colas, límites y respaldo propios:
   `planner` (pocas llamadas, razonamiento; candidato en la nube, p. ej. Gemini
   Flash gratis) y `chat` (frecuente; modelo local, el chat del jugador no sale del PC).
@@ -171,7 +171,7 @@ Pasos (una sesión por paso, coordinada por el chat orquestador):
 2. Stats, habilidades y equipo: repartir puntos según una build y equipar objetos.
 3. Campos de caza según nivel y peligro, no solo distancia.
 4. Personaje nuevo que sale de la zona de entrenamiento por NPC, sin recolocación.
-5. Cambio a primera clase al llegar a Job 10 (prueba NPC de una clase viable).
+5. Cambio a primera clase en el Job Changer gratuito aprobado: seis clases clásicas, Novice Job 10 y puntos de habilidad gastados. Reemplaza las quests oficiales; no prueba esas quests.
 6. Prueba larga acotada con muertes, atascos y reinicios.
 7. Segundo jugador (cooperación y comercio), luego tres y opcionalmente cinco.
 

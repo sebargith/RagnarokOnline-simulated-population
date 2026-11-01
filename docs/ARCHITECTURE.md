@@ -115,3 +115,7 @@ Portable MariaDB 10.11.19 x64 runs as an explicitly started process. rAthena bui
 - [llama.cpp server](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md): runtime options, slots, cache controls, and metrics.
 
 Upstream links are discovery sources. Record the revisions actually tested in milestone evidence.
+
+## Approved first-job rule
+
+The server may use the project-owned free First Job Changer in Prontera instead of the official first-job quests. It offers only the six classic first classes to a normal Novice at Job 10 with no unspent skill points. This is a custom server rule, not verification of official quests. The restricted bot action requires the matching server job-change event; unresolved results block replay. Installation is staged, not yet loaded or validated in a live server.

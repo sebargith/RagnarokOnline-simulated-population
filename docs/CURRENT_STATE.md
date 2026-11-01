@@ -1,5 +1,12 @@
 # Estado actual
 
+## P5.5 — Job Changer preparado, pendiente de validación (2026-11-01)
+
+- Regla aprobada: NPC gratuito para las seis primeras clases clásicas; Novice normal Job 10 y puntos de habilidad gastados. Reemplaza las quests, no las prueba.
+- Fuente y configuración instaladas de forma idempotente para el próximo arranque; el map-server activo no fue recargado. Consola deshabilitada. No hay muestra en vivo ni cambio real confirmado.
+- Puente restringido y política de viaje implementados, con resultado confirmado únicamente por evento de clase y bloqueo ante incertidumbre. Validados en pruebas locales, no en servidor. El ciclo actual completo 1/1 no se reactiva automáticamente; entrenamiento acotado a Job 10 pendiente.
+- Nilo permanece detenido y sin cambios conocidos desde P5.4. Siguiente: revisar carga controlada del NPC y pruebas reales sin alterar personajes ni interrumpir usuarios; después decidir entrenamiento reanudable.
+
 ## P5.4 — tutorial y primera kill observados (2026-11-01)
 
 - Conciliación específica de la recepcionista con dos snapshots frescos completos;
