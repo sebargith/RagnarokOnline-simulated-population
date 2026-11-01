@@ -55,6 +55,10 @@ class CycleTests(unittest.TestCase):
         self.c.state['history'][-1]['result']['evidence']['hits'] = 1
         with self.assertRaises(RuntimeError): self.c.reconcile_quiet_attack(observations, 11000)
         self.c.state['history'][-1]['result']['evidence']['hits'] = 0
+        self.c.state['history'].append(copy.deepcopy(self.c.state['history'][-1]))
+        self.c.state['history'][-1]['result']['reason'] = 'other'
+        with self.assertRaises(RuntimeError): self.c.reconcile_quiet_attack(observations, 11000)
+        self.c.state['history'][-1] = copy.deepcopy(self.c.state['history'][-2])
         self.c.reconcile_quiet_attack(observations, 11000)
         self.assertEqual(self.c.state['kills'], 0)
         self.assertEqual(self.c.state['retired_attack_targets'], ['01000000'])

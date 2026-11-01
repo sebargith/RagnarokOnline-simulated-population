@@ -134,9 +134,11 @@ class SoloCycle:
                 s.get('reason') != 'attack:unknown/attack_ended' or not p or p['action'].get('type') != 'attack'):
             raise RuntimeError('Not a reconcilable attack')
         matches = [h for h in s['history'] if h.get('request_id') == p['request_id'] and
-                   h.get('session') == p['session'] and h.get('result', {}).get('status') == 'unknown' and
-                   h['result'].get('reason') == 'attack_ended']
-        if len(matches) != 1 or len(observations) != 2:
+                   h.get('session') == p['session']]
+        if (not matches or len(observations) != 2 or
+                any(h.get('result') != matches[0].get('result') for h in matches) or
+                matches[0].get('result', {}).get('status') != 'unknown' or
+                matches[0]['result'].get('reason') != 'attack_ended'):
             raise RuntimeError('Missing terminal evidence or observations')
         evidence = matches[0]['result'].get('evidence') or {}
         if evidence.get('hits') != 0 or evidence.get('damage_dealt') != 0:
@@ -210,6 +212,9 @@ class SoloCycle:
     def result(self, result, now=None, observed_after=0):
         p = self.state['inflight']
         if not p or result.get('request_id') != p['request_id'] or result.get('status') not in FINAL:
+            return False
+        if any(h.get('request_id') == p['request_id'] and h.get('session') == p['session'] and
+               h.get('result') == result for h in self.state['history']):
             return False
         now = time.time() if now is None else now
         s, action = self.state, p['action']
