@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "source": "rAthena npc/pre-re/jobs/novice/novice.txt and npc/warps/other/jobquests.txt (vendor d4b8e7b); OpenKore tables/portals.txt and fields new_zone01-04 (e0b04ee)",
+  "note": "Hand-transcribed; tests/test_p5_tutorial.py checks every label, coordinate, warp and reward against the vendor scripts and every stand cell against the walk data. {n} is the start instance (new_1-1..new_5-1); from the receptionist on, the scripts always use instance 1.",
+  "start_maps": ["new_1-1", "new_2-1", "new_3-1", "new_4-1", "new_5-1"],
+  "steps": [
+    {"id": "enter_castle", "kind": "travel", "map": "new_{n}-2", "x": 100, "y": 27},
+    {"id": "receptionist", "kind": "script", "npc": "Receptionist", "map": "new_{n}-2", "x": 100, "y": 29,
+     "stand": {"x": 100, "y": 27}, "name_reply": 1, "choices": ["Apply for training."],
+     "expect": {"map": "new_1-2", "x": 100, "y": 70}, "rewards": {}, "timeout_s": 60},
+    {"id": "inner_door", "kind": "portal", "map": "new_1-2", "x": 73, "y": 106, "landing": {"x": 41, "y": 172}},
+    {"id": "helper", "kind": "script", "npc": "Helper", "map": "new_1-2", "x": 17, "y": 182,
+     "stand": {"x": 19, "y": 180}, "name_reply": 0, "choices": ["Yes", "Quit."], "rewards": {}, "timeout_s": 90},
+    {"id": "entrance_guard", "kind": "script", "npc": "Entrance Guard", "map": "new_1-2", "x": 38, "y": 182,
+     "stand": {"x": 38, "y": 184}, "name_reply": 0, "choices": ["Yes"],
+     "expect": {"map": "new_1-3", "x": 96, "y": 21},
+     "rewards": {"602": 1, "601": 9, "1243": 1, "2112": 1, "611": 2, "569": 300}, "timeout_s": 90},
+    {"id": "test_examiner", "kind": "script", "npc": "Test Examiner", "map": "new_1-3", "x": 96, "y": 174,
+     "stand": {"x": 96, "y": 172}, "name_reply": 0, "choices": ["Yes"],
+     "expect": {"map": "new_1-4", "x": 99, "y": 10}, "rewards": {}, "timeout_s": 60},
+    {"id": "bruce", "kind": "script", "npc": "Bruce", "map": "new_1-4", "x": 91, "y": 22,
+     "stand": {"x": 91, "y": 20}, "name_reply": 0, "choices": ["Swordman", "End conversation."], "rewards": {}, "timeout_s": 90},
+    {"id": "destination", "kind": "decide"},
+    {"id": "hanson", "kind": "script", "npc": "Hanson", "map": "new_1-4", "x": 100, "y": 29,
+     "stand": {"x": 100, "y": 25}, "name_reply": 0,
+     "choices": ["I'll take the course.", "{answers}", "My own choice!", "{job}"],
+     "expect": "{destination}",
+     "rewards": {"501": 4, "503": 2, "506": 2, "7059": 5, "7060": 5, "2305": 1}, "timeout_s": 220}
+  ],
+  "personality_answers": [
+    "Study", "Change", "Consumer", "Celebrity", "Theory", "The Past",
+    "Yes.", "Yes.", "Yes.", "Yes.", "Yes.", "Yes.", "Yes.", "Yes.",
+    "You feel like a robot.", "Consider if you need it.", "don't mind...",
+    "Handle it myself, even if it's hard.", "Carry her to a hospital.", "Check the brand.",
+    "Pretend it's a joke.", "Buy the item for her/him."
+  ],
+  "destinations": [
+    {"job": "Swordsman", "town": "izlude", "save": {"x": 93, "y": 104}, "landing": {"map": "izlude_in", "x": 74, "y": 167}},
+    {"job": "Mage", "town": "geffen", "save": {"x": 119, "y": 37}, "landing": {"map": "geffen_in", "x": 163, "y": 98}},
+    {"job": "Merchant", "town": "alberta", "save": {"x": 30, "y": 232}, "landing": {"map": "alberta_in", "x": 62, "y": 44}},
+    {"job": "Thief", "town": "morocc", "save": {"x": 150, "y": 99}, "landing": {"map": "moc_ruins", "x": 155, "y": 44}},
+    {"job": "Archer", "town": "payon", "save": {"x": 70, "y": 100}, "landing": {"map": "payon_in02", "x": 64, "y": 65}},
+    {"job": "Acolyte", "town": "prontera", "save": {"x": 117, "y": 72}, "landing": {"map": "prt_church", "x": 172, "y": 19}}
+  ]
+}

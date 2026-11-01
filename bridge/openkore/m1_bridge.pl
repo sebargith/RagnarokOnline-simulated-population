@@ -57,13 +57,13 @@ $hooks = Plugins::addHooks(
     ['engaged_deal', \&trade_engaged], ['incoming_deal', \&trade_incoming],
     ['packet/deal_add_you', \&trade_added], ['packet/deal_finalize', \&trade_locked],
     ['complete_deal', \&trade_complete], ['cancelled_deal', \&trade_cancelled],
-    ['Network::serverConnect/master', \&reconnecting], ['checkConnection', \&check_connection],
+    ['Network::serverConnect/master', \&reconnecting], ['Network::Receive::map_changed', \&map_changed], ['checkConnection', \&check_connection],
 );
 
 sub start {
     open my $fh, '<:raw', $ENV{M1_BRIDGE_CONFIG} or die "M1_BRIDGE_CONFIG required: $!";
     local $/; $cfg = $json->decode(<$fh>); close $fh;
-    die 'Invalid bridge configuration' unless $cfg->{port} =~ /^(876[567]|8770)$/ && length($cfg->{token}) >= 20;
+    die 'Invalid bridge configuration' unless $cfg->{port} =~ /^(876[567]|877[01])$/ && length($cfg->{token}) >= 20;
     # Native profiles have exactly one movement owner: OpenKore's route task.
     die 'Native navigation requires --ai=manual' if $cfg->{native_navigation} && AI::state() != AI::MANUAL();
     $healing = M1Healing->new(File::Basename::dirname($ENV{M1_BRIDGE_CONFIG}) . '/healing-state.json')
@@ -454,6 +454,25 @@ sub travel_request {
     result($id, 'accepted', 'walk_route_planned', {legs => \@legs}) if $pending && $pending->{id} eq $id;
 }
 
+# P5 tutorial: one same-map walk portal, as a travel with a portal leg and the
+# landing cell as its final leg; the hop needs the server's map-change packet.
+sub portal_request {
+    my ($id, $a) = @_;
+    my $portals = M1Travel::same_map_portals(\%portals_lut);
+    my $reason = M1Travel::validate_portal($a, {manual_ai => $cfg->{native_navigation} && AI::state() == AI::MANUAL(),
+        hp => $char->{hp}, map => $field->baseName}, $portals);
+    if ($reason) { result($id, 'rejected', $reason); return }
+    my $to = $portals->{"$a->{map} $a->{x} $a->{y}"};
+    my @legs = ({map => $a->{map}, x => 0 + $a->{x}, y => 0 + $a->{y}, to_map => $a->{map}, to => $to},
+        {map => $a->{map}, x => $to->{x}, y => $to->{y}});
+    my $now = time;
+    $pending = {id => $id, action => $a, native => 'travel', portal => 1, legs => \@legs, leg => 0, hops => [],
+        zeny => $char->{zeny} // 0, started => $now, progress => 0, deadline => $now + $a->{timeout_s} + M1Navigation::GRACE};
+    $last_action = $now;
+    start_leg();
+    result($id, 'accepted', 'portal_planned', {legs => \@legs}) if $pending && $pending->{id} eq $id;
+}
+
 sub travel_tick {
     my $p = $pending;
     if (AI::state() != AI::MANUAL()) { stop_route(); finish('unknown', 'executor_mode_changed', travel_evidence()); return }
@@ -472,7 +491,8 @@ sub travel_tick {
     my $calc = Utils::calcPosFromPathfinding($field, $char);
     my ($step, $status, $reason) = M1Travel::leg_step({map => $field->baseName, leg => $leg, phase => $p->{phase},
         task_state => $state, error => $state eq 'done' ? $task->getError() : undef,
-        pos_to => $char->{pos_to}, calc => $calc, enter_elapsed => $p->{enter_since} ? time - $p->{enter_since} : 0});
+        pos_to => $char->{pos_to}, calc => $calc, enter_elapsed => $p->{enter_since} ? time - $p->{enter_since} : 0,
+        warped => $p->{warped}});
     $step //= '';
     if ($step eq 'hopped') {
         AI::clear(qw/move route mapRoute/);
@@ -480,7 +500,7 @@ sub travel_tick {
             position => {x => 0 + $char->{pos_to}{x}, y => 0 + $char->{pos_to}{y}}};
         push @{$p->{hops}}, $hop;
         emit('travel_hop', {request_id => $p->{id}, %$hop});
-        $p->{leg}++; undef $p->{task}; delete $p->{enter_since};
+        $p->{leg}++; undef $p->{task}; delete $p->{enter_since}; delete $p->{warped};
         $p->{settle_until} = time + .5;
         return;
     }
@@ -503,7 +523,16 @@ sub travel_tick {
 # P2a dialog: continue, pre-declared exact menu labels and closing only.
 sub talk_snapshot {
     return {map => $field->baseName, zeny => 0 + ($char->{zeny} // 0),
-        inventory => join(',', sort map { "$_->{nameID}:$_->{amount}" } @{$char->inventory->getItems})};
+        inventory => join(',', sort map { "$_->{nameID}:$_->{amount}" } @{$char->inventory->getItems}),
+        exp => join(',', map { 0 + ($char->{$_} // 0) } qw(lv exp lv_job exp_job))};
+}
+
+# P5 tutorial: NPC and same-map portal warps arrive as a map-change packet even
+# when the map stays the same; only scripts and portal steps listen for it.
+sub map_changed {
+    return unless $pending && ($pending->{script} || $pending->{portal}) && connected();
+    $pending->{warped} //= {map => $field->baseName, x => 0 + $char->{pos_to}{x}, y => 0 + $char->{pos_to}{y},
+        elapsed_ms => int((time - $pending->{started}) * 1000)};
 }
 
 sub cancel_talk { $messageSender->sendTalkCancel($pending->{npc_bin}) if connected() }
@@ -513,15 +542,18 @@ sub talk_request {
     my $at = sub { defined($_[0]) && !ref($_[0]) && $_[0] =~ /^\d{1,3}$/ };
     my ($npc) = $at->($a->{x}) && $at->($a->{y}) ?
         grep { $_->{pos}{x} == $a->{x} && $_->{pos}{y} == $a->{y} } @{$npcsList->getItems} : ();
-    my $reason = M1Travel::validate_talk($a, {manual_ai => $cfg->{native_navigation} && AI::state() == AI::MANUAL(),
+    my $script = $a->{type} eq 'npc_script';
+    my $ctx = {manual_ai => $cfg->{native_navigation} && AI::state() == AI::MANUAL(),
         hp => $char->{hp}, recovering => $recovery{phase} ne 'none', talking => %talk ? 1 : 0,
-        npc => $npc && $npc->{pos}, pos => Utils::calcPosFromPathfinding($field, $char)});
+        npc => $npc && $npc->{pos}, pos => Utils::calcPosFromPathfinding($field, $char)};
+    my $reason = $script ? M1Travel::validate_script($a, $ctx) : M1Travel::validate_talk($a, $ctx);
     if ($reason) { result($id, 'rejected', $reason); return }
     AI::clear(qw/move route mapRoute/);
     my $now = time;
     $pending = {id => $id, action => $a, native => 'npc_talk', npc_bin => $npc->{ID}, npc_name => $npc->{name},
         choices => [@{$a->{choices}}], chosen => [], menus => [], transcript => [], pages => 0,
-        before => talk_snapshot(), acted => $now, started => $now, progress => 0, deadline => $now + $a->{timeout_s}};
+        before => talk_snapshot(), acted => $now, started => $now, progress => 0, deadline => $now + $a->{timeout_s},
+        $script ? (script => 1, expect => $a->{expect}, name_reply => $a->{name_reply}, name_sent => 0) : ()};
     $last_action = $now;
     $messageSender->sendTalk($npc->{ID});
     result($id, 'accepted', 'talk_sent');
@@ -532,7 +564,11 @@ sub talk_finish {
     my $p = $pending;
     my $after = talk_snapshot();
     my ($final, $why, $changed) = M1Travel::talk_outcome($status, $reason, $p->{before}, $after);
-    finish($final, $why, {%{nav_evidence()}, npc => $p->{npc_name}, transcript => $p->{transcript},
+    if ($p->{script}) {
+        ($final, $why) = M1Travel::script_outcome($status, $reason, $p->{expect}, $p->{warped});
+        $changed = [grep { $p->{before}{$_} ne $after->{$_} } qw(map zeny inventory exp)];
+    }
+    finish($final, $why, {warped => $p->{warped}, name_sent => $p->{name_sent},%{nav_evidence()}, npc => $p->{npc_name}, transcript => $p->{transcript},
         menus => $p->{menus}, chosen => $p->{chosen}, pages => $p->{pages},
         autotalk_suppressed => $p->{autotalk_suppressed} // 0, npc_task_left => AI::inQueue('NPC') ? 1 : 0,
         dialog_result => $final eq $status ? undef : "$status/$reason", changed => $changed,
@@ -542,10 +578,22 @@ sub talk_finish {
 sub talk_tick {
     my $p = $pending;
     my $now = time;
+    if ($p->{warped}) {
+        # The server moved us: the dialog is over, whatever page it was on.
+        AI::clear(qw/move route mapRoute/);
+        talk_finish('completed', 'conversation_closed'); return;
+    }
+    if ($p->{await_warp}) {
+        return if $now < $p->{await_warp};
+        talk_finish(@{$p->{close_result}}); return;
+    }
     if ($p->{closing}) {
         # Like OpenKore's TalkNPC: acknowledge the close button after a short wait.
         return if $now < $p->{closing};
-        cancel_talk(); talk_finish(@{$p->{close_result}}); return;
+        cancel_talk();
+        # close2 + warp: the script warps only after the close is acknowledged.
+        if ($p->{expect}) { $p->{await_warp} = $now + 5; return }
+        talk_finish(@{$p->{close_result}}); return;
     }
     if ($char->{dead}) { cancel_talk(); talk_finish('failed', 'died'); return }
     if ($now >= $p->{deadline}) { cancel_talk(); talk_finish('failed', 'timeout'); return }
@@ -554,14 +602,20 @@ sub talk_tick {
     return unless ($v->{time} // 0) > $p->{acted} && $now - $v->{time} >= .5 &&
         (!defined $v->{ID} || $v->{ID} eq $p->{npc_bin});
     my ($act, $status, $reason) = M1Travel::dialog_step({state => $v->{talk}, choices => $p->{choices},
-        pages => $p->{pages}, responses => $talk{responses}});
+        pages => $p->{pages}, responses => $talk{responses}, name_reply => $p->{name_reply}, name_sent => $p->{name_sent},
+        $p->{script} ? (max_pages => M1Travel::SCRIPT_MAX_PAGES) : ()});
     return unless $act;
     $p->{acted} = $now;
     if (($v->{talk} // '') eq 'select') {
         my @menu = @{$talk{responses} || []}; pop @menu;
-        push @{$p->{menus}}, [@menu[0 .. ($#menu > 15 ? 15 : $#menu)]] if @{$p->{menus}} < 8;
+        push @{$p->{menus}}, [@menu[0 .. ($#menu > 15 ? 15 : $#menu)]] if @{$p->{menus}} < ($p->{script} ? 32 : 8);
     }
     if ($act eq 'continue') { $p->{pages}++; $messageSender->sendTalkContinue($p->{npc_bin}) }
+    elsif ($act eq 'name') {
+        # The own name as the server knows it; never caller-supplied text.
+        $p->{name_sent} = 1;
+        $messageSender->sendTalkText($p->{npc_bin}, $char->{name});
+    }
     elsif ($act eq 'respond') {
         push @{$p->{chosen}}, shift @{$p->{choices}};
         $messageSender->sendTalkResponse($p->{npc_bin}, $status);
@@ -723,7 +777,7 @@ sub npc_text {
     my (undef, $args) = @_;
     return unless $pending && ($pending->{native} // '') eq 'npc_talk' && $args->{ID} eq $pending->{npc_bin};
     my $line = (split /\n/, $args->{msg} // '')[-1] // '';
-    push @{$pending->{transcript}}, substr($line, 0, 120) if @{$pending->{transcript}} < 40;
+    push @{$pending->{transcript}}, substr($line, 0, 120) if @{$pending->{transcript}} < ($pending->{script} ? 60 : 40);
 }
 
 # P5 progress: one stat point, one skill point, or one equip/take-off per
@@ -914,7 +968,7 @@ sub request {
     }
     if ($pending) { result($id, 'rejected', 'busy'); return }
     if (time - $last_action < 1) { result($id, 'rejected', 'rate_limited'); return }
-    if ($cfg->{native_navigation} && $a->{type} =~ /^(navigate|travel|npc_talk|npc_sell|npc_buy|attack|take)$/ && $recovery{phase} ne 'none') {
+    if ($cfg->{native_navigation} && $a->{type} =~ /^(navigate|travel|portal|npc_talk|npc_script|npc_sell|npc_buy|attack|take)$/ && $recovery{phase} ne 'none') {
         result($id, 'rejected', 'recovering'); return;
     }
     if ($a->{type} eq 'navigate') {
@@ -936,6 +990,8 @@ sub request {
     }
     if ($a->{type} eq 'travel') { travel_request($id, $a); return }
     if ($a->{type} eq 'npc_talk') { talk_request($id, $a); return }
+    if ($cfg->{native_navigation} && $a->{type} eq 'npc_script') { talk_request($id, $a); return }
+    if ($cfg->{native_navigation} && $a->{type} eq 'portal') { portal_request($id, $a); return }
     if ($a->{type} =~ /^npc_(sell|buy)$/) { shop_request($id, $a); return }
     if ($cfg->{native_navigation} && $a->{type} =~ /^(attack|take|respawn)$/) { native_request($id, $a); return }
     if ($cfg->{native_navigation} && $a->{type} =~ /^(stat_up|skill_up|equip|unequip)$/) { progress_request($id, $a); return }

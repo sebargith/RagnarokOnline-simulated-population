@@ -281,8 +281,10 @@ class FieldPlanner:
     def request(self, facts, options, current, mood, why):
         if self.pending:
             raise RuntimeError('One planning request at a time')
-        if not any(o['field_id'] == current for o in options):
+        if current is not None and not any(o['field_id'] == current for o in options):
             raise ValueError('Current field must be an option')
+        if not options:
+            raise ValueError('No field option')
         from agent.hunting import TEMPERAMENTS
         messages = [{'role': 'system', 'content': (
             'You choose where a pre-Renewal Ragnarok Online character hunts. Pick one field_id from the '
@@ -315,4 +317,70 @@ class FieldPlanner:
         except Exception:
             return {**keep, 'reason': 'invalid_or_failed_inference'}
         return {'status': 'proposed', 'proposal': proposal, 'current': p['current'],
+                'served_by': result.get('served_by'), 'degraded': result.get('degraded')}
+
+
+# P5 tutorial exit: the planner picks one job town from code-validated options.
+DESTINATION_SCHEMA = {'type': 'object', 'additionalProperties': False,
+    'properties': {'job': {'type': 'string', 'enum': []},
+                   'reason': {'type': 'string', 'minLength': 1, 'maxLength': 200}},
+    'required': ['job', 'reason']}
+
+
+def validate_destination(value, options):
+    if not isinstance(value, dict) or set(value) != {'job', 'reason'}:
+        raise ValueError('Invalid destination fields')
+    reason = value['reason']
+    if type(reason) is not str or not 1 <= len(reason) <= 200:
+        raise ValueError('Invalid reason')
+    if value['job'] not in {o['job'] for o in options if o['offered']}:
+        raise ValueError('Destination is not a validated option')
+    return dict(value)
+
+
+class DestinationPlanner:
+    """One bounded request; a failed or late answer is reported, never guessed."""
+    def __init__(self, service, deadline_s=100):
+        if not 0 < deadline_s <= 100:
+            raise ValueError('Invalid deadline')
+        self.service, self.deadline_s = service, deadline_s
+        self.pending = None
+
+    def request(self, facts, options, mood):
+        if self.pending:
+            raise RuntimeError('One planning request at a time')
+        offered = [o for o in options if o['offered']]
+        if not offered:
+            raise ValueError('No offered destination')
+        from agent.hunting import TEMPERAMENTS
+        messages = [{'role': 'system', 'content': (
+            'A new pre-Renewal Ragnarok Online novice is finishing the training grounds. The last trainer sends '
+            'it to the town of the job it names. Pick one job from the options (already checked: the town reaches '
+            'the supply shop and has hunting fields for this character) and give a short reason based only on '
+            "the facts. build_for_job says whether a stat build exists for that class. Its temperament: "
+            + TEMPERAMENTS[mood] + ' Return only JSON. You cannot move, talk or execute game actions; '
+            'deterministic code does that.')},
+            {'role': 'user', 'content': json.dumps({'character': facts, 'options': [
+                {k: o[k] for k in ('job', 'town', 'fields', 'build_for_job')} for o in offered]})}]
+        schema = json.loads(json.dumps(DESTINATION_SCHEMA))
+        schema['properties']['job']['enum'] = [o['job'] for o in offered]
+        future = self.service.submit('destination-goal', messages, 43, cold=True, response_format=schema)
+        self.pending = {'future': future, 'options': options, 'deadline': time.monotonic()+self.deadline_s}
+
+    def poll(self):
+        p = self.pending
+        if not p:
+            return None
+        if time.monotonic() >= p['deadline']:
+            self.pending = None
+            return {'status': 'failed', 'reason': 'planning_deadline'}
+        if not p['future'].done():
+            return None
+        self.pending = None
+        try:
+            result = p['future'].result()
+            proposal = validate_destination(json.loads(result['content']), p['options'])
+        except Exception:
+            return {'status': 'failed', 'reason': 'invalid_or_failed_inference'}
+        return {'status': 'proposed', 'proposal': proposal,
                 'served_by': result.get('served_by'), 'degraded': result.get('degraded')}

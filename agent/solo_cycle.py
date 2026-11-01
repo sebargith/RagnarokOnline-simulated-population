@@ -27,23 +27,29 @@ FIELD_REVIEW_S = 1800
 
 
 class SoloCycle:
-    def __init__(self, path, goal_kills=6, p5=None):
+    def __init__(self, path, goal_kills=6, p5=None, identity='Tarin'):
         self.path, self.p5 = Path(path), p5
         if self.path.exists():
             self.state = json.loads(self.path.read_text(encoding='utf-8'))
-            if self.state.get('version') != 1 or self.state.get('identity') != 'Tarin':
+            if self.state.get('version') != 1 or self.state.get('identity') != identity:
                 raise ValueError('Unsupported cycle checkpoint')
         else:
             if not 1 <= goal_kills <= 100:
                 raise ValueError('goal_kills must be 1..100')
-            self.state = dict(version=1, identity='Tarin', goal_kills=goal_kills,
+            # Tarin's test placement hunted prt_fild08; any other character
+            # starts without a field and waits for its own decision.
+            tarin = identity == 'Tarin'
+            self.state = dict(version=1, identity=identity, goal_kills=goal_kills,
                 kills=0, phase='hunt', status='active', inflight=None, history=[],
                 failures=0, skip={}, patrol=0, loot_until=0, loot_spot=None,
-                return_to={'map': 'prt_fild08', 'x': 170, 'y': 365}, observe_after=0)
+                return_to={'map': 'prt_fild08', 'x': 170, 'y': 365} if tarin else None, observe_after=0)
+            if not tarin:
+                self.state['field'] = {'id': None, 'decided_level': None, 'decided_at': 0, 'retreats_at_decision': 0}
             self.save()
         # Older checkpoints hunted only prt_fild08; that stays the field until a decision.
-        self.state.setdefault('field', {'id': self.state['return_to']['map'], 'decided_level': None,
-                                        'decided_at': 0, 'retreats_at_decision': 0})
+        if 'field' not in self.state:
+            self.state['field'] = {'id': self.state['return_to']['map'], 'decided_level': None,
+                                   'decided_at': 0, 'retreats_at_decision': 0}
         self.state.setdefault('outcomes', {'monsters': {}, 'fields': {}})
         self.state.setdefault('field_decisions', [])
 
@@ -352,6 +358,8 @@ class SoloCycle:
                 grow = self.progress_action(snap)
                 if grow:
                     return grow
+                if field is None:
+                    return None  # A new character waits for its first field decision.
                 need = self.supply(snap)
                 if need['go']:
                     if snap['map'] == field:

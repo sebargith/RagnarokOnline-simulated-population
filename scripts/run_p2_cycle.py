@@ -22,8 +22,9 @@ from agent.solo_cycle import SoloCycle, FINAL
 from bridge.client import Bridge
 from scripts.bench_m2 import ram_sample
 from agent.goal_planner import (GoalPlanner, apply_proposal_locked, BuildPlanner, FieldPlanner,
-                                apply_build, read_build, build_facts)
-from agent import build_policy, hunting
+                                DestinationPlanner, apply_build, read_build, build_facts)
+from agent import build_policy, hunting, tutorial
+from agent.tutorial import Tutorial
 FRESH_MS = 2500
 
 
@@ -71,10 +72,17 @@ class P5Planning:
             self.pending = ('build', None)
             return
         current = self.cycle.state['field']['id']
-        why = snap.get('map') == current and self.cycle.field_due(snap)
+        # A character without a field yet decides wherever it stands.
+        why = (current is None or snap.get('map') == current) and self.cycle.field_due(snap)
+        build = self.cycle.p5.get('build')
+        if why and current is None and build and build_policy.next_action(snap, build, self.cycle.p5['equipment'])[0]:
+            return  # A new character first spends its starting points: danger depends on them.
         if why:
             opts, mood = hunting.options(snap, current, self.cycle.p5['tables'], self.cycle.p5['equipment'],
                                          self.cycle.state['outcomes'], self.identity, time.time())
+            if not opts:
+                self.retry_at = time.monotonic() + 60  # Nothing viable yet; never invent a field.
+                return
             facts = {**{k: v for k, v in build_facts(snap).items() if k in ('level', 'job', 'stats')},
                      'hp_max': snap['hp_max'], 'build': self.build_id}
             self.field_planner.request(facts, opts, current, mood, why)
@@ -95,7 +103,8 @@ class P5Planning:
         if s['status'] != 'active':
             self.ready = None; return  # The cycle stopped; the next run decides again.
         if (s['inflight'] or s['phase'] != 'hunt' or not 0 <= time.time()*1000 - latest['time_ms'] <= FRESH_MS or
-                not snap.get('connected') or snap.get('dead') or snap.get('native_task') or snap.get('map') != s['field']['id']):
+                not snap.get('connected') or snap.get('dead') or snap.get('native_task') or
+                s['field']['id'] not in (None, snap.get('map'))):
             return  # Wait for an idle hunting cycle.
         result, info = self.ready
         self.ready, current = None, s['field']['id']
@@ -111,7 +120,13 @@ class P5Planning:
             record['proposed'] = result['proposal']['field_id']
         else:
             record['reason'] = result.get('reason')
-        if chosen is None:
+        if chosen is None and current is None:
+            # Nothing to keep: no field is invented; ask again after the back-off.
+            record['decision'] = 'no_field_retry'
+            self.retry_at = time.monotonic() + 60
+            s['field_decisions'] = (s['field_decisions'] + [record])[-24:]
+            c.save()
+        elif chosen is None:
             record['decision'] = 'kept_on_failure' if result['status'] != 'proposed' else 'rejected_not_offered'
             c.set_field(current, None, record | {'field_id': current}, snap['level']['base'])
         else:
@@ -119,6 +134,61 @@ class P5Planning:
             record['entry'] = chosen['entry']
             c.set_field(chosen['field_id'], chosen['entry'], record | {'field_id': chosen['field_id']}, snap['level']['base'])
         note('field_result', record)
+
+
+class TutorialPlanning:
+    """The one destination decision of the training grounds. Options are code
+    validated; a failed or late planner answer falls back to the local policy,
+    marked as such. Applied only between actions, against fresh perception."""
+    def __init__(self, tutorial, service, tables, builds):
+        self.tutorial, self.identity = tutorial, tutorial.state['identity']
+        self.tables, self.builds = tables, builds
+        self.planner = DestinationPlanner(service)
+        self.pending, self.ready, self.calls, self.retry_at = None, None, 0, 0
+
+    def options(self, snap):
+        return tutorial.destinations(snap, self.tutorial.script, self.tables, self.builds)
+
+    def tick(self, latest, note):
+        t, snap = self.tutorial, latest['data']
+        if not t.needs_decision() or 'progress' not in snap or snap.get('name') != self.identity:
+            return
+        if not self.pending and not self.ready and time.monotonic() >= self.retry_at:
+            opts = self.options(snap)
+            if not any(o['offered'] for o in opts):
+                note('destination_result', {'decision': 'none_offered', 'options': opts})
+                t.block('no_valid_destination'); return
+            facts = {**{k: v for k, v in build_facts(snap).items() if k in ('level', 'job', 'stats')},
+                     'hp_max': snap['hp_max']}
+            self.mood = hunting.temperament(self.identity)
+            self.planner.request(facts, opts, self.mood)
+            self.calls += 1
+            self.pending = opts
+            note('destination_request', {'options': opts, 'temperament': self.mood})
+        if self.pending:
+            result = self.planner.poll()
+            if result is None:
+                return
+            self.ready, self.pending = result, None
+            note('destination_proposal', result)
+        if t.state['inflight'] or snap.get('native_task') or not 0 <= time.time()*1000 - latest['time_ms'] <= FRESH_MS:
+            return
+        result, self.ready = self.ready, None
+        opts = self.options(snap)  # Validate again: the option must still be offered.
+        record = {'temperament': self.mood, 'served_by': result.get('served_by'), 'degraded': result.get('degraded'),
+                  'offered': [o['job'] for o in opts if o['offered']],
+                  'rejected': {o['job']: o['rejected'] for o in opts if not o['offered']}, 'time': time.time()}
+        choice = None
+        if result['status'] == 'proposed':
+            choice = next((o for o in opts if o['offered'] and o['job'] == result['proposal']['job']), None)
+            record.update(decision='planner', reason=result['proposal']['reason'])
+        if choice is None:
+            choice = tutorial.fallback_choice(opts, self.identity)
+            record.update(decision='local_fallback', reason=f"planner {result['status']}: {result.get('reason')}")
+        if choice is None:
+            t.block('no_valid_destination'); return
+        t.decide(choice, record)
+        note('destination_result', {**record, 'job': choice['job'], 'town': choice['town'], 'fields': choice['fields']})
 
 
 class Runner:
@@ -340,28 +410,39 @@ def main():
     parser.add_argument('--max-actions', type=int, default=0)
     parser.add_argument('--pause-after-send', action='store_true', help='Disconnect after one proposal to verify restart recovery')
     parser.add_argument('--p5', action='store_true', help='Apply the build and choose hunting fields with the planner role')
+    parser.add_argument('--agent', choices=('p1', 'p5'), default='p1',
+                        help='p1: Tarin (test bench); p5: the new novice, which first leaves the training grounds')
     args = parser.parse_args()
     if args.intent is not None and (args.command != 'run' or not 1 <= len(args.intent) <= 400):
         parser.error('--intent requires run and 1..400 characters')
-    directory = args.runtime/'p1/cycle'
+    if args.agent == 'p5' and (args.intent is not None or args.command in ('set-goal', 'reconcile-navigation') or
+                               (args.command == 'run' and not args.p5)):
+        parser.error('--agent p5 supports run --p5 and status')
+    base = args.runtime/args.agent
+    directory = base/'cycle'
+    identity = json.loads((base/'identity.json').read_text(encoding='utf-8'))['name'] if args.agent == 'p5' else 'Tarin'
+    bridge_config = base/'openkore/solo/bridge.json'
     if args.command == 'status':
         path = directory/'status.json'
         state = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {'running': False, 'reason': 'not_started'}
+        if (directory/'tutorial.json').exists():
+            t = json.loads((directory/'tutorial.json').read_text(encoding='utf-8'))
+            state['tutorial'] = {k: t.get(k) for k in ('status', 'reason', 'step', 'destination', 'inflight')}
         state['status_age_s'] = round(time.time()-state['updated'], 1) if 'updated' in state else None
         print(json.dumps(state))
         return
     if not 1 <= args.seconds <= 3600 or not 0 <= args.max_actions <= 100:
         parser.error('seconds must be 1..3600 and max-actions 0..100')
     directory.mkdir(parents=True, exist_ok=True)
-    with exclusive(args.runtime/'p1/cycle.lock'):
+    with exclusive(base/'cycle.lock'):
         if args.command == 'set-goal' and (args.target_kills is None or not (directory/'state.json').exists()):
             parser.error('set-goal requires --target-kills and an existing checkpoint')
         p5 = args.p5 and args.command == 'run' and {
             'tables': {'monsters': hunting.load_monsters(), 'fields': hunting.load_fields()},
             'equipment': build_policy.load_equipment(), 'build': None}
-        cycle = SoloCycle(directory/'state.json', args.goal_kills, p5 or None)
+        cycle = SoloCycle(directory/'state.json', args.goal_kills, p5 or None, identity)
         if args.command == 'reconcile-navigation':
-            bridge = Bridge(args.runtime/'p1/openkore/solo/bridge.json')
+            bridge = Bridge(bridge_config)
             observations, ready = [], None
             try:
                 deadline = time.monotonic() + 12
@@ -385,26 +466,42 @@ def main():
             print(json.dumps({'changed': changed, 'goal_kills': cycle.state['goal_kills'],
                               'kills': cycle.state['kills'], 'status': cycle.state['status']}))
             return
+        lesson = Tutorial(directory/'tutorial.json', identity) if args.agent == 'p5' else None
+        if lesson and lesson.state['status'] == 'blocked':
+            print(json.dumps({'tutorial': lesson.state})); return
         if cycle.state['status'] != 'active' and args.intent is None:
             print(json.dumps(cycle.state)); return
-        bridge = Bridge(args.runtime/'p1/openkore/solo/bridge.json')
         service = None
+        end = time.monotonic() + args.seconds
         try:
             planner, p5_planning = None, None
             if args.intent is not None or p5:
                 from inference.roles import build_role
                 service = build_role('planner')  # cloud primary, local fallback, explicit errors
+            actions = args.max_actions
+            if lesson and lesson.state['status'] == 'active':
+                # P5 step 4: leave the training grounds first, then the same run continues in the cycle.
+                guide = TutorialPlanning(lesson, service, p5['tables'], build_policy.load_builds())
+                out = Runner(lesson, Bridge(bridge_config), directory, p5=guide).run(
+                    args.seconds, args.max_actions, args.pause_after_send)
+                print(json.dumps({'tutorial': out, 'tutorial_status': lesson.state['status'],
+                                  'reason': lesson.state.get('reason'), 'destination': lesson.state['destination']}))
+                left = int(end - time.monotonic())
+                if lesson.state['status'] != 'complete' or left < 10 or out['reason'] != 'complete':
+                    return
+                actions = max(0, args.max_actions - out['actions_sent']) if args.max_actions else 0
+                if args.max_actions and not actions:
+                    return
+                args.seconds = left
             if args.intent is not None:
                 planner = GoalPlanner(service, directory/'state.json')
             if p5:
                 p5_planning = P5Planning(cycle, service, directory)
-            print(json.dumps(Runner(cycle, bridge, directory, planner, args.intent, p5_planning).run(
-                args.seconds, args.max_actions, args.pause_after_send)))
+            print(json.dumps(Runner(cycle, Bridge(bridge_config), directory, planner, args.intent, p5_planning).run(
+                args.seconds, actions, args.pause_after_send)))
         finally:
-            bridge.close()
             if service:
                 service.close()
-
 
 if __name__ == '__main__':
     main()
