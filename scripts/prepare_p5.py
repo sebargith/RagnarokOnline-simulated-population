@@ -2,7 +2,7 @@
 
 Never initializes or resets a database, and never updates a row: INSERT only,
 idempotent. The character gets what rAthena's char server gives a new one with
-this client (PACKETVER 20211103): stats 1, start_status_points 48, HP 40/SP 11,
+this client (PACKETVER 20130807): stats 1, start_status_points 48, HP 40/SP 11,
 0 Zeny, start_items_pre (Knife and Cotton Shirt equipped) and one of the
 start_point_pre maps picked at random, as the server picks it. After creation
 only the game changes it. Processes live in runtime/p5/processes.json; Tarin
@@ -55,9 +55,10 @@ VALUES({ACCOUNT},'{USERID}','{credentials['password']}','M','p5@localhost');
 INSERT INTO `char`(account_id,char_num,name,class,base_level,job_level,zeny,status_point,str,agi,vit,`int`,dex,luk,max_hp,hp,max_sp,sp,last_map,last_x,last_y,save_map,save_x,save_y,sex)
 SELECT {ACCOUNT},0,'{NAME}',0,1,1,0,{STATUS_POINTS},1,1,1,1,1,1,{HP},{HP},{SP},{SP},'{start[0]}',{start[1]},{start[2]},'{start[0]}',{start[1]},{start[2]},'M'
 WHERE NOT EXISTS(SELECT 1 FROM `char` WHERE account_id={ACCOUNT});
+SET @character_created = ROW_COUNT();
 INSERT INTO inventory(char_id,nameid,amount,equip,identify)
 SELECT c.char_id,i.nameid,i.amount,i.equip,1 FROM `char` c JOIN ({items}) i
-WHERE c.account_id={ACCOUNT} AND NOT EXISTS(SELECT 1 FROM inventory v WHERE v.char_id=c.char_id);
+WHERE c.account_id={ACCOUNT} AND @character_created = 1;
 """)
     row = query(f"SELECT char_id,name,last_map,base_level,zeny,status_point FROM ragnarok.`char` WHERE account_id={ACCOUNT}")
     if not row or row[0][1] != NAME:
