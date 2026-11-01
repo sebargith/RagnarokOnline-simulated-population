@@ -247,10 +247,15 @@ OPTION_FACTS = ('field_id', 'current', 'hops', 'monsters', 'rare_threats', 'viab
 
 
 def field_prompt_option(option):
-    """What the planner sees of an option: public monster facts and own history."""
-    out = {k: option[k] for k in OPTION_FACTS}
-    out['monsters'] = [{k: m[k] for k in ('name', 'level', 'share', 'aggressive', 'hits', 'hp_loss', 'viable', 'base_exp')}
-                       for m in option['monsters']]
+    """What the planner sees of an option: public monster facts and own history,
+    compacted to fit the planner prompt budget (empty facts are left out)."""
+    out = {k: option[k] for k in OPTION_FACTS if option[k] not in ([], None, False)}
+    out['targets'] = [f"{m['name']} lv{m['level']} {round(m['share']*100)}% exp{m['base_exp']} "
+                      f"hits{m['hits']} hp_loss{m['hp_loss']}" + (' aggressive' if m['aggressive'] else '')
+                      for m in option['monsters'] if m['viable']]
+    out['avoided'] = [f"{m['name']} ({m['why']})" for m in option['monsters'] if not m['viable']]
+    del out['monsters']
+    out['history'] = {k: v for k, v in option['history'].items() if v}
     return out
 
 

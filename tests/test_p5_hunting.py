@@ -193,6 +193,20 @@ class FieldPlannerTests(unittest.TestCase):
         self.assertNotIn('Tarin', prompt)
         self.assertIn(hunting.TEMPERAMENTS[self.mood], messages[0]['content'])
         self.assertNotIn('entry', json.loads(prompt)['options'][0])
+        self.assertLess(sum(len(m['content']) for m in messages), 5000)  # cloud_limits.max_prompt_chars
+
+    def test_request_error_backs_off_instead_of_retrying_every_tick(self):
+        with tempfile.TemporaryDirectory() as folder:
+            directory = Path(folder)
+            (directory/'build.json').write_text(json.dumps({'build_id': 'novice-swordman'}), encoding='utf-8')
+            cycle = SoloCycle(directory/'state.json', 20, {'tables': TABLES, 'equipment': EQUIPMENT, 'build': None})
+            service = Service({'field_id': 'prt_fild08', 'reason': 'ok'})
+            bridge = ControlledBridge(tarin())
+            runner = Runner(cycle, bridge, directory, p5=P5Planning(cycle, service, directory))
+            with patch.object(FieldPlanner, 'request', side_effect=ValueError('prompt character budget exceeded')) as req:
+                runner.p5_tick(); runner.p5_tick()
+            self.assertEqual(req.call_count, 1)
+            runner.log.close()
 
     def test_invalid_failed_or_late_answers_keep_current(self):
         for service in (Service({'field_id': 'gef_fild10', 'reason': 'x'}), Service({'field_id': 'prt_fild06', 'reason': ''}),

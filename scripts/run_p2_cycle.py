@@ -37,6 +37,7 @@ class P5Planning:
         self.builds = build_policy.load_builds()
         self.build_planner, self.field_planner = BuildPlanner(service, self.builds), FieldPlanner(service)
         self.pending, self.ready, self.calls, self.build_tried = None, None, 0, False
+        self.retry_at = 0  # Back-off after a request or application error.
         stored = read_build(self.build_path)
         cycle.p5['build'] = stored and self.builds[stored['build_id']]
         self.build_id = stored and stored['build_id']
@@ -61,7 +62,7 @@ class P5Planning:
             self.apply_field(latest, note)
 
     def request(self, snap):
-        if 'progress' not in snap or snap.get('name') != self.identity:
+        if 'progress' not in snap or snap.get('name') != self.identity or time.monotonic() < self.retry_at:
             return
         if self.build_id is None and not self.build_tried:
             self.build_tried = True
@@ -174,6 +175,7 @@ class Runner:
             self.p5.tick(latest, self.note)
         except (ValueError, RuntimeError, OSError, KeyError) as error:
             self.p5.pending = self.p5.ready = None
+            self.p5.retry_at = time.monotonic() + 60
             self.note('p5_error', {'reason': f'{type(error).__name__}: {error}'})
         self.inference_calls += self.p5.calls - before
 
