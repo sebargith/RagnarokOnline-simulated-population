@@ -1,5 +1,19 @@
 # Estado actual
 
+## P5 paso 3 — campos de caza según nivel y peligro (2026-11-01)
+
+- Tablas públicas generadas y reproducibles: 214 monstruos (`config/p5-monsters.json`) y 144 campos
+  con spawns, portales gratuitos y punto de entrada (`config/p5-fields.json`), desde rAthena y OpenKore fijados.
+- `agent/hunting.py`: peligro estimado, objetivos viables, aprendizaje por retiradas y muertes, opciones
+  de campo validadas, temperamento por personaje y desempate con semilla. `FieldPlanner` elige con un motivo;
+  si falla, se mantiene el campo. `run_p2_cycle.py run --p5` integra la build, la caza y el campo. Suite: 188 OK.
+- En vivo con Tarin: Groq eligió prt_fild06 (`prudent`, «lowest danger»). Travel llegó en 64 s,
+  5 kills viables ahí, venta en Prontera y vuelta a prt_fild06; 14/14 kills, sin muertes. Cliente P1 detenido.
+  [Evidencia y límites](evidence/P5-hunting-fields.md).
+- Pendiente: sin subida de nivel en vivo, el reparto de puntos dentro del runner solo está probado
+  con simulaciones; tampoco se han visto en vivo retiradas, muertes ni un cambio de campo por nivel.
+  Siguiente: revisión del orquestador; luego, P5 paso 4.
+
 ## P5 paso 2 — stats, habilidades y equipo (2026-10-31)
 
 - Acciones nativas `stat_up`, `skill_up`, `equip` y `unequip` (contrato en `M1Progress.pm`), admitidas

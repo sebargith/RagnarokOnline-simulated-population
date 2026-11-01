@@ -1,6 +1,6 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-10-31 por Claude (P5 paso 2, stats/habilidades/equipo)
-Referencia: rama codex/single-agent-plan, commit_ref a8052d5; docs en el commit siguiente.
+Actualizado: 2026-11-01 por Claude (P5 paso 3, campos de caza)
+Referencia: rama codex/single-agent-plan; código en 586de19 + 6553c7e, docs en el último commit.
 ## Objetivo actual
 P5: un novato nuevo de nivel 1 decide solo cómo progresar hasta primera clase; luego
 comunidad. Dos funciones de modelo: planner inteligente (nube) y chat local.
@@ -23,7 +23,11 @@ comunidad. Dos funciones de modelo: planner inteligente (nube) y chat local.
   el paquete del servidor; agent/build_policy.py, config/p5-builds.json, config/p5-equipment.json,
   BuildPlanner en goal_planner.py. 166 tests OK. En vivo: Groq eligió novice-swordman; STR 5→11,
   NV_BASIC 0→2, Knife desequipado y reequipado, 10/10 confirmadas. Ver docs/evidence/P5-stats-equipment.md.
-  Build de Tarin en runtime/p1/cycle/build.json. La política todavía no está en el runner continuo.
+  Build de Tarin en runtime/p1/cycle/build.json.
+- P5 paso 3 hecho: config/p5-monsters.json + config/p5-fields.json (scripts/build_p5_hunting.py, reproducible),
+  agent/hunting.py (peligro, viables, opciones, temperamento + semilla), FieldPlanner, SoloCycle con field/outcomes
+  y build en el ciclo; `run_p2_cycle.py run --p5`. 188 tests OK. En vivo: Groq eligió prt_fild06, travel 64 s,
+  5 kills, venta y vuelta a prt_fild06; checkpoint complete 14/14, campo prt_fild06. Ver docs/evidence/P5-hunting-fields.md.
 - Servicios (PIDs): MariaDB 50024, login 40760, char 55704, map 36528 (puertos 3306/6900/6121/5121), Ollama, Docker/SearXNG.
   Cliente P1 detenido; clientes m4-field no están corriendo.
 - Visitor en grupo local Observer (20: @jumpto, @hide); carga tras el último reinicio [por verificar].
@@ -36,12 +40,13 @@ comunidad. Dos funciones de modelo: planner inteligente (nube) y chat local.
 - Un chat orquestador y una sesión por objetivo, en este checkout; un solo escritor.
 ## Incompleto / problemas / validaciones pendientes
 - P4: selección de consulta demasiado amplia; status ok no implica evidencia suficiente.
-- Selección de objetivo sin peligro; operación prolongada y spawns naturales sin demostrar.
+- Peligro estimado (no fórmula exacta); en vivo sin retirada, muerte, subida de nivel ni reparto en el runner.
+- Operación prolongada sin demostrar. ComfyUI del usuario puede ocupar la GPU (>14 GiB corta el runner).
 - "M4 Poring" = etiqueta de la caché compartida tables/monsters.txt; no editarla.
 - DB/puertos/GPU compartidos: no reiniciar servicios sin permiso; no ejecutar prepare_m4.py
   con clientes m4-field vivos; transacciones inciertas sin replay.
 ## Próxima acción
-Revisión del orquestador del paso 2; luego P5 paso 3 (campos de caza por nivel y peligro). Pendiente aparte: revisión
+Revisión del orquestador del paso 3; luego P5 paso 4 (salir de la zona de entrenamiento por NPC). Pendiente aparte: revisión
 humana del chat con Gemma.
 ## Archivos relevantes
 - docs/CURRENT_STATE.md; docs/NATIVE_AGENT_PLAN.md; docs/USER_GUIDE.txt.
