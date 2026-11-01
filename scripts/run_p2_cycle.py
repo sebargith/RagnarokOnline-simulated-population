@@ -32,10 +32,14 @@ class P5Planning:
     """Build choice (once, when none is stored) and hunting-field decisions.
     One planner request at a time; gameplay continues while it is pending, and a
     decision is applied only to an idle hunting cycle with fresh own perception."""
-    def __init__(self, cycle, service, directory):
+    def __init__(self, cycle, service, directory, target_class=None):
         self.cycle, self.identity = cycle, cycle.state['identity']
         self.build_path, self.build_lock = directory/'build.json', directory/'build.lock'
         self.builds = build_policy.load_builds()
+        if target_class:
+            self.builds = {k: v for k, v in self.builds.items() if v['target_class'] == target_class}
+            if not self.builds:
+                raise RuntimeError('No build for the tutorial destination')
         self.build_planner, self.field_planner = BuildPlanner(service, self.builds), FieldPlanner(service)
         self.pending, self.ready, self.calls, self.build_tried = None, None, 0, False
         self.retry_at = 0  # Back-off after a request or application error.
@@ -496,7 +500,9 @@ def main():
             if args.intent is not None:
                 planner = GoalPlanner(service, directory/'state.json')
             if p5:
-                p5_planning = P5Planning(cycle, service, directory)
+                destination = lesson.state.get('destination') if lesson else None
+                target_class = destination and destination['job'].replace('Swordsman', 'Swordman')
+                p5_planning = P5Planning(cycle, service, directory, target_class)
             print(json.dumps(Runner(cycle, Bridge(bridge_config), directory, planner, args.intent, p5_planning).run(
                 args.seconds, actions, args.pause_after_send)))
         finally:

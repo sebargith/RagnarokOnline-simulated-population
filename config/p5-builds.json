@@ -8,6 +8,12 @@
       "stats": [["str", 20], ["vit", 15], ["dex", 10], ["str", 40], ["vit", 30], ["dex", 20], ["str", 70], ["vit", 50]],
       "skills": [["NV_BASIC", 9], ["SM_SWORD", 10], ["SM_BASH", 10], ["SM_RECOVERY", 5], ["SM_PROVOKE", 5], ["SM_MAGNUM", 10], ["SM_ENDURE", 5]]
     },
+    "novice-acolyte": {
+      "target_class": "Acolyte",
+      "summary": "Novice melee progression toward Acolyte; support skills are not automated.",
+      "stats": [["str", 20], ["dex", 10], ["vit", 15], ["int", 20]],
+      "skills": [["NV_BASIC", 9]]
+    },
     "novice-archer": {
       "target_class": "Archer",
       "summary": "Ranged: DEX for damage and hit, AGI for attack speed and flee.",

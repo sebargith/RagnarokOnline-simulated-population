@@ -110,7 +110,10 @@ sub snapshot {
     my $s = {connected => $ready};
     if ($ready) {
         $s->{name} = $char->{name}; $s->{map} = $field->baseName;
-        $s->{position} = {x => 0 + $char->{pos}{x}, y => 0 + $char->{pos}{y}};
+        # pos is the start of the last movement; use the same interpolated
+        # position as navigation evidence and action range checks.
+        my $position = Utils::calcPosFromPathfinding($field, $char);
+        $s->{position} = {x => 0 + $position->{x}, y => 0 + $position->{y}};
         $s->{destination} = {x => 0 + $char->{pos_to}{x}, y => 0 + $char->{pos_to}{y}};
         $s->{executor} = $cfg->{native_navigation} ? 'openkore_route' : 'bridge_steps';
         $s->{navigation} = $pending && $pending->{task} ? $pending->{id} : undef;

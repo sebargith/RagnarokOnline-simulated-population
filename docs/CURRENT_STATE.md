@@ -1,5 +1,19 @@
 # Estado actual
 
+## P5.4 — muestra detenida, posición corregida sin validación viva (2026-11-01)
+
+- Nilo creado normalmente en `new_2-1`; reejecución conserva equipo. Pruebas de
+  inventario vacío/interrupción simuladas. Stats 1 y 48 puntos siguen correctos.
+- Una muestra: portal `new_2-1` → `new_2-2` confirmado; dos rechazos iguales
+  `already_at_destination`, bloqueo en recepcionista. No hay NPC, destino ni kill.
+- Snapshot usaba origen antiguo de movimiento; se ajustó al cálculo de OpenKore.
+  213 tests OK y sintaxis Perl OK; cambio aún sin prueba viva. [Evidencia](evidence/P5-tutorial-exit.md).
+- Nilo detenido, sin tarea ni petición pendientes al cierre; guardado en `new_2-2`
+  (100,27). Checkpoint bloqueado e historial conservados. Servicios de juego activos.
+- Siguiente: revisar recuperación segura explícita del bloqueo y validar el snapshot
+  corregido antes de continuar el tutorial, sin repetir resultados inciertos.
+
+
 ## P5 paso 4 — salida del tutorial por NPC, sin prueba en vivo (2026-11-01)
 
 - `d64b41e`: `scripts/prepare_p5.py` (Nilo, cuenta 2000031, puerto 8771, `runtime/p5/`, solo INSERT;

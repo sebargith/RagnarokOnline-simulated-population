@@ -307,6 +307,17 @@ class TutorialTests(unittest.TestCase):
         self.assertIsNone(self.t.plan(self.npc('hanson')))
         return gifts
 
+    def test_arrival_snapshot_selects_npc_instead_of_repeating_navigation(self):
+        self.act(nilo())
+        # Reproduces the observed arrival at (100,26), while OpenKore's raw
+        # movement origin was still (100,17) and pos_to was (100,27).
+        action = self.t.plan(self.npc('receptionist', x=100, y=26))
+        self.assertEqual(action['type'], 'npc_script')
+        source = (ROOT/'bridge/openkore/m1_bridge.pl').read_text(encoding='utf-8')
+        snapshot = source.split('sub snapshot {', 1)[1].split('sub nav_evidence', 1)[0]
+        self.assertIn('Utils::calcPosFromPathfinding($field, $char)', snapshot)
+        self.assertIn('$position->{y}', snapshot)
+
     def test_full_path_to_the_chosen_town(self):
         gifts = self.walk_to_decision()
         opts = tutorial.destinations(nilo(), SCRIPT, TABLES, BUILDS)
@@ -368,7 +379,14 @@ class DestinationTests(unittest.TestCase):
         opts = {o['job']: o for o in tutorial.destinations(nilo(), SCRIPT, TABLES, BUILDS)}
         self.assertEqual(opts['Swordsman']['fields'][0], 'prt_fild08')
         self.assertTrue(opts['Swordsman']['build_for_job'])
-        self.assertFalse(opts['Acolyte']['build_for_job'])
+        self.assertTrue(opts['Acolyte']['build_for_job'])
+        for option in opts.values():
+            if option['offered']:
+                self.assertTrue(option['build_for_job'])
+                self.assertTrue(option['fields'])
+                for place in (option['town'], option['landing']['map'], *option['fields']):
+                    self.assertTrue(tutorial.hunting.hops(TABLES['fields']['portals'], place, tutorial.hunting.SHOP_MAP))
+                    self.assertTrue(tutorial.hunting.hops(TABLES['fields']['portals'], tutorial.hunting.SHOP_MAP, place))
         self.assertIn('no_supply_route:morocc', opts['Thief']['rejected'])
         self.assertEqual(tutorial.fallback_choice(list(opts.values()), 'Nilo')['offered'], True)
 
@@ -433,6 +451,13 @@ class HandOffTests(unittest.TestCase):
         self.assertEqual(done['decision'], 'local_fallback')
         self.assertIn(done['job'], ('Swordsman', 'Acolyte'))
         self.assertTrue(done['reason'].startswith('planner failed'))
+
+    def test_destination_constrains_build_choices(self):
+        p5 = {'tables': TABLES, 'equipment': build_policy.load_equipment(), 'build': None}
+        cycle = SoloCycle(self.directory/'state.json', 1, p5, 'Nilo')
+        for target, expected in (('Swordman', 'novice-swordman'), ('Acolyte', 'novice-acolyte')):
+            planning = P5Planning(cycle, Service({}), self.directory, target)
+            self.assertEqual(list(planning.builds), [expected])
 
     def test_cycle_for_a_new_character_waits_for_its_own_field(self):
         p5 = {'tables': TABLES, 'equipment': build_policy.load_equipment(), 'build': None}

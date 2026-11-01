@@ -42,7 +42,7 @@ class Service:
 
 class PolicyTests(unittest.TestCase):
     def test_config_is_valid(self):
-        self.assertEqual({b['target_class'] for b in BUILDS.values()}, {'Swordman', 'Archer', 'Thief'})
+        self.assertEqual({b['target_class'] for b in BUILDS.values()}, {'Swordman', 'Archer', 'Thief', 'Acolyte'})
         self.assertTrue(all(b['skills'][0] == ['NV_BASIC', 9] for b in BUILDS.values()))
         knife = EQUIPMENT['1201']
         self.assertEqual((knife['attack'], knife['locations'], knife['min_level']), (17, ['Right_Hand'], 1))
