@@ -8,6 +8,7 @@ attacks only viable monsters and asks the planner role for a hunting field when
 one is due; a failed or late answer keeps the current field.
 """
 import argparse
+import copy
 import json
 import os
 from pathlib import Path
@@ -91,7 +92,11 @@ class P5Planning:
                      'hp_max': snap['hp_max'], 'build': self.build_id}
             self.field_planner.request(facts, opts, current, mood, why)
             self.calls += 1
-            self.pending = ('field', {'why': why, 'mood': mood, 'options': [(o['field_id'], o['score']) for o in opts]})
+            # The record keeps what the planner saw plus the own history of the current field.
+            evidence = {**facts, 'map': snap.get('map'),
+                        'field_history': copy.deepcopy(self.cycle.state['outcomes']['fields'].get(current))}
+            self.pending = ('field', {'why': why, 'mood': mood, 'facts': evidence,
+                                      'options': [(o['field_id'], o['score']) for o in opts]})
 
     def apply_build(self, result, latest, note):
         if result['status'] != 'proposed':
@@ -112,7 +117,8 @@ class P5Planning:
             return  # Wait for an idle hunting cycle.
         result, info = self.ready
         self.ready, current = None, s['field']['id']
-        record = {'trigger': info['why'], 'temperament': info['mood'], 'options': info['options'], 'previous': current,
+        record = {'trigger': info['why'], 'temperament': info['mood'], 'facts': info['facts'],
+                  'options': info['options'], 'previous': current,
                   'served_by': result.get('served_by'), 'degraded': result.get('degraded'), 'time': time.time()}
         chosen = None
         if result['status'] == 'proposed':
@@ -441,14 +447,14 @@ def main():
     parser.add_argument('--pause-after-send', action='store_true', help='Disconnect after one proposal to verify restart recovery')
     parser.add_argument('--p5', action='store_true', help='Apply the build and choose hunting fields with the planner role')
     parser.add_argument('--no-inference', action='store_true', help='Use only the already selected build and field')
-    parser.add_argument('--train-first-job', action='store_true', help='Resume the persistent first-class macro goal')
+    parser.add_argument('--train-first-job', action='store_true', help='Resume the persistent first-class macro goal; the planner re-decides the field unless --no-inference')
     parser.add_argument('--agent', choices=('p1', 'p5'), default='p1',
                         help='p1: Tarin (test bench); p5: the new novice, which first leaves the training grounds')
     args = parser.parse_args()
     if args.no_inference and (args.command != 'run' or args.agent != 'p5' or not args.p5 or args.intent is not None):
         parser.error('--no-inference requires run --agent p5 --p5 without intent')
-    if args.train_first_job and not args.no_inference:
-        parser.error('--train-first-job requires --no-inference')
+    if args.train_first_job and (args.command != 'run' or args.agent != 'p5' or not args.p5 or args.intent is not None):
+        parser.error('--train-first-job requires run --agent p5 --p5 without intent')
     if args.intent is not None and (args.command != 'run' or not 1 <= len(args.intent) <= 400):
         parser.error('--intent requires run and 1..400 characters')
     if args.agent == 'p5' and (args.intent is not None or args.command in ('set-goal', 'reconcile-navigation') or
@@ -531,9 +537,11 @@ def main():
                               'kills': cycle.state['kills'], 'status': cycle.state['status']}))
             return
         lesson = Tutorial(directory/'tutorial.json', identity) if args.agent == 'p5' else None
-        if args.no_inference:
+        if args.no_inference or args.train_first_job:
+            # Training resumes only from the saved choices; with inference the planner
+            # may later move the field, never the build.
             if not lesson or lesson.state['status'] != 'complete':
-                raise RuntimeError('No-inference mode requires a completed tutorial')
+                raise RuntimeError('Training and no-inference modes require a completed tutorial')
             stored = read_build(directory/'build.json')
             builds = build_policy.load_builds()
             build_id = stored and stored.get('build_id')
@@ -541,7 +549,7 @@ def main():
             if (not stored or stored.get('identity') != identity or build_id not in builds or
                     builds[build_id]['target_class'] != destination.get('job', '').replace('Swordsman', 'Swordman') or
                     not cycle.state['field'].get('id') or not cycle.state.get('return_to')):
-                raise RuntimeError('No-inference mode requires a matching saved build, destination and field')
+                raise RuntimeError('Training and no-inference modes require a matching saved build, destination and field')
             p5['build'] = builds[build_id]
             if args.train_first_job:
                 cycle.train_first_job()

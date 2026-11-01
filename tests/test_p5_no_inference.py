@@ -59,6 +59,13 @@ class NoInferenceTests(unittest.TestCase):
             self.assertIsNone(seen[0][0][3])  # Goal planner
             self.assertIsNone(seen[0][0][5])  # P5 planner
 
+    def test_background_keeps_explicit_no_inference_mode(self):
+        plain = run_p5_background.runner_command(Path('rt'), 60, 10, no_inference=False)
+        explicit = run_p5_background.runner_command(Path('rt'), 60, 10, no_inference=True)
+        self.assertNotIn('--no-inference', plain)
+        self.assertIn('--train-first-job', plain)
+        self.assertEqual([x for x in explicit if x != '--no-inference'], plain)
+
     def test_no_inference_disallows_intent(self):
         args = ['run_p2_cycle.py', 'run', '--runtime', '.', '--agent', 'p5', '--p5',
                 '--no-inference', '--intent', 'hello']

@@ -1,4 +1,8 @@
-"""One bounded no-inference P5 sample, with durable summary and safe cleanup."""
+"""One bounded P5 training sample, with durable summary and safe cleanup.
+
+By default the planner role re-decides the hunting field when one is due
+(level up, unsafe field, periodic review); --no-inference keeps the saved
+build and field without any model call."""
 import argparse
 import ctypes
 import json
@@ -42,6 +46,12 @@ def idle(config):
         b.close()
 
 
+def runner_command(runtime, seconds, max_actions, no_inference):
+    return [sys.executable, str(ROOT / 'scripts/run_p2_cycle.py'), 'run', '--runtime', str(runtime),
+            '--agent', 'p5', '--p5', *(['--no-inference'] if no_inference else []),
+            '--train-first-job', '--seconds', str(seconds), '--max-actions', str(max_actions)]
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--runtime', required=True, type=Path)
@@ -49,6 +59,7 @@ def main():
     parser.add_argument('--seconds', type=int, default=600)
     parser.add_argument('--max-actions', type=int, default=150)
     parser.add_argument('--reuse-client', action='store_true')
+    parser.add_argument('--no-inference', action='store_true', help='Keep the saved field; no planner calls')
     args = parser.parse_args()
     if not 30 <= args.seconds <= 3600 or not 1 <= args.max_actions <= 600:
         parser.error('seconds must be 30..3600 and max-actions 1..600')
@@ -56,7 +67,8 @@ def main():
     base = runtime / 'p5'
     args.summary.parent.mkdir(parents=True, exist_ok=True)
     summary = {'phase': 'starting', 'pid': os.getpid(), 'inference_calls': 0, 'client_owned': False, 'started': time.time(),
-               'max_seconds': args.seconds, 'max_actions': args.max_actions}
+               'max_seconds': args.seconds, 'max_actions': args.max_actions,
+               'mode': 'no_inference' if args.no_inference else 'field_planner'}
     atomic_json(args.summary, summary)
     with exclusive(base / 'background.lock'):
         try:
@@ -90,9 +102,7 @@ def main():
             remaining = min(args.seconds - 30, int(args.seconds - 10 - (time.time() - summary['started'])))
             if remaining < 10:
                 raise RuntimeError('Insufficient time remaining in the sample budget')
-            command = [sys.executable, str(ROOT / 'scripts/run_p2_cycle.py'), 'run', '--runtime', str(runtime),
-                       '--agent', 'p5', '--p5', '--no-inference', '--train-first-job',
-                       '--seconds', str(remaining), '--max-actions', str(args.max_actions)]
+            command = runner_command(runtime, remaining, args.max_actions, args.no_inference)
             summary['command'] = command
             atomic_json(args.summary, summary)
             result = subprocess.run(command, cwd=ROOT, timeout=remaining + 8)
