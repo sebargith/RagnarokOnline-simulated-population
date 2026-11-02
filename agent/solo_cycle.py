@@ -235,10 +235,17 @@ class SoloCycle:
             s.update(status='blocked', reason='two_consecutive_action_failures')
         self.save()
 
+    def late_result_pending(self):
+        """Blocked only because the previous run ended before its intent's result: the
+        runner may still read that result from the bridge (never resend it)."""
+        s = self.state
+        return (s['status'] == 'blocked' and s.get('reason') == 'intent_deadline_no_replay' and
+                bool(s.get('inflight')) and not s['inflight'].get('cancel'))
+
     def train_first_job(self):
         """Resume one persistent macro goal without replacing confirmed history."""
         s = self.state
-        if s.get('macro_goal') == 'train_first_job' and s['status'] == 'active':
+        if s.get('macro_goal') == 'train_first_job' and (s['status'] == 'active' or self.late_result_pending()):
             return False
         if (s.get('macro_goal') or s['status'] != 'complete' or s.get('reason') != 'confirmed_kill_goal'
                 or s.get('inflight') or s['phase'] != 'hunt'):

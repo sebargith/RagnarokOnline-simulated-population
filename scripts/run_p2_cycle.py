@@ -221,8 +221,8 @@ class Runner:
     def late_result_tick(self):
         """A checkpoint blocked only because its intent outlived the previous run: ask
         the bridge for the retained result in the same session for LATE_QUERY_S."""
-        s, p = self.cycle.state, self.cycle.state.get('inflight')
-        if s.get('reason') != 'intent_deadline_no_replay' or not p or p.get('cancel'):
+        p = self.cycle.state.get('inflight')
+        if not self.cycle.late_result_pending():
             return False
         if not self.late or self.late[0] != p['request_id']:
             self.late = (p['request_id'], time.monotonic())
@@ -588,7 +588,7 @@ def main():
                 cycle.train_first_job()
         if lesson and lesson.state['status'] == 'blocked':
             print(json.dumps({'tutorial': lesson.state})); return
-        if cycle.state['status'] != 'active' and args.intent is None:
+        if cycle.state['status'] != 'active' and args.intent is None and not cycle.late_result_pending():
             print(json.dumps(cycle.state)); return
         service = None
         end = time.monotonic() + args.seconds

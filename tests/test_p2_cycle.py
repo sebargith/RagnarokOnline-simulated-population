@@ -164,6 +164,17 @@ class CycleTests(unittest.TestCase):
         self.assertEqual(self.c.state['reconciliations'][-1]['disposition'], 'retired_same_map_warp')
         self.assertEqual(self.c.state['history'][-1]['result']['status'], 'unknown')
 
+    def test_training_resumes_only_to_read_a_late_result(self):
+        self.c.state.update(macro_goal='train_first_job', status='blocked', reason='intent_deadline_no_replay',
+                            inflight={'request_id': 'c_56', 'session': 's:2', 'action': {'type': 'travel'}})
+        self.assertTrue(self.c.late_result_pending())
+        self.assertFalse(self.c.train_first_job())
+        self.assertEqual(self.c.state['status'], 'blocked')  # Only the bridge's result unblocks it.
+        self.c.state['reason'] = 'travel:failed/timeout'
+        self.assertFalse(self.c.late_result_pending())
+        with self.assertRaises(RuntimeError):
+            self.c.train_first_job()
+
     def test_new_goal_rejects_uncertainty_and_invalid_targets(self):
         self.c.state.update(status='complete', kills=1, reason='confirmed_kill_goal', inflight={'request_id': 'c_1'})
         with self.assertRaises(RuntimeError):
