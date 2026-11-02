@@ -1,6 +1,6 @@
 # Relevo — Ragnarok Agents
 Actualizado: 2026-11-02 por Claude (alcanzabilidad a pie y tiempo de viaje).
-Referencia: codex/single-agent-plan, código fae125e; documentos en commit siguiente.
+Referencia: codex/single-agent-plan, código a682e76; documentos en commit siguiente.
 ## Preflight 2026-11-01
 - No se lanzó otra ejecución: GPU 14991–15130 MiB, sobre el límite 14336 MiB; RAM libre 2,83 GiB. No se tocaron procesos.
 - El estado de la muestra anterior no es una observación actual; proceso 31704, puerto y locks no quedaron confirmados desde este entorno.
@@ -17,9 +17,12 @@ Referencia: codex/single-agent-plan, código fae125e; documentos en commit sigui
   - fae125e tiempo de viaje según la ruta (30–300 s) y `navigate` dentro del mismo mapa;
   - 80c13c2/38034e7 `reconcile-travel`.
 - **En vivo:** dos reinicios del cliente aprobados por el usuario (ahora PID 46148). En 870 s salió del castillo, quedó en prt_fild00, de 136 a 148 kills y abastecimiento a unos 220 s.
-- **Final:** active/return con c_56 travel en vuelo: consultar el resultado retenido, no reenviar. Evidencia: runtime/p5/evidence/walk-reachability-1/.
+- **Coste del abastecimiento (c5b636f):** `supply_round_trip_s` y `hunt_share` en las opciones de campo.
+- **Resultado tardío (569b68f, a682e76):** se pide al puente antes de bloquear, sin reenviarlo; c_56 se recuperó como `arrived` en vivo.
+- **Final:** active/loot, sin acción en vuelo, 151 kills, prt_fild00. La última ejecución la cortó el guardián de GPU (15218 MiB usados por otros programas).
+- Evidencia: runtime/p5/evidence/walk-reachability-1/ y supply-cost-1/.
 - **Pendiente:**
-  - coste del abastecimiento en la elección de campo;
+  - ver en vivo una revisión de campo con el nuevo peso;
   - carrera de arranque (`Listen => 1` en el puente frente a `wait_port`): reutilizar el cliente o arrancarlo antes con `prepare_p5.py start`.
 ## Objetivo actual
 Nilo entrena legítimamente hasta Job10 y primera clase con NPC gratuito en Prontera.
@@ -58,7 +61,7 @@ Nilo entrena legítimamente hasta Job10 y primera clase con NPC gratuito en Pron
 - Groq planner y Gemma4 12B respaldo/chat se conservan para uso normal.
 - Principal revisa informes y propone siguiente alcance para aprobación del usuario.
 ## Próxima acción
-Leer resumen/status/state actuales ANTES de operar (último: runtime/p5/evidence/walk-reachability-1/summary.json).
+Leer resumen/status/state actuales ANTES de operar (último: runtime/p5/evidence/supply-cost-1/summary.json).
 Reanudar con run_p5_background.py --reuse-client (planner por defecto). Pendiente: Job10 y cambio de clase,
 ventas frecuentes, Gemma/vencimiento en vivo.
 ## Archivos relevantes

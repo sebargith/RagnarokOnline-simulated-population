@@ -15,10 +15,14 @@
   - Nilo salió de `prt_castle` por las dos puertas internas;
   - las revisiones de campo solo ofrecieron destinos alcanzables, y Groq eligió y luego mantuvo prt_fild00;
   - 136 → 148 kills; dos viajes de abastecimiento de ida y vuelta, de unos 220 s, todos `arrived`.
-- **Estado al terminar:** checkpoint `active`/`return`, con travel c_56 de vuelta a prt_fild00 todavía en vuelo; su resultado retenido se recoge al reanudar. Cliente 46148 vivo.
+- **Después (`c5b636f`, `569b68f`, `a682e76`):**
+  - las opciones de campo pesan lo que dura el abastecimiento (`supply_round_trip_s`, `hunt_share`);
+  - un resultado que llega tarde se lee del puente al reanudar, sin reenviarlo. En vivo, c_56 se recuperó como `arrived` y Nilo pasó de 148 a 151 kills.
+  - Esa ejecución la paró el guardián de GPU (15218 MiB usados por otros programas).
+- **Estado al terminar:** `active`/`loot`, sin acción en vuelo, 151 kills, en prt_fild00. Cliente 46148 vivo.
 - **Pendiente:**
-  - las opciones de campo no tienen en cuenta lo que dura el abastecimiento (prt_fild00 cuesta unos 7,5 minutos por ida y vuelta);
-  - hay una carrera de arranque entre el cliente y el runner;
+  - ver en vivo una revisión de campo con el nuevo peso;
+  - la carrera de arranque entre el cliente y el runner;
   - Job10 y el cambio de clase.
 
 ## P5.5 — campo por nivel durante el entrenamiento (2026-11-01, Claude)
