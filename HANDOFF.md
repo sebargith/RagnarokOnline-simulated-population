@@ -19,7 +19,8 @@ Referencia: codex/single-agent-plan, código a682e76; documentos en commit sigui
 - **En vivo:** dos reinicios del cliente aprobados por el usuario (ahora PID 46148). En 870 s salió del castillo, quedó en prt_fild00, de 136 a 148 kills y abastecimiento a unos 220 s.
 - **Coste del abastecimiento (c5b636f):** `supply_round_trip_s` y `hunt_share` en las opciones de campo.
 - **Resultado tardío (569b68f, a682e76):** se pide al puente antes de bloquear, sin reenviarlo; c_56 se recuperó como `arrived` en vivo.
-- **Final:** active/loot, sin acción en vuelo, 151 kills, prt_fild00. La última ejecución la cortó el guardián de GPU (15218 MiB usados por otros programas).
+- **En vivo con el nuevo peso:** Groq eligió prt_fild05 por tener el abastecimiento más corto (88 s cada trayecto); de 151 a 158 kills.
+- **Final:** blocked `exploration_no_reachable_candidate`, sin acción en vuelo, 158 kills, en prt_fild05 (115,373), una bolsa sin salida en línea recta. Pendiente arreglar la exploración.
 - Evidencia: runtime/p5/evidence/walk-reachability-1/ y supply-cost-1/.
 - **Pendiente:**
   - ver en vivo una revisión de campo con el nuevo peso;

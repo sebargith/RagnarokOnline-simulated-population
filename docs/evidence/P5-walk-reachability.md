@@ -1,6 +1,6 @@
 # P5 — reachability on foot inside each map
 
-Date: 2026-11-01, Claude. Branch `codex/single-agent-plan`; code `e574b18`, `80c13c2`, `38034e7`.
+Date: 2026-11-01/02, Claude. Branch `codex/single-agent-plan`; code `e574b18`, `80c13c2`, `38034e7`, `eda1a07`, `fae125e`, `c5b636f`, `569b68f`, `a682e76`.
 
 ## Failure
 
@@ -91,6 +91,39 @@ Date: 2026-11-01, Claude. Branch `codex/single-agent-plan`; code `e574b18`, `80c
   - At the end, travel c_56 back to prt_fild00 (300 s) was still in flight, with the checkpoint `active`. The next run should pick up its retained result without resending it.
 - **Local evidence, outside Git:** `runtime/p5/evidence/walk-reachability-1/`, with summaries and logs for every attempt, `state-*` at each step, and `events-live.json`.
 
+## Supply trip cost and late results (2026-11-02)
+
+- **`c5b636f`, new figure `supply_round_trip_s`:**
+  - each field option carries the estimated round trip between its entry spot (or the current cell, for the current field) and the shop (104,51);
+  - it is computed at 0.25 s per straight-line cell plus 5 s per portal;
+  - the score is multiplied by `hunt_share` = 90 / (90 + round trip). 90 s is Nilo's median hunting time between two supply trips;
+  - the planner sees that figure among each option's facts.
+- **With real tables, from prt_fild05:**
+  - prt_fild06: 108 s round trip, score 1.28;
+  - prt_fild08: 132 s, 0.92;
+  - prt_fild00: 518 s, from 0.75·1.5 down to 0.167.
+- **`569b68f` and `a682e76`, late result:**
+  - a run that ended with an action in flight left it blocked on resume (`intent_deadline_no_replay`), without asking the bridge for the result;
+  - now the runner asks for it for 5 s in the same session, and training starts only in that case;
+  - a final result unblocks it; otherwise it stays blocked. Nothing is ever resent.
+- **Tests:** 256 OK.
+- **Live** (`runtime/p5/evidence/supply-cost-1/`):
+  - Attempts 1 and 2 failed at start-up because of those two blocks, without acting.
+  - **Attempt 3:**
+    - c_56 recovered from the bridge as `completed/arrived` without resending it;
+    - 148 → 151 kills;
+    - after 58 s the guard stopped on GPU > 14336 MiB (15218 MiB used by the user's other programs).
+  - **Attempt 4 (464 s, 1 inference):**
+    - `periodic_review` with the new weighting. Scores: prt_fild05 0.449; prt_fild01 0.372; prt_fild00 0.13; prt_fild04 0.059;
+    - Groq switched to **prt_fild05**. Reason: more EXP per hit, higher `viable_share`, low danger and the shortest supply round trip;
+    - travel 122 s, and a supply round trip of 88 + 88 s (from prt_fild00 it had been about 220 + 220 s); all `arrived`;
+    - 151 → 158 kills; two `attack_ended` attacks with no hits conciliated automatically (`retired_unknown_no_kill`).
+  - **Block at the end, `exploration_no_reachable_candidate`:**
+    - while exploring, Nilo walked into a dead-end pocket in prt_fild05 (115,373), next to the top edge;
+    - the area is walkable and connected (82,191 cells), but `M1Explore::candidates` requires a clear straight line at 20/35/50 cells and every one crosses a wall;
+    - with no monsters in view, the cycle blocks;
+    - it is a pre-existing exploration limit, not a travel one. No action is left in flight.
+
 ## Limits
 
 - The zones come from OpenKore's `.fld2` and `portals.txt`. A wall or portal on the server that differs from those files is still discovered while walking, as `failed/unreachable` or `portal_not_taken`.
@@ -98,5 +131,6 @@ Date: 2026-11-01, Claude. Branch `codex/single-agent-plan`; code `e574b18`, `80c
 - The tutorial towns use the save point as an approximation of where the character is in town.
 - The landings in OpenKore's table can differ from the server's. For map-to-map portals the hop only checks the map; for inner doors, the zone.
 - The time budget is capped at 300 s. A trip of more than about 620 straight-line cells could still run out.
-- Field options do not weigh the length of the supply trip. prt_fild00 costs about 7.5 minutes per round trip to Prontera, which eats much of the hunting time.
+- The supply weighting uses estimates (straight-line pace, fixed 90 s stint); the model's reason is still not validated beyond the `field_id`.
+- Exploration can get stuck in pockets where no candidate has a straight line clear (`M1Explore`).
 - Attempt 1 showed a start-up race between `prepare_p5.start` and the runner. It was worked around by reusing the client, and not fixed.

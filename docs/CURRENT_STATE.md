@@ -19,9 +19,12 @@
   - las opciones de campo pesan lo que dura el abastecimiento (`supply_round_trip_s`, `hunt_share`);
   - un resultado que llega tarde se lee del puente al reanudar, sin reenviarlo. En vivo, c_56 se recuperó como `arrived` y Nilo pasó de 148 a 151 kills.
   - Esa ejecución la paró el guardián de GPU (15218 MiB usados por otros programas).
-- **Estado al terminar:** `active`/`loot`, sin acción en vuelo, 151 kills, en prt_fild00. Cliente 46148 vivo.
+- **Revisión con el nuevo peso, en vivo:** Groq eligió prt_fild05 (abastecimiento de 88 s por trayecto); de 151 a 158 kills.
+- **Estado al terminar:** `blocked` por `exploration_no_reachable_candidate`, sin acción en vuelo, 158 kills, en prt_fild05 (115,373).
+  - Nilo entró explorando en una bolsa donde ningún candidato tiene línea recta libre.
+  - Cliente 46148 vivo.
 - **Pendiente:**
-  - ver en vivo una revisión de campo con el nuevo peso;
+  - exploración atascada en bolsas sin salida en línea recta (`M1Explore`);
   - la carrera de arranque entre el cliente y el runner;
   - Job10 y el cambio de clase.
 
