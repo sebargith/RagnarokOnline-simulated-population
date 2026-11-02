@@ -105,7 +105,8 @@ class OptionTests(unittest.TestCase):
         self.snap = tarin(map='home')
 
     def ids(self, history=None, identity='Tarin', current='home', snap=None):
-        with patch.object(hunting, 'SHOP_MAP', 'town'):
+        # Synthetic maps have no real cells: supply trip length is tested on real tables.
+        with patch.object(hunting, 'SHOP_MAP', 'town'), patch.object(hunting, 'HUNT_STINT_S', 10**9):
             opts, mood = hunting.options(snap or self.snap, current, self.tables, EQUIPMENT, history or {}, identity, 10000)
         return [o['field_id'] for o in opts], opts, mood
 
@@ -154,6 +155,16 @@ class OptionTests(unittest.TestCase):
         self.assertIn('prt_fild08', ids)
         self.assertTrue({'prt_fild05', 'prt_fild06'} <= set(ids))
         self.assertTrue(all(o['entry'] for o in opts if not o['current']))
+
+    def test_long_supply_trips_lower_the_score(self):
+        # Live 2026-11-02: prt_fild00 cost about 7.5 min per supply round trip.
+        snap = tarin(map='prt_fild05', position={'x': 130, 'y': 298})
+        opts = {o['field_id']: o for o in hunting.options(snap, 'prt_fild05', TABLES, EQUIPMENT, {}, 'Nilo', 0)[0]}
+        far, near = opts['prt_fild00'], opts['prt_fild06']
+        self.assertGreater(far['supply_round_trip_s'], 3 * near['supply_round_trip_s'])
+        self.assertLess(far['hunt_share'], near['hunt_share'])
+        self.assertGreater(near['score'], far['score'])
+        self.assertIsNotNone(opts['prt_fild05']['supply_round_trip_s'])  # Current field: from where it stands.
 
 
 class TableTests(unittest.TestCase):

@@ -26,6 +26,7 @@ MAX_HITS = 12           # Longer fights are not worth it at this level.
 RECENT_DEATH_S = 3600
 MAX_OPTIONS = 6
 NEAR_BEST = .90         # Options within 10% of the best score are equivalent.
+HUNT_STINT_S = 90       # Median hunting time between supply trips, Nilo 2026-11-01/02.
 TEMPERAMENTS = {
     'prudent': 'Prefers safer fields even if experience is slower.',
     'ambitious': 'Prefers the fastest experience among safe fields.',
@@ -149,7 +150,8 @@ def options(snap, current, tables, equipment, history, identity, now):
     allow supply trips from that entry to the shop and back, offer viable common
     monsters and no aggressive threat, and have no recent own death."""
     monsters, fields, graph = tables['monsters'], tables['fields']['fields'], walk_table(tables)
-    here_zone = walk.zone_at(graph, snap['map'], (snap['position']['x'], snap['position']['y']))
+    pos = (snap['position']['x'], snap['position']['y'])
+    here_zone = walk.zone_at(graph, snap['map'], pos)
     shop_zone = walk.zone_at(graph, SHOP_MAP, SHOP_STAND)
     me = profile(snap, equipment)
     outcomes, field_history = history.get('monsters', {}), history.get('fields', {})
@@ -170,6 +172,13 @@ def options(snap, current, tables, equipment, history, identity, now):
         route, entry = ((best[0]['hops'], best[1]), best[2]) if best else (None, None)
         zone = entry_zone(entry) if entry else None
         trip = hops(graph, name, SHOP_MAP, zone, shop_zone), hops(graph, SHOP_MAP, name, shop_zone, zone)
+        # Supply round trip from where it hunts: the entry spot, or where it stands.
+        spot = entry[:2] if entry else (pos if name == snap['map'] else None)
+        supply_s = None
+        if spot and trip[0] and trip[1]:
+            legs = (walk.walk_seconds(graph, name, spot, SHOP_MAP, SHOP_STAND),
+                    walk.walk_seconds(graph, SHOP_MAP, SHOP_STAND, name, spot))
+            supply_s = round(sum(legs)) if None not in legs else None
         facts = field_facts(name, field, monsters, me, outcomes)
         past = history_view(field_history.get(name, {}), now)
         unsafe = ([] if trip[0] and trip[1] else ['no_supply_route']) + \
@@ -178,11 +187,14 @@ def options(snap, current, tables, equipment, history, identity, now):
                  (['recent_death'] if past['recent_death'] else [])
         if not here and (unsafe or not entry):
             continue
-        score = facts['exp_per_hit'] * (1 - facts['danger'] if mood == 'prudent' else 1) * \
+        # Share of the time left for hunting between supply round trips.
+        hunt_share = HUNT_STINT_S / (HUNT_STINT_S + supply_s) if supply_s else 1
+        score = facts['exp_per_hit'] * hunt_share * (1 - facts['danger'] if mood == 'prudent' else 1) * \
                 (1.5 if mood == 'explorer' and not past['minutes'] else 1)
         out.append({'field_id': name, 'current': here, 'hops': route[0] if route else None,
                     'entry': {'via': route[1], 'x': entry[0], 'y': entry[1]} if entry else None,
-                    'unsafe': unsafe, 'score': round(score, 3), **facts, 'history': past})
+                    'unsafe': unsafe, 'score': round(score, 3), 'supply_round_trip_s': supply_s,
+                    'hunt_share': round(hunt_share, 2), **facts, 'history': past})
     best = max((o['score'] for o in out), default=0)
     # Comparable options are ordered by a per-character seed, the rest by score.
     tie = lambda o: hashlib.sha256(f'{identity}:{o["field_id"]}'.encode()).hexdigest()

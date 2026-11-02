@@ -242,7 +242,7 @@ FIELD_SCHEMA = {'type': 'object', 'additionalProperties': False,
     'properties': {'field_id': {'type': 'string', 'enum': []},
                    'reason': {'type': 'string', 'minLength': 1, 'maxLength': 200}},
     'required': ['field_id', 'reason']}
-OPTION_FACTS = ('field_id', 'current', 'hops', 'monsters', 'rare_threats', 'viable_share',
+OPTION_FACTS = ('field_id', 'current', 'hops', 'supply_round_trip_s', 'monsters', 'rare_threats', 'viable_share',
                 'exp_per_hit', 'danger', 'unsafe', 'history')
 
 

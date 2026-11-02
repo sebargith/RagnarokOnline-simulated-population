@@ -147,6 +147,7 @@ def route(walk, start, goal, start_zone=None, goal_zone=None):
 # Travel time budget. Observed 2026-11-01 (Nilo, 47 legs): 0.17-0.28 s per cell of
 # straight-line distance, detours up to 0.45 s (prt_fild08). Bridge limit: 300 s.
 SECONDS_PER_CELL = 0.45
+TYPICAL_SECONDS_PER_CELL = 0.25
 SECONDS_PER_PORTAL = 5
 BASE_SECONDS = 20
 MIN_TIMEOUT, MAX_TIMEOUT = 30, 300
@@ -170,10 +171,9 @@ def legs(walk, route, pos, dest):
     return out
 
 
-def travel_timeout(walk, start, pos, goal, dest):
-    """Seconds for a walk from (start, pos) to (goal, dest): straight-line cells of
-    each leg at the slowest observed pace plus a pause per portal, within the
-    bridge's limits. None when there is no walk route."""
+def walk_seconds(walk, start, pos, goal, dest, pace=TYPICAL_SECONDS_PER_CELL):
+    """Estimated seconds from (start, pos) to (goal, dest): straight-line cells of each
+    planned leg at `pace` plus a pause per portal. None when there is no walk route."""
     r = route(walk, start, goal, zone_at(walk, start, pos), zone_at(walk, goal, dest))
     if not r:
         return None
@@ -183,5 +183,13 @@ def travel_timeout(walk, start, pos, goal, dest):
         if i + 1 < len(points):
             here, nxt = r['nodes'][i], r['nodes'][i + 1]
             at = next((e[3], e[4]) for e in walk['edges'][here] if (e[0], e[1]) == (x, y) and e[2] == nxt[0] and e[5] == nxt[1])
-    seconds = BASE_SECONDS + cells * SECONDS_PER_CELL + SECONDS_PER_PORTAL * (len(points) - 1)
-    return max(MIN_TIMEOUT, min(MAX_TIMEOUT, int(seconds + .999)))
+    return cells * pace + SECONDS_PER_PORTAL * (len(points) - 1)
+
+
+def travel_timeout(walk, start, pos, goal, dest):
+    """Seconds for a walk at the slowest observed pace plus BASE_SECONDS, within the
+    bridge's limits. None when there is no walk route."""
+    seconds = walk_seconds(walk, start, pos, goal, dest, SECONDS_PER_CELL)
+    if seconds is None:
+        return None
+    return max(MIN_TIMEOUT, min(MAX_TIMEOUT, int(BASE_SECONDS + seconds + .999)))
