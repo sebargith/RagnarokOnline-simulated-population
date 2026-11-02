@@ -128,7 +128,13 @@ Date: 2026-11-01/02, Claude. Branch `codex/single-agent-plan`; code `e574b18`, `
   - from (115,373) it finds 6 targets in the same connected area;
   - `train_first_job` resumes a block of this kind (no action in flight) and records it in `resumes`;
   - 258 OK;
-  - not yet seen live: the GPU was at 15,601 MiB, in use by other programs.
+- **Live** (`runtime/p5/evidence/explore-pocket-1/`, 799 s, 2 inferences):
+  - the block resumed by itself (`resumes`). The `periodic_review` (scores prt_fild06 0.864, prt_fild08 0.624, prt_fild05 0.449, …) took Nilo to prt_fild06, citing a short supply round trip, so the pocket fallback was not needed;
+  - 158 → 175 kills, 2 `stat_up`, rise to Base 9; supply round trips of 53–62 s each way;
+  - at the `level_up`, Groq chose **prt_fild04** (score 0.052, the lowest; reason: never tried and the lowest danger);
+  - on the way, at (277,51), a Vocal and six Rockers attacked him at once: 93 damage in under a second, against 92 max HP. **Death**, `travel:failed/died`;
+  - cause: Vocal (rare, aggressive) summons Rockers as slaves (`NPC_SUMMONSLAVE`), and they attack together with it. It was listed in `rare_threats`, but rare threats do not exclude a field, and the model does not see the slaves;
+  - Nilo is dead in prt_fild04 (Base 9, 0 EXP). The cycle does not use the bridge's `respawn` action.
 
 ## Limits
 
@@ -138,5 +144,6 @@ Date: 2026-11-01/02, Claude. Branch `codex/single-agent-plan`; code `e574b18`, `
 - The landings in OpenKore's table can differ from the server's. For map-to-map portals the hop only checks the map; for inner doors, the zone.
 - The time budget is capped at 300 s. A trip of more than about 620 straight-line cells could still run out.
 - The supply weighting uses estimates (straight-line pace, fixed 90 s stint); the model's reason is still not validated beyond the `field_id`.
+- Rare aggressive spawns with slaves (Vocal) are listed but do not exclude a field; travel crosses fields without fighting back.
 - Exploration only uses walking-distance targets when M1Explore offers none; its straight-line candidates can still lead into pockets.
 - Attempt 1 showed a start-up race between `prepare_p5.start` and the runner. It was worked around by reusing the client, and not fixed.

@@ -24,7 +24,7 @@
   - Nilo entró explorando en una bolsa donde ningún candidato tiene línea recta libre.
   - Cliente 46148 vivo.
 - **Pendiente:**
-  - prueba en vivo de `10425e5` (exploración por distancia a pie), pendiente de que la GPU baje de 14336 MiB;
+  - **Nilo murió** en prt_fild04: un Vocal y seis Rockers esclavos lo atacaron a la vez. Está blocked `travel:failed/died`, Base 9, 175 kills. Falta reaparecer y excluir los campos con apariciones raras que traen esclavos;
   - la carrera de arranque entre el cliente y el runner;
   - Job10 y el cambio de clase.
 
