@@ -6,7 +6,7 @@ use M1Navigation;
 # Pure contract for P2a: cross-map travel through walkable portals only, and a
 # bounded NPC dialog. The plugin supplies observed state; nothing here touches
 # the network, AI queue or game globals.
-use constant {MAX_HOPS => 3, MIN_TIMEOUT => 5, MAX_TIMEOUT => 300, ENTER_WAIT => 5,
+use constant {MAX_HOPS => 3, MAX_INNER => 4, MIN_TIMEOUT => 5, MAX_TIMEOUT => 300, ENTER_WAIT => 5,
     TALK_MIN_TIMEOUT => 5, TALK_MAX_TIMEOUT => 60, TALK_RANGE => 5, MAX_CHOICES => 4, MAX_PAGES => 12, APPROACH => 2,
     # P5 tutorial scripts (npc_script): long dialogs, warps and same-map portals.
     SCRIPT_MAX_CHOICES => 32, SCRIPT_MAX_PAGES => 160, SCRIPT_MAX_TIMEOUT => 240, WARP_SLACK => 2};
@@ -24,56 +24,127 @@ sub validate {
     return undef;
 }
 
-# Keeps only free, talk-less, permanently enabled map-to-map portals from
-# OpenKore's portals table: no Kafra, paid or scripted NPC warps, no dynamic
-# groups, airships or warp items (those live in other tables).
+# Keeps only free, talk-less, permanently enabled portals from OpenKore's portals
+# table: no Kafra, paid or scripted NPC warps, no dynamic groups, airships or warp
+# items (those live in other tables). With a zone table (config/walk-zones.json,
+# see zone_table) each edge carries the walk zone it is entered from and lands in,
+# same-map walk portals are kept as edges, and portals the table lacks are left out.
+# Without it, map-to-map portals only and every map is one zone (0).
 sub walk_graph {
-    my ($lut) = @_;
+    my ($lut, $zones) = @_;
     my %g;
     for my $key (sort keys %$lut) {
         my $src = $lut->{$key}{source} or next;
         for my $d (sort keys %{$lut->{$key}{dest} || {}}) {
             my $e = $lut->{$key}{dest}{$d};
             next if ($e->{cost} // 0) || ($e->{steps} // '') ne '' || !$e->{enabled} ||
-                defined $e->{dynamicPortalGroup} || defined $e->{dynamicPortalGroupBlock} ||
-                $e->{map} eq $src->{map};
+                defined $e->{dynamicPortalGroup} || defined $e->{dynamicPortalGroupBlock};
+            my ($zf, $zt) = (0, 0);
+            if ($zones) {
+                ($zf, $zt) = @{$zones->{portals}{"$src->{map} $src->{x} $src->{y} $e->{map} $e->{x} $e->{y}"} || next};
+            } else {
+                next if $e->{map} eq $src->{map};
+            }
             push @{$g{$src->{map}}}, {x => 0 + $src->{x}, y => 0 + $src->{y}, to_map => $e->{map},
-                to => {x => 0 + $e->{x}, y => 0 + $e->{y}}};
+                to => {x => 0 + $e->{x}, y => 0 + $e->{y}}, zone => $zf, to_zone => $zt};
         }
     }
     \%g;
 }
 
-# Fewest-hops map path (ties by map name), then on each map the portal closest
-# to where the character is or lands. Returns portal legs plus the final leg,
-# or () when no walkable path within MAX_HOPS exists.
-sub plan {
-    my ($g, $from, $pos, $to, $dest) = @_;
-    my %prev = ($from => '');
-    my @queue = ([$from, 0]);
-    while (@queue) {
-        my ($map, $hops) = @{shift @queue};
-        last if exists $prev{$to};
-        next if $hops >= MAX_HOPS;
-        for my $next (sort { $a cmp $b } map { $_->{to_map} } @{$g->{$map} || []}) {
-            next if exists $prev{$next};
-            $prev{$next} = $map;
-            push @queue, [$next, $hops + 1];
+# config/walk-zones.json as lookups: "map x y to tx ty" -> [zone, to_zone] and
+# map -> {"x y" => zone} for the anchor cells.
+sub zone_table {
+    my ($doc) = @_;
+    my (%portals, %anchors);
+    $portals{join ' ', @{$_}[0 .. 5]} = [@{$_}[6, 7]] for @{$doc->{portals} || []};
+    for my $map (keys %{$doc->{anchors} || {}}) {
+        $anchors{$map}{"$_->[0] $_->[1]"} = $_->[2] for @{$doc->{anchors}{$map}};
+    }
+    return {portals => \%portals, anchors => \%anchors};
+}
+
+# Zone of a cell: from it (or the nearest walkable cell within APPROACH) walk the
+# 4-neighbour walkable cells to the first anchor. undef when the component holds
+# no portal. $walkable must reject cells outside the map; at most $limit cells.
+sub zone_at {
+    my ($anchors, $walkable, $pos, $limit) = @_;
+    my $start = approach_cell($pos, $walkable) or return undef;
+    my @queue = ([$start->{x}, $start->{y}]);
+    my %seen = ("$start->{x} $start->{y}" => 1);
+    $limit //= 250000;
+    while (@queue && $limit-- > 0) {
+        my ($x, $y) = @{shift @queue};
+        my $zone = $anchors->{"$x $y"};
+        return $zone if defined $zone;
+        for my $c ([$x + 1, $y], [$x - 1, $y], [$x, $y + 1], [$x, $y - 1]) {
+            next if $c->[0] < 0 || $c->[1] < 0 || $seen{"$c->[0] $c->[1]"}++ || !$walkable->(@$c);
+            push @queue, $c;
         }
     }
-    return () unless exists $prev{$to};
-    my @maps = ($to);
-    unshift @maps, $prev{$maps[0]} while $prev{$maps[0]} ne '';
+    undef;
+}
+
+# Fewest map hops, then fewest same-map portals (at most MAX_HOPS and MAX_INNER),
+# between walk zones; ties by map name, zone and portal cell. On each step the
+# portal closest to where the character is or lands. $o: start_zone and dest_zone
+# (undef = any zone of that map; with zones => 1 an undef zone means no walk route).
+# Returns (\@legs) or (undef, reason): start_isolated, destination_unreachable,
+# no_zone_path. Legs are portal legs plus the final leg to $dest.
+sub route {
+    my ($g, $from, $pos, $to, $dest, $o) = @_;
+    $o //= {};
+    if ($o->{zones}) {
+        return (undef, 'start_isolated') unless defined $o->{start_zone};
+        return (undef, 'destination_unreachable') unless defined $o->{dest_zone};
+    }
+    my @starts = defined $o->{start_zone} ? ("$from	$o->{start_zone}") :
+        map { "$from	$_" } sort { $a <=> $b } keys %{{map { $_->{zone} => 1 } @{$g->{$from} || []}}};
+    my $goal = sub { my ($m, $z) = split /	/, $_[0]; $m eq $to && (!defined $o->{dest_zone} || $z == $o->{dest_zone}) };
+    my $span = MAX_INNER + 1;
+    my (%cost, %prev, %buckets, $found);
+    for (@starts) { $cost{$_} = [0, 0]; $prev{$_} = '' }
+    $buckets{0} = [@starts];
+    LEVEL: for my $level (0 .. (MAX_HOPS + 1) * $span - 1) {
+        for my $node (@{$buckets{$level} || []}) {
+            next if $cost{$node}[0] * $span + $cost{$node}[1] != $level;
+            if ($goal->($node)) { $found = $node; last LEVEL }
+            my ($map, $zone) = split /	/, $node;
+            my ($hops, $inner) = @{$cost{$node}};
+            for my $e (sort { $a->{to_map} cmp $b->{to_map} || $a->{to_zone} <=> $b->{to_zone} ||
+                    $a->{x} <=> $b->{x} || $a->{y} <=> $b->{y} } grep { $_->{zone} == $zone } @{$g->{$map} || []}) {
+                my @step = $e->{to_map} eq $map ? ($hops, $inner + 1) : ($hops + 1, $inner);
+                next if $step[0] > MAX_HOPS || $step[1] > MAX_INNER;
+                my $next = "$e->{to_map}	$e->{to_zone}";
+                next if $cost{$next} && $cost{$next}[0] * $span + $cost{$next}[1] <= $step[0] * $span + $step[1];
+                $cost{$next} = \@step; $prev{$next} = $node;
+                push @{$buckets{$step[0] * $span + $step[1]}}, $next;
+            }
+        }
+    }
+    return (undef, $o->{zones} ? 'no_zone_path' : 'no_walk_route') unless $found;
+    my @nodes = ($found);
+    unshift @nodes, $prev{$nodes[0]} while $prev{$nodes[0]} ne '';
     my (@legs, $at);
     $at = $pos;
-    for my $i (0 .. $#maps - 1) {
+    for my $i (0 .. $#nodes - 1) {
+        my ($map, $zone) = split /	/, $nodes[$i];
+        my ($next, $next_zone) = split /	/, $nodes[$i + 1];
         my ($portal) = sort { M1Navigation::distance($a, $at) <=> M1Navigation::distance($b, $at) ||
-            $a->{x} <=> $b->{x} || $a->{y} <=> $b->{y} } grep { $_->{to_map} eq $maps[$i + 1] } @{$g->{$maps[$i]}};
-        push @legs, {map => $maps[$i], x => $portal->{x}, y => $portal->{y}, to_map => $portal->{to_map}};
+            $a->{x} <=> $b->{x} || $a->{y} <=> $b->{y} }
+            grep { $_->{zone} == $zone && $_->{to_map} eq $next && $_->{to_zone} == $next_zone } @{$g->{$map}};
+        push @legs, {map => $map, x => $portal->{x}, y => $portal->{y}, to_map => $portal->{to_map},
+            $portal->{to_map} eq $map ? (to => {%{$portal->{to}}}) : ()};
         $at = $portal->{to};
     }
     push @legs, {map => $to, x => 0 + $dest->{x}, y => 0 + $dest->{y}};
-    @legs;
+    (\@legs);
+}
+
+# Legs of route(), or () when there is no walk route.
+sub plan {
+    my ($legs) = route(@_);
+    $legs ? @$legs : ();
 }
 
 # One travel tick. $o: map (observed), leg {map, to_map?}, phase route|enter,

@@ -15,7 +15,7 @@ import os
 from pathlib import Path
 import time
 
-from agent import hunting
+from agent import hunting, walk
 from scripts.p1_hunt import dist
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,19 +40,28 @@ def inventory_delta(before, after):
     return {k: b.get(k, 0) - a.get(k, 0) for k in sorted(set(a) | set(b)) if b.get(k, 0) != a.get(k, 0)}
 
 
-def starter_fields(start, level, tables):
-    """Hunting fields a level-`level` novice may start from: within the hop limit,
-    with an entry spot and a supply route, common monsters at most LEVEL_MARGIN
+def supply_route(graph, place, zone=None):
+    """Walk route from (place, zone) to the supply shop's stand and back."""
+    shop = walk.zone_at(graph, hunting.SHOP_MAP, hunting.SHOP_STAND)
+    return bool(hunting.hops(graph, place, hunting.SHOP_MAP, zone, shop) and
+                hunting.hops(graph, hunting.SHOP_MAP, place, shop, zone))
+
+
+def starter_fields(start, level, tables, start_zone=None):
+    """Hunting fields a level-`level` novice may start from: an entry spot reachable on
+    foot within the hop limits, with a supply route, common monsters at most LEVEL_MARGIN
     above it and no aggressive common monster beyond that. Public facts only:
     its own danger is judged later by the cycle, once its build has spent the
     starting status points (at stats 1 every monster looks too strong)."""
-    graph, fields, monsters = tables['fields']['portals'], tables['fields']['fields'], tables['monsters']
+    graph, fields, monsters = hunting.walk_table(tables), tables['fields']['fields'], tables['monsters']
     out = []
     for name, field in sorted(fields.items()):
-        route = hunting.hops(graph, start, name)
-        if not route or not route[1] or not field['entries'].get(route[1]):
+        reach = sorted((r[0], via) for via, spot in field['entries'].items()
+                       for r in [hunting.hops(graph, start, name, start_zone, hunting.entry_zone(spot))] if r and r[0])
+        if not reach:
             continue
-        if not (hunting.hops(graph, name, hunting.SHOP_MAP) and hunting.hops(graph, hunting.SHOP_MAP, name)):
+        route = reach[0]
+        if not supply_route(graph, name, hunting.entry_zone(field['entries'][route[1]])):
             continue
         common = [monsters.get(str(m['id'])) for m in field['monsters'] if not m['rare']]
         common = [m for m in common if m]
@@ -66,18 +75,20 @@ def destinations(snap, script, tables, builds):
     """Every job town of Hanson's own-choice menu, each either offered or rejected
     with the reason. Offered: the landing and the save town reach the supply shop
     and back within the travel hop limit, and the landing has a starter field."""
-    graph = tables['fields']['portals']
+    graph = hunting.walk_table(tables)
     targets = {b['target_class'] for b in builds.values()}
     out = []
     for d in script['destinations']:
         landing, town = d['landing']['map'], d['town']
         why = []
-        for place in (landing, town):
-            if not (hunting.hops(graph, place, hunting.SHOP_MAP) and hunting.hops(graph, hunting.SHOP_MAP, place)):
+        landing_zone = walk.zone_at(graph, landing, (d['landing']['x'], d['landing']['y']))
+        town_zone = walk.zone_at(graph, town, (d['save']['x'], d['save']['y']))
+        for place, zone in ((landing, landing_zone), (town, town_zone)):
+            if not supply_route(graph, place, zone):
                 why.append(f'no_supply_route:{place}')
         fields = []
         if not why:
-            fields = starter_fields(landing, snap['level']['base'], tables)
+            fields = starter_fields(landing, snap['level']['base'], tables, landing_zone)
             if not fields:
                 why.append('no_hunting_field')
         out.append({'job': d['job'], 'town': town, 'landing': d['landing'], 'save': d['save'],

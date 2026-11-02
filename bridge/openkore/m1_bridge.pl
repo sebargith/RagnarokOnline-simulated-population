@@ -40,6 +40,10 @@ my $healing;
 my ($last_hit_on_me, $last_hp_update, $was_dead) = (0, 0, 0);
 my %item_weight;    # item_weights.txt (tenths), loaded on first purchase.
 my $walk_graph;    # Built once from OpenKore's portals table on first travel.
+my $walk_zones;    # config/walk-zones.json lookups, loaded with the graph.
+my (%zone_cache, @zone_order);    # "map x y" -> zone, at most ZONE_CACHE entries.
+my (%field_cache, @field_order);    # Destination maps' Field objects, at most FIELD_CACHE.
+use constant {ZONE_CACHE => 64, FIELD_CACHE => 4};
 my $equipment;    # config/p5-equipment.json items, loaded on first equip.
 my %STAT_CODE = (str => 13, agi => 14, vit => 15, int => 16, dex => 17, luk => 18);
 my $boot = sprintf('%x-%x-%x', time * 1000, $$, rand(2**30));
@@ -449,15 +453,55 @@ sub travel_request {
     my $reason = M1Travel::validate($a, {manual_ai => $cfg->{native_navigation} && AI::state() == AI::MANUAL(),
         hp => $char->{hp}, map => $field->baseName});
     if ($reason) { result($id, 'rejected', $reason); return }
-    $walk_graph //= M1Travel::walk_graph(\%portals_lut);
-    my @legs = M1Travel::plan($walk_graph, $field->baseName, $char->{pos_to}, $a->{map}, $a);
-    unless (@legs) { result($id, 'rejected', 'no_walk_route'); return }
+    unless (walk_graph()) { result($id, 'rejected', 'walk_zones_missing'); return }
+    my $dest_field = destination_field($a->{map});
+    unless ($dest_field) { result($id, 'rejected', 'destination_field_missing'); return }
+    my $zones = {zones => 1, start_zone => cell_zone($field, $char->{pos_to}), dest_zone => cell_zone($dest_field, $a)};
+    my ($legs, $why) = M1Travel::route($walk_graph, $field->baseName, $char->{pos_to}, $a->{map}, $a, $zones);
+    unless ($legs) { result($id, 'rejected', 'no_walk_route', {walk => $why, %$zones}); return }
+    my @legs = @$legs;
     my $now = time;
     $pending = {id => $id, action => $a, native => 'travel', legs => \@legs, leg => 0, hops => [],
         zeny => $char->{zeny} // 0, started => $now, progress => 0, deadline => $now + $a->{timeout_s} + M1Navigation::GRACE};
     $last_action = $now;
     start_leg();
     result($id, 'accepted', 'walk_route_planned', {legs => \@legs}) if $pending && $pending->{id} eq $id;
+}
+
+# Walk graph with zones from config/walk-zones.json (scripts/build_walk_zones.py,
+# same pinned OpenKore portals and fields); undef when the table is missing.
+sub walk_graph {
+    return $walk_graph if $walk_graph;
+    my $path = File::Basename::dirname(__FILE__) . '/../../config/walk-zones.json';
+    open my $fh, '<:raw', $path or return undef;
+    local $/; my $doc = eval { $json->decode(<$fh>) }; close $fh;
+    return undef unless $doc && $doc->{portals};
+    $walk_zones = M1Travel::zone_table($doc);
+    $walk_graph = M1Travel::walk_graph(\%portals_lut, $walk_zones);
+}
+
+sub destination_field {
+    my ($name) = @_;
+    return $field if $name eq $field->baseName;
+    unless ($field_cache{$name}) {
+        my $f = eval { Field->new(name => $name) } or return undef;
+        $field_cache{$name} = $f; push @field_order, $name;
+        delete $field_cache{shift @field_order} while @field_order > FIELD_CACHE;
+    }
+    $field_cache{$name};
+}
+
+sub cell_zone {
+    my ($f, $pos) = @_;
+    my $key = join ' ', $f->baseName, 0 + $pos->{x}, 0 + $pos->{y};
+    unless (exists $zone_cache{$key}) {
+        my ($w, $h) = ($f->width, $f->height);
+        $zone_cache{$key} = M1Travel::zone_at($walk_zones->{anchors}{$f->baseName} || {},
+            sub { $_[0] < $w && $_[1] < $h && $f->isWalkable(@_) }, $pos);
+        push @zone_order, $key;
+        delete $zone_cache{shift @zone_order} while @zone_order > ZONE_CACHE;
+    }
+    $zone_cache{$key};
 }
 
 # P5 tutorial: one same-map walk portal, as a travel with a portal leg and the
@@ -536,9 +580,12 @@ sub talk_snapshot {
 }
 
 # P5 tutorial: NPC and same-map portal warps arrive as a map-change packet even
-# when the map stays the same; only scripts and portal steps listen for it.
+# when the map stays the same; only scripts, portal steps and a travel on a
+# same-map portal leg listen for it.
 sub map_changed {
-    return unless $pending && ($pending->{script} || $pending->{portal}) && connected();
+    my $inner = $pending && ($pending->{native} // '') eq 'travel' && $pending->{legs} &&
+        do { my $leg = $pending->{legs}[$pending->{leg}]; $leg && ($leg->{to_map} // '') eq $leg->{map} };
+    return unless $pending && ($pending->{script} || $pending->{portal} || $inner) && connected();
     $pending->{warped} //= {map => $field->baseName, x => 0 + $char->{pos_to}{x}, y => 0 + $char->{pos_to}{y},
         elapsed_ms => int((time - $pending->{started}) * 1000)};
 }

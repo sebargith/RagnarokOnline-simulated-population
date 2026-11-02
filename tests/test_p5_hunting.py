@@ -9,7 +9,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from agent import build_policy, hunting
+from agent import build_policy, hunting, walk
 from agent.goal_planner import FieldPlanner, validate_field
 from agent.solo_cycle import SoloCycle
 from scripts.run_p2_cycle import P5Planning, Runner
@@ -46,7 +46,7 @@ def synthetic():
               'risky': field([(1, 40, False), (2, 10, False)], {'home': [12, 12]}),
               'rich': field([(4, 40, False)], {'town': [13, 13]}),
               'far4': field([(1, 50, False)], {'far3': [14, 14]})}
-    return {'monsters': monsters, 'fields': {'fields': fields, 'portals': portals}}
+    return {'monsters': monsters, 'fields': {'fields': fields, 'portals': portals}, 'walk': walk.from_graph(portals)}
 
 
 def tarin(**changes):

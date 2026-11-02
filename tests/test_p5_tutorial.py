@@ -508,8 +508,7 @@ class DestinationTests(unittest.TestCase):
                 self.assertTrue(option['build_for_job'])
                 self.assertTrue(option['fields'])
                 for place in (option['town'], option['landing']['map'], *option['fields']):
-                    self.assertTrue(tutorial.hunting.hops(TABLES['fields']['portals'], place, tutorial.hunting.SHOP_MAP))
-                    self.assertTrue(tutorial.hunting.hops(TABLES['fields']['portals'], tutorial.hunting.SHOP_MAP, place))
+                    self.assertTrue(tutorial.supply_route(tutorial.hunting.walk_table(TABLES), place))
         self.assertIn('no_supply_route:morocc', opts['Thief']['rejected'])
         self.assertEqual(tutorial.fallback_choice(list(opts.values()), 'Nilo')['offered'], True)
 

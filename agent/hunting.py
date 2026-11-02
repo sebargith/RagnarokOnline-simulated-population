@@ -7,15 +7,17 @@ and the character's own outcome history from the cycle checkpoint.
 The danger figures are a simple, explainable pre-Renewal estimate, not the exact
 damage formula: hit/flee, ASPD variance, skills and elements are ignored.
 """
-from collections import deque
 import hashlib
 import json
 from math import ceil
 from pathlib import Path
 
+from agent import walk
+
 ROOT = Path(__file__).resolve().parents[1]
 SHOP_MAP = 'prontera'  # scripts.p2_supply.SHOP; supply trips must fit the travel hop limit.
-MAX_HOPS = 3           # M1Travel::MAX_HOPS
+SHOP_STAND = (104, 51)  # scripts.p2_supply.SHOP['stand']
+MAX_HOPS = walk.MAX_HOPS
 PLAYER_DELAY_MS = 1500  # Conservative novice attack interval; ASPD is not observed.
 LEVEL_MARGIN = 5
 MAX_LOSS = .50          # Estimated HP lost per kill, as a share of max HP.
@@ -87,24 +89,24 @@ def viable(mob_id, monsters, me, outcomes):
     return assess(mob, me)['viable'] and not learned_too_strong(outcomes.get(str(mob_id), {}))
 
 
-def hops(graph, start, goal):
-    """Fewest walkable-portal hops (same graph and limit as M1Travel::plan) and the last
-    map before the goal; None when unreachable within MAX_HOPS."""
-    if start == goal:
+def walk_table(tables):
+    """Zone graph (agent/walk.py); the real config/walk-zones.json unless tables carry one."""
+    if 'walk' not in tables:
+        tables['walk'] = walk.load()
+    return tables['walk']
+
+
+def hops(walk_graph, start, goal, start_zone=None, goal_zone=None):
+    """Fewest walkable-portal map hops between walk zones (same graph and limits as
+    M1Travel::route) and the last other map before the goal; None when unreachable."""
+    if start == goal and (start_zone is None or goal_zone is None or start_zone == goal_zone):
         return 0, None
-    prev, queue = {start: None}, deque([(start, 0)])
-    while queue:
-        here, n = queue.popleft()
-        if n >= MAX_HOPS:
-            continue
-        for nxt in sorted({e[2] for e in graph.get(here, [])}):
-            if nxt in prev:
-                continue
-            prev[nxt] = here
-            if nxt == goal:
-                return n + 1, here
-            queue.append((nxt, n + 1))
-    return None
+    r = walk.route(walk_graph, start, goal, start_zone, goal_zone)
+    return (r['hops'], r['via']) if r else None
+
+
+def entry_zone(entry):
+    return entry[2] if len(entry) > 2 else None
 
 
 def field_facts(name, field, monsters, me, outcomes):
@@ -142,21 +144,32 @@ def history_view(record, now):
 
 def options(snap, current, tables, equipment, history, identity, now):
     """Validated field options, ordered by the character's temperament. The current
-    field is always included (to keep it); others must be reachable within the hop
-    limit, allow supply trips, offer viable common monsters and no aggressive threat,
-    and have no recent own death."""
-    monsters, fields, graph = tables['monsters'], tables['fields']['fields'], tables['fields']['portals']
+    field is always included (to keep it); others must have an entry spot reachable on
+    foot from where the character stands (walk zones, portals within the hop limits),
+    allow supply trips from that entry to the shop and back, offer viable common
+    monsters and no aggressive threat, and have no recent own death."""
+    monsters, fields, graph = tables['monsters'], tables['fields']['fields'], walk_table(tables)
+    here_zone = walk.zone_at(graph, snap['map'], (snap['position']['x'], snap['position']['y']))
+    shop_zone = walk.zone_at(graph, SHOP_MAP, SHOP_STAND)
     me = profile(snap, equipment)
     outcomes, field_history = history.get('monsters', {}), history.get('fields', {})
     mood = temperament(identity)
     out = []
     for name, field in fields.items():
-        route = hops(graph, snap['map'], name)
         here = name == current
-        if not here and (route is None or route[0] == 0):
+        if not here and name == snap['map']:
             continue
-        entry = field['entries'].get(route[1]) if route and route[1] else None
-        trip = hops(graph, name, SHOP_MAP), hops(graph, SHOP_MAP, name)
+        # The entry spot reached with the fewest hops (then inner portals, then via name).
+        best = None
+        for via, spot in sorted(field['entries'].items()):
+            r = walk.route(graph, snap['map'], name, here_zone, entry_zone(spot))
+            if r and r['hops'] and (best is None or (r['hops'], r['inner']) < (best[0]['hops'], best[0]['inner'])):
+                best = (r, via, spot)
+        if not here and best is None:
+            continue
+        route, entry = ((best[0]['hops'], best[1]), best[2]) if best else (None, None)
+        zone = entry_zone(entry) if entry else None
+        trip = hops(graph, name, SHOP_MAP, zone, shop_zone), hops(graph, SHOP_MAP, name, shop_zone, zone)
         facts = field_facts(name, field, monsters, me, outcomes)
         past = history_view(field_history.get(name, {}), now)
         unsafe = ([] if trip[0] and trip[1] else ['no_supply_route']) + \
