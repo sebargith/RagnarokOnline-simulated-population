@@ -3,7 +3,9 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
+from agent import walk
 from agent.solo_cycle import SoloCycle
 from test_p2_cycle import snapshot
 
@@ -52,15 +54,38 @@ print JSON::PP->new->encode({c=>$c,none=>$none});
     def test_missing_empty_and_avoided_candidates_fail_closed(self):
         for candidates, reason in [(None, 'exploration_candidates_unavailable'),
                                    ([], 'exploration_no_reachable_candidate')]:
-            with self.subTest(reason=reason), tempfile.TemporaryDirectory() as folder:
+            with self.subTest(reason=reason), tempfile.TemporaryDirectory() as folder,                     patch.object(walk, 'explore_cells', return_value=[]):
                 cycle = SoloCycle(Path(folder)/'state.json')
                 self.assertIsNone(cycle.plan(snapshot(monsters=[], explore_candidates=candidates)))
                 self.assertEqual(cycle.state['reason'], reason)
         with tempfile.TemporaryDirectory() as folder:
             cycle = SoloCycle(Path(folder)/'state.json')
             cycle.state['avoid_route'] = {'map':'prt_fild08','x':220,'y':250,'until':200}
-            self.assertIsNone(cycle.plan(snapshot(monsters=[], explore_candidates=[{'x':220,'y':250}]), now=100))
+            with patch.object(walk, 'explore_cells', return_value=[{'x':220,'y':250}]):
+                self.assertIsNone(cycle.plan(snapshot(monsters=[], explore_candidates=[{'x':220,'y':250}]), now=100))
             self.assertEqual(cycle.state['reason'], 'exploration_no_reachable_candidate')
+
+    @unittest.skipUnless((ROOT.parent/'vendor/openkore/fields/prt_fild05.fld2.gz').exists(), 'pinned field data absent')
+    def test_pocket_without_straight_line_candidates_explores_by_walking(self):
+        # Live 2026-11-02: Nilo blocked at prt_fild05 (115,373), a dead end below the top
+        # edge where every straight-line candidate crosses a wall.
+        pocket = (115, 373)
+        cells = walk.explore_cells('prt_fild05', pocket)
+        self.assertGreaterEqual(len(cells), 3)
+        g = walk.grid('prt_fild05')
+        reach = walk.flood(g, pocket)
+        for p in cells:
+            self.assertIn((p['x'], p['y']), reach)
+            self.assertGreaterEqual(max(abs(p['x'] - pocket[0]), abs(p['y'] - pocket[1])), 10)
+        with tempfile.TemporaryDirectory() as folder:
+            cycle = SoloCycle(Path(folder)/'state.json')
+            cycle.state['return_to'] = {'map': 'prt_fild05', 'x': 99, 'y': 314}
+            cycle.state['field']['id'] = 'prt_fild05'
+            snap = snapshot(map='prt_fild05', position={'x': pocket[0], 'y': pocket[1]}, monsters=[], explore_candidates=[])
+            action = cycle.plan(snap, now=100)
+            self.assertEqual(action['type'], 'navigate')
+            self.assertIn({'x': action['x'], 'y': action['y']}, cells)
+            self.assertEqual(cycle.state['status'], 'active')
 
     def test_uncertain_exploration_survives_reload_without_replay(self):
         with tempfile.TemporaryDirectory() as folder:

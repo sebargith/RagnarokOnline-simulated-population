@@ -24,6 +24,7 @@ SUCCESS = {'attack': 'killed', 'take': 'picked_up', 'navigate': 'arrived',
            'stat_up': 'stat_raised', 'skill_up': 'skill_raised', 'equip': 'equipped', 'unequip': 'unequipped'}
 PROGRESS = {'stat_up', 'skill_up', 'equip', 'unequip'}
 HUNTING = {'attack', 'take', 'navigate'}
+PLANNING_BLOCKS = {'exploration_no_reachable_candidate', 'exploration_candidates_unavailable'}
 TRAVEL_TIMEOUT = 150  # Without a walk route the bridge rejects the trip before moving.
 FIELD_REVIEW_S = 1800
 
@@ -247,6 +248,14 @@ class SoloCycle:
         s = self.state
         if s.get('macro_goal') == 'train_first_job' and (s['status'] == 'active' or self.late_result_pending()):
             return False
+        if (s.get('macro_goal') == 'train_first_job' and s['status'] == 'blocked' and not s.get('inflight') and
+                s.get('reason') in PLANNING_BLOCKS):
+            # Nothing was sent: the next plan starts from fresh observations.
+            s['resumes'] = (s.get('resumes', []) + [{'reason': s['reason'], 'at': time.time()}])[-24:]
+            s['status'] = 'active'
+            s.pop('reason', None)
+            self.save()
+            return True
         if (s.get('macro_goal') or s['status'] != 'complete' or s.get('reason') != 'confirmed_kill_goal'
                 or s.get('inflight') or s['phase'] != 'hunt'):
             raise RuntimeError('Training requires a completed, resolved hunt checkpoint')
@@ -553,6 +562,13 @@ class SoloCycle:
                         dist(p, snap['position']) > 1 and not
                         (avoid.get('until', 0) > now and avoid.get('map') == snap['map'] and
                          p['x'] == avoid.get('x') and p['y'] == avoid.get('y'))]
+                    if not candidates:
+                        # Pockets where every straight-line candidate crosses a wall: pick
+                        # targets by real walking distance on the map's cells instead.
+                        pos = (snap['position']['x'], snap['position']['y'])
+                        candidates = [p for p in walk.explore_cells(snap['map'], pos) if dist(p, snap['position']) > 1 and not
+                            (avoid.get('until', 0) > now and avoid.get('map') == snap['map'] and
+                             p['x'] == avoid.get('x') and p['y'] == avoid.get('y'))]
                     if not candidates:
                         self.block('exploration_no_reachable_candidate'); return None
                     visits = [p for p in s.get('explore_visits', []) if p.get('map') == snap['map']]

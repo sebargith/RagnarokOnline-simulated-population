@@ -164,6 +164,17 @@ class CycleTests(unittest.TestCase):
         self.assertEqual(self.c.state['reconciliations'][-1]['disposition'], 'retired_same_map_warp')
         self.assertEqual(self.c.state['history'][-1]['result']['status'], 'unknown')
 
+    def test_training_resumes_after_a_planning_only_block(self):
+        self.c.state.update(macro_goal='train_first_job', status='blocked', reason='exploration_no_reachable_candidate',
+                            inflight=None)
+        self.assertTrue(self.c.train_first_job())
+        self.assertEqual(self.c.state['status'], 'active')
+        self.assertEqual(self.c.state['resumes'][-1]['reason'], 'exploration_no_reachable_candidate')
+        self.c.state.update(status='blocked', reason='exploration_no_reachable_candidate',
+                            inflight={'request_id': 'c_1', 'session': 's:1', 'action': {'type': 'navigate'}})
+        with self.assertRaises(RuntimeError):
+            self.c.train_first_job()
+
     def test_training_resumes_only_to_read_a_late_result(self):
         self.c.state.update(macro_goal='train_first_job', status='blocked', reason='intent_deadline_no_replay',
                             inflight={'request_id': 'c_56', 'session': 's:2', 'action': {'type': 'travel'}})

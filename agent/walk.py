@@ -193,3 +193,35 @@ def travel_timeout(walk, start, pos, goal, dest):
     if seconds is None:
         return None
     return max(MIN_TIMEOUT, min(MAX_TIMEOUT, int(BASE_SECONDS + seconds + .999)))
+
+
+EXPLORE_STEPS = (20, 45)  # Walking steps away: beyond sight of the current spot, within one navigate.
+EXPLORE_EDGE = 8          # M1Explore keeps this far from map edges (and edge portals).
+
+
+def explore_cells(name, pos, fields=None):
+    """Exploration targets by real walking distance, for spots where M1Explore's
+    straight-line candidates all cross a wall: one cell per 16 directions, the
+    farthest within EXPLORE_STEPS. [] without a field file."""
+    from math import atan2, pi
+    g = grid(name, fields)
+    start = g and approach(g, *pos)
+    if not start:
+        return []
+    width, height, cells = g
+    lo, hi = EXPLORE_STEPS
+    steps, queue, best = {start: 0}, deque([start]), {}
+    while queue:
+        x, y = queue.popleft()
+        n = steps[(x, y)]
+        if lo <= n and EXPLORE_EDGE <= x < width - EXPLORE_EDGE and EXPLORE_EDGE <= y < height - EXPLORE_EDGE:
+            sector = int((atan2(y - pos[1], x - pos[0]) + pi) / (2 * pi) * 16) % 16
+            if sector not in best or (n, -x, -y) > (steps[best[sector]], -best[sector][0], -best[sector][1]):
+                best[sector] = (x, y)
+        if n >= hi:
+            continue
+        for c in ((x+1, y), (x-1, y), (x, y+1), (x, y-1)):
+            if c not in steps and 0 <= c[0] < width and 0 <= c[1] < height and cells[c[1]*width + c[0]] & 1:
+                steps[c] = n + 1
+                queue.append(c)
+    return [{'x': x, 'y': y} for _, (x, y) in sorted(best.items())]
