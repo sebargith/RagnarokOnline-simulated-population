@@ -24,7 +24,7 @@
   - Nilo entró explorando en una bolsa donde ningún candidato tiene línea recta libre.
   - Cliente 46148 vivo.
 - **Pendiente:**
-  - exploración atascada en bolsas sin salida en línea recta (`M1Explore`);
+  - prueba en vivo de `10425e5` (exploración por distancia a pie), pendiente de que la GPU baje de 14336 MiB;
   - la carrera de arranque entre el cliente y el runner;
   - Job10 y el cambio de clase.
 

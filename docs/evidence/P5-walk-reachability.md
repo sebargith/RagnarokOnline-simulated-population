@@ -1,6 +1,6 @@
 # P5 — reachability on foot inside each map
 
-Date: 2026-11-01/02, Claude. Branch `codex/single-agent-plan`; code `e574b18`, `80c13c2`, `38034e7`, `eda1a07`, `fae125e`, `c5b636f`, `569b68f`, `a682e76`.
+Date: 2026-11-01/02, Claude. Branch `codex/single-agent-plan`; code `e574b18`, `80c13c2`, `38034e7`, `eda1a07`, `fae125e`, `c5b636f`, `569b68f`, `a682e76`, `10425e5`.
 
 ## Failure
 
@@ -123,6 +123,12 @@ Date: 2026-11-01/02, Claude. Branch `codex/single-agent-plan`; code `e574b18`, `
     - the area is walkable and connected (82,191 cells), but `M1Explore::candidates` requires a clear straight line at 20/35/50 cells and every one crosses a wall;
     - with no monsters in view, the cycle blocks;
     - it is a pre-existing exploration limit, not a travel one. No action is left in flight.
+- **`10425e5`, fix:**
+  - when the bridge offers no straight-line candidates, the cycle picks targets by real walking distance on OpenKore's cells (`walk.explore_cells`): one per 16 directions, 20–45 steps away, away from the edges;
+  - from (115,373) it finds 6 targets in the same connected area;
+  - `train_first_job` resumes a block of this kind (no action in flight) and records it in `resumes`;
+  - 258 OK;
+  - not yet seen live: the GPU was at 15,601 MiB, in use by other programs.
 
 ## Limits
 
@@ -132,5 +138,5 @@ Date: 2026-11-01/02, Claude. Branch `codex/single-agent-plan`; code `e574b18`, `
 - The landings in OpenKore's table can differ from the server's. For map-to-map portals the hop only checks the map; for inner doors, the zone.
 - The time budget is capped at 300 s. A trip of more than about 620 straight-line cells could still run out.
 - The supply weighting uses estimates (straight-line pace, fixed 90 s stint); the model's reason is still not validated beyond the `field_id`.
-- Exploration can get stuck in pockets where no candidate has a straight line clear (`M1Explore`).
+- Exploration only uses walking-distance targets when M1Explore offers none; its straight-line candidates can still lead into pockets.
 - Attempt 1 showed a start-up race between `prepare_p5.start` and the runner. It was worked around by reusing the client, and not fixed.
