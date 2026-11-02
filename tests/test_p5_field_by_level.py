@@ -86,7 +86,7 @@ class FieldByLevelTests(unittest.TestCase):
         self.drive(runner)
         decision = self.cycle.state['field_decisions'][-1]
         self.assertEqual((decision['trigger'], decision['decision'], decision['field_id']), ('level_up', 'change', 'prt_fild06'))
-        self.assertEqual(bridge.proposals[0][0], {'type': 'travel', 'map': 'prt_fild06', 'x': 33, 'y': 185, 'timeout_s': 150})
+        self.assertEqual(bridge.proposals[0][0], {'type': 'travel', 'map': 'prt_fild06', 'x': 33, 'y': 185, 'timeout_s': 174})
 
     def test_pending_request_never_repeats_and_hunting_continues(self):
         service = Pending()

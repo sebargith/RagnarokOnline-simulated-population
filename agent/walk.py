@@ -142,3 +142,46 @@ def route(walk, start, goal, start_zone=None, goal_zone=None):
                 cost[nxt], prev[nxt] = step, node
                 buckets.setdefault(step[0] * (MAX_INNER + 1) + step[1], []).append(nxt)
     return None
+
+
+# Travel time budget. Observed 2026-11-01 (Nilo, 47 legs): 0.17-0.28 s per cell of
+# straight-line distance, detours up to 0.45 s (prt_fild08). Bridge limit: 300 s.
+SECONDS_PER_CELL = 0.45
+SECONDS_PER_PORTAL = 5
+BASE_SECONDS = 20
+MIN_TIMEOUT, MAX_TIMEOUT = 30, 300
+
+
+def cheb(a, b):
+    return max(abs(a[0] - b[0]), abs(a[1] - b[1]))  # M1Navigation::distance
+
+
+def legs(walk, route, pos, dest):
+    """Portal cells of a route() as M1Travel::route picks them (closest to where the
+    character is or lands), then dest: [(map, x, y), ...]."""
+    out, at = [], tuple(pos)
+    nodes = route['nodes']
+    for here, nxt in zip(nodes, nodes[1:]):
+        x, y, to, tx, ty, zt = min((e for e in walk['edges'][here] if e[2] == nxt[0] and e[5] == nxt[1]),
+                                   key=lambda e: (cheb((e[0], e[1]), at), e[0], e[1]))
+        out.append((here[0], x, y))
+        at = (tx, ty)
+    out.append((nodes[-1][0], *dest))
+    return out
+
+
+def travel_timeout(walk, start, pos, goal, dest):
+    """Seconds for a walk from (start, pos) to (goal, dest): straight-line cells of
+    each leg at the slowest observed pace plus a pause per portal, within the
+    bridge's limits. None when there is no walk route."""
+    r = route(walk, start, goal, zone_at(walk, start, pos), zone_at(walk, goal, dest))
+    if not r:
+        return None
+    points, at, cells = legs(walk, r, pos, dest), tuple(pos), 0
+    for i, (m, x, y) in enumerate(points):
+        cells += cheb(at, (x, y))
+        if i + 1 < len(points):
+            here, nxt = r['nodes'][i], r['nodes'][i + 1]
+            at = next((e[3], e[4]) for e in walk['edges'][here] if (e[0], e[1]) == (x, y) and e[2] == nxt[0] and e[5] == nxt[1])
+    seconds = BASE_SECONDS + cells * SECONDS_PER_CELL + SECONDS_PER_PORTAL * (len(points) - 1)
+    return max(MIN_TIMEOUT, min(MAX_TIMEOUT, int(seconds + .999)))

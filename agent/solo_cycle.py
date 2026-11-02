@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 import time
 
-from agent import build_policy, hunting
+from agent import build_policy, hunting, walk
 from scripts.p1_hunt import dist
 from scripts.p2_supply import SHOP, buy_plan, decide
 
@@ -24,6 +24,7 @@ SUCCESS = {'attack': 'killed', 'take': 'picked_up', 'navigate': 'arrived',
            'stat_up': 'stat_raised', 'skill_up': 'skill_raised', 'equip': 'equipped', 'unequip': 'unequipped'}
 PROGRESS = {'stat_up', 'skill_up', 'equip', 'unequip'}
 HUNTING = {'attack', 'take', 'navigate'}
+TRAVEL_TIMEOUT = 150  # Without a walk route the bridge rejects the trip before moving.
 FIELD_REVIEW_S = 1800
 
 
@@ -172,6 +173,16 @@ class SoloCycle:
         s.update(status='active', inflight=None, observe_after=b['time_ms'])
         s.pop('reason', None)
         self.save()
+
+    def go(self, snap, target_map, cell):
+        """Walk to (target_map, cell): travel across maps, navigate inside the current
+        one (travel rejects same-map trips), with a time budget from the walk route."""
+        tables = (self.p5 or {}).get('tables')
+        graph = hunting.walk_table(tables) if tables else walk.load()
+        pos, dest = (snap['position']['x'], snap['position']['y']), (cell['x'], cell['y'])
+        timeout = walk.travel_timeout(graph, snap['map'], pos, target_map, dest) or TRAVEL_TIMEOUT
+        kind = 'navigate' if snap['map'] == target_map else 'travel'
+        return {'type': kind, 'map': target_map, 'x': cell['x'], 'y': cell['y'], 'timeout_s': timeout}
 
     def reconcile_failed_travel(self, observations, now_ms):
         """Retire a travel whose final failed result was observed, once two fresh
@@ -558,14 +569,14 @@ class SoloCycle:
                     self.block('first_job_preconditions_changed'); return None
                 stand = {'x': 153, 'y': 192}
                 if snap['map'] != 'prontera' or dist(snap['position'], stand) > 1:
-                    return {'type': 'travel', 'map': 'prontera', **stand, 'timeout_s': 150}
+                    return self.go(snap, 'prontera', stand)
                 return {'type': 'first_job', 'job': target, 'timeout_s': 40}
             elif phase == 'to_shop':
                 stand = {'x': SHOP['stand'][0], 'y': SHOP['stand'][1]}
                 if snap['map'] == SHOP['map'] and dist(snap['position'], stand) <= 1:
                     s['phase'] = 'sell'
                 else:
-                    return {'type': 'travel', 'map': SHOP['map'], **stand, 'timeout_s': 150}
+                    return self.go(snap, SHOP['map'], stand)
             elif phase == 'sell':
                 sell = self.supply(snap)['sell']
                 if sell:
@@ -583,7 +594,7 @@ class SoloCycle:
                 if snap['map'] == home['map'] and dist(snap['position'], home) <= 1:
                     s['phase'] = 'hunt'
                 else:
-                    return {'type': 'travel', **home, 'timeout_s': 150}
+                    return self.go(snap, home['map'], home)
             else:
                 self.block('invalid_phase'); return None
         self.block('phase_transition_limit')

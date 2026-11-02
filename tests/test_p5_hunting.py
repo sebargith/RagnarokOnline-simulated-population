@@ -275,7 +275,7 @@ class CycleTests(unittest.TestCase):
         self.assertEqual(self.c.field_due(tarin(level={'base': 6, 'job': 3}), now=200), 'level_up')
         self.assertEqual(self.c.field_due(tarin(), now=100 + 1800), 'periodic_review')
         action = self.run_action(tarin())
-        self.assertEqual(action, {'type': 'travel', 'map': 'prt_fild06', 'x': 33, 'y': 185, 'timeout_s': 150})
+        self.assertEqual(action, {'type': 'travel', 'map': 'prt_fild06', 'x': 33, 'y': 185, 'timeout_s': 174})
         there = tarin(map='prt_fild06', position={'x': 33, 'y': 185},
                       monsters=[{'id': 'p', 'name_id': 1002, 'x': 34, 'y': 185, 'eligible': 1}])
         self.assertEqual(self.c.plan(there, now=120)['type'], 'attack')
@@ -332,7 +332,7 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual((decision['decision'], decision['field_id'], decision['previous'], decision['trigger']),
                          ('change', 'prt_fild06', 'prt_fild08', 'no_decision'))
         self.assertEqual(decision['reason'], 'Two hops, more Lunatics, low danger.')
-        self.assertEqual(bridge.proposals[0][0], {'type': 'travel', 'map': 'prt_fild06', 'x': 33, 'y': 185, 'timeout_s': 150})
+        self.assertEqual(bridge.proposals[0][0], {'type': 'travel', 'map': 'prt_fild06', 'x': 33, 'y': 185, 'timeout_s': 174})
         self.assertEqual(out['inference_calls'], 1)
         events = [json.loads(l)['kind'] for l in (self.directory/'events.jsonl').read_text(encoding='utf-8').splitlines()]
         self.assertIn('field_result', events)

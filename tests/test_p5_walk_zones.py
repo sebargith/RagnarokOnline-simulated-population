@@ -157,6 +157,26 @@ class WalkZoneTests(unittest.TestCase):
             self.assertTrue(walk.route(self.walk, o['field_id'], 'prontera', zone, shop), o['field_id'])
             self.assertTrue(walk.route(self.walk, 'prontera', o['field_id'], shop, zone), o['field_id'])
 
+    def test_travel_time_budget_follows_the_route(self):
+        budget = lambda *a: walk.travel_timeout(self.walk, *a)
+        # Live 2026-11-01: c_4 needed about 220 s for prt_fild01 -> mjolnir_09 -> prt_fild00
+        # and failed at the fixed 150 s; one hop from Prontera took about 50-60 s.
+        self.assertEqual(budget('prt_fild01', (52, 327), 'prt_fild00', (28, 136)), walk.MAX_TIMEOUT)
+        self.assertTrue(54 <= budget('prontera', (104, 51), 'prt_fild08', (178, 367)) < 150)
+        self.assertGreater(budget('prontera', (104, 51), 'izlude', (93, 104)), budget('prontera', (104, 51), 'prt_fild08', (178, 367)))
+        self.assertIsNone(budget('prt_castle', (199, 0), 'prontera', (104, 51)))
+
+    def test_cycle_walks_inside_the_map_with_navigate(self):
+        from agent.solo_cycle import SoloCycle
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            c = SoloCycle(Path(d)/'state.json', 1, None, 'Nilo')
+            snap = {'map': 'prt_fild00', 'position': {'x': 142, 'y': 250}}
+            self.assertEqual(c.go(snap, 'prt_fild00', {'x': 28, 'y': 136}),
+                             {'type': 'navigate', 'map': 'prt_fild00', 'x': 28, 'y': 136, 'timeout_s': 72})
+            snap = {'map': 'prt_castle', 'position': {'x': 199, 'y': 0}}
+            self.assertEqual(c.go(snap, 'prontera', {'x': 104, 'y': 51})['timeout_s'], 150)  # Bridge rejects it.
+
     def test_regeneration_is_identical(self):
         from scripts import build_walk_zones
         self.assertEqual(json.loads(json.dumps(build_walk_zones.build())),
