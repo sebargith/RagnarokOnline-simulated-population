@@ -1,10 +1,26 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-11-01 por Claude (campo por nivel en el entrenamiento).
-Referencia: codex/single-agent-plan, código 01c4cd5; documentos en commit siguiente.
+Actualizado: 2026-11-02 por Claude (alcanzabilidad a pie y tiempo de viaje).
+Referencia: codex/single-agent-plan, código fae125e; documentos en commit siguiente.
 ## Preflight 2026-11-01
 - No se lanzó otra ejecución: GPU 14991–15130 MiB, sobre el límite 14336 MiB; RAM libre 2,83 GiB. No se tocaron procesos.
 - El estado de la muestra anterior no es una observación actual; proceso 31704, puerto y locks no quedaron confirmados desde este entorno.
 - Al retomar: comprobar recursos, controlador, identidad/puerto/locks y checkpoint fresco antes de lanzar.
+## Lanzamiento 2026-11-01
+- Ejecución en curso al inicio: wrapper PID 5484 (lanzador 11596), cliente 31704 reutilizado; planner por defecto, 3600 s/600 acciones (runner 3570 s).
+- Preflight: RAM 12,60 GiB, GPU 1449 MiB, locks libres, Nilo confirmado y checkpoint sin inflight.
+- Resumen y logs: runtime/p5/evidence/resume-20261101-unique-1/. Resultado no evaluado; revisar resumen al retomar.
+## Alcanzabilidad a pie 2026-11-02 (Claude)
+- Resultado de resume-20261101-unique-1: bloqueado a los 5 minutos con c_384 `travel:failed/unreachable` en prt_castle (102,20); corregido.
+- **Cambios:**
+  - e574b18 rutas por zonas transitables (`config/walk-zones.json`, `scripts/build_walk_zones.py`); opciones de campo y abastecimiento alcanzables;
+  - eda1a07 puertas internas por zona;
+  - fae125e tiempo de viaje según la ruta (30–300 s) y `navigate` dentro del mismo mapa;
+  - 80c13c2/38034e7 `reconcile-travel`.
+- **En vivo:** dos reinicios del cliente aprobados por el usuario (ahora PID 46148). En 870 s salió del castillo, quedó en prt_fild00, de 136 a 148 kills y abastecimiento a unos 220 s.
+- **Final:** active/return con c_56 travel en vuelo: consultar el resultado retenido, no reenviar. Evidencia: runtime/p5/evidence/walk-reachability-1/.
+- **Pendiente:**
+  - coste del abastecimiento en la elección de campo;
+  - carrera de arranque (`Listen => 1` en el puente frente a `wait_port`): reutilizar el cliente o arrancarlo antes con `prepare_p5.py start`.
 ## Objetivo actual
 Nilo entrena legítimamente hasta Job10 y primera clase con NPC gratuito en Prontera.
 ## Estado comprobado (muestra, no estado permanente)
@@ -42,7 +58,7 @@ Nilo entrena legítimamente hasta Job10 y primera clase con NPC gratuito en Pron
 - Groq planner y Gemma4 12B respaldo/chat se conservan para uso normal.
 - Principal revisa informes y propone siguiente alcance para aprobación del usuario.
 ## Próxima acción
-Leer resumen/status/state actuales ANTES de operar (último: runtime/p5/evidence/field-by-level-1/summary.json).
+Leer resumen/status/state actuales ANTES de operar (último: runtime/p5/evidence/walk-reachability-1/summary.json).
 Reanudar con run_p5_background.py --reuse-client (planner por defecto). Pendiente: Job10 y cambio de clase,
 ventas frecuentes, Gemma/vencimiento en vivo.
 ## Archivos relevantes

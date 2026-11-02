@@ -1,6 +1,25 @@
-> Preflight 2026-11-01: no se lanzó nueva ejecución; GPU 14991–15130 MiB supera límite 14336 MiB. RAM libre 2,83 GiB. Cliente, puerto y locks no confirmados desde este entorno. Repetir preflight al retomar.
 
 # Estado actual
+
+## P5.6 — alcanzabilidad a pie y tiempo de viaje (2026-11-02, Claude)
+
+- **Fallo corregido:** la tanda `resume-20261101-unique-1` se bloqueó porque c_384 planeó cruzar `prt_castle` hasta un portal al que no se llega andando desde la entrada.
+- **Planificador:** el plan de viaje busca ahora por zonas transitables de cada mapa (`config/walk-zones.json`, generada desde OpenKore fijado) y cuenta las puertas internas del mismo mapa.
+- **Sin ruta:** `rejected/no_walk_route` con su motivo.
+- **Mismo criterio** para las opciones de campo, el abastecimiento y el tutorial.
+- **Puertas internas:** se acepta el aterrizaje real del servidor dentro de la zona planeada (`eda1a07`).
+- **Tiempo de viaje:** sale de la ruta, entre 30 y 300 s, en vez de 150 s fijos (`fae125e`).
+- **Conciliación:** `reconcile-travel` retira un `travel` fallido, o un warp del mismo mapa, ya observados, sin reenviar nada.
+- Suite: 253 OK. [Evidencia y límites](evidence/P5-walk-reachability.md).
+- **En vivo (870 s, salida 0):**
+  - Nilo salió de `prt_castle` por las dos puertas internas;
+  - las revisiones de campo solo ofrecieron destinos alcanzables, y Groq eligió y luego mantuvo prt_fild00;
+  - 136 → 148 kills; dos viajes de abastecimiento de ida y vuelta, de unos 220 s, todos `arrived`.
+- **Estado al terminar:** checkpoint `active`/`return`, con travel c_56 de vuelta a prt_fild00 todavía en vuelo; su resultado retenido se recoge al reanudar. Cliente 46148 vivo.
+- **Pendiente:**
+  - las opciones de campo no tienen en cuenta lo que dura el abastecimiento (prt_fild00 cuesta unos 7,5 minutos por ida y vuelta);
+  - hay una carrera de arranque entre el cliente y el runner;
+  - Job10 y el cambio de clase.
 
 ## P5.5 — campo por nivel durante el entrenamiento (2026-11-01, Claude)
 
