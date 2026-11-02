@@ -437,7 +437,7 @@ class Runner:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('run', 'status', 'set-goal', 'reconcile-navigation', 'recover-receptionist', 'reconcile-receptionist-warp'))
+    parser.add_argument('command', choices=('run', 'status', 'set-goal', 'reconcile-navigation', 'reconcile-travel', 'recover-receptionist', 'reconcile-receptionist-warp'))
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('--seconds', type=int, default=180)
     parser.add_argument('--goal-kills', type=int, default=6, help='Only used when creating a new checkpoint')
@@ -511,7 +511,7 @@ def main():
             finally:
                 bridge.close()
             return
-        if args.command == 'reconcile-navigation':
+        if args.command in ('reconcile-navigation', 'reconcile-travel'):
             bridge = Bridge(bridge_config)
             observations, ready = [], None
             try:
@@ -526,7 +526,10 @@ def main():
                                 raise RuntimeError('Bridge has a pending action')
                             if not observations or event['time_ms'] - observations[0]['time_ms'] >= 1000:
                                 observations.append(event)
-                cycle.reconcile_navigation(observations, int(time.time()*1000))
+                if args.command == 'reconcile-travel':
+                    cycle.reconcile_failed_travel(observations, int(time.time()*1000))
+                else:
+                    cycle.reconcile_navigation(observations, int(time.time()*1000))
                 print(json.dumps({'status': cycle.state['status'], 'reconciliation': cycle.state['reconciliations'][-1]}))
             finally:
                 bridge.close()

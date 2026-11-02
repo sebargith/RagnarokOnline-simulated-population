@@ -173,6 +173,47 @@ class SoloCycle:
         s.pop('reason', None)
         self.save()
 
+    def reconcile_failed_travel(self, observations, now_ms):
+        """Retire a travel whose final failed result was observed, once a new bridge
+        session shows the character stationary on the map where it stopped. The
+        original result stays in history; nothing is replayed."""
+        s, p = self.state, self.state.get('inflight')
+        if (s.get('status') != 'blocked' or not str(s.get('reason', '')).startswith('travel:failed/') or
+                not p or p['action'].get('type') != 'travel'):
+            raise RuntimeError('Not a reconcilable travel result')
+        matches = [h for h in s['history'] if h.get('request_id') == p['request_id'] and
+                   h.get('session') == p['session']]
+        result = matches[0].get('result', {}) if matches else {}
+        if (len(matches) != 1 or result.get('status') != 'failed' or
+                s['reason'] != 'travel:failed/' + str(result.get('reason')) or len(observations) != 2):
+            raise RuntimeError('Missing unique terminal evidence or observations')
+        stopped = (result.get('evidence') or {}).get('map')
+        a, b = observations
+        if (a['session'] != b['session'] or b['session'] == p['session'] or b['time_ms'] - a['time_ms'] < 1000 or
+                now_ms - a['time_ms'] > 5000 or not 0 <= now_ms - b['time_ms'] <= 2500):
+            raise RuntimeError('Observations are not fresh and separated')
+        for event in observations:
+            snap = event['data']
+            if (not snap.get('connected') or snap.get('name') != s['identity'] or snap.get('dead') or
+                    snap.get('executor') != 'openkore_route' or snap.get('recovery') != 'none' or
+                    snap.get('map') != stopped or 'native_task' not in snap or snap.get('native_task') or
+                    not isinstance(snap.get('ai_queue'), list) or
+                    any(x in snap['ai_queue'] for x in ('move', 'route', 'mapRoute', 'NPC')) or
+                    not snap.get('position') or not snap.get('destination') or
+                    dist(snap['position'], snap['destination']) > 1):
+                raise RuntimeError('Character is not stationary and safe to replan')
+        if a['data']['position'] != b['data']['position']:
+            raise RuntimeError('Position changed between observations')
+        s['reconciliations'] = (s.get('reconciliations', []) + [{
+            'request_id': p['request_id'], 'session': p['session'], 'result': 'failed/' + result['reason'],
+            'disposition': 'retired_failed_travel', 'observed_session': b['session'],
+            'map': b['data']['map'], 'position': b['data']['position'], 'observed_at_ms': b['time_ms']}])[-24:]
+        s.update(status='active', inflight=None, failures=s.get('failures', 0) + 1, observe_after=b['time_ms'])
+        s.pop('reason', None)
+        if s['failures'] >= 2:
+            s.update(status='blocked', reason='two_consecutive_action_failures')
+        self.save()
+
     def train_first_job(self):
         """Resume one persistent macro goal without replacing confirmed history."""
         s = self.state

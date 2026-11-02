@@ -109,6 +109,38 @@ class CycleTests(unittest.TestCase):
             self.c.reconcile_navigation(obs, 20000)
         self.assertEqual(self.c.state['status'], 'blocked')
 
+    def test_reconcile_failed_travel_keeps_result_and_does_not_replay(self):
+        self.c.state['identity'] = 'Tarin'
+        action = dict(type='travel', map='prt_fild01', x=49, y=331, timeout_s=150)
+        self.c.prepare(action, 'c_1', 'old:2', now=100)
+        self.c.result({'request_id': 'c_1', 'status': 'failed', 'reason': 'unreachable',
+                       'evidence': {'map': 'prt_castle', 'pos_to': {'x': 102, 'y': 20}}}, now=101)
+        self.assertEqual((self.c.state['status'], self.c.state['reason']), ('blocked', 'travel:failed/unreachable'))
+        self.assertEqual(self.c.state['inflight']['request_id'], 'c_1')
+        snap = snapshot(map='prt_castle', position={'x': 102, 'y': 20}, destination={'x': 102, 'y': 20}, ai_queue=[])
+        obs = [dict(session='new:1', time_ms=10000, data=copy.deepcopy(snap)),
+               dict(session='new:1', time_ms=11000, data=copy.deepcopy(snap))]
+        for change in (dict(ai_queue=['route']), dict(map='prontera'), dict(native_task={'id': 'x'}),
+                       dict(destination={'x': 102, 'y': 30}), dict(recovery='retreat'), dict(position={'x': 103, 'y': 20})):
+            bad = copy.deepcopy(obs)
+            bad[1]['data'].update(change)
+            with self.assertRaises(RuntimeError):
+                self.c.reconcile_failed_travel(bad, 11100)
+        same_session = copy.deepcopy(obs)
+        for o in same_session:
+            o['session'] = 'old:2'
+        with self.assertRaises(RuntimeError):
+            self.c.reconcile_failed_travel(same_session, 11100)
+        with self.assertRaises(RuntimeError):
+            self.c.reconcile_failed_travel(obs, 20000)
+        self.c.reconcile_failed_travel(obs, 11100)
+        saved = SoloCycle(self.path)
+        self.assertEqual((saved.state['status'], saved.state['inflight'], saved.state['failures']), ('active', None, 1))
+        self.assertEqual(saved.state['history'][-1]['result']['reason'], 'unreachable')
+        self.assertEqual(saved.state['reconciliations'][-1]['disposition'], 'retired_failed_travel')
+        with self.assertRaises(RuntimeError):
+            saved.reconcile_failed_travel(obs, 11100)
+
     def test_new_goal_rejects_uncertainty_and_invalid_targets(self):
         self.c.state.update(status='complete', kills=1, reason='confirmed_kill_goal', inflight={'request_id': 'c_1'})
         with self.assertRaises(RuntimeError):
