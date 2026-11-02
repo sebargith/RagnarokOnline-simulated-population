@@ -27,6 +27,7 @@ from agent.goal_planner import (GoalPlanner, apply_proposal_locked, BuildPlanner
 from agent import build_policy, hunting, tutorial
 from agent.tutorial import Tutorial
 FRESH_MS = 2500
+LATE_QUERY_S = 5  # Past its deadline, an intent's retained result is still asked for this long.
 
 
 class P5Planning:
@@ -215,6 +216,22 @@ class Runner:
         self.planning_requested, self.planning_done = False, planner is None
         self.inference_calls, self.planning_result = 0, None
         self.quiet_observations, self.quiet_started = [], None
+        self.late = None  # (request_id, monotonic) of an intent first seen past its deadline.
+
+    def late_result_tick(self):
+        """A checkpoint blocked only because its intent outlived the previous run: ask
+        the bridge for the retained result in the same session for LATE_QUERY_S."""
+        s, p = self.cycle.state, self.cycle.state.get('inflight')
+        if s.get('reason') != 'intent_deadline_no_replay' or not p or p.get('cancel'):
+            return False
+        if not self.late or self.late[0] != p['request_id']:
+            self.late = (p['request_id'], time.monotonic())
+        if time.monotonic() - self.late[1] > LATE_QUERY_S:
+            return False
+        if getattr(self.b, 'session', None) == p['session'] and time.monotonic() - self.last_query >= 1:
+            self.b.send({'type': 'query_result', 'request_id': p['request_id'], 'session': p['session']})
+            self.last_query = time.monotonic()
+        return True
 
     def reconcile_quiet_tick(self):
         s, event = self.cycle.state, self.b.latest
@@ -301,7 +318,14 @@ class Runner:
                     if not data['available']:
                         self.cycle.block('result_unavailable_no_replay')
                     elif data['result']['status'] in FINAL:
-                        (self.cycle.cancel_result(data['result'], e['time_ms']) if p.get('cancel') else self.cycle.result(data['result'], observed_after=e['time_ms']))
+                        late = self.cycle.state.get('reason') == 'intent_deadline_no_replay'
+                        applied = (self.cycle.cancel_result(data['result'], e['time_ms']) if p.get('cancel') else self.cycle.result(data['result'], observed_after=e['time_ms']))
+                        s = self.cycle.state
+                        if late and applied and not s['inflight'] and s.get('reason') == 'intent_deadline_no_replay':
+                            # Only the missing result blocked it; the bridge's final result resolves it.
+                            s['status'] = 'active'
+                            s.pop('reason', None)
+                            self.cycle.save()
                     self.note(kind, data)
             elif kind in {'healing', 'recovery', 'death', 'connection'}:
                 self.note(kind, data)
@@ -344,7 +368,7 @@ class Runner:
                 self.pump()
                 self.planning_tick()
                 self.p5_tick()
-                if self.cycle.state['status'] == 'blocked' and self.reconcile_quiet_tick():
+                if self.cycle.state['status'] == 'blocked' and (self.reconcile_quiet_tick() or self.late_result_tick()):
                     continue
                 if self.cycle.state['status'] != 'active' and self.planning_done:
                     reason = self.cycle.state['status']; break
@@ -368,9 +392,15 @@ class Runner:
                 if p:
                     if self.b.session != p['session']:
                         self.cycle.block('session_changed_no_replay'); continue
-                    if time.time() >= p['deadline']:
-                        self.cycle.block('intent_deadline_no_replay'); continue
-                    if (p.get('exploration') and not p.get('cancel') and (not max_actions or self.actions < max_actions) and self.b.session == latest['session'] and
+                    late = time.time() >= p['deadline']
+                    if late:
+                        # A run that stopped mid-action leaves the final result retained by
+                        # the bridge: ask for it briefly before blocking; never resend.
+                        if not self.late or self.late[0] != p['request_id']:
+                            self.late = (p['request_id'], time.monotonic())
+                        if time.monotonic() - self.late[1] > LATE_QUERY_S:
+                            self.cycle.block('intent_deadline_no_replay'); continue
+                    if (not late and p.get('exploration') and not p.get('cancel') and (not max_actions or self.actions < max_actions) and self.b.session == latest['session'] and
                             0 <= time.time()*1000 - latest['time_ms'] <= 2500 and
                             self.cycle.interruptible(latest['data'])):
                         rid = self.b.serial_id()

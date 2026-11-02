@@ -77,6 +77,38 @@ class RunnerInterruptionTests(unittest.TestCase):
         self.run_once()
         self.assertEqual([p[0]['type'] for p in self.bridge.proposals], ['cancel','attack'])
 
+    def test_late_intent_uses_its_retained_result_or_blocks_without_replay(self):
+        # Live 2026-11-02: a run ended with travel c_56 in flight; the next run started
+        # after its deadline and blocked without asking the bridge for the result.
+        self.cycle.state['inflight']['deadline'] = time.time() - 60
+        bridge = ControlledBridge(self.snap)
+        bridge.send = lambda q: (bridge.queries.append(q), bridge.emit('request_status', {
+            'request_id': q['request_id'], 'session': q['session'], 'available': 1,
+            'result': {'request_id': q['request_id'], 'status': 'completed', 'reason': 'arrived'}}))
+        self.run_once(bridge)
+        self.assertEqual([q['request_id'] for q in bridge.queries][:1], ['c_1'])
+        self.assertIsNone(self.cycle.state['inflight'])
+        self.assertNotIn('c_1', [p[1] for p in bridge.proposals])
+        self.assertNotIn('cancel', [p[0]['type'] for p in bridge.proposals])
+
+        self.cycle.prepare({'type': 'navigate', 'map': 'prt_fild08', 'x': 220, 'y': 250, 'timeout_s': 25}, 'c_2', 'boot:1')
+        self.cycle.state['inflight']['deadline'] = time.time() - 60
+        silent = ControlledBridge(self.snap)
+        with patch('scripts.run_p2_cycle.LATE_QUERY_S', 0.005):
+            self.run_once(silent)
+        self.assertEqual(self.cycle.state['reason'], 'intent_deadline_no_replay')
+        self.assertEqual(silent.proposals, [])
+        self.assertIn('c_2', [q['request_id'] for q in silent.queries])
+
+        # Already blocked by an earlier run for that reason: the retained final result resolves it.
+        answering = ControlledBridge(self.snap)
+        answering.send = lambda q: (answering.queries.append(q), answering.emit('request_status', {
+            'request_id': q['request_id'], 'session': q['session'], 'available': 1,
+            'result': {'request_id': q['request_id'], 'status': 'completed', 'reason': 'arrived'}}))
+        self.run_once(answering)
+        self.assertEqual((self.cycle.state['status'], self.cycle.state['inflight']), ('active', None))
+        self.assertNotIn('c_2', [p[1] for p in answering.proposals])
+
     def test_restart_with_one_confirmation_queries_only_missing(self):
         self.run_once()
         self.result('c_10', 'completed', 'navigation_cancelled')
