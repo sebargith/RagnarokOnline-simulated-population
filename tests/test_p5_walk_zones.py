@@ -60,6 +60,13 @@ print JSON::PP->new->canonical->encode({
     to_izlude => $route->('prontera', 104, 51, 'izlude', 93, 104),
     isolated_start => $route->('prt_castle', 199, 0, 'prontera', 104, 51),
     isolated_dest => $route->('prontera', 104, 51, 'prt_castle', 199, 0),
+    door_hop => do {
+        my $door = $route->('prt_castle', 102, 20, 'prt_gld', 159, 30)->{legs}[0];
+        my $step = sub { [M1Travel::leg_step({map => 'prt_castle', leg => $door, phase => 'enter', task_state => 'done',
+            warped => {map => 'prt_castle', @_[0, 1] ? (x => $_[0], y => $_[1]) : ()}, warped_zone => $zone->('prt_castle', @_[0, 1])})] };
+        # rAthena prontera.txt: prtca02 lands at 102,91; OpenKore's table says 102,88.
+        {server_landing => $step->(102, 91), table_landing => $step->(102, 88), other_zone => $step->(102, 20)};
+    },
 });
 '''
 
@@ -94,6 +101,11 @@ class WalkZoneTests(unittest.TestCase):
             ('prt_castle', 102, 73, 'prt_castle'), ('prt_castle', 102, 129, 'prt_castle'),
             ('prt_castle', 102, 181, 'prt_gld'), ('prt_gld', 159, 30, None)])
         self.assertEqual(legs[0]['to'], {'x': 102, 'y': 88})
+        self.assertEqual(legs[0]['to_zone'], walk.zone_at(self.walk, 'prt_castle', (102, 88)))
+
+    def test_inner_door_hop_accepts_the_server_landing_in_the_planned_zone(self):
+        self.assertEqual(self.perl['door_hop'], {'server_landing': ['hopped'], 'table_landing': ['hopped'],
+                                                 'other_zone': ['final', 'unknown', 'unexpected_warp']})
         r = walk.route(self.walk, 'prt_castle', 'prt_gld', walk.zone_at(self.walk, 'prt_castle', (102, 20)))
         self.assertEqual((r['hops'], r['inner']), (1, 2))
 

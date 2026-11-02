@@ -140,6 +140,30 @@ class CycleTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             saved.reconcile_failed_travel(obs, 11100)
 
+    def test_reconcile_same_map_warp_needs_its_own_cell_and_no_zeny_change(self):
+        self.c.state['identity'] = 'Tarin'
+        action = dict(type='travel', map='prt_fild01', x=49, y=331, timeout_s=150)
+        evidence = {'map': 'prt_castle', 'pos_to': {'x': 102, 'y': 91}, 'zeny_delta': 0, 'hops': []}
+        self.c.prepare(action, 'c_1', 'b:1', now=100)
+        self.c.result({'request_id': 'c_1', 'status': 'unknown', 'reason': 'unexpected_warp', 'evidence': evidence}, now=101)
+        self.assertEqual(self.c.state['reason'], 'travel:unknown/unexpected_warp')
+        snap = snapshot(map='prt_castle', position={'x': 102, 'y': 91}, destination={'x': 102, 'y': 91}, ai_queue=[])
+        obs = [dict(session='b:1', time_ms=10000, data=copy.deepcopy(snap)),
+               dict(session='b:1', time_ms=11000, data=copy.deepcopy(snap))]
+        moved = copy.deepcopy(obs)
+        for o in moved:
+            o['data'].update(position={'x': 102, 'y': 60}, destination={'x': 102, 'y': 60})
+        with self.assertRaises(RuntimeError):
+            self.c.reconcile_failed_travel(moved, 11100)
+        self.c.state['history'][-1]['result']['evidence']['zeny_delta'] = -10
+        with self.assertRaises(RuntimeError):
+            self.c.reconcile_failed_travel(obs, 11100)
+        self.c.state['history'][-1]['result']['evidence']['zeny_delta'] = 0
+        self.c.reconcile_failed_travel(obs, 11100)
+        self.assertEqual((self.c.state['status'], self.c.state['failures'], self.c.state['inflight']), ('active', 0, None))
+        self.assertEqual(self.c.state['reconciliations'][-1]['disposition'], 'retired_same_map_warp')
+        self.assertEqual(self.c.state['history'][-1]['result']['status'], 'unknown')
+
     def test_new_goal_rejects_uncertainty_and_invalid_targets(self):
         self.c.state.update(status='complete', kills=1, reason='confirmed_kill_goal', inflight={'request_id': 'c_1'})
         with self.assertRaises(RuntimeError):

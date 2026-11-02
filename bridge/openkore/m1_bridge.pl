@@ -542,7 +542,8 @@ sub travel_tick {
     my ($step, $status, $reason) = M1Travel::leg_step({map => $field->baseName, leg => $leg, phase => $p->{phase},
         task_state => $state, error => $state eq 'done' ? $task->getError() : undef,
         pos_to => $char->{pos_to}, calc => $calc, enter_elapsed => $p->{enter_since} ? time - $p->{enter_since} : 0,
-        warped => $p->{warped}});
+        warped => $p->{warped}, warped_zone => $p->{warped} && defined $leg->{to_zone} &&
+            $p->{warped}{map} eq $field->baseName ? cell_zone($field, $p->{warped}) : undef});
     $step //= '';
     if ($step eq 'hopped') {
         AI::clear(qw/move route mapRoute/);

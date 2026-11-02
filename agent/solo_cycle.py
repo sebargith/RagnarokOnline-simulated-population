@@ -176,19 +176,25 @@ class SoloCycle:
     def reconcile_failed_travel(self, observations, now_ms):
         """Retire a travel whose final failed result was observed, once two fresh
         snapshots of one bridge session (the caller checks the bridge has no pending
-        action) show the character stationary on the map where it stopped. The
+        action) show the character stationary on the map where it stopped. Also
+        unknown/unexpected_warp: a same-map warp the bridge stopped at, with no Zeny
+        change, still standing on that cell; it is not counted as a failure. The
         original result stays in history; nothing is replayed."""
         s, p = self.state, self.state.get('inflight')
-        if (s.get('status') != 'blocked' or not str(s.get('reason', '')).startswith('travel:failed/') or
-                not p or p['action'].get('type') != 'travel'):
+        reason = str(s.get('reason', ''))
+        if (s.get('status') != 'blocked' or not (reason.startswith('travel:failed/') or
+                reason == 'travel:unknown/unexpected_warp') or not p or p['action'].get('type') != 'travel'):
             raise RuntimeError('Not a reconcilable travel result')
         matches = [h for h in s['history'] if h.get('request_id') == p['request_id'] and
                    h.get('session') == p['session']]
         result = matches[0].get('result', {}) if matches else {}
-        if (len(matches) != 1 or result.get('status') != 'failed' or
-                s['reason'] != 'travel:failed/' + str(result.get('reason')) or len(observations) != 2):
+        evidence = result.get('evidence') or {}
+        warp = result.get('status') == 'unknown'
+        if (len(matches) != 1 or result.get('status') not in ('failed', 'unknown') or
+                reason != f"travel:{result.get('status')}/{result.get('reason')}" or len(observations) != 2 or
+                (warp and (evidence.get('zeny_delta') != 0 or not evidence.get('pos_to') or evidence.get('hops')))):
             raise RuntimeError('Missing unique terminal evidence or observations')
-        stopped = (result.get('evidence') or {}).get('map')
+        stopped = evidence.get('map')
         a, b = observations
         if (a['session'] != b['session'] or b['time_ms'] - a['time_ms'] < 1000 or
                 now_ms - a['time_ms'] > 5000 or not 0 <= now_ms - b['time_ms'] <= 2500):
@@ -205,11 +211,14 @@ class SoloCycle:
                 raise RuntimeError('Character is not stationary and safe to replan')
         if a['data']['position'] != b['data']['position']:
             raise RuntimeError('Position changed between observations')
+        if warp and dist(b['data']['position'], evidence['pos_to']) > 1:
+            raise RuntimeError('Character is not where the warp left it')
         s['reconciliations'] = (s.get('reconciliations', []) + [{
-            'request_id': p['request_id'], 'session': p['session'], 'result': 'failed/' + result['reason'],
-            'disposition': 'retired_failed_travel', 'observed_session': b['session'],
+            'request_id': p['request_id'], 'session': p['session'], 'result': f"{result['status']}/{result['reason']}",
+            'disposition': 'retired_same_map_warp' if warp else 'retired_failed_travel', 'observed_session': b['session'],
             'map': b['data']['map'], 'position': b['data']['position'], 'observed_at_ms': b['time_ms']}])[-24:]
-        s.update(status='active', inflight=None, failures=s.get('failures', 0) + 1, observe_after=b['time_ms'])
+        s.update(status='active', inflight=None, failures=s.get('failures', 0) + (0 if warp else 1),
+                 observe_after=b['time_ms'])
         s.pop('reason', None)
         if s['failures'] >= 2:
             s.update(status='blocked', reason='two_consecutive_action_failures')

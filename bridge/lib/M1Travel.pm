@@ -134,7 +134,7 @@ sub route {
             $a->{x} <=> $b->{x} || $a->{y} <=> $b->{y} }
             grep { $_->{zone} == $zone && $_->{to_map} eq $next && $_->{to_zone} == $next_zone } @{$g->{$map}};
         push @legs, {map => $map, x => $portal->{x}, y => $portal->{y}, to_map => $portal->{to_map},
-            $portal->{to_map} eq $map ? (to => {%{$portal->{to}}}) : ()};
+            $portal->{to_map} eq $map ? (to => {%{$portal->{to}}}, $o->{zones} ? (to_zone => $portal->{to_zone}) : ()) : ()};
         $at = $portal->{to};
     }
     push @legs, {map => $to, x => 0 + $dest->{x}, y => 0 + $dest->{y}};
@@ -156,7 +156,11 @@ sub leg_step {
     my $leg = $o->{leg};
     if (defined $leg->{to_map} && $leg->{to_map} eq $leg->{map} && $o->{warped}) {
         # Same-map portal: only the server's map-change packet at the landing counts.
-        return ('hopped') if $o->{map} eq $leg->{map} && M1Navigation::distance($o->{warped}, $leg->{to}) <= WARP_SLACK;
+        # OpenKore's table may place the landing a few cells off the server's warp
+        # (prt_castle 102,73 lands at 102,91, not 102,88); a planned travel leg also
+        # accepts a landing in the walk zone it planned for (warped_zone).
+        return ('hopped') if $o->{map} eq $leg->{map} && (M1Navigation::distance($o->{warped}, $leg->{to}) <= WARP_SLACK ||
+            defined $leg->{to_zone} && defined $o->{warped_zone} && $o->{warped_zone} == $leg->{to_zone});
         return ('final', 'unknown', 'unexpected_warp');
     }
     if ($o->{map} ne $leg->{map}) {
