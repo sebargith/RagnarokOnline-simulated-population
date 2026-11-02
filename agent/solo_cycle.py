@@ -174,8 +174,9 @@ class SoloCycle:
         self.save()
 
     def reconcile_failed_travel(self, observations, now_ms):
-        """Retire a travel whose final failed result was observed, once a new bridge
-        session shows the character stationary on the map where it stopped. The
+        """Retire a travel whose final failed result was observed, once two fresh
+        snapshots of one bridge session (the caller checks the bridge has no pending
+        action) show the character stationary on the map where it stopped. The
         original result stays in history; nothing is replayed."""
         s, p = self.state, self.state.get('inflight')
         if (s.get('status') != 'blocked' or not str(s.get('reason', '')).startswith('travel:failed/') or
@@ -189,7 +190,7 @@ class SoloCycle:
             raise RuntimeError('Missing unique terminal evidence or observations')
         stopped = (result.get('evidence') or {}).get('map')
         a, b = observations
-        if (a['session'] != b['session'] or b['session'] == p['session'] or b['time_ms'] - a['time_ms'] < 1000 or
+        if (a['session'] != b['session'] or b['time_ms'] - a['time_ms'] < 1000 or
                 now_ms - a['time_ms'] > 5000 or not 0 <= now_ms - b['time_ms'] <= 2500):
             raise RuntimeError('Observations are not fresh and separated')
         for event in observations:

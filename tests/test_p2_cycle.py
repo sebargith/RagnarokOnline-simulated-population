@@ -118,19 +118,18 @@ class CycleTests(unittest.TestCase):
         self.assertEqual((self.c.state['status'], self.c.state['reason']), ('blocked', 'travel:failed/unreachable'))
         self.assertEqual(self.c.state['inflight']['request_id'], 'c_1')
         snap = snapshot(map='prt_castle', position={'x': 102, 'y': 20}, destination={'x': 102, 'y': 20}, ai_queue=[])
-        obs = [dict(session='new:1', time_ms=10000, data=copy.deepcopy(snap)),
-               dict(session='new:1', time_ms=11000, data=copy.deepcopy(snap))]
+        obs = [dict(session='old:2', time_ms=10000, data=copy.deepcopy(snap)),
+               dict(session='old:2', time_ms=11000, data=copy.deepcopy(snap))]
         for change in (dict(ai_queue=['route']), dict(map='prontera'), dict(native_task={'id': 'x'}),
                        dict(destination={'x': 102, 'y': 30}), dict(recovery='retreat'), dict(position={'x': 103, 'y': 20})):
             bad = copy.deepcopy(obs)
             bad[1]['data'].update(change)
             with self.assertRaises(RuntimeError):
                 self.c.reconcile_failed_travel(bad, 11100)
-        same_session = copy.deepcopy(obs)
-        for o in same_session:
-            o['session'] = 'old:2'
+        mixed = copy.deepcopy(obs)
+        mixed[1]['session'] = 'other:1'
         with self.assertRaises(RuntimeError):
-            self.c.reconcile_failed_travel(same_session, 11100)
+            self.c.reconcile_failed_travel(mixed, 11100)
         with self.assertRaises(RuntimeError):
             self.c.reconcile_failed_travel(obs, 20000)
         self.c.reconcile_failed_travel(obs, 11100)
