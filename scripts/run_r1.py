@@ -50,10 +50,10 @@ def bind(runtime):
     (m1.RUN/'logs').mkdir(parents=True, exist_ok=True)
 
 
-def prepare(runtime):
+def prepare(runtime, policy_path=ROOT/'config/r1-policy.json'):
     p, template = paths(runtime), runtime.resolve()/'openkore/agent'
     password = json.loads((runtime.resolve()/'p1/secrets.json').read_text())['password']
-    policy = json.loads((ROOT/'config/r1-policy.json').read_text(encoding='utf-8'))
+    policy = json.loads(Path(policy_path).read_text(encoding='utf-8'))
     result = build_r1_profile.translate(policy, build_r1_profile.load_tables())
     files = build_r1_profile.render(result, (template/'config.txt').read_text(encoding='utf-8'))
     for key, value in {'username': USERID, 'password': password}.items():
@@ -229,10 +229,14 @@ def summarize(events, lock_map, started=None):
             'unexpected': unexpected, 'disconnects': sum(1 for e in events if e['type'] == 'disconnected')}
 
 
-def watch(runtime, seconds):
+def lock_map(policy_path):
+    return json.loads(Path(policy_path).read_text(encoding='utf-8'))['rules'][0]['do']['hunt']['field']
+
+
+def watch(runtime, seconds, policy_path=ROOT/'config/r1-policy.json', summary=None):
     """Supervise one bounded run: only guards and measurement, never game input."""
     p = paths(runtime)
-    lock = json.loads((ROOT/'config/r1-policy.json').read_text(encoding='utf-8'))['rules'][0]['do']['hunt']['field']
+    lock = lock_map(policy_path)
     bind(runtime)
     pid = json.loads((m1.RUN/'processes.json').read_text())[CLIENT]['pid']
     started, reason, res = time.time(), 'time_budget', []
@@ -266,7 +270,7 @@ def watch(runtime, seconds):
                               'client_ws_max_mib': round(max(r['client_ws'] for r in res) / 2**20) if res else None,
                               'ram_available_min_gib': round(min(r['ram_available'] for r in res) / 2**30, 2) if res else None,
                               'gpu_used_mib': [min(r['gpu_used_mib'] for r in res), max(r['gpu_used_mib'] for r in res)] if res else None}})
-    m1.write(p['summary'], json.dumps(out, indent=1))
+    m1.write(summary or p['summary'], json.dumps(out, indent=1))
     print(json.dumps({k: out[k] for k in ('stop_reason', 'span_s', 'kills', 'kills_per_h', 'base_exp_per_h', 'deaths', 'time_share_s')}))
 
 
@@ -276,20 +280,21 @@ def main():
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('--seconds', type=int, default=3600)
     parser.add_argument('--since', type=float, default=0)
+    parser.add_argument('--policy', type=Path, default=ROOT/'config/r1-policy.json')
+    parser.add_argument('--summary', type=Path, help='summary path (default runtime/r1/summary.json)')
     args = parser.parse_args()
     if args.command == 'preflight':
         preflight(args.runtime)
     elif args.command == 'prepare':
-        bind(args.runtime); prepare(args.runtime)
+        bind(args.runtime); prepare(args.runtime, args.policy)
     elif args.command == 'start':
         start(args.runtime)
     elif args.command == 'watch':
-        watch(args.runtime, args.seconds)
+        watch(args.runtime, args.seconds, args.policy, args.summary)
     elif args.command == 'stop':
         stop(args.runtime)
     else:
-        lock = json.loads((ROOT/'config/r1-policy.json').read_text(encoding='utf-8'))['rules'][0]['do']['hunt']['field']
-        print(json.dumps(summarize(read_events(paths(args.runtime)['events'], args.since), lock, args.since or None), indent=1))
+        print(json.dumps(summarize(read_events(paths(args.runtime)['events'], args.since), lock_map(args.policy), args.since or None), indent=1))
 
 
 if __name__ == '__main__':
