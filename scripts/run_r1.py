@@ -87,6 +87,12 @@ def prepare(runtime, policy_path=ROOT/'config/r1-policy.json', character=None):
     return result
 
 
+def ready_for_first_job(sample):
+    """Novice at Job 10 with no unspent skill points: the custom Job Changer's own rule
+    (config/npc/first-job-changer.txt). The class change itself goes through the bridge."""
+    return sample.get('job_id', 0) == 0 and sample['level']['job'] >= 10 and sample.get('points_skill', 0) == 0
+
+
 def facts_of(sample):
     """Policy character facts from one observer sample; None for a class the generator does not know."""
     job = JOBS.get(sample.get('job_id', 0))
@@ -285,6 +291,8 @@ def watch(runtime, seconds, policy_path=ROOT/'config/r1-policy.json', summary=No
                 reason = 'death_loop'; break
             samples = [e for e in events if e['type'] == 'sample' and e.get('connected')]
             if samples:
+                if ready_for_first_job(samples[-1]):
+                    reason = 'job10_ready'; break
                 base = samples[-1]['level']['base']
                 if base > refit_level and not pending:
                     # Single sync point: regenerate from observed facts, then ask r1_reload.

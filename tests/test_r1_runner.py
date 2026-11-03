@@ -73,6 +73,13 @@ class Refit(unittest.TestCase):
                          ({'base': 9, 'job': 3}, 'Novice', [1201, 2301], 63))
         self.assertIsNone(run_r1.facts_of(dict(s, job_id=1)))  # first class: not refit here
 
+    def test_job10_stop_matches_the_job_changer_rule(self):
+        ready = dict(sample(0, job=10), job_id=0, points_skill=0)
+        self.assertTrue(run_r1.ready_for_first_job(ready))
+        self.assertFalse(run_r1.ready_for_first_job(dict(ready, points_skill=1)))  # raiseSkill not done
+        self.assertFalse(run_r1.ready_for_first_job(dict(ready, level=dict(ready['level'], job=9))))
+        self.assertFalse(run_r1.ready_for_first_job(dict(ready, job_id=1)))  # already Swordman
+
     def test_refits_are_reported(self):
         events = [sample(0), {'t': 1, 'type': 'reloaded', 'id': 'refit-6-1', 'ok': 1, 'lockMap': LOCK, 'error': ''}]
         self.assertEqual(run_r1.summarize(events, LOCK, 0)['refits'][0]['id'], 'refit-6-1')
