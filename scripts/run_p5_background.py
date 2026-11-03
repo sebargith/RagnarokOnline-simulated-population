@@ -65,6 +65,8 @@ def main():
         parser.error('seconds must be 30..3600 and max-actions 1..600')
     runtime = args.runtime.resolve()
     base = runtime / 'p5'
+    if (base / 'FROZEN.json').exists():
+        parser.error('P5 is frozen: Nilo runs on R1 (scripts/run_r1.py --character nilo)')
     args.summary.parent.mkdir(parents=True, exist_ok=True)
     summary = {'phase': 'starting', 'pid': os.getpid(), 'inference_calls': 0, 'client_owned': False, 'started': time.time(),
                'max_seconds': args.seconds, 'max_actions': args.max_actions,
