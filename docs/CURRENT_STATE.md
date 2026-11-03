@@ -1,6 +1,22 @@
 
 # Estado actual
 
+## R2 — camino principal nativo con Nilo (2026-11-03, Claude)
+
+- **Resultado:** Nilo pasa a OpenKore `auto` (`run_r1.py --character nilo`, `runtime/r1-nilo/`, puerto 8773). [Evidencia](evidence/R2-native-main-path.md).
+- **P5:** congelado. c_177 se concilió sin reenviarse y `FROZEN.json` impide relanzarlo.
+- **P5 aceptado:**
+  - Job 10 y después **Swordman** (`first_job` `completed/job_changed`; en la BD, clase 1);
+  - la ida al Job Changer fue nativa.
+- **En vivo:** 1,9 h en total, con 0 intervenciones y 0 muertes.
+  - Planner: 5 decisiones de campo de Groq, todas con recarga confirmada.
+  - Huida: 2 teletransportes en 1,5 h.
+- **Pendiente:**
+  - **MTBI ≥ 4 h, no demostrado.** La tanda más larga duró 1,5 h y la cortó un fallo del supervisor, ya corregido. La siguiente la paró el usuario a los 15 min.
+  - Falta ver en vivo una muerte nueva y `r1_flee`.
+- **Estado:** cliente detenido. Nilo es Swordman Base 13 / Job 3 en `prt_fild00`, con 5 495 Zeny y 8 Fly Wing. Suite: 288 OK.
+- **Siguiente:** `run_r1.py campaign --character nilo --seconds 15300 --ram-min-gib 0.5`.
+
 ## R1 — OpenKore `auto` con configuración generada (2026-11-03, Claude)
 
 - **Resultado:** **adoptar con cambios.** [Evidencia](evidence/R1-openkore-auto.md).

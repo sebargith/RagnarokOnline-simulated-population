@@ -1,6 +1,15 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-11-03 por Claude (prueba R1, OpenKore `auto`).
+Actualizado: 2026-11-03 por Claude (R2, Nilo en OpenKore `auto`).
 Referencia: codex/single-agent-plan; R1 en 23a6688…545489d más documentos.
+## R2 2026-11-03 (Claude)
+- **Resultado:** Nilo en OpenKore `auto`. Ver `docs/evidence/R2-native-main-path.md`; commits decd764…4b1efbc.
+- **Cómo lanzar:** `scripts/run_r1.py preflight|prepare|start|watch|stop|campaign|class-refit --character nilo --runtime ../runtime`.
+- **P5 congelado:** `scripts/freeze_p5.py` y `runtime/p5/FROZEN.json`.
+- **Hecho:** Job 10 → **Swordman**, confirmado en la BD (aceptación de P5). En vivo, 1,9 h con 0 intervenciones y 0 muertes.
+- **Pendiente:**
+  - MTBI ≥ 4 h: la tanda más larga duró 1,5 h y la cortó un fallo del supervisor, ya corregido; `long-2` la paró el usuario;
+  - ver en vivo una muerte y `r1_flee`.
+- **Estado:** cliente detenido. Nilo es Swordman Base 13 / Job 3, en `prt_fild00`. No se ha empezado R3.
 ## R1 2026-11-03 (Claude)
 - **Resultado:** adoptar con cambios. Ver docs/evidence/R1-openkore-auto.md.
 - **Tarin en el perfil runtime/r1:** 1 h sin intervención, 316 kills/h, 0 muertes; venta y compra solo por portales.
