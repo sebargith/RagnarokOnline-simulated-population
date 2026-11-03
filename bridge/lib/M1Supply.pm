@@ -1,3 +1,5 @@
+# Frozen (R2, 2026-11-03): off the main path; OpenKore auto (scripts/run_r1.py)
+# replaces it. Kept for its tests and evidence; do not extend.
 package M1Supply;
 use strict;
 use warnings;

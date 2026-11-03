@@ -1,4 +1,7 @@
-"""Short live P2b run: a local, model-free supply decision and one shop trip.
+"""Frozen (R2, 2026-11-03): off the main path; OpenKore auto (scripts/run_r1.py) replaces it.
+Kept for its tests and evidence; do not extend.
+
+Short live P2b run: a local, model-free supply decision and one shop trip.
 
 Decides from the observed snapshot whether to sell loot and buy healing, then
 travels (walk portals only) to a known shop, sells, buys and returns. Each step

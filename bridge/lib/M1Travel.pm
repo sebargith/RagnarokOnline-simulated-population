@@ -1,3 +1,7 @@
+# Frozen in part (R2, 2026-11-03): the inter-map route (walk_graph, zone_table,
+# zone_at, route, plan, leg_step, approach_cell) is off the main path; OpenKore
+# auto routes. The talk, script, portal and first-job validation stay in use by
+# the reconciled bridge for irreversible actions.
 package M1Travel;
 use strict;
 use warnings;

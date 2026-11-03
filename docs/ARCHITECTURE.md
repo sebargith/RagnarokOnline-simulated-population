@@ -1,6 +1,28 @@
 # Architecture and constraints
 
-## Dirección aprobada — 2026-10-31
+## Camino principal — R2, 2026-11-03
+
+Revisión independiente (`docs/research/PROJECT_REVIEW-2026-11.md`, R1/R2) adoptada por el usuario.
+
+- **Ejecutor:** OpenKore `--ai=auto`. Navegación, combate, descanso, curación, venta, compra, huida y reaparición son nativos.
+- **Política como datos:** `config/r1-policy*.json`, traducida de forma determinista por `scripts/build_r1_profile.py` a `config.txt`, `mon_control`, `items_control` y `routeweights`. Las reglas sin equivalente nativo salen como huecos.
+- **Supervisor** (`scripts/run_r1.py`, uno por personaje, con perfil, puerto y registro propios):
+  - solo hace guardias, medición y un único punto de recarga: regenera el perfil y lo aplica con `r1_reload`, con confirmación;
+  - el planner (Groq con respaldo Gemma) elige el campo entre opciones validadas (`field_options`) al empezar, al subir de nivel, al morir y al cambiar de clase;
+  - cada muerte marca su mapa en `danger.json`, que lo evita durante 3 niveles.
+- **Plugins:**
+  - `r1_observer`: solo lee;
+  - `r1_reload`: recarga el perfil;
+  - `r1_flee`: sin Fly Wing, huye por la ruta nativa sin atacar.
+- **Puente reconciliado** (`m1_bridge`, `--ai=manual`): solo para lo irreversible, es decir, el tutorial, el Job Changer (`first-job`), la compraventa explícita y el comercio. OpenKore lleva al personaje al Job Changer con `lockMap`; el puente ya no viaja entre mapas.
+- **Congelado** (no se borra; conserva pruebas y evidencia):
+  - las rutas propias entre mapas de `M1Travel` y `agent/walk.py`, con `config/walk-zones.json` como comprobación cruzada de `portalsLOS`;
+  - la exploración (`M1Explore` y la de `solo_cycle`);
+  - el abastecimiento (`p2_supply`, `M1Supply`);
+  - `recovery_tick` y `M1Healing`;
+  - los ciclos `run_p2_cycle` y `run_p5_background`. P5 está congelado con `FROZEN.json`.
+
+## Dirección aprobada — 2026-10-31 (histórica; ver R2 arriba)
 
 El [plan vigente](NATIVE_AGENT_PLAN.md) prioriza un personaje normal desde nivel 1.
 OpenKore será el único ejecutor de navegación, combate y rutinas reactivas; Python

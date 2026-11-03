@@ -1,4 +1,7 @@
-"""Persistent bounded solo policy. Decisions use one character's observations.
+"""Frozen (R2, 2026-11-03): off the main path; OpenKore auto (scripts/run_r1.py) replaces it.
+Kept for its tests and evidence; do not extend.
+
+Persistent bounded solo policy. Decisions use one character's observations.
 
 No bridge IO or model calls here. A checkpointed intent is never proposed twice.
 Only its matching terminal result can advance confirmed progress.

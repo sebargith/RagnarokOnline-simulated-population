@@ -1,4 +1,7 @@
-"""Walk reachability inside maps, shared by the field options and the zone table build.
+"""Frozen (R2, 2026-11-03): off the main path; OpenKore auto (scripts/run_r1.py) replaces it.
+Kept for its tests and evidence; do not extend.
+
+Walk reachability inside maps, shared by the field options and the zone table build.
 
 A zone is a connected set of walkable cells of OpenKore's field file (.fld2). OpenKore's
 route only steps diagonally when both orthogonal cells are walkable, so 4-neighbour

@@ -1,4 +1,7 @@
-"""One bounded P5 training sample, with durable summary and safe cleanup.
+"""Frozen (R2, 2026-11-03): off the main path; OpenKore auto (scripts/run_r1.py) replaces it.
+Kept for its tests and evidence; do not extend.
+
+One bounded P5 training sample, with durable summary and safe cleanup.
 
 By default the planner role re-decides the hunting field when one is due
 (level up, unsafe field, periodic review); --no-inference keeps the saved

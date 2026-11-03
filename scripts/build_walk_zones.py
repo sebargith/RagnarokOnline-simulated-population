@@ -1,4 +1,7 @@
-"""Build config/walk-zones.json from OpenKore's pinned portals table and field files.
+"""Frozen (R2, 2026-11-03): off the main path; OpenKore auto (scripts/run_r1.py) replaces it.
+Kept for its tests and evidence; do not extend.
+
+Build config/walk-zones.json from OpenKore's pinned portals table and field files.
 
 Portals are read as OpenKore's FileParsers::parsePortals reads them and kept with the
 filter of M1Travel::walk_graph (free, talk-less, no dynamic group), but same-map walk

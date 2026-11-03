@@ -1,4 +1,7 @@
-"""Run/resume one bounded solo goal; status reads files without bridge access.
+"""Frozen (R2, 2026-11-03): off the main path; OpenKore auto (scripts/run_r1.py) replaces it.
+Kept for its tests and evidence; do not extend.
+
+Run/resume one bounded solo goal; status reads files without bridge access.
 
 Requires the separate P1 client already running. Does not restart any service.
 The checkpoint survives this process; uncertain intents are queried, never sent
