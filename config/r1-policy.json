@@ -3,11 +3,11 @@
   "note": "R1 trial policy as data: each rule is on (event) + requires (conditions) + do (action). scripts/build_r1_profile.py translates it deterministically to OpenKore config; rules without a native equivalent are reported as gaps, never implemented in code.",
   "identity": "Tarin",
   "character": {
-    "source": "ragnarok.char SELECT for account 2000030, 2026-11-03 (read-only)",
-    "level": {"base": 5, "job": 3},
-    "job": "Novice",
-    "stats": {"str": 11, "agi": 5, "vit": 5, "int": 5, "dex": 5, "luk": 5},
-    "hp_max": 63,
+    "source": "ragnarok.char SELECT for account 2000030 after first_job c_2 (Swordman), 2026-11-03 (read-only)",
+    "level": {"base": 14, "job": 1},
+    "job": "Swordman",
+    "stats": {"str": 20, "agi": 5, "vit": 11, "int": 5, "dex": 5, "luk": 5},
+    "hp_max": 197,
     "equipped": [1201, 2301]
   },
   "rules": [

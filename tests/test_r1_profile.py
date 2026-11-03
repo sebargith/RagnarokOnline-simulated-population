@@ -51,7 +51,7 @@ class R1Profile(unittest.TestCase):
         self.assertEqual((c['sitAuto_hp_lower'], c['sitAuto_hp_upper']), ('45', '90'))
         self.assertEqual((c['sellAuto'], c['sellAuto_npc'], c['itemsMaxWeight_sellOrStore']), ('1', 'prontera 104 49', '30'))
         self.assertTrue(c['statsAddAuto_list'].startswith('20 str, 15 vit, 10 dex'))
-        self.assertEqual(c['skillsAddAuto_list'], 'NV_BASIC 9')  # Novice skills only
+        self.assertEqual(c['skillsAddAuto_list'], 'SM_SWORD 10, SM_BASH 10, SM_RECOVERY 5, SM_PROVOKE 5, SM_MAGNUM 10, SM_ENDURE 5')  # Swordman skills only
         self.assertEqual((c['teleportAuto_hp'], c['teleportAuto_minAggressives'], c['dcOnDeath']), ('30', '3', '0'))
         self.assertEqual(c['portalRecord'], '0')  # never rewrite the pinned portals.txt
         buys = {value: keys for name, value, keys in self.result['blocks'] if name == 'buyAuto'}
