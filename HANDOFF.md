@@ -7,8 +7,8 @@ Referencia: codex/single-agent-plan; R1 en 23a6688…545489d más documentos.
 - **Cómo lanzar:** `scripts/run_r1.py preflight|prepare|start|watch|stop|report --runtime ../runtime`; la política está en `config/r1-policy.json`.
 - **Estado:** cliente R1 detenido. Tarin en prt_fild06 (Base 11 / Job 8, 1350 Zeny, 3 Fly Wing). Nilo sin tocar (muerto, cliente 46148).
 - **Adoptado** por el usuario. Recálculo con recarga, venta al 30 % y parada en Job 10 ya están hechos (f13dbda).
-- **Última tanda:** cortada por RAM a los 782 s, con 0 intervenciones. Tarin en Base 12 / Job 8.
-- **Siguiente:** con RAM ≥ 2 GiB, `run_r1.py prepare/start/watch --seconds 14400` (para solo en Job 10); después, el paso al Job Changer con el puente.
+- **Última tanda:** llegó a Job 10 y se paró sola (`long-2`, 29 min, 0 intervenciones). Tarin es Novice Base 14 / Job 10 y cumple las condiciones del Job Changer.
+- **Siguiente:** `first_job` a Swordman con el puente (perfil manual de Tarin) y regenerar la política para Swordman. `watch --ram-min-gib` permite bajar el suelo de RAM si el usuario lo pide.
 ## Preflight 2026-11-01
 - No se lanzó otra ejecución: GPU 14991–15130 MiB, sobre el límite 14336 MiB; RAM libre 2,83 GiB. No se tocaron procesos.
 - El estado de la muestra anterior no es una observación actual; proceso 31704, puerto y locks no quedaron confirmados desde este entorno.

@@ -131,3 +131,22 @@ OpenKore en `auto` con la configuración generada entrenó 1 h sin intervención
 - observar una muerte real.
 
 Relanzar solo con RAM libre ≥ 2 GiB.
+
+**Tanda `long-2`** (`runtime/r1/evidence/long-2/`). A petición del usuario, el suelo de RAM se bajó a 0,5 GiB (`--ram-min-gib`, `f5273db`); la RAM libre mínima fue de 4,14 GiB.
+
+| Métrica | Resultado |
+| --- | --- |
+| Salida | `job10_ready` a los 1 720 s, sola |
+| Intervenciones / muertes / desconexiones | 0 / 0 / 0 |
+| Kills/h / EXP base/h / EXP job/h | 350 / 1 498 / 728 (167 kills; Base 12→14, Job 8→10) |
+| Recálculos en vivo | 2 confirmados (Base 12 y 13); 12 objetivos viables |
+| Build | VIT 6→11; NV_BASIC 9 y 0 puntos de habilidad (leído en la BD) |
+| Zeny / eventos inesperados / diálogos NPC | 1 350 sin cambios / 0 / 0 |
+| Reparto del tiempo | caza 1 655 s, descanso 65 s |
+| CPU / RAM del cliente | 8,0 % de un núcleo / 95 MiB |
+
+**Estado al terminar:** Tarin es Novice Base 14 / Job 10 en `prt_fild06`, sin puntos de habilidad. Cumple las condiciones del Job Changer, y el cliente R1 está detenido.
+
+En total, R1 ha sumado unas 1,7 h de juego sin ninguna intervención (1 h + 13 min + 29 min), en tres tandas que terminaron por presupuesto de tiempo, RAM del equipo y Job 10. El MTBI ≥ 4 h en una sola tanda sigue sin demostrarse.
+
+**Siguiente:** el paso al Job Changer. El modo `auto` está detenido; falta ejecutar `first_job` con el puente conciliado, en el perfil manual de Tarin, eligiendo Swordman. Después, regenerar la política para Swordman y volver al modo `auto`.
