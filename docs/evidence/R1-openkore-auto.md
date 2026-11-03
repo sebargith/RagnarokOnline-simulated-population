@@ -100,3 +100,34 @@ OpenKore en `auto` con la configuración generada entrenó 1 h sin intervención
 - el parámetro `avoid` propuesto.
 
 **El puente se conserva** para el tutorial, el Job Changer, el comercio y las compraventas que haya que conciliar.
+
+## Adopción (2026-11-03, aprobada por el usuario)
+
+**Cambios hechos sobre el perfil R1** (`861c8db`, `f13dbda`). El camino de P5 y Nilo siguen sin cambios.
+
+- **Recálculo al subir de nivel:**
+  - el supervisor regenera los archivos del perfil con los hechos observados (nivel, stats, HP máximo y equipo puesto);
+  - `bridge/r1/r1_reload.pl` los aplica con la recarga nativa (`Misc::parseReload`) y lo confirma con un evento `reloaded`;
+  - si la recarga falla o no se confirma en 60 s, la tanda se para. El hueco `refit_on_level` queda cerrado.
+- **Venta** al 30 % de peso.
+- **Parada en Job 10:** `watch` se detiene con `job10_ready` cuando el Novice tiene Job 10 y 0 puntos de habilidad, que es la regla del Job Changer propio. El cambio de clase sigue por el puente conciliado y aún no está conectado a R1.
+- **Suite:** 275 OK en 3 de 4 ejecuciones. Hubo 1 error único que no se repitió ni se pudo capturar, con la RAM del equipo baja en ese momento.
+
+**Tanda larga `long-1`** (`runtime/r1/evidence/long-1/`), con objetivo de 4 h y parada en Job 10:
+
+| Métrica | Resultado |
+| --- | --- |
+| Salida | `ram_guard` a los 782 s: RAM libre mínima de 1,7 GiB por otros programas del usuario; el cliente usaba 94 MiB |
+| Intervenciones / muertes | 0 / 0 |
+| Kills/h / EXP base/h / EXP job/h | 387 / 1 758 / 805 (84 kills; Base 11→12, Job 8 a 256/268) |
+| Recálculos en vivo | 2 confirmados (Base 11 y Base 12). Pasó de 6 a 12 objetivos viables en el OpenKore fijado (Pupa entra en `prt_fild06`) |
+| Build | STR 19→20 y después VIT 5→6, en el orden de la build |
+| Zeny / eventos inesperados / diálogos NPC | 1 350 sin cambios / 0 / 0 |
+| CPU | 6,7 % de un núcleo |
+
+**Sigue pendiente:**
+- MTBI ≥ 4 h: no demostrado, porque la tanda la cortó la RAM del equipo y no el bot;
+- llegar a Job 10 y el paso al Job Changer: parar el modo `auto`, ejecutar `first_job` con el puente y regenerar la política para Swordman;
+- observar una muerte real.
+
+Relanzar solo con RAM libre ≥ 2 GiB.

@@ -17,7 +17,9 @@
   - observar una muerte real;
   - tanda de ≥ 4 h.
 - **Corregido:** OpenKore escribía portales y tiendas en `vendor/openkore/tables`; se restauraron y ahora el perfil R1 usa copias propias y `portalRecord 0`. P5 hereda `portalRecord 2`, sin comprobar.
-- **Estado al terminar:** cliente R1 detenido. Tarin en `prt_fild06`, Base 11 / Job 8, 1 350 Zeny y 3 Fly Wing. Nilo sin tocar. Suite: 271 OK.
+- **Adoptado (usuario):** recálculo al subir de nivel con recarga confirmada (2 en vivo), venta al 30 % y parada en Job 10. La tanda larga se cortó por RAM (1,7 GiB libres) a los 782 s, con 0 intervenciones.
+- **Estado al terminar:** cliente R1 detenido. Tarin en `prt_fild06`, Base 12 / Job 8 (256/268), 1 350 Zeny y 3 Fly Wing. Nilo sin tocar. Suite: 275 OK.
+- **Siguiente:** con RAM ≥ 2 GiB, relanzar hasta Job 10 y después conectar el Job Changer.
 
 ## P5.6 — alcanzabilidad a pie y tiempo de viaje (2026-11-02, Claude)
 
