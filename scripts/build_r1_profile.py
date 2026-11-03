@@ -167,6 +167,10 @@ def translate(policy, tables):
             emit(rule, teleportAuto_hp=str(rule['value']))
         elif do.get('teleport') and rule['on'] == 'aggressives_at_least':
             emit(rule, teleportAuto_minAggressives=str(rule['value']))
+        elif do.get('regenerate_profile'):
+            # Not an OpenKore key: scripts/run_r1.py regenerates from observed facts and
+            # bridge/r1/r1_reload.pl applies it with OpenKore's own reload.
+            mapping.setdefault(rid, []).append('supervisor:refit+r1_reload')
         elif do.get('respawn'):
             # Native: processDead sends the restart; lockMap routes back to the field.
             emit(rule, dcOnDeath='0')
@@ -186,8 +190,6 @@ def translate(policy, tables):
 GAP_REASONS = {
     'move_away': 'melee without Fly Wing: OpenKore has no flee for melee (runFromTarget only keeps range '
                  'while attacking); routeWeights is fixed at load time, so a map cannot be avoided after the fact',
-    'regenerate_profile': 'OpenKore applies config on load/reload only; raising stats is native '
-                          '(raiseStat) but re-deciding viability per level needs the planner to rewrite and reload',
 }
 
 

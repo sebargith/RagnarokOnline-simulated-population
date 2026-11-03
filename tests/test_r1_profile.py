@@ -49,7 +49,7 @@ class R1Profile(unittest.TestCase):
         self.assertEqual((c['lockMap'], c['attackAuto'], c['route_randomWalk']), ('prt_fild06', '2', '1'))
         self.assertEqual(c['route_maxWarpFee'], '0')
         self.assertEqual((c['sitAuto_hp_lower'], c['sitAuto_hp_upper']), ('45', '90'))
-        self.assertEqual((c['sellAuto'], c['sellAuto_npc'], c['itemsMaxWeight_sellOrStore']), ('1', 'prontera 104 49', '40'))
+        self.assertEqual((c['sellAuto'], c['sellAuto_npc'], c['itemsMaxWeight_sellOrStore']), ('1', 'prontera 104 49', '30'))
         self.assertTrue(c['statsAddAuto_list'].startswith('20 str, 15 vit, 10 dex'))
         self.assertEqual(c['skillsAddAuto_list'], 'NV_BASIC 9')  # Novice skills only
         self.assertEqual((c['teleportAuto_hp'], c['teleportAuto_minAggressives'], c['dcOnDeath']), ('30', '3', '0'))
@@ -85,7 +85,8 @@ class R1Profile(unittest.TestCase):
             r1.translate(policy, TABLES)
 
     def test_untranslatable_rules_are_gaps(self):
-        self.assertEqual({g['rule'] for g in self.result['gaps']}, {'leave_pack_no_wings', 'refit_on_level'})
+        self.assertEqual({g['rule'] for g in self.result['gaps']}, {'leave_pack_no_wings'})
+        self.assertEqual(self.result['mapping']['refit_on_level'], ['supervisor:refit+r1_reload'])
 
     def test_render_replaces_keys_and_template_blocks(self):
         files = r1.render(self.result, TEMPLATE)

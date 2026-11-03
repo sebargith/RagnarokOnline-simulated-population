@@ -58,7 +58,8 @@ sub sample {
      hp => 0 + ($char->{hp} // 0), hp_max => 0 + ($char->{hp_max} // 0), dead => $char->{dead} ? 1 : 0,
      sitting => $char->{sitting} ? 1 : 0, zeny => zeny(), weight => 0 + ($char->{weight} // 0),
      weight_max => 0 + ($char->{weight_max} // 0), points_free => 0 + ($char->{points_free} // 0),
-     points_skill => 0 + ($char->{points_skill} // 0),
+     points_skill => 0 + ($char->{points_skill} // 0), job_id => 0 + ($char->{jobID} // 0),
+     equipped => [sort { $a <=> $b } map { 0 + $_->{nameID} } grep { $_->{equipped} } @{$char->inventory->getItems}],
      stats => {map { $_ => 0 + ($char->{$_} // 0) } qw(str agi vit int dex luk)},
      level => level(), ai => [queue_view()], inventory => \%inventory}
 }

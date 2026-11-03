@@ -54,7 +54,28 @@ class ObserverContract(unittest.TestCase):
         text = (ROOT/'bridge/r1/r1_observer.pl').read_text()
         for pattern in (r'messageSender', r'Commands::', r'\bsend\w*\(', r'configModify', r'AI::queue', r'ai_\w+\('):
             self.assertIsNone(re.search(pattern, text), pattern)
-        self.assertEqual(run_r1.PLUGINS, 'r1_observer,raiseStat,raiseSkill')  # m1_bridge never loads
+        self.assertEqual(run_r1.PLUGINS, 'r1_observer,r1_reload,raiseStat,raiseSkill')  # m1_bridge never loads
+
+    def test_reload_plugin_only_reloads_profile_files(self):
+        text = (ROOT/'bridge/r1/r1_reload.pl').read_text()
+        for pattern in (r'messageSender', r'Commands::', r'\bsend\w*\(', r'AI::queue', r'configModify'):
+            self.assertIsNone(re.search(pattern, text), pattern)
+        self.assertIn('Misc::parseReload(FILES)', text)
+        for name in ('config', 'mon_control', 'items_control', 'routeweights'):
+            self.assertIn(name + '\\.txt$', text)
+
+
+class Refit(unittest.TestCase):
+    def test_facts_from_observed_sample(self):
+        s = dict(sample(9, base=9), job_id=0, equipped=[1201, 2301])
+        f = run_r1.facts_of(s)
+        self.assertEqual((f['level'], f['job'], f['equipped'], f['hp_max']),
+                         ({'base': 9, 'job': 3}, 'Novice', [1201, 2301], 63))
+        self.assertIsNone(run_r1.facts_of(dict(s, job_id=1)))  # first class: not refit here
+
+    def test_refits_are_reported(self):
+        events = [sample(0), {'t': 1, 'type': 'reloaded', 'id': 'refit-6-1', 'ok': 1, 'lockMap': LOCK, 'error': ''}]
+        self.assertEqual(run_r1.summarize(events, LOCK, 0)['refits'][0]['id'], 'refit-6-1')
 
 
 if __name__ == '__main__':

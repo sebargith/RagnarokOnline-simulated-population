@@ -20,7 +20,7 @@
     {"id": "free_portals_only", "on": "route", "do": {"warp_fee_max": 0, "avoid_transport": ["NPC", "COMMAND", "AIRSHIP"]}},
     {"id": "rest", "on": "hp_below", "value": 45, "do": {"sit_until_hp": 90}},
     {"id": "heal", "on": "hp_below", "value": 35, "do": {"use_item": [512, 507]}},
-    {"id": "sell_loot", "on": "weight_above", "value": 40, "do": {"sell_at": "Fruit Gardener#prt", "keep": [512, 507, 601, 602]}},
+    {"id": "sell_loot", "on": "weight_above", "value": 30, "do": {"sell_at": "Fruit Gardener#prt", "keep": [512, 507, 601, 602]}},
     {"id": "buy_apples", "on": "item_below", "requires": {"zeny_at_least": 150}, "do": {"buy": {"item": 512, "name": "Apple", "at": "Fruit Gardener#prt", "min": 2, "max": 10}}},
     {"id": "buy_fly_wings", "on": "item_below", "requires": {"zeny_at_least": 300}, "do": {"buy": {"item": 601, "name": "Fly Wing", "at": "Tool Dealer#prt1", "min": 0, "max": 3}}},
     {"id": "raise_build", "on": "points_free", "do": {"raise_build": "novice-swordman"}},

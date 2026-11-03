@@ -31,7 +31,9 @@ from scripts.bench_m2 import ram_sample
 from scripts.prepare_m4 import bind_runtime
 
 NAME, USERID, PORT, CLIENT = 'Tarin', 'p1solo', 8772, 'r1-tarin'
-PLUGINS = 'r1_observer,raiseStat,raiseSkill'
+PLUGINS = 'r1_observer,r1_reload,raiseStat,raiseSkill'
+JOBS = {0: 'Novice'}  # classes the generator knows skill prefixes for
+RELOAD_CONFIRM_S = 60
 SUPPLY_AI = {'sellAuto', 'buyAuto', 'storageAuto'}
 CONSUMED = {512, 507, 601}  # useSelf_item Apple/Red Herb, teleport Fly Wing
 RAM_MIN, GPU_MAX = 2 * 1024**3, 14336
@@ -50,10 +52,14 @@ def bind(runtime):
     (m1.RUN/'logs').mkdir(parents=True, exist_ok=True)
 
 
-def prepare(runtime, policy_path=ROOT/'config/r1-policy.json'):
+def prepare(runtime, policy_path=ROOT/'config/r1-policy.json', character=None):
+    """Write the profile. With character (observed facts), only the generated
+    files are rewritten, for r1_reload to apply in place."""
     p, template = paths(runtime), runtime.resolve()/'openkore/agent'
     password = json.loads((runtime.resolve()/'p1/secrets.json').read_text())['password']
     policy = json.loads(Path(policy_path).read_text(encoding='utf-8'))
+    if character:
+        policy['character'] = character
     result = build_r1_profile.translate(policy, build_r1_profile.load_tables())
     files = build_r1_profile.render(result, (template/'config.txt').read_text(encoding='utf-8'))
     for key, value in {'username': USERID, 'password': password}.items():
@@ -63,6 +69,8 @@ def prepare(runtime, policy_path=ROOT/'config/r1-policy.json'):
     p['observer'].mkdir(parents=True, exist_ok=True)
     for name, text in files.items():
         m1.write(p['profile']/name, text)
+    if character:
+        return result
     for name in ('servers.txt', 'timeouts.txt'):
         shutil.copyfile(template/name, p['profile']/name)
     # The profile is first in --tables, so OpenKore's shop/portal recording
@@ -76,6 +84,17 @@ def prepare(runtime, policy_path=ROOT/'config/r1-policy.json'):
               'avoided_maps': sorted(k for k in result['weights'] if k not in build_r1_profile.TRANSPORT_WEIGHTS)}
     m1.write(p['base']/'profile-report.json', json.dumps(report, indent=1, default=str))
     print(f'R1 profile ready: {p["profile"]} (gaps: {[g["rule"] for g in result["gaps"]]})')
+    return result
+
+
+def facts_of(sample):
+    """Policy character facts from one observer sample; None for a class the generator does not know."""
+    job = JOBS.get(sample.get('job_id', 0))
+    if not job or not sample.get('equipped'):
+        return None
+    return {'source': f'observer sample t={sample["t"]}', 'job': job,
+            'level': {'base': sample['level']['base'], 'job': sample['level']['job']},
+            'stats': sample['stats'], 'hp_max': sample['hp_max'], 'equipped': sample['equipped']}
 
 
 def resources(pid=None):
@@ -207,6 +226,8 @@ def summarize(events, lock_map, started=None):
         if e['type'] == 'zeny' and not supply and e['change'] != e['zeny']:
             unexpected.append({'t': e['t'], 'kind': 'zeny_change_outside_supply', 'change': e['change'], 'map': e['map']})
     teleports = [e['t'] for e in events if e['type'] == 'teleport']
+    refits = [{'t': e['t'], 'id': e['id'], 'ok': e['ok'], 'lockMap': e['lockMap'], 'error': e['error']}
+              for e in events if e['type'] == 'reloaded']
     for a, b in zip(samples, samples[1:]):
         if SUPPLY_AI & set(a['ai'] + b['ai']):
             continue
@@ -230,7 +251,7 @@ def summarize(events, lock_map, started=None):
             'deaths': deaths, 'teleports': len(teleports),
             'npc_dialogs': [{'name': e['name'], 'map': e['map'], 'supply': bool(SUPPLY_AI & set(e.get('ai', [])))}
                             for e in events if e['type'] == 'npc_talk'],
-            'unexpected': unexpected, 'disconnects': sum(1 for e in events if e['type'] == 'disconnected')}
+            'refits': refits, 'unexpected': unexpected, 'disconnects': sum(1 for e in events if e['type'] == 'disconnected')}
 
 
 def lock_map(policy_path):
@@ -244,6 +265,10 @@ def watch(runtime, seconds, policy_path=ROOT/'config/r1-policy.json', summary=No
     bind(runtime)
     pid = json.loads((m1.RUN/'processes.json').read_text())[CLIENT]['pid']
     started, reason, res = time.time(), 'time_budget', []
+    # Refit from the level the profile was generated for, so a character that has
+    # outgrown it is refit as soon as it is observed.
+    refit_level = json.loads(Path(policy_path).read_text(encoding='utf-8'))['character']['level']['base']
+    pending, refit_log = None, []
     try:
         while time.time() - started < seconds:
             time.sleep(10)
@@ -258,6 +283,32 @@ def watch(runtime, seconds, policy_path=ROOT/'config/r1-policy.json', summary=No
             deaths = [e for e in events if e['type'] == 'died' and e['t'] > time.time() - DEATH_WINDOW_S]
             if len(deaths) >= DEATHS_MAX:
                 reason = 'death_loop'; break
+            samples = [e for e in events if e['type'] == 'sample' and e.get('connected')]
+            if samples:
+                base = samples[-1]['level']['base']
+                if base > refit_level and not pending:
+                    # Single sync point: regenerate from observed facts, then ask r1_reload.
+                    facts = facts_of(samples[-1])
+                    refit_level = base
+                    try:
+                        result = prepare(runtime, policy_path, facts) if facts else None
+                    except ValueError as e:  # e.g. the field turned hostile: keep the loaded profile
+                        refit_log.append({'t': time.time(), 'facts': facts, 'error': str(e)})
+                        result = None
+                    if result:
+                        pending = (f'refit-{base}-{int(time.time())}', time.time())
+                        m1.write(p['observer']/'reload.request', pending[0])
+                        refit_log.append({'t': time.time(), 'id': pending[0], 'facts': facts,
+                                          'classes': {k: sum(1 for v in result['kinds'].values() if v == k)
+                                                      for k in ('viable', 'spare', 'aggressive', 'threat')}})
+            if pending:
+                done = [e for e in events if e['type'] == 'reloaded' and e['id'] == pending[0]]
+                if done and not done[-1]['ok']:
+                    reason = 'reload_failed'; break
+                if done:
+                    pending = None
+                elif time.time() - pending[1] > RELOAD_CONFIRM_S:
+                    reason = 'reload_unconfirmed'; break
             bad = [u for u in summarize(events, lock, started)['unexpected'] if u['kind'] != 'inventory_loss']
             if bad:
                 reason = f'unexpected:{bad[0]["kind"]}'; break
@@ -268,6 +319,7 @@ def watch(runtime, seconds, policy_path=ROOT/'config/r1-policy.json', summary=No
             stop(runtime)
     out = summarize(read_events(p['events'], started), lock, started)
     cpu = [r for r in res if r['cpu_s'] is not None]
+    out['refit_requests'] = refit_log
     out.update({'stop_reason': reason, 'started': started, 'ended': time.time(), 'pid': pid,
                 'resources': {'samples': len(res),
                               'cpu_pct_one_core': round(100 * (cpu[-1]['cpu_s'] - cpu[0]['cpu_s']) / (cpu[-1]['t'] - cpu[0]['t']), 2) if len(cpu) > 1 else None,
