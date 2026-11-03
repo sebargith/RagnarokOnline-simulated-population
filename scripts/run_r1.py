@@ -210,6 +210,7 @@ def first_job(runtime, job):
             end = time.time() + timeout
             while time.time() < end:
                 b.poll(.5)
+                b.drain()  # only the latest snapshot matters here
                 s = b.latest and b.latest['data']
                 if s and s.get('connected') and s.get('inventory_ready') and time.time() * 1000 - b.latest['time_ms'] < 2000:
                     return s
@@ -222,7 +223,9 @@ def first_job(runtime, job):
             log['requests'].append(entry)
             end = time.time() + timeout + 30
             while time.time() < end:
-                for e in b.poll(.5):
+                received = b.poll(.5)
+                b.drain()
+                for e in received:
                     if e['kind'] == 'action_result' and e['data']['request_id'] == request['id']:
                         entry['results'].append(e['data'])
                         if e['data']['status'] != 'accepted':
