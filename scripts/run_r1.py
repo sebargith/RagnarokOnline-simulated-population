@@ -264,7 +264,7 @@ def lock_map(policy_path):
     return json.loads(Path(policy_path).read_text(encoding='utf-8'))['rules'][0]['do']['hunt']['field']
 
 
-def watch(runtime, seconds, policy_path=ROOT/'config/r1-policy.json', summary=None):
+def watch(runtime, seconds, policy_path=ROOT/'config/r1-policy.json', summary=None, ram_min=RAM_MIN):
     """Supervise one bounded run: only guards and measurement, never game input."""
     p = paths(runtime)
     lock = lock_map(policy_path)
@@ -281,7 +281,7 @@ def watch(runtime, seconds, policy_path=ROOT/'config/r1-policy.json', summary=No
             if not alive(pid):
                 reason = 'client_exited'; break
             sample = resources(pid); sample['t'] = time.time(); res.append(sample)
-            if sample['ram_available'] < RAM_MIN:
+            if sample['ram_available'] < ram_min:
                 reason = 'ram_guard'; break
             if sample['gpu_used_mib'] >= GPU_MAX:
                 reason = 'gpu_guard'; break
@@ -328,7 +328,7 @@ def watch(runtime, seconds, policy_path=ROOT/'config/r1-policy.json', summary=No
     out = summarize(read_events(p['events'], started), lock, started)
     cpu = [r for r in res if r['cpu_s'] is not None]
     out['refit_requests'] = refit_log
-    out.update({'stop_reason': reason, 'started': started, 'ended': time.time(), 'pid': pid,
+    out.update({'ram_min_gib': round(ram_min / 2**30, 2), 'stop_reason': reason, 'started': started, 'ended': time.time(), 'pid': pid,
                 'resources': {'samples': len(res),
                               'cpu_pct_one_core': round(100 * (cpu[-1]['cpu_s'] - cpu[0]['cpu_s']) / (cpu[-1]['t'] - cpu[0]['t']), 2) if len(cpu) > 1 else None,
                               'client_ws_max_mib': round(max(r['client_ws'] for r in res) / 2**20) if res else None,
@@ -346,6 +346,8 @@ def main():
     parser.add_argument('--since', type=float, default=0)
     parser.add_argument('--policy', type=Path, default=ROOT/'config/r1-policy.json')
     parser.add_argument('--summary', type=Path, help='summary path (default runtime/r1/summary.json)')
+    parser.add_argument('--ram-min-gib', type=float, default=RAM_MIN / 2**30,
+                        help='stop below this free RAM (default 2; the user may lower it)')
     args = parser.parse_args()
     if args.command == 'preflight':
         preflight(args.runtime)
@@ -354,7 +356,7 @@ def main():
     elif args.command == 'start':
         start(args.runtime)
     elif args.command == 'watch':
-        watch(args.runtime, args.seconds, args.policy, args.summary)
+        watch(args.runtime, args.seconds, args.policy, args.summary, int(args.ram_min_gib * 2**30))
     elif args.command == 'stop':
         stop(args.runtime)
     else:
