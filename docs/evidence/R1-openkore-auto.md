@@ -150,3 +150,37 @@ Relanzar solo con RAM libre ≥ 2 GiB.
 En total, R1 ha sumado unas 1,7 h de juego sin ninguna intervención (1 h + 13 min + 29 min), en tres tandas que terminaron por presupuesto de tiempo, RAM del equipo y Job 10. El MTBI ≥ 4 h en una sola tanda sigue sin demostrarse.
 
 **Siguiente:** el paso al Job Changer. El modo `auto` está detenido; falta ejecutar `first_job` con el puente conciliado, en el perfil manual de Tarin, eligiendo Swordman. Después, regenerar la política para Swordman y volver al modo `auto`.
+
+## Cambio de clase a Swordman (2026-11-03, aprobado por el usuario)
+
+**Ejecución:** `scripts/run_r1.py first-job --job Swordman`. Arranca el perfil R1 de Tarin en `--ai=manual` con `m1_bridge` (puerto 8772 y token propio, sin tocar P1), lo lleva junto al NPC y envía **una** petición `first_job`. Solo se da por cambiada la clase con el paquete del servidor, nunca reenviando la petición.
+
+- **Intento 1** (`first-job-1`): el puente no abrió el puerto, porque su lista de puertos acababa en 8771. Se corrigió en `8dcc497`. No se envió nada.
+- **Intento 2** (`first-job-2`): la cola de eventos del cliente se llenó durante el viaje (el script no la vaciaba) y el paso se abortó. Se corrigió en `83e20c9`. El viaje `c_1` llegó a aceptarse, pero no se envió `first_job`.
+- **Intento 3** (`first-job-3`):
+  - `c_1 navigate` → `completed/arrived` en Prontera (153,190);
+  - `c_2 first_job` → `accepted/npc_name_requested` → `accepted/talk_sent` → **`completed/job_changed`**, con «First Job Changer» resuelto por el servidor, la elección `Swordman, Confirm` y `observed_job 1 = expected_job 1`;
+  - Zeny e inventario idénticos antes y después;
+  - en la BD: clase 1, Base 14 / Job 1, 0 puntos de habilidad.
+
+Es el primer cambio de clase real con un personaje elegible en el proyecto. En P5 solo se había visto la negativa del NPC.
+
+**Vuelta al modo `auto` como Swordman** (`swordman-1`, 904 s, `dc61122`). Los hechos de la política son ahora Swordman Base 14; hay 15 objetivos viables y en `prt_fild06` ya lo son todos.
+
+| Métrica | Resultado |
+| --- | --- |
+| Salida | `time_budget` |
+| Intervenciones / muertes / diálogos NPC / eventos inesperados | 0 / 0 / 0 / 0 |
+| Kills/h / EXP base/h / EXP job/h | 203 / 1 771 / 581 (51 kills; Job 1→4) |
+| Habilidades | SM_SWORD 0→3 con `raiseSkill` (leído en la BD) |
+| Rutas | Prontera → `prt_fild06` al arrancar, y 2 viajes al Tool Dealer (`prt_in`), todos por portales |
+| Huida | 6 teletransportes reactivos con Fly Wing por HP bajo o varios agresivos; las alas se repusieron solas (Zeny 1 350 → 990) |
+| Reparto del tiempo | caza 342 s, descanso 296, viaje 100, abastecimiento 166 |
+| CPU / RAM del cliente | 7,4 % de un núcleo / 99 MiB |
+
+**Ajustes pendientes:**
+- `prt_fild06` se queda corto para un Swordman de Base 14: elegir campo es tarea del planner y la política aún lo fija;
+- los teletransportes son caros y frecuentes (6 en 15 min, 360 Zeny); hay que revisar `teleportAuto_hp` y `teleportAuto_minAggressives`, o el campo;
+- el descanso ocupa el 33 % del tiempo.
+
+Estas tandas de R1 nunca escribieron en las tablas fijadas de OpenKore.
