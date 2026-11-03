@@ -20,7 +20,7 @@ from agent import build_policy, hunting
 RATHENA = ROOT.parent/'vendor/rathena'
 OPENKORE = ROOT.parent/'vendor/openkore'
 SUPPLY_MAPS = {'prontera', 'prt_in'}
-JOB_SKILL_PREFIX = {'Novice': 'NV_'}
+JOB_SKILL_PREFIX = {'Novice': 'NV_', 'Swordman': 'SM_'}
 TRANSPORT_WEIGHTS = {'NPC', 'COMMAND', 'AIRSHIP'}
 # Unconditional profile settings (not decisions): the observer only reads, so
 # OpenKore must not trade, gather others' loot or sit idle like a bot, nor

@@ -71,7 +71,8 @@ class Refit(unittest.TestCase):
         f = run_r1.facts_of(s)
         self.assertEqual((f['level'], f['job'], f['equipped'], f['hp_max']),
                          ({'base': 9, 'job': 3}, 'Novice', [1201, 2301], 63))
-        self.assertIsNone(run_r1.facts_of(dict(s, job_id=1)))  # first class: not refit here
+        self.assertEqual(run_r1.facts_of(dict(s, job_id=1))['job'], 'Swordman')
+        self.assertIsNone(run_r1.facts_of(dict(s, job_id=2)))  # Mage: no build here
 
     def test_job10_stop_matches_the_job_changer_rule(self):
         ready = dict(sample(0, job=10), job_id=0, points_skill=0)

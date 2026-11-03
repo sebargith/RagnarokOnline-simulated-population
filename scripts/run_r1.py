@@ -12,6 +12,9 @@ game action: OpenKore's own AI acts, the observer only writes events.
   watch      run up to --seconds with stop guards, then stop and summarize
   stop       stop the R1 client
   report     summarize runtime/r1/observer/events.jsonl
+  first-job  irreversible class change on the reconciled bridge: Tarin's R1 profile
+             in --ai=manual with m1_bridge (port 8772), travel to the Job Changer,
+             one first_job request; success only from the server's job packet
 """
 import argparse
 import ctypes
@@ -19,6 +22,7 @@ import ctypes.wintypes as wt
 import json
 from pathlib import Path
 import re
+import secrets
 import shutil
 import subprocess
 import sys
@@ -32,7 +36,7 @@ from scripts.prepare_m4 import bind_runtime
 
 NAME, USERID, PORT, CLIENT = 'Tarin', 'p1solo', 8772, 'r1-tarin'
 PLUGINS = 'r1_observer,r1_reload,raiseStat,raiseSkill'
-JOBS = {0: 'Novice'}  # classes the generator knows skill prefixes for
+JOBS = {0: 'Novice', 1: 'Swordman'}  # OpenKore jobID -> classes the generator knows skill prefixes for
 RELOAD_CONFIRM_S = 60
 SUPPLY_AI = {'sellAuto', 'buyAuto', 'storageAuto'}
 CONSUMED = {512, 507, 601}  # useSelf_item Apple/Red Herb, teleport Fly Wing
@@ -170,6 +174,79 @@ def start(runtime):
                                             'started': time.time()}}, indent=2))
     print(f'R1 client started: PID {process.pid}')
     return process.pid
+
+
+def first_job(runtime, job):
+    """One reconciled class change. Never resends an action: an uncertain result
+    is recorded for reconciliation and the client is stopped."""
+    from bridge.client import Bridge
+    p = paths(runtime)
+    bind(runtime)
+    if (runtime.resolve()/'p1/processes.json').exists() or (m1.RUN/'processes.json').exists():
+        raise RuntimeError('A client for this account is registered; stop it first')
+    bridge_dir = p['base']/'bridge'
+    bridge_dir.mkdir(parents=True, exist_ok=True)
+    config = bridge_dir/'bridge.json'
+    m1.write(config, json.dumps({'agent_id': 'tarin', 'port': PORT, 'token': secrets.token_hex(20),
+                                 'native_navigation': True}))
+    sys_txt = p['profile']/'sys.txt'
+    auto_plugins = sys_txt.read_text()
+    m1.write(sys_txt, re.sub(r'(?m)^loadPlugins_list.*$', 'loadPlugins_list m1_bridge,r1_observer', auto_plugins))
+    args = [m1.PERL/'perl/bin/perl.exe', f'-I{ROOT/"bridge/lib"}', 'openkore.pl',
+            f'--control={p["profile"]};{m1.OK/"control"}', f'--tables={p["profile"]};{m1.OK/"tables"}',
+            f'--logs={p["profile"]/"logs"}', f'--plugins={ROOT/"bridge/openkore"};{ROOT/"bridge/r1"}',
+            '--interface=M1Headless', '--ai=manual']
+    env = m1.env_perl()
+    env.update(M1_BRIDGE_CONFIG=str(config), R1_OBSERVER_DIR=str(p['observer']))
+    process = m1.launch(args, CLIENT, m1.OK, env)
+    m1.write(m1.RUN/'processes.json', json.dumps({CLIENT: {'pid': process.pid,
+        'exe': str((m1.PERL/'perl/bin/perl.exe').resolve()), 'started': time.time()}}, indent=2))
+    log = {'job': job, 'started': time.time(), 'pid': process.pid, 'requests': []}
+    try:
+        m1.wait_port(PORT, 60)
+        b = Bridge(config)
+
+        def snapshot(timeout=900):
+            end = time.time() + timeout
+            while time.time() < end:
+                b.poll(.5)
+                s = b.latest and b.latest['data']
+                if s and s.get('connected') and s.get('inventory_ready') and time.time() * 1000 - b.latest['time_ms'] < 2000:
+                    return s
+            raise TimeoutError('no fresh in-game snapshot')
+
+        def act(action, timeout):
+            snapshot()
+            request = b.proposal(action, request_id=b.serial_id())
+            entry = {'request': request['id'], 'action': action, 'results': []}
+            log['requests'].append(entry)
+            end = time.time() + timeout + 30
+            while time.time() < end:
+                for e in b.poll(.5):
+                    if e['kind'] == 'action_result' and e['data']['request_id'] == request['id']:
+                        entry['results'].append(e['data'])
+                        if e['data']['status'] != 'accepted':
+                            return e['data']
+            return {'status': 'unknown', 'reason': 'no_final_result_observed'}
+
+        start = snapshot()
+        log['before'] = {k: start.get(k) for k in ('map', 'position', 'level', 'zeny')}
+        if start['map'] != 'prontera':
+            moved = act({'type': 'travel', 'map': 'prontera', 'x': 153, 'y': 190, 'timeout_s': 300}, 300)
+            if moved['status'] != 'completed':
+                log['outcome'] = 'travel_' + moved['status']; return log
+        else:
+            moved = act({'type': 'navigate', 'map': 'prontera', 'x': 153, 'y': 190, 'timeout_s': 60}, 60)
+        log['outcome'] = act({'type': 'first_job', 'job': job, 'timeout_s': 30}, 30)
+        after = snapshot(30)
+        log['after'] = {k: after.get(k) for k in ('map', 'position', 'level', 'zeny', 'progress')}
+        return log
+    finally:
+        log['ended'] = time.time()
+        m1.write(p['base']/'first-job.json', json.dumps(log, indent=1, default=str))
+        if alive(process.pid):
+            stop(runtime)
+        m1.write(sys_txt, auto_plugins)
 
 
 def stop(runtime):
@@ -340,7 +417,8 @@ def watch(runtime, seconds, policy_path=ROOT/'config/r1-policy.json', summary=No
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('command', choices=('preflight', 'prepare', 'start', 'watch', 'stop', 'report'))
+    parser.add_argument('command', choices=('preflight', 'prepare', 'start', 'watch', 'stop', 'report', 'first-job'))
+    parser.add_argument('--job', default='Swordman', choices=('Swordman', 'Mage', 'Archer', 'Acolyte', 'Merchant', 'Thief'))
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('--seconds', type=int, default=3600)
     parser.add_argument('--since', type=float, default=0)
@@ -359,6 +437,9 @@ def main():
         watch(args.runtime, args.seconds, args.policy, args.summary, int(args.ram_min_gib * 2**30))
     elif args.command == 'stop':
         stop(args.runtime)
+    elif args.command == 'first-job':
+        log = first_job(args.runtime, args.job)
+        print(json.dumps({k: log.get(k) for k in ('outcome', 'before', 'after')}, default=str))
     else:
         print(json.dumps(summarize(read_events(paths(args.runtime)['events'], args.since), lock_map(args.policy), args.since or None), indent=1))
 
