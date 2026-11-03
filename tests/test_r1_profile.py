@@ -53,6 +53,7 @@ class R1Profile(unittest.TestCase):
         self.assertTrue(c['statsAddAuto_list'].startswith('20 str, 15 vit, 10 dex'))
         self.assertEqual(c['skillsAddAuto_list'], 'NV_BASIC 9')  # Novice skills only
         self.assertEqual((c['teleportAuto_hp'], c['teleportAuto_minAggressives'], c['dcOnDeath']), ('30', '3', '0'))
+        self.assertEqual(c['portalRecord'], '0')  # never rewrite the pinned portals.txt
         buys = {value: keys for name, value, keys in self.result['blocks'] if name == 'buyAuto'}
         self.assertEqual(buys['601']['npc'], 'prt_in 126 76')  # Tool Dealer#prt1 sells Fly Wing
         self.assertEqual(buys['512']['zeny'], '>= 150')

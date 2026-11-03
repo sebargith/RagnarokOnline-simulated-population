@@ -1,6 +1,12 @@
 # Relevo — Ragnarok Agents
-Actualizado: 2026-11-02 por Claude (alcanzabilidad a pie y tiempo de viaje).
-Referencia: codex/single-agent-plan, código a682e76; documentos en commit siguiente.
+Actualizado: 2026-11-03 por Claude (prueba R1, OpenKore `auto`).
+Referencia: codex/single-agent-plan; R1 en 23a6688…545489d más documentos.
+## R1 2026-11-03 (Claude)
+- **Resultado:** adoptar con cambios. Ver docs/evidence/R1-openkore-auto.md.
+- **Tarin en el perfil runtime/r1:** 1 h sin intervención, 316 kills/h, 0 muertes; venta y compra solo por portales.
+- **Cómo lanzar:** `scripts/run_r1.py preflight|prepare|start|watch|stop|report --runtime ../runtime`; la política está en `config/r1-policy.json`.
+- **Estado:** cliente R1 detenido. Tarin en prt_fild06 (Base 11 / Job 8, 1350 Zeny, 3 Fly Wing). Nilo sin tocar (muerto, cliente 46148).
+- **Siguiente:** que el usuario decida si adoptar R1. Si se adopta: recalcular al subir de nivel con `reload`, venta al 25–30 %, observar una muerte real y una tanda de ≥ 4 h.
 ## Preflight 2026-11-01
 - No se lanzó otra ejecución: GPU 14991–15130 MiB, sobre el límite 14336 MiB; RAM libre 2,83 GiB. No se tocaron procesos.
 - El estado de la muestra anterior no es una observación actual; proceso 31704, puerto y locks no quedaron confirmados desde este entorno.

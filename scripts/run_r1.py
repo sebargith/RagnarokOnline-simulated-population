@@ -65,6 +65,10 @@ def prepare(runtime, policy_path=ROOT/'config/r1-policy.json'):
         m1.write(p['profile']/name, text)
     for name in ('servers.txt', 'timeouts.txt'):
         shutil.copyfile(template/name, p['profile']/name)
+    # The profile is first in --tables, so OpenKore's shop/portal recording
+    # writes these copies instead of the pinned vendor tables.
+    for name in build_r1_profile.WRITTEN_TABLES:
+        shutil.copyfile(m1.OK/'tables'/name, p['profile']/name)
     sys_txt = (template/'sys.txt').read_text()
     sys_txt = re.sub(r'(?m)^loadPlugins_list.*$', f'loadPlugins_list {PLUGINS}', sys_txt)
     m1.write(p['profile']/'sys.txt', sys_txt)

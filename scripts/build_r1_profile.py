@@ -23,9 +23,12 @@ SUPPLY_MAPS = {'prontera', 'prt_in'}
 JOB_SKILL_PREFIX = {'Novice': 'NV_'}
 TRANSPORT_WEIGHTS = {'NPC', 'COMMAND', 'AIRSHIP'}
 # Unconditional profile settings (not decisions): the observer only reads, so
-# OpenKore must not trade, gather others' loot or sit idle like a bot.
+# OpenKore must not trade, gather others' loot or sit idle like a bot, nor
+# record portals into the pinned tables (portalRecord rewrites portals.txt).
 BASE = {'dealAuto': '1', 'itemsGatherAuto': '0', 'sitAuto_idle': '0', 'storageAuto': '0',
-        'teleportAuto_dropTargetEngaged': '0', 'attackChangeTarget': '1'}
+        'teleportAuto_dropTargetEngaged': '0', 'attackChangeTarget': '1', 'portalRecord': '0'}
+# Tables OpenKore writes back to while playing; the profile keeps its own copy.
+WRITTEN_TABLES = ('portals.txt', 'npc_shops.txt')
 
 
 def load_summoners(path=None):

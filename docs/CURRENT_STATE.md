@@ -1,6 +1,24 @@
 
 # Estado actual
 
+## R1 — OpenKore `auto` con configuración generada (2026-11-03, Claude)
+
+- **Resultado:** **adoptar con cambios.** [Evidencia](evidence/R1-openkore-auto.md).
+- **Prueba:** Tarin en el perfil `runtime/r1/`, con la política declarativa `config/r1-policy.json` traducida por `scripts/build_r1_profile.py`; observador de solo lectura y `scripts/run_r1.py`.
+- **En vivo, 1 h:**
+  - 0 intervenciones y 0 muertes;
+  - 316 kills/h y 1 312 de EXP base/h (Base 5→11); P5 hacía 50–87 kills/h;
+  - CPU al 5,9 % y 95 MiB.
+- **Abastecimiento en vivo:** venta, compra de 3 Fly Wing y vuelta solo por portales, sin diálogos NPC.
+- **`portalsLOS`:** coincide con nuestras zonas en el 99,96 % y acierta en `prt_castle`.
+- **Pendiente:**
+  - recalcular la política al subir de nivel;
+  - umbral de venta del 25–30 %;
+  - observar una muerte real;
+  - tanda de ≥ 4 h.
+- **Corregido:** OpenKore escribía portales y tiendas en `vendor/openkore/tables`; se restauraron y ahora el perfil R1 usa copias propias y `portalRecord 0`. P5 hereda `portalRecord 2`, sin comprobar.
+- **Estado al terminar:** cliente R1 detenido. Tarin en `prt_fild06`, Base 11 / Job 8, 1 350 Zeny y 3 Fly Wing. Nilo sin tocar. Suite: 271 OK.
+
 ## P5.6 — alcanzabilidad a pie y tiempo de viaje (2026-11-02, Claude)
 
 - **Fallo corregido:** la tanda `resume-20261101-unique-1` se bloqueó porque c_384 planeó cruzar `prt_castle` hasta un portal al que no se llega andando desde la entrada.
