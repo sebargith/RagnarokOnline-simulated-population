@@ -107,9 +107,11 @@ def record_death(danger, name, level, t):
     return {**danger, name: entry}
 
 
-def translate(policy, tables, danger=None):
+def translate(policy, tables, danger=None, goto=None):
     """Rules -> {config, blocks, mon, items, weights, gaps, mapping}. tables: monsters, fields,
-    builds, equipment, summoners, shops. danger: maps where the character died (danger.json)."""
+    builds, equipment, summoners, shops. danger: maps where the character died (danger.json).
+    goto (map, x, y): go there with OpenKore's own lockMap route and stay, fighting only
+    back (the approach to the Job Changer); the hunt rules stay as they are."""
     monsters, fields = tables['monsters'], tables['fields']['fields']
     me = me_of(policy['character'], tables['equipment'])
     exp_min = max([r.get('requires', {}).get('base_exp_at_least', 0) for r in policy['rules']])
@@ -210,6 +212,10 @@ def translate(policy, tables, danger=None):
         raise ValueError(f'hunt field {lock} is hostile: {sorted(hostile(fields[lock], monsters, kinds))}')
     if lock in active_danger(danger, policy['character']['level']['base']):
         raise ValueError(f'hunt field {lock} is dangerous: died there')
+    if goto:
+        config.update(lockMap=goto[0], lockMap_x=str(goto[1]), lockMap_y=str(goto[2]), lockMap_randX='2',
+                      lockMap_randY='2', route_randomWalk='0', attackAuto='1')
+        mapping['goto'] = [f'lockMap {goto[0]} {goto[1]} {goto[2]}', 'attackAuto 1']
     for key in sorted(monsters, key=int):
         attack, teleport = columns[kinds[key]]
         mon[key] = (f'{attack} {teleport} 0 0 0 0 0 0 0', monsters[key]['name'], kinds[key])

@@ -138,5 +138,16 @@ class FieldOptions(unittest.TestCase):
         field_prompt_option(opts[0])  # what the planner sees
 
 
+class Goto(unittest.TestCase):
+    def test_job_changer_approach_uses_the_native_lockmap_route(self):
+        result = r1.translate(POLICY, TABLES, None, ('prontera', 153, 190))
+        c = result['config']
+        self.assertEqual((c['lockMap'], c['lockMap_x'], c['lockMap_y'], c['route_randomWalk'], c['attackAuto']),
+                         ('prontera', '153', '190', '0', '1'))
+        for key in c:
+            self.assertTrue(scalar_known(key), key)
+        self.assertEqual(r1.translate(POLICY, TABLES)['config']['lockMap'], POLICY['rules'][0]['do']['hunt']['field'])
+
+
 if __name__ == '__main__':
     unittest.main()

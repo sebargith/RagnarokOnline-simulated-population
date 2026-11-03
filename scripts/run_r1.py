@@ -63,6 +63,8 @@ CONSUMED = {512, 507, 601}  # useSelf_item Apple/Red Herb, teleport Fly Wing
 RAM_MIN, GPU_MAX = 2 * 1024**3, 14336
 DEATHS_MAX, DEATH_WINDOW_S = 3, 900
 FLY_WING = '601'
+JOB_CHANGER = ('prontera', 153, 190)  # config/npc/first-job-changer.txt; the first-job step talks from here
+APPROACH_S, APPROACH_NEAR = 900, 3
 
 
 def use(who):
@@ -113,9 +115,9 @@ def bind(runtime):
     (m1.RUN/'logs').mkdir(parents=True, exist_ok=True)
 
 
-def prepare(runtime, policy_path=None, character=None):
+def prepare(runtime, policy_path=None, character=None, goto=None):
     """Write the profile. With character (observed facts), only the generated
-    files are rewritten, for r1_reload to apply in place."""
+    files are rewritten, for r1_reload to apply in place. goto: see translate."""
     p, template = paths(runtime), runtime.resolve()/'openkore/agent'
     password = json.loads((runtime.resolve()/CHARACTERS[WHO]['secrets']).read_text())['password']
     policy = effective_policy(runtime, policy_path)
@@ -125,7 +127,7 @@ def prepare(runtime, policy_path=None, character=None):
         policy['character'] = character
     if p['field'].exists():
         policy = with_field(policy, load(p['field'], None)['field_id'])
-    result = build_r1_profile.translate(policy, build_r1_profile.load_tables(), load(p['danger'], {}))
+    result = build_r1_profile.translate(policy, build_r1_profile.load_tables(), load(p['danger'], {}), goto)
     p['base'].mkdir(parents=True, exist_ok=True)
     m1.write(p['effective'], json.dumps(policy, indent=1, ensure_ascii=False))
     files = build_r1_profile.render(result, (template/'config.txt').read_text(encoding='utf-8'))
@@ -385,12 +387,13 @@ def first_job(runtime, job):
 
         start = snapshot()
         log['before'] = {k: start.get(k) for k in ('map', 'position', 'level', 'zeny')}
-        if start['map'] != 'prontera':
-            moved = act({'type': 'travel', 'map': 'prontera', 'x': 153, 'y': 190, 'timeout_s': 300}, 300)
-            if moved['status'] != 'completed':
-                log['outcome'] = 'travel_' + moved['status']; return log
-        else:
-            moved = act({'type': 'navigate', 'map': 'prontera', 'x': 153, 'y': 190, 'timeout_s': 60}, 60)
+        # The auto profile brings the character to the Job Changer (watch's approach);
+        # the bridge's own inter-map travel is no longer used.
+        if start['map'] != JOB_CHANGER[0]:
+            log['outcome'] = 'not_in_' + JOB_CHANGER[0]; return log
+        moved = act({'type': 'navigate', 'map': JOB_CHANGER[0], 'x': JOB_CHANGER[1], 'y': JOB_CHANGER[2], 'timeout_s': 60}, 60)
+        if moved['status'] != 'completed':
+            log['outcome'] = 'navigate_' + moved['status']; return log
         log['outcome'] = act({'type': 'first_job', 'job': job, 'timeout_s': 30}, 30)
         after = snapshot(30)
         log['after'] = {k: after.get(k) for k in ('map', 'position', 'level', 'zeny', 'progress')}
@@ -438,7 +441,8 @@ def summarize(events, lock_map, started=None):
     """Trial metrics from observer events. Pure: tests feed recorded events. The hunt
     field is lock_map plus every lockMap a confirmed reload applied."""
     samples = [e for e in events if e['type'] == 'sample' and e.get('connected')]
-    locks = {lock_map} | {e['lockMap'] for e in events if e['type'] == 'reloaded' and e.get('ok') and e.get('lockMap')}
+    locks = {lock_map} | {e['lockMap'] for e in events if e['type'] == 'reloaded' and e.get('ok') and e.get('lockMap')
+                          and e['lockMap'] not in build_r1_profile.SUPPLY_MAPS}
     if started is None:
         started = events[0]['t'] if events else 0
     span = (samples[-1]['t'] - samples[0]['t']) if len(samples) > 1 else 0
@@ -514,7 +518,7 @@ def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN, ser
     # outgrown it is refit as soon as it is observed.
     refit_level = policy['character']['level']['base']
     pending, refit_log, choice, deaths_seen, since_decision = None, [], FieldChoice(runtime, service), 0, started
-    died_since_choice, choice_facts = False, None
+    died_since_choice, choice_facts, approach = False, None, None
     try:
         while time.time() - started < seconds:
             time.sleep(10)
@@ -540,13 +544,23 @@ def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN, ser
             deaths_seen = len(died)
             why = 'death' if died_since_choice else None
             if samples:
-                if ready_for_first_job(samples[-1]):
+                s = samples[-1]
+                if approach and s['map'] == JOB_CHANGER[0] and \
+                        max(abs(s['x'] - JOB_CHANGER[1]), abs(s['y'] - JOB_CHANGER[2])) <= APPROACH_NEAR:
                     reason = 'job10_ready'; break
-                base = samples[-1]['level']['base']
+                if approach and time.time() - approach > APPROACH_S:
+                    reason = 'approach_timeout'; break
+                if ready_for_first_job(s) and not approach and not pending and not choice.pending:
+                    # Native approach: OpenKore's lockMap route to the Job Changer, at the sync point.
+                    prepare(runtime, None, facts_of(s), JOB_CHANGER)
+                    pending, approach = (f'job-changer-{int(time.time())}', time.time()), time.time()
+                    m1.write(p['observer']/'reload.request', pending[0])
+                    refit_log.append({'t': time.time(), 'id': pending[0], 'trigger': 'job10', 'goto': JOB_CHANGER})
+                base = s['level']['base']
                 if base > refit_level:
                     why = why or 'level_up'
                 facts = facts_of(samples[-1])
-                if why and facts and not pending and not choice.pending:
+                if why and facts and not pending and not choice.pending and not approach:
                     refit_level = max(refit_level, base)
                     policy = effective_policy(runtime)
                     policy['character'] = facts
