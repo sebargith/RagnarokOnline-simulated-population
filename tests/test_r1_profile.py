@@ -56,6 +56,8 @@ class R1Profile(unittest.TestCase):
         buys = {value: keys for name, value, keys in self.result['blocks'] if name == 'buyAuto'}
         self.assertEqual(buys['601']['npc'], 'prt_in 126 76')  # Tool Dealer#prt1 sells Fly Wing
         self.assertEqual(buys['512']['zeny'], '>= 150')
+        uses = [value for name, value, _ in self.result['blocks'] if name == 'useSelf_item']
+        self.assertEqual(uses, ['512,507'])  # ids, not the Korean kRO names
         for rule in POLICY['rules']:
             self.assertTrue(rule['id'] in m or rule['id'] in {g['rule'] for g in self.result['gaps']}, rule['id'])
 
@@ -64,6 +66,7 @@ class R1Profile(unittest.TestCase):
         mon = self.result['mon']
         self.assertEqual(mon[VOCAL][0].split()[:2], ['0', '-10'])
         self.assertEqual(mon[PORING][0].split()[:2], ['1', '0'])
+        self.assertEqual(mon['1080'][0].split()[:2], ['0', '0'])  # Green Plant: viable but 0 EXP
         aggressive = [k for k, v in self.result['kinds'].items() if v == 'aggressive']
         self.assertTrue(aggressive and all(mon[k][0].split()[:2] == ['0', '2'] for k in aggressive))
 

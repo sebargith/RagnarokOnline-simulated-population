@@ -58,13 +58,14 @@ def me_of(character, equipment):
     return hunting.profile(snap, equipment)
 
 
-def classify(monsters, summoners, me):
-    """Per monster id: 'threat' (boss or summoner), 'viable', 'aggressive' (not viable) or 'spare'."""
+def classify(monsters, summoners, me, exp_min=0):
+    """Per monster id: 'threat' (boss or summoner), 'viable', 'aggressive' (not viable) or 'spare'.
+    exp_min drops targets worth no EXP (plants take 1 damage per hit and give none)."""
     out = {}
     for key, mob in monsters.items():
         if mob['boss'] or int(key) in summoners:
             out[key] = 'threat'
-        elif hunting.assess(mob, me)['viable']:
+        elif hunting.assess(mob, me)['viable'] and mob['base_exp'] >= exp_min:
             out[key] = 'viable'
         else:
             out[key] = 'aggressive' if mob['aggressive'] else 'spare'
@@ -90,7 +91,8 @@ def translate(policy, tables):
     builds, equipment, summoners, shops."""
     monsters, fields = tables['monsters'], tables['fields']['fields']
     me = me_of(policy['character'], tables['equipment'])
-    kinds = classify(monsters, tables['summoners'], me)
+    exp_min = max([r.get('requires', {}).get('base_exp_at_least', 0) for r in policy['rules']])
+    kinds = classify(monsters, tables['summoners'], me, exp_min)
     config, blocks, mon, items, weights, gaps, mapping = dict(BASE), [], {}, {}, {}, [], {}
     columns = {'viable': [1, 0], 'spare': [0, 0], 'aggressive': [0, 0], 'threat': [0, 0]}
     lock = None
@@ -135,7 +137,8 @@ def translate(policy, tables):
         elif 'sit_until_hp' in do:
             emit(rule, sitAuto_hp_lower=str(rule['value']), sitAuto_hp_upper=str(do['sit_until_hp']))
         elif 'use_item' in do:
-            blocks.append(('useSelf_item', ','.join(do['use_item']),
+            # Item ids: names come from the kRO tables (Korean); getByNameList also matches ids.
+            blocks.append(('useSelf_item', ','.join(str(i) for i in do['use_item']),
                            {'hp': f'< {rule["value"]}%', 'timeout': '2', 'notWhileSitting': '0'}))
             mapping.setdefault(rid, []).append('useSelf_item')
         elif 'sell_at' in do:
