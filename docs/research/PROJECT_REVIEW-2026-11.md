@@ -52,6 +52,19 @@ Se mide con una prueba acotada (1–2 días) antes de decidir. Después, adelant
 capa social: 2 personajes con chat y grupo en el mismo campo, en lugar de pulir
 más el grind en solitario.
 
+**Actualización 2026-11-03 (ver [anexo](#7-anexo-proyectos-adicionales-evaluados)):**
+la revisión de rdoc, ragnarokoffline.app y otros proyectos no cambia el orden de
+R1–R5. Añade tres ajustes:
+- R4/P4: la consulta de mecánicas debe ir primero a fuentes pre-Renewal
+  concretas y cacheadas, sobre todo iRO Wiki Classic y los datos del propio
+  rAthena, antes que a una búsqueda web general.
+- Population Engine pasa de "futuro" a candidato concreto para la población de
+  ambiente, después de R3 y con dos condiciones: verificar que funciona con
+  PACKETVER 20130807 y que nunca sustituya a los 3–5 agentes núcleo.
+- Un cliente web (roBrowserLegacy) es la vía más probable para que el usuario
+  juegue junto a los agentes y haga la revisión ciega de R3. Falta verificar que
+  sea compatible.
+
 ---
 
 ## 2. Evaluación por punto
@@ -412,3 +425,115 @@ Consultadas el 2026-11-02 salvo indicación.
 **Inferencia:**
 
 - Groq, límites de uso — <https://console.groq.com/docs/rate-limits> (`openai/gpt-oss-120b`: 30 RPM, 1K RPD, 8K TPM, 200K TPD; por organización)
+
+---
+
+## 7. Anexo: proyectos adicionales evaluados
+
+Consultas del 2026-11-03, hechas a petición del usuario. Se leyeron páginas
+públicas, la API de GitHub y documentos en bruto de los repositorios. No se
+instaló ni ejecutó nada. Las estrellas y fechas son las de la API de GitHub en
+ese momento.
+
+### 7.1 rdoc — <https://manuuuu21.github.io/rdoc/>
+
+- **Qué es [verificado]:**
+  - un sitio estático de **documentación del lenguaje de scripts de rAthena**: comandos y funciones, RID/GID, cómo cargar un NPC en `npc/custom/` y `@loadnpc`/`@reloadnpcfile`;
+  - incluye ejemplos con un editor Ace y reglas de resaltado propias (`rathena_highlight_rules.js`);
+  - no es un bot ni una base de datos de mecánicas: no trae fórmulas, tablas de monstruos ni mapas.
+- **Repositorio:** `manuuuu21/rdoc`, creado el 2025-07-24, último push el 2026-10-30, 2 estrellas y **sin licencia declarada**.
+- **Proyectos del mismo autor:**
+  - [rAthena-Text-Editor](https://github.com/manuuuu21/rAthena-Text-Editor): editor de scripts sin conexión, GPL-3.0, 4 estrellas;
+  - [Ragnarok-Atlast](https://github.com/manuuuu21/Ragnarok-Atlast): buscador local de exportaciones de datos y arte, con importador, extractor GRF y conversor ACT/SPR→GIF; MIT, 3 estrellas, creado el 2026-10-27.
+- **Qué aprovechar:**
+  - como **referencia humana** al escribir o revisar los NPC propios: el Job Changer (`ARCHITECTURE.md`, "Approved first-job rule") y los scripts de prueba. La referencia oficial sigue siendo `doc/script_commands.txt` del rAthena fijado; rdoc es una versión más legible;
+  - Ragnarok-Atlast solo tiene interés para inspeccionar datos a mano; el proyecto ya genera sus tablas desde la base de datos fijada.
+- **Qué no adoptar:**
+  - nada en tiempo de ejecución. Los agentes no deben leer ni ejecutar scripts de servidor, y los comandos `@` que documenta son de GM, fuera de la frontera de seguridad;
+  - sin licencia, no se puede copiar contenido.
+- **Encaje con R1–R5:** marginal. Solo sirve como herramienta de desarrollo para los NPC del servidor.
+
+### 7.2 ragnarokoffline.app — <https://github.com/Flux159/ragnarokoffline.app>
+
+**Qué es [verificado]:**
+
+- Una aplicación de escritorio para jugar a RO sin conexión. Electron lanza una microVM (nebula, MIT) con rAthena (fork `Flux159/rathena`) y MariaDB, y el cliente web roBrowserLegacy (fork), con un servidor de recursos en Rust (RemoteClient-Rust).
+- Cambia entre Renewal y pre-Renewal con un ajuste ("Game era").
+- Prueba los clientes kRO '23 y uno de 2026.
+- Datos del repositorio: GPL-3.0, creado el 2026-08-25, último push el 2026-11-02, 192 estrellas, 60 forks, 89 issues abiertas.
+- Publica versiones casi a diario: v1.7.5 el 2026-10-28, v1.7.6 el 2026-10-29 y v1.7.7 el 2026-10-31.
+- Es un proyecto **muy activo y bastante maduro**, desarrollado en buena parte con agentes de código (tiene `AGENTS.md` y `CLAUDE.md`).
+
+Tiene **tres sistemas de IA distintos**:
+
+1. **Agentes externos** (`electron/AGENT.md`, `agent-api.js`, `agent-driver.js`; el PR #193 del informe):
+   - hasta 4 cuentas `aiagent…`, cada una en su ventana del cliente gráfico, manejadas por MCP (`/mcp`, `/mcp/2`…) o por CLI (`ragnarok-agent`);
+   - comandos `state`, `walk`, `attack`, `interact`, `dialog`/`choose`, `say`/`whisper`/`party`, `answer`, `skill`, `equip` y entradas de bajo nivel (`click`, `key`);
+   - el LLM decide **cada acción**. Las cuentas están en un grupo con `@warp`, `@go` y `@load`, y la guía pide usarlos "cuando de verdad haga falta".
+2. **Population Engine**, en una copia propia (`third-party/population-engine/README.md`):
+   - "shells" del lado del servidor que caminan, luchan, se sientan, chatean y abren puestos de venta reales; los clientes los ven como jugadores normales;
+   - la copia corrige al upstream: interruptor general (`population_engine_enable`, apagado por defecto), población **solo en mapas ocupados**, colores y nombres válidos, y botín recogido;
+   - coste medido: ~0,3–0,4 MB por shell. El límite es la CPU del map-server, de un solo hilo: 22–25 % de un núcleo con 1.855 shells y sin jugadores, y prácticamente nada en modo bajo demanda;
+   - el upstream fija `PACKETVER 20250716`, y esta copia lo quita para que coincida con el cliente.
+3. **Compañeros** (`docs/COMPANIONS.md`, `docs/mods/companion-strategies/`):
+   - shells reclutables en un grupo real, entre 4 y 11;
+   - siguen a su dueño entre mapas, obedecen modos (`attack`, `def`, `pass`) y roles (`tank`, `supp`, `dd`) por chat de grupo, y su configuración persiste;
+   - tienen un **lenguaje declarativo de estrategias** (`db/population_strategy.yml`): reglas con `On:` (eventos como `party_chat` o `party_member_died`), `Requires:` (`Role`, `Skills`, `Items`, `BaseLevel`), `Cast`, `UseItem`, `Equip`, `Leave:` (salir de terreno hostil) y `Sit`. Hay una traza de depuración (`<nombre> trace`). Algunas reglas están "built, not yet played" (`COMPANION_STRATEGY_ROADMAP.md`).
+
+Además, `docs/AGENT_TESTING.md` (`scripts/rotest`) monta un mundo desechable y maneja el cliente real desde la línea de comandos. Distingue "lo que envió el cliente" de "lo que hizo el servidor" con `net(since)`, incluido el código `useskill_fail_cause` cuando se rechaza una habilidad.
+
+**Qué aprovechar:**
+
+| Pieza | Cómo se aprovecha | Encaje |
+| --- | --- | --- |
+| Population Engine (versión de ragnarokoffline, con interruptor y demanda) | Población de ambiente barata alrededor de los 3–5 agentes núcleo: ciudades con gente, puestos de venta y chat de fondo. Activarla solo en mapas con agentes o con el usuario | Después de R3. Exige verificar con `PACKETVER 20130807` y con OpenKore (que los shells aparezcan como actores normales) y aislarlo con su interruptor. GPL-3.0, compatible con rAthena |
+| Lenguaje de estrategias (`On`/`Requires`/`Leave`/`Sit`) | Modelo para el formato de **política como datos** de R1: reglas declarativas y verificables que se traducen a config de OpenKore o a `eventMacro`. `Leave:` es justo la huida de terreno hostil que faltó con el Vocal | R1/R2, como idea de diseño; no se copia código |
+| Normas de comportamiento de `AGENT.md` | Base del prompt social: el humano primero, responder por el canal en que te hablaron, una línea cada vez, no tocar su botín ni sus kills | R3 |
+| `state` barato con chat y avisos pendientes; `answer yes/no` para invitaciones de grupo | Forma del informe de estado del rol `chat` y de las invitaciones de grupo | R3 |
+| `rotest` y `net(since)` | Confirma el diseño `accepted` frente a `completed` del puente. Su idea de **mundo desechable para reproducir fallos** es la pieza intermedia entre las pruebas unitarias y la tanda en vivo que falta (§2.5) | R2/R5 |
+| roBrowserLegacy (cliente web, GPL-3.0, 445 estrellas, push del 2026-11-03) | Cliente gráfico para que el **usuario** juegue junto a los agentes y haga la revisión ciega. Hoy el proyecto no tiene cliente humano verificado (README, sección M4). Elige el protocolo por fecha (`PacketVerManager`) [reportado] | R3. Falta verificar que funcione con 20130807 y que los recursos sean legales |
+
+**Qué no adoptar:**
+
+- **El agente LLM paso a paso con `@warp`/`@go`/`@load`.** Contradice la frontera de seguridad: el modelo no toca la consola ni comandos de GM. También contradice el objetivo, que es progreso normal sin recolocaciones (`NATIVE_AGENT_PLAN.md:178-180`). Además, un LLM por acción es lento y caro. Es lo que el informe ya llama contraejemplo.
+- **Cambiar de plataforma a ragnarokoffline.app.** Usa clientes kRO 2023/2026 y otro PACKETVER. OpenKore, el ejecutor del proyecto, tendría que soportar ese protocolo, y la microVM con Electron suma piezas que este proyecto no necesita en Windows nativo. El beneficio (instalador y multiplataforma) no responde a ninguna necesidad actual.
+- **Los shells como sustitutos de los agentes núcleo.** Tienen recursos y habilidades "virtuales" o facilitados. El propio README cuenta cambios como "Shells pay for their skills" y "A companion lives on its bag" para acercarlos a las reglas, y no progresan como un jugador. Valen como ambiente, no como prueba de autonomía.
+
+### 7.3 Otros proyectos y fuentes nuevos
+
+| Proyecto o fuente | Qué es | Qué aprovechar | Qué no | Licencia | Encaje |
+| --- | --- | --- | --- | --- | --- |
+| [iRO Wiki Classic](https://irowiki.org/classic/Main_Page) | Wiki de mecánicas **pre-Renewal**: monstruos, mapas, mecánicas de juego, stats, clases y misiones [verificado en la portada] | **Fuente principal de P4:** consultas acotadas a esa wiki, cacheadas con URL y fecha, en lugar de una búsqueda web general. Es MediaWiki, pero no pude verificar la ruta de `api.php` (las rutas probadas daban 301/404) | No tratar su texto como verdad del servidor, que es rAthena con reglas propias (Job Changer) | GFDL 1.3+ "salvo indicación" [verificado] | R4/P4 |
+| [RateMyServer, base pre-Renewal](https://ratemyserver.net/) | Base de monstruos, objetos, drops y apariciones por mapa, a tasas 1x | Contraste manual de tablas de apariciones y drops | No extraer datos de forma masiva: la base fijada de rAthena ya es la fuente de verdad del proyecto | Sin licencia de datos clara [opinión] | Solo apoyo |
+| [rs-sdk](https://github.com/MaxBittker/rs-sdk) (RuneScape, LostCity) | SDK para agentes de código: servidor propio, cliente sin interfaz "Lite" (~14 MB y 0,4 % de CPU por bot [reportado]) y pasarela | Mismo principio que este proyecto: "high-level bot methods attempt to observe game effects, while low-level sdk.send* methods only confirm … dispatch". Muestra que un SDK de **alto nivel que observa efectos** es la forma usable para agentes, como la de R1. Tiene simulador y tick configurable para pruebas rápidas | No aplica a RO; los agentes escriben código, como en Voyager | MIT, 1.096 estrellas, push del 2026-10-29 | R1/R5, como referencia |
+| [OpenMMO Agent UI](https://github.com/OpenMMO-Agent-UI/openmmo-agent-ui), *The Null Epoch*, [Machine-Learning-mmo](https://github.com/killerboyyy777/Machine-Learning-mmo) | MMOs nuevos diseñados para agentes LLM (MCP o JSON por turno) | Confirman la tendencia de exponer el juego como herramientas tipadas | Juegos propios, no RO; prototipos [reportado] | Varias | Ninguno directo |
+| [roBrowserLegacy](https://github.com/MrAntares/roBrowserLegacy) | Cliente web de RO | Ver §7.2 | — | GPL-3.0 | R3 |
+| [rathena-AI-world](https://github.com/spike-ro/rathena-AI-world) | Fork de rAthena con NPC e historias generados por LLM | Ideas para NPC del mundo, no para jugadores | 4 estrellas y actividad dudosa (la API muestra un push anterior a la fecha de creación) | GPL-3.0 | Ninguno |
+| [openkore-mcp](https://github.com/diviatrix/openkore-mcp) / [openkore-ai-v3](https://github.com/iskandarsulaili/openkore-ai-v3) | Ya en §3 | Fechas: openkore-mcp con un solo día de actividad (2026-04-02, 13 estrellas); openkore-ai-v3 con último push el 2026-09-19 (9 estrellas) | — | — | Sin cambios |
+
+Búsquedas sin resultado útil: plugins de bots o "autobattle" para rAthena o
+Hercules con LLM, y bots LLM para Ultima Online o Tibia. No se encontró otro
+proyecto público de **jugadores** IA persistentes sobre rAthena con un cliente
+bot y progreso normal. La conclusión de §3 se mantiene.
+
+### 7.4 ¿Cambia alguna recomendación?
+
+- **R1–R5 mantienen el orden.** Nada de lo revisado ofrece un ejecutor mejor que OpenKore en modo `auto` para el protocolo 20130807. ragnarokoffline.app confirma por otra vía la tesis central: las reglas declarativas de comportamiento (su lenguaje de estrategias) escalan mejor que la lógica por acción, y el LLM paso a paso solo vale como compañero dirigido por un humano.
+- **Ajuste a R4/P4 (nuevo):** consultar primero fuentes pre-Renewal concretas, en este orden: la base fijada de rAthena e iRO Wiki Classic con caché y URL. SearXNG queda como respaldo. Se reduce el riesgo de mezclar mecánicas de Renewal, que es la fuente de error más probable en una búsqueda general.
+- **Ajuste a R3 (nuevo):**
+  - añadir un **cliente humano** (roBrowserLegacy, por verificar) para que el usuario juegue con los agentes y haga la revisión ciega;
+  - usar las normas de `AGENT.md` como base del prompt social.
+- **Ajuste al futuro (§3, bots del lado del servidor):** Population Engine, en la versión depurada de ragnarokoffline.app, pasa de "futuro" a **candidato concreto** para la población de ambiente, tras R3. Condiciones: probarlo con 20130807 y con OpenKore; mantener el interruptor apagado salvo en mapas con agentes; no contarlo como agente creíble.
+- **Lo que el proyecto no debe adoptar:** comandos de GM para agentes, el LLM por acción y el cambio de plataforma o de PACKETVER.
+
+### 7.5 Fuentes del anexo (consultadas el 2026-11-03)
+
+- rdoc — <https://manuuuu21.github.io/rdoc/>; repositorio `manuuuu21/rdoc` en la API de GitHub; [rAthena-Text-Editor](https://github.com/manuuuu21/rAthena-Text-Editor); [Ragnarok-Atlast](https://github.com/manuuuu21/Ragnarok-Atlast)
+- ragnarokoffline.app — <https://github.com/Flux159/ragnarokoffline.app>; documentos leídos en bruto de `main`: `electron/AGENT.md`, `docs/COMPANIONS.md`, `docs/COMPANION_STRATEGY_ROADMAP.md`, `docs/AGENT_TESTING.md`, `docs/mods/companion-strategies/reference.md`, `third-party/population-engine/README.md`; versiones v1.7.5–v1.7.7
+- Population Engine (upstream) — <https://github.com/YlenXWalker/Population-Engine>; hilo — <https://rathena.org/board/topic/149283-population-engine-advance-fake-players>
+- roBrowserLegacy — <https://github.com/MrAntares/roBrowserLegacy>; resumen DeepWiki — <https://deepwiki.com/MrAntares/roBrowserLegacy>
+- iRO Wiki Classic — <https://irowiki.org/classic/Main_Page>
+- RateMyServer — <https://ratemyserver.net/>
+- rs-sdk — <https://github.com/MaxBittker/rs-sdk>
+- OpenMMO Agent UI — <https://github.com/OpenMMO-Agent-UI/openmmo-agent-ui>; Machine-Learning-mmo — <https://github.com/killerboyyy777/Machine-Learning-mmo>
+- rathena-AI-world — <https://github.com/spike-ro/rathena-AI-world>
