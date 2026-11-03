@@ -52,7 +52,8 @@ class R1Profile(unittest.TestCase):
         self.assertEqual((c['sellAuto'], c['sellAuto_npc'], c['itemsMaxWeight_sellOrStore']), ('1', 'prontera 104 49', '30'))
         self.assertTrue(c['statsAddAuto_list'].startswith('20 str, 15 vit, 10 dex'))
         self.assertEqual(c['skillsAddAuto_list'], 'SM_SWORD 10, SM_BASH 10, SM_RECOVERY 5, SM_PROVOKE 5, SM_MAGNUM 10, SM_ENDURE 5')  # Swordman skills only
-        self.assertEqual((c['teleportAuto_hp'], c['teleportAuto_minAggressives'], c['dcOnDeath']), ('30', '3', '0'))
+        self.assertEqual((c['teleportAuto_hp'], c['teleportAuto_minAggressives'], c['teleportAuto_minAggressivesInLock'],
+                          c['dcOnDeath']), ('25', '3', '5', '0'))
         self.assertEqual(c['portalRecord'], '0')  # never rewrite the pinned portals.txt
         buys = {value: keys for name, value, keys in self.result['blocks'] if name == 'buyAuto'}
         self.assertEqual(buys['601']['npc'], 'prt_in 126 76')  # Tool Dealer#prt1 sells Fly Wing
@@ -85,7 +86,8 @@ class R1Profile(unittest.TestCase):
             r1.translate(policy, TABLES)
 
     def test_untranslatable_rules_are_gaps(self):
-        self.assertEqual({g['rule'] for g in self.result['gaps']}, {'leave_pack_no_wings'})
+        self.assertEqual(self.result['gaps'], [])
+        self.assertEqual(self.result['mapping']['leave_pack_no_wings'], ['plugin:r1_flee'])
         self.assertEqual(self.result['mapping']['refit_on_level'], ['supervisor:refit+r1_reload'])
 
     def test_render_replaces_keys_and_template_blocks(self):
@@ -98,6 +100,42 @@ class R1Profile(unittest.TestCase):
         self.assertIn(f'\n{VOCAL}\t0 -10 0 0 0 0 0 0 0  # Vocal (threat)', files['mon_control.txt'])
         self.assertIn('\nall 0 0 1\n', files['items_control.txt'])
         self.assertIn('\nprt_fild04 10000\n', files['routeweights.txt'])
+
+
+class Danger(unittest.TestCase):
+    def test_death_map_is_avoided_for_a_few_levels(self):
+        danger = r1.record_death({}, 'prt_fild05', 14, 1.0)
+        self.assertEqual(danger['prt_fild05'], {'deaths': 1, 'level': 14, 't': 1.0})
+        self.assertEqual(r1.record_death(danger, 'prt_fild05', 15, 2.0)['prt_fild05']['deaths'], 2)
+        self.assertEqual(r1.active_danger(danger, 16), ['prt_fild05'])
+        self.assertEqual(r1.active_danger(danger, 14 + r1.DANGER_LEVELS), [])
+        result = r1.translate(POLICY, TABLES, danger)
+        self.assertEqual(result['weights']['prt_fild05'], 10000)
+        policy = copy.deepcopy(POLICY)
+        policy['rules'][0]['do']['hunt']['field'] = 'prt_fild05'
+        with self.assertRaises(ValueError):  # never hunt where it just died
+            r1.translate(policy, TABLES, danger)
+
+
+class FieldOptions(unittest.TestCase):
+    def test_options_are_validated_bounded_and_keep_the_current_field(self):
+        danger = {'prt_fild05': {'deaths': 1, 'level': 14, 't': 0}}
+        opts = r1.field_options(POLICY, TABLES, danger, 'prt_fild06')
+        ids = [o['field_id'] for o in opts]
+        self.assertLessEqual(len(opts), r1.OPTIONS_MAX + 1)
+        self.assertIn('prt_fild06', ids)
+        self.assertNotIn('prt_fild05', ids)  # died there
+        self.assertNotIn('prt_fild04', ids)  # Vocal: summoner
+        kinds = r1.classify(TABLES['monsters'], TABLES['summoners'], r1.me_of(POLICY['character'], TABLES['equipment']), 1)
+        for o in opts:
+            self.assertLessEqual(o['hops'], r1.MAX_HOPS)
+            self.assertFalse(r1.hostile(TABLES['fields']['fields'][o['field_id']], TABLES['monsters'], kinds))
+            self.assertEqual(o['aggressive_threats'], [])
+            self.assertGreater(o['exp_per_hit'], 0)
+        best = [o['score'] for o in opts[:r1.OPTIONS_MAX]]
+        self.assertEqual(best, sorted(best, reverse=True))
+        from agent.goal_planner import field_prompt_option
+        field_prompt_option(opts[0])  # what the planner sees
 
 
 if __name__ == '__main__':

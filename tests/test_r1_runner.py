@@ -1,6 +1,8 @@
 """R1 runner metrics from recorded observer events, and the observer's read-only contract."""
+import json
 from pathlib import Path
 import re
+import tempfile
 import unittest
 
 from scripts import run_r1
@@ -54,7 +56,14 @@ class ObserverContract(unittest.TestCase):
         text = (ROOT/'bridge/r1/r1_observer.pl').read_text()
         for pattern in (r'messageSender', r'Commands::', r'\bsend\w*\(', r'configModify', r'AI::queue', r'ai_\w+\('):
             self.assertIsNone(re.search(pattern, text), pattern)
-        self.assertEqual(run_r1.PLUGINS, 'r1_observer,r1_reload,raiseStat,raiseSkill')  # m1_bridge never loads
+        self.assertEqual(run_r1.PLUGINS, 'r1_observer,r1_reload,r1_flee,raiseStat,raiseSkill')  # m1_bridge never loads
+
+    def test_flee_plugin_only_routes_without_attacking(self):
+        text = (ROOT/'bridge/r1/r1_flee.pl').read_text()
+        for pattern in (r'messageSender', r'Commands::', r'\bsend\w*\(', r'configModify', r'talk', r'useTeleport'):
+            self.assertIsNone(re.search(pattern, text), pattern)
+        self.assertIn('attackOnRoute => 0', text)
+        self.assertIn('getByNameID(FLY_WING)', text)  # only without a Fly Wing
 
     def test_reload_plugin_only_reloads_profile_files(self):
         text = (ROOT/'bridge/r1/r1_reload.pl').read_text()
@@ -91,7 +100,6 @@ class Characters(unittest.TestCase):
         run_r1.use('tarin')
 
     def test_each_character_has_its_own_profile_port_and_registry(self):
-        import json, tempfile
         with tempfile.TemporaryDirectory() as tmp:
             runtime = Path(tmp)
             run_r1.use('nilo')
@@ -105,6 +113,74 @@ class Characters(unittest.TestCase):
             run_r1.use('tarin')
             self.assertEqual((run_r1.paths(runtime)['base'], run_r1.PORT), (runtime.resolve()/'r1', 8772))
             self.assertEqual(run_r1.same_account(runtime), [])  # another account's registry does not block
+
+
+class FakeFuture:
+    def __init__(self, value):
+        self.value = value
+
+    def done(self):
+        return True
+
+    def result(self):
+        if isinstance(self.value, Exception):
+            raise self.value
+        return self.value
+
+
+class FakeService:
+    def __init__(self, answer):
+        self.answer, self.calls = answer, []
+
+    def submit(self, identity, messages, seed, cold=False, response_format=None):
+        self.calls.append(response_format['properties']['field_id']['enum'])
+        return FakeFuture(self.answer)
+
+
+class FieldDecision(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.runtime = Path(self.tmp.name)
+        run_r1.use('nilo')
+        self.policy = json.loads(run_r1.default_policy().read_text(encoding='utf-8'))
+
+    def tearDown(self):
+        run_r1.use('tarin')
+        self.tmp.cleanup()
+
+    def test_planner_picks_a_validated_option_and_it_is_recorded(self):
+        service = FakeService({'content': json.dumps({'field_id': 'prt_fild08', 'reason': 'more Drops'}),
+                               'served_by': 'groq-gpt-oss', 'degraded': False})
+        d = run_r1.FieldChoice(self.runtime, service).decide(self.policy, 'level_up', {'prt_fild06': {'kills': 3, 'hunt_s': 60}})
+        self.assertEqual((d['field_id'], d['decision'], d['served_by'], d['trigger']),
+                         ('prt_fild08', 'planner', 'groq-gpt-oss', 'level_up'))
+        self.assertIn('prt_fild08', service.calls[0])
+        p = run_r1.paths(self.runtime)
+        self.assertEqual(json.loads(p['field'].read_text())['field_id'], 'prt_fild08')
+        self.assertEqual(len(p['decisions'].read_text().splitlines()), 1)
+        self.assertEqual(d['history']['prt_fild06'], {'kills': 3, 'hunt_s': 60})
+        self.assertEqual(run_r1.lock_map(run_r1.with_field(self.policy, d['field_id'])), 'prt_fild08')
+
+    def test_invalid_or_failed_answer_keeps_the_current_field(self):
+        for answer in ({'content': json.dumps({'field_id': 'prt_fild04', 'reason': 'x'})}, RuntimeError('down')):
+            d = run_r1.FieldChoice(self.runtime, FakeService(answer)).decide(self.policy, 'level_up')
+            self.assertEqual((d['field_id'], d['decision']), ('prt_fild06', 'local_fallback'))
+
+    def test_without_planner_a_dangerous_current_field_is_left(self):
+        p = run_r1.paths(self.runtime)
+        p['base'].mkdir(parents=True)
+        p['danger'].write_text(json.dumps({'prt_fild06': {'deaths': 1, 'level': 9, 't': 0}}))
+        d = run_r1.FieldChoice(self.runtime).decide(self.policy, 'death')
+        self.assertNotEqual(d['field_id'], 'prt_fild06')
+        self.assertEqual(d['field_id'], d['options'][0][0])  # best score
+
+    def test_field_history_and_reloaded_fields_count_as_hunting(self):
+        events = [sample(0), {'t': 1, 'type': 'kill'}, sample(5), sample(10, map='prt_fild08'),
+                  {'t': 11, 'type': 'reloaded', 'id': 'r', 'ok': 1, 'lockMap': 'prt_fild08', 'error': ''},
+                  {'t': 12, 'type': 'kill'}, sample(15, map='prt_fild08')]
+        self.assertEqual(run_r1.field_history(events),
+                         {LOCK: {'kills': 1, 'hunt_s': 10}, 'prt_fild08': {'kills': 1, 'hunt_s': 5}})
+        self.assertEqual(run_r1.summarize(events, LOCK, 0)['time_share_s']['hunt'], 15)
 
 
 if __name__ == '__main__':

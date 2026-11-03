@@ -8,6 +8,7 @@ the report, never custom code. Credentials are not handled here (run_r1.py adds
 them when it writes the live profile).
 """
 import argparse
+from collections import deque
 import json
 from pathlib import Path
 import re
@@ -29,6 +30,11 @@ BASE = {'dealAuto': '1', 'itemsGatherAuto': '0', 'sitAuto_idle': '0', 'storageAu
         'teleportAuto_dropTargetEngaged': '0', 'attackChangeTarget': '1', 'portalRecord': '0'}
 # Tables OpenKore writes back to while playing; the profile keeps its own copy.
 WRITTEN_TABLES = ('portals.txt', 'npc_shops.txt')
+# A map where the character died stays avoided until it has this many more base levels.
+DANGER_LEVELS = 3
+# Field options: map hops from the supply town over the pinned portals, and how
+# many go to the planner (best by score, plus the current field).
+SUPPLY_TOWN, MAX_HOPS, OPTIONS_MAX = 'prontera', 3, 5
 
 
 def load_summoners(path=None):
@@ -89,9 +95,21 @@ def hostile(field, monsters, kinds):
     return why
 
 
-def translate(policy, tables):
+def active_danger(danger, level):
+    """Maps where the character died less than DANGER_LEVELS base levels ago."""
+    return sorted(m for m, d in (danger or {}).items() if level < d['level'] + DANGER_LEVELS)
+
+
+def record_death(danger, name, level, t):
+    """danger.json update for one observed death: count, level and time of the last one."""
+    entry = dict(danger.get(name, {'deaths': 0}))
+    entry.update(deaths=entry['deaths'] + 1, level=level, t=t)
+    return {**danger, name: entry}
+
+
+def translate(policy, tables, danger=None):
     """Rules -> {config, blocks, mon, items, weights, gaps, mapping}. tables: monsters, fields,
-    builds, equipment, summoners, shops."""
+    builds, equipment, summoners, shops. danger: maps where the character died (danger.json)."""
     monsters, fields = tables['monsters'], tables['fields']['fields']
     me = me_of(policy['character'], tables['equipment'])
     exp_min = max([r.get('requires', {}).get('base_exp_at_least', 0) for r in policy['rules']])
@@ -131,6 +149,9 @@ def translate(policy, tables):
                     continue
                 if hostile(fields[name], monsters, kinds) & wanted:
                     weights[name] = int(do['avoid_map'])
+            for name in active_danger(danger, policy['character']['level']['base']):
+                if name not in SUPPLY_MAPS and name != lock:
+                    weights[name] = int(do['avoid_map'])
             mapping.setdefault(rid, []).append(f'routeweights x{len([w for w in weights if w not in TRANSPORT_WEIGHTS])}')
         elif 'warp_fee_max' in do:
             emit(rule, route_maxWarpFee=str(do['warp_fee_max']))
@@ -167,6 +188,13 @@ def translate(policy, tables):
             emit(rule, teleportAuto_hp=str(rule['value']))
         elif do.get('teleport') and rule['on'] == 'aggressives_at_least':
             emit(rule, teleportAuto_minAggressives=str(rule['value']))
+        elif do.get('teleport') and rule['on'] == 'aggressives_at_least_in_field':
+            # In the hunt field the common monsters were validated as viable: a larger pack.
+            emit(rule, teleportAuto_minAggressivesInLock=str(rule['value']))
+        elif do.get('move_away'):
+            # bridge/r1/r1_flee.pl: with no Fly Wing, the same thresholds trigger OpenKore's
+            # own route to the supply town without attacking on the way.
+            mapping.setdefault(rid, []).append('plugin:r1_flee')
         elif do.get('regenerate_profile'):
             # Not an OpenKore key: scripts/run_r1.py regenerates from observed facts and
             # bridge/r1/r1_reload.pl applies it with OpenKore's own reload.
@@ -180,6 +208,8 @@ def translate(policy, tables):
 
     if lock and hostile(fields[lock], monsters, kinds):
         raise ValueError(f'hunt field {lock} is hostile: {sorted(hostile(fields[lock], monsters, kinds))}')
+    if lock in active_danger(danger, policy['character']['level']['base']):
+        raise ValueError(f'hunt field {lock} is dangerous: died there')
     for key in sorted(monsters, key=int):
         attack, teleport = columns[kinds[key]]
         mon[key] = (f'{attack} {teleport} 0 0 0 0 0 0 0', monsters[key]['name'], kinds[key])
@@ -187,10 +217,55 @@ def translate(policy, tables):
             'gaps': gaps, 'mapping': mapping, 'kinds': kinds, 'me': me}
 
 
-GAP_REASONS = {
-    'move_away': 'melee without Fly Wing: OpenKore has no flee for melee (runFromTarget only keeps range '
-                 'while attacking); routeWeights is fixed at load time, so a map cannot be avoided after the fact',
-}
+GAP_REASONS = {}
+
+
+def map_hops(portals, start, blocked):
+    """Fewest map hops from start over the pinned portals, not entering blocked maps."""
+    out, queue = {start: 0}, deque([start])
+    while queue:
+        here = queue.popleft()
+        if out[here] >= MAX_HOPS:
+            continue
+        for exit in portals.get(here, []):
+            there = exit[2]
+            if there not in out and there not in blocked:
+                out[there] = out[here] + 1
+                queue.append(there)
+    return out
+
+
+def field_options(policy, tables, danger=None, current=None, history=None):
+    """Validated hunt fields for the planner: within MAX_HOPS map hops of the supply
+    town over portals that avoid hostile and dangerous maps, not hostile, no recent
+    own death, viable common monsters and no aggressive common monster it cannot
+    beat. Best OPTIONS_MAX by score, plus the current field when it still passes.
+    Reachability on foot inside each map is OpenKore's (portalsLOS)."""
+    monsters, fields = tables['monsters'], tables['fields']['fields']
+    me = me_of(policy['character'], tables['equipment'])
+    kinds = classify(monsters, tables['summoners'], me, 1)
+    wanted = {'boss', 'summoner', 'rare_threat'}
+    dangerous = set(active_danger(danger, policy['character']['level']['base']))
+    blocked = {n for n, f in fields.items() if hostile(f, monsters, kinds) & wanted} | dangerous
+    hops = map_hops(tables['fields']['portals'], SUPPLY_TOWN, blocked - SUPPLY_MAPS)
+    history = history or {}
+    out = []
+    for name in sorted(fields):
+        if name not in hops or name in blocked:
+            continue
+        facts = hunting.field_facts(name, fields[name], monsters, me, {})
+        if not facts['exp_per_hit'] or facts['aggressive_threats']:
+            continue
+        own = history.get(name, {})
+        score = facts['exp_per_hit'] * (1 - min(facts['danger'], .9)) / (1 + .25 * hops[name])
+        out.append({'field_id': name, 'current': name == current, 'hops': hops[name], 'supply_round_trip_s': None,
+                    'unsafe': [], 'score': round(score, 3), **facts,
+                    'history': {'kills': own.get('kills', 0), 'minutes': round(own.get('hunt_s', 0) / 60, 1),
+                                'deaths': (danger or {}).get(name, {}).get('deaths', 0)}})
+    out.sort(key=lambda o: (-o['score'], o['field_id']))
+    best = out[:OPTIONS_MAX]
+    best += [o for o in out[OPTIONS_MAX:] if o['current']]
+    return best
 
 
 def render(result, template):

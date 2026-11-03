@@ -24,9 +24,10 @@
     {"id": "buy_apples", "on": "item_below", "requires": {"zeny_at_least": 150}, "do": {"buy": {"item": 512, "name": "Apple", "at": "Fruit Gardener#prt", "min": 2, "max": 10}}},
     {"id": "buy_fly_wings", "on": "item_below", "requires": {"zeny_at_least": 300}, "do": {"buy": {"item": 601, "name": "Fly Wing", "at": "Tool Dealer#prt1", "min": 0, "max": 3}}},
     {"id": "raise_build", "on": "points_free", "do": {"raise_build": "novice-swordman"}},
-    {"id": "leave_low_hp", "on": "hp_below", "value": 30, "requires": {"items": ["Fly Wing"]}, "do": {"teleport": true}},
+    {"id": "leave_low_hp", "on": "hp_below", "value": 25, "requires": {"items": ["Fly Wing"]}, "do": {"teleport": true}},
     {"id": "leave_pack", "on": "aggressives_at_least", "value": 3, "requires": {"items": ["Fly Wing"]}, "do": {"teleport": true}},
-    {"id": "leave_pack_no_wings", "on": "aggressives_at_least", "value": 3, "requires": {"no_items": ["Fly Wing"]}, "do": {"move_away": true, "then_avoid_map": true}},
+    {"id": "leave_pack_in_field", "on": "aggressives_at_least_in_field", "value": 5, "requires": {"items": ["Fly Wing"]}, "do": {"teleport": true}},
+    {"id": "leave_pack_no_wings", "on": "aggressives_at_least", "requires": {"no_items": ["Fly Wing"]}, "do": {"move_away": true}, "note": "same thresholds as leave_low_hp and leave_pack/leave_pack_in_field, when no Fly Wing"},
     {"id": "respawn", "on": "died", "do": {"respawn": true, "return_to_field": true}},
     {"id": "refit_on_level", "on": "level_up", "do": {"regenerate_profile": true}}
   ]

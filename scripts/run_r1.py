@@ -13,7 +13,16 @@ only writes events.
   start      launch the client (refuses if a P1 or R1 client is registered)
   watch      run up to --seconds with stop guards, then stop and summarize
   stop       stop the R1 client
-  report     summarize runtime/r1/observer/events.jsonl
+  report     summarize the character's observer events
+  campaign   one unattended run of --seconds: auto until Job 10, the first-job step,
+             the policy for the new class and auto again until the budget ends
+
+Field choice: at prepare and on each base level-up or death, the planner role
+(Groq, Gemma fallback) picks one field among code-validated options
+(build_r1_profile.field_options); a failed or late answer keeps the current field
+or takes the best-scored one. The decision is applied at the single sync point
+(regenerate the profile, r1_reload). Each death is recorded in danger.json and the
+map is avoided for a few levels.
   first-job  irreversible class change on the reconciled bridge: the R1 profile
              in --ai=manual with m1_bridge (own port), travel to the Job Changer,
              one first_job request; success only from the server's job packet
@@ -46,13 +55,14 @@ CHARACTERS = {
 }
 WHO = 'tarin'
 NAME, USERID, PORT, CLIENT = 'Tarin', 'p1solo', 8772, 'r1-tarin'
-PLUGINS = 'r1_observer,r1_reload,raiseStat,raiseSkill'
+PLUGINS = 'r1_observer,r1_reload,r1_flee,raiseStat,raiseSkill'
 JOBS = {0: 'Novice', 1: 'Swordman'}  # OpenKore jobID -> classes the generator knows skill prefixes for
 RELOAD_CONFIRM_S = 60
 SUPPLY_AI = {'sellAuto', 'buyAuto', 'storageAuto'}
 CONSUMED = {512, 507, 601}  # useSelf_item Apple/Red Herb, teleport Fly Wing
 RAM_MIN, GPU_MAX = 2 * 1024**3, 14336
 DEATHS_MAX, DEATH_WINDOW_S = 3, 900
+FLY_WING = '601'
 
 
 def use(who):
@@ -74,7 +84,27 @@ def same_account(runtime):
 def paths(runtime):
     base = runtime.resolve()/CHARACTERS[WHO]['dir']
     return {'base': base, 'profile': base/'openkore'/WHO, 'observer': base/'observer',
-            'events': base/'observer/events.jsonl', 'summary': base/'summary.json'}
+            'events': base/'observer/events.jsonl', 'summary': base/'summary.json',
+            'field': base/'field.json', 'decisions': base/'field-decisions.jsonl', 'danger': base/'danger.json',
+            'effective': base/'policy-effective.json'}
+
+
+def load(path, default):
+    return json.loads(path.read_text(encoding='utf-8')) if path.exists() else default
+
+
+def effective_policy(runtime, policy_path=None):
+    """The policy as last applied (observed facts and chosen field), else the configured one."""
+    p = paths(runtime)
+    if p['effective'].exists() and policy_path is None:
+        return load(p['effective'], None)
+    return json.loads(Path(policy_path or default_policy()).read_text(encoding='utf-8'))
+
+
+def with_field(policy, field):
+    policy = json.loads(json.dumps(policy))
+    policy['rules'][0]['do']['hunt']['field'] = field
+    return policy
 
 
 def bind(runtime):
@@ -88,12 +118,16 @@ def prepare(runtime, policy_path=None, character=None):
     files are rewritten, for r1_reload to apply in place."""
     p, template = paths(runtime), runtime.resolve()/'openkore/agent'
     password = json.loads((runtime.resolve()/CHARACTERS[WHO]['secrets']).read_text())['password']
-    policy = json.loads(Path(policy_path or default_policy()).read_text(encoding='utf-8'))
+    policy = effective_policy(runtime, policy_path)
     if policy['identity'] != NAME:
         raise ValueError(f'policy is for {policy["identity"]}, not {NAME}')
     if character:
         policy['character'] = character
-    result = build_r1_profile.translate(policy, build_r1_profile.load_tables())
+    if p['field'].exists():
+        policy = with_field(policy, load(p['field'], None)['field_id'])
+    result = build_r1_profile.translate(policy, build_r1_profile.load_tables(), load(p['danger'], {}))
+    p['base'].mkdir(parents=True, exist_ok=True)
+    m1.write(p['effective'], json.dumps(policy, indent=1, ensure_ascii=False))
     files = build_r1_profile.render(result, (template/'config.txt').read_text(encoding='utf-8'))
     for key, value in {'username': USERID, 'password': password}.items():
         files['config.txt'] = re.sub(rf'(?m)^{key}(?:[ \t].*)?$', lambda _: f'{key} {value}', files['config.txt'], count=1)
@@ -118,6 +152,94 @@ def prepare(runtime, policy_path=None, character=None):
     m1.write(p['base']/'profile-report.json', json.dumps(report, indent=1, default=str))
     print(f'R1 profile ready: {p["profile"]} (gaps: {[g["rule"] for g in result["gaps"]]})')
     return result
+
+
+class FieldChoice:
+    """One field decision at a time: validated options, one planner request, and a
+    deterministic answer when the planner fails, is late or is off."""
+    def __init__(self, runtime, service=None):
+        from agent.goal_planner import FieldPlanner
+        self.runtime, self.service = runtime, service
+        self.planner = FieldPlanner(service) if service else None
+        self.pending = None
+
+    def start(self, policy, why, history=None):
+        if self.pending:
+            raise RuntimeError('one field decision at a time')
+        p = paths(self.runtime)
+        current = load(p['field'], {}).get('field_id') or policy['rules'][0]['do']['hunt']['field']
+        stored = load(p['field'], {}).get('history', {})
+        for name, h in (history or {}).items():
+            row = stored.setdefault(name, {'kills': 0, 'hunt_s': 0})
+            row['kills'] += h['kills']; row['hunt_s'] += h['hunt_s']
+        options = build_r1_profile.field_options(policy, build_r1_profile.load_tables(), load(p['danger'], {}),
+                                                 current, stored)
+        if not options:
+            raise ValueError('no validated field option')
+        keep = current if any(o['current'] for o in options) else None
+        c = policy['character']
+        facts = {'level': c['level'], 'job': c['job'], 'stats': c['stats'], 'hp_max': c['hp_max']}
+        self.pending = {'why': why, 'options': options, 'current': keep, 'previous': current, 'history': stored,
+                        'facts': facts, 't': time.time()}
+        if self.planner:
+            from agent.hunting import temperament
+            self.planner.request(facts, options, keep, temperament(NAME), why)
+        return self.pending
+
+    def poll(self):
+        """None while waiting; else the decision, recorded in field.json and field-decisions.jsonl."""
+        q = self.pending
+        if not q:
+            return None
+        result = self.planner.poll() if self.planner else {'status': 'kept', 'reason': 'no_planner'}
+        if result is None:
+            return None
+        self.pending = None
+        ids = [o['field_id'] for o in q['options']]
+        if result['status'] == 'proposed' and result['proposal']['field_id'] in ids:
+            field, decision, reason = result['proposal']['field_id'], 'planner', result['proposal']['reason']
+        else:
+            field = q['current'] or ids[0]
+            decision, reason = 'local_fallback', f"planner {result['status']}: {result.get('reason')}"
+        record = {'t': time.time(), 'trigger': q['why'], 'field_id': field, 'previous': q['previous'],
+                  'decision': decision, 'reason': reason, 'served_by': result.get('served_by'),
+                  'degraded': result.get('degraded'), 'facts': q['facts'],
+                  'options': [[o['field_id'], o['score']] for o in q['options']], 'history': q['history']}
+        p = paths(self.runtime)
+        m1.write(p['field'], json.dumps(record, indent=1))
+        with p['decisions'].open('a', encoding='utf-8') as f:
+            f.write(json.dumps(record) + '\n')
+        return record
+
+    def decide(self, policy, why, history=None, timeout=110):
+        """Synchronous decision (before a client runs)."""
+        self.start(policy, why, history)
+        end = time.time() + timeout
+        while True:
+            out = self.poll()
+            if out:
+                return out
+            if time.time() > end:
+                raise TimeoutError('field decision')
+            time.sleep(.5)
+
+
+def planner_service():
+    from inference.roles import build_role
+    return build_role('planner')  # cloud primary, local fallback, explicit errors
+
+
+def field_history(events):
+    """Own kills and hunting seconds per map in these events (the last sample's map)."""
+    out, here, last = {}, None, None
+    for e in events:
+        if e['type'] == 'sample' and e.get('connected'):
+            if here and last is not None and not e['dead'] and not e['sitting']:
+                out.setdefault(here, {'kills': 0, 'hunt_s': 0})['hunt_s'] += min(e['t'] - last, 15)
+            here, last = e['map'], e['t']
+        elif e['type'] == 'kill' and here:
+            out.setdefault(here, {'kills': 0, 'hunt_s': 0})['kills'] += 1
+    return {k: {'kills': v['kills'], 'hunt_s': round(v['hunt_s'])} for k, v in out.items()}
 
 
 def ready_for_first_job(sample):
@@ -313,8 +435,10 @@ def exp_gained(levels):
 
 
 def summarize(events, lock_map, started=None):
-    """Trial metrics from observer events. Pure: tests feed recorded events."""
+    """Trial metrics from observer events. Pure: tests feed recorded events. The hunt
+    field is lock_map plus every lockMap a confirmed reload applied."""
     samples = [e for e in events if e['type'] == 'sample' and e.get('connected')]
+    locks = {lock_map} | {e['lockMap'] for e in events if e['type'] == 'reloaded' and e.get('ok') and e.get('lockMap')}
     if started is None:
         started = events[0]['t'] if events else 0
     span = (samples[-1]['t'] - samples[0]['t']) if len(samples) > 1 else 0
@@ -322,11 +446,11 @@ def summarize(events, lock_map, started=None):
     for a, b in zip(samples, samples[1:]):
         dt = min(b['t'] - a['t'], 15)
         state = ('dead' if a['dead'] else 'supply' if SUPPLY_AI & set(a['ai']) else
-                 ('rest' if a['sitting'] else 'hunt') if a['map'] == lock_map else 'travel')
+                 ('rest' if a['sitting'] else 'hunt') if a['map'] in locks else 'travel')
         share[state] += dt
     deaths = []
     for d in (e for e in events if e['type'] == 'died'):
-        back = next((s for s in samples if s['t'] > d['t'] and not s['dead'] and s['map'] == lock_map), None)
+        back = next((s for s in samples if s['t'] > d['t'] and not s['dead'] and s['map'] in locks), None)
         respawn = next((s for s in samples if s['t'] > d['t'] and not s['dead']), None)
         deaths.append({'t': d['t'], 'map': d.get('map'), 'respawned_s': round(respawn['t'] - d['t'], 1) if respawn else None,
                        'back_in_field_s': round(back['t'] - d['t'], 1) if back else None})
@@ -364,27 +488,33 @@ def summarize(events, lock_map, started=None):
             'time_share_s': {k: round(v) for k, v in share.items()},
             'maps_visited': sorted({s['map'] for s in samples}),
             'deaths': deaths, 'teleports': len(teleports),
+            'flees': [{k: e.get(k) for k in ('t', 'map', 'why', 'aggressives')} for e in events if e['type'] == 'flee'],
+            'fly_wings': {'start': first.get('inventory', {}).get(FLY_WING, 0), 'end': last.get('inventory', {}).get(FLY_WING, 0)},
             'npc_dialogs': [{'name': e['name'], 'map': e['map'], 'supply': bool(SUPPLY_AI & set(e.get('ai', [])))}
                             for e in events if e['type'] == 'npc_talk'],
             'refits': refits, 'unexpected': unexpected, 'disconnects': sum(1 for e in events if e['type'] == 'disconnected')}
 
 
-def lock_map(policy_path):
-    return json.loads(Path(policy_path).read_text(encoding='utf-8'))['rules'][0]['do']['hunt']['field']
+def lock_map(policy):
+    if not isinstance(policy, dict):
+        policy = json.loads(Path(policy).read_text(encoding='utf-8'))
+    return policy['rules'][0]['do']['hunt']['field']
 
 
-def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN):
-    """Supervise one bounded run: only guards and measurement, never game input."""
+def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN, service=None):
+    """Supervise one bounded run: only guards, measurement and the single refit
+    point (field decision, regenerated profile, r1_reload), never game input."""
     p = paths(runtime)
-    policy_path = policy_path or default_policy()
-    lock = lock_map(policy_path)
+    policy = effective_policy(runtime, policy_path)
+    lock = lock_map(policy)
     bind(runtime)
     pid = json.loads((m1.RUN/'processes.json').read_text())[CLIENT]['pid']
     started, reason, res = time.time(), 'time_budget', []
     # Refit from the level the profile was generated for, so a character that has
     # outgrown it is refit as soon as it is observed.
-    refit_level = json.loads(Path(policy_path).read_text(encoding='utf-8'))['character']['level']['base']
-    pending, refit_log = None, []
+    refit_level = policy['character']['level']['base']
+    pending, refit_log, choice, deaths_seen, since_decision = None, [], FieldChoice(runtime, service), 0, started
+    died_since_choice, choice_facts = False, None
     try:
         while time.time() - started < seconds:
             time.sleep(10)
@@ -400,23 +530,46 @@ def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN):
             if len(deaths) >= DEATHS_MAX:
                 reason = 'death_loop'; break
             samples = [e for e in events if e['type'] == 'sample' and e.get('connected')]
+            died = [e for e in events if e['type'] == 'died']
+            for d in died[deaths_seen:]:
+                # A death marks its map as dangerous and asks for a new field decision.
+                level = (d.get('level') or {}).get('base') or refit_level
+                m1.write(p['danger'], json.dumps(build_r1_profile.record_death(load(p['danger'], {}), d.get('map'),
+                                                                               level, d['t']), indent=1))
+            died_since_choice = died_since_choice or len(died) > deaths_seen
+            deaths_seen = len(died)
+            why = 'death' if died_since_choice else None
             if samples:
                 if ready_for_first_job(samples[-1]):
                     reason = 'job10_ready'; break
                 base = samples[-1]['level']['base']
-                if base > refit_level and not pending:
-                    # Single sync point: regenerate from observed facts, then ask r1_reload.
-                    facts = facts_of(samples[-1])
-                    refit_level = base
+                if base > refit_level:
+                    why = why or 'level_up'
+                facts = facts_of(samples[-1])
+                if why and facts and not pending and not choice.pending:
+                    refit_level = max(refit_level, base)
+                    policy = effective_policy(runtime)
+                    policy['character'] = facts
+                    died_since_choice, choice_facts = False, facts
                     try:
-                        result = prepare(runtime, policy_path, facts) if facts else None
-                    except ValueError as e:  # e.g. the field turned hostile: keep the loaded profile
+                        choice.start(policy, why, field_history(read_events(p['events'], since_decision)))
+                        since_decision = time.time()
+                    except ValueError as e:  # no validated option: keep the loaded profile
                         refit_log.append({'t': time.time(), 'facts': facts, 'error': str(e)})
+                decided = choice.poll()
+                if decided:
+                    # Single sync point: regenerate from observed facts and the chosen field, then ask r1_reload.
+                    try:
+                        result = prepare(runtime, None, choice_facts)
+                    except ValueError as e:
+                        refit_log.append({'t': time.time(), 'field': decided['field_id'], 'error': str(e)})
                         result = None
                     if result:
                         pending = (f'refit-{base}-{int(time.time())}', time.time())
                         m1.write(p['observer']/'reload.request', pending[0])
-                        refit_log.append({'t': time.time(), 'id': pending[0], 'facts': facts,
+                        refit_log.append({'t': time.time(), 'id': pending[0], 'trigger': decided['trigger'],
+                                          'field': decided['field_id'], 'decision': decided['decision'],
+                                          'served_by': decided['served_by'],
                                           'classes': {k: sum(1 for v in result['kinds'].values() if v == k)
                                                       for k in ('viable', 'spare', 'aggressive', 'threat')}})
             if pending:
@@ -436,6 +589,8 @@ def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN):
         if alive(pid):
             stop(runtime)
     out = summarize(read_events(p['events'], started), lock, started)
+    out['field_decisions'] = [d for d in (json.loads(l) for l in p['decisions'].read_text(encoding='utf-8').splitlines())
+                              if d['t'] >= started] if p['decisions'].exists() else []
     cpu = [r for r in res if r['cpu_s'] is not None]
     out['refit_requests'] = refit_log
     out.update({'ram_min_gib': round(ram_min / 2**30, 2), 'stop_reason': reason, 'started': started, 'ended': time.time(), 'pid': pid,
@@ -446,11 +601,49 @@ def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN):
                               'gpu_used_mib': [min(r['gpu_used_mib'] for r in res), max(r['gpu_used_mib'] for r in res)] if res else None}})
     m1.write(summary or p['summary'], json.dumps(out, indent=1))
     print(json.dumps({k: out[k] for k in ('stop_reason', 'span_s', 'kills', 'kills_per_h', 'base_exp_per_h', 'deaths', 'time_share_s')}))
+    return out
+
+
+def campaign(runtime, seconds, job, summary_dir, ram_min=RAM_MIN, service=None):
+    """One unattended run: auto until Job 10, the reconciled first-job step, the
+    policy for the new class and auto again until the budget ends. Any other stop
+    ends it; nothing is retried or resent."""
+    p = paths(runtime)
+    summary_dir.mkdir(parents=True, exist_ok=True)
+    started, legs, n = time.time(), [], 0
+    while time.time() - started < seconds - 60:
+        n += 1
+        start(runtime)
+        out = watch(runtime, seconds - (time.time() - started), None, summary_dir/f'leg-{n}.json', ram_min, service)
+        legs.append({'leg': n, 'stop_reason': out['stop_reason'], 'span_s': out['span_s']})
+        if out['stop_reason'] != 'job10_ready':
+            break
+        log = first_job(runtime, job)
+        legs.append({'first_job': log.get('outcome'), 'before': log.get('before'), 'after': log.get('after')})
+        m1.write(summary_dir/'first-job.json', json.dumps(log, indent=1, default=str))
+        outcome = log.get('outcome') or {}
+        if not isinstance(outcome, dict) or outcome.get('status') != 'completed':
+            break
+        samples = [e for e in read_events(p['events'], log['started']) if e['type'] == 'sample' and e.get('connected')]
+        facts = facts_of(samples[-1]) if samples else None
+        if not facts or facts['job'] != job:
+            legs.append({'stop': 'new_class_not_observed'}); break
+        policy = effective_policy(runtime)
+        policy['character'] = facts
+        FieldChoice(runtime, service).decide(policy, 'class_change')
+        prepare(runtime, None, facts)
+    record = {'started': started, 'ended': time.time(), 'seconds': seconds, 'legs': legs,
+              'interventions': 0, 'note': 'interventions counts manual actions during the campaign; it starts at 0 and '
+                                          'any manual stop, restart or command ends the campaign'}
+    m1.write(summary_dir/'campaign.json', json.dumps(record, indent=1, default=str))
+    print(json.dumps(record, default=str))
+    return record
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('command', choices=('preflight', 'prepare', 'start', 'watch', 'stop', 'report', 'first-job'))
+    parser.add_argument('command', choices=('preflight', 'prepare', 'start', 'watch', 'stop', 'report', 'first-job',
+                                            'campaign'))
     parser.add_argument('--job', default='Swordman', choices=('Swordman', 'Mage', 'Archer', 'Acolyte', 'Merchant', 'Thief'))
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('--seconds', type=int, default=3600)
@@ -460,23 +653,42 @@ def main():
     parser.add_argument('--summary', type=Path, help='summary path (default <character dir>/summary.json)')
     parser.add_argument('--ram-min-gib', type=float, default=RAM_MIN / 2**30,
                         help='stop below this free RAM (default 2; the user may lower it)')
+    parser.add_argument('--no-inference', action='store_true', help='field decisions without the planner')
+    parser.add_argument('--out', type=Path, help='campaign: summaries directory')
     args = parser.parse_args()
     use(args.character)
+    service = None if args.no_inference or args.command not in ('prepare', 'watch', 'campaign') else planner_service()
+    try:
+        run(args, service)
+    finally:
+        if service:
+            service.close()
+
+
+def run(args, service):
     if args.command == 'preflight':
         preflight(args.runtime)
     elif args.command == 'prepare':
-        bind(args.runtime); prepare(args.runtime, args.policy)
+        bind(args.runtime)
+        policy = effective_policy(args.runtime, args.policy)
+        print(json.dumps({k: v for k, v in FieldChoice(args.runtime, service).decide(policy, 'start').items()
+                          if k in ('field_id', 'decision', 'served_by', 'reason', 'options')}))
+        prepare(args.runtime, args.policy)
     elif args.command == 'start':
         start(args.runtime)
     elif args.command == 'watch':
-        watch(args.runtime, args.seconds, args.policy, args.summary, int(args.ram_min_gib * 2**30))
+        watch(args.runtime, args.seconds, args.policy, args.summary, int(args.ram_min_gib * 2**30), service)
+    elif args.command == 'campaign':
+        campaign(args.runtime, args.seconds, args.job, args.out or paths(args.runtime)['base']/'campaign',
+                 int(args.ram_min_gib * 2**30), service)
     elif args.command == 'stop':
         stop(args.runtime)
     elif args.command == 'first-job':
         log = first_job(args.runtime, args.job)
         print(json.dumps({k: log.get(k) for k in ('outcome', 'before', 'after')}, default=str))
     else:
-        print(json.dumps(summarize(read_events(paths(args.runtime)['events'], args.since), lock_map(args.policy or default_policy()), args.since or None), indent=1))
+        print(json.dumps(summarize(read_events(paths(args.runtime)['events'], args.since),
+                                   lock_map(effective_policy(args.runtime, args.policy)), args.since or None), indent=1))
 
 
 if __name__ == '__main__':
