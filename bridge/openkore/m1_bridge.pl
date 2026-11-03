@@ -69,7 +69,7 @@ $hooks = Plugins::addHooks(
 sub start {
     open my $fh, '<:raw', $ENV{M1_BRIDGE_CONFIG} or die "M1_BRIDGE_CONFIG required: $!";
     local $/; $cfg = $json->decode(<$fh>); close $fh;
-    die 'Invalid bridge configuration' unless $cfg->{port} =~ /^(876[567]|877[012])$/ && length($cfg->{token}) >= 20;
+    die 'Invalid bridge configuration' unless $cfg->{port} =~ /^(876[567]|877[0-3])$/ && length($cfg->{token}) >= 20;
     # Native profiles have exactly one movement owner: OpenKore's route task.
     die 'Native navigation requires --ai=manual' if $cfg->{native_navigation} && AI::state() != AI::MANUAL();
     $healing = M1Healing->new(File::Basename::dirname($ENV{M1_BRIDGE_CONFIG}) . '/healing-state.json')

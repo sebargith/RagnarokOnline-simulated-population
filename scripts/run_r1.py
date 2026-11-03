@@ -1,10 +1,12 @@
-"""R1 trial runner: Tarin (account 2000030) on OpenKore --ai=auto with the profile
-generated from config/r1-policy.json, plus a read-only observer.
+"""R1 runner: one character on OpenKore --ai=auto with the profile generated from
+its policy (config/r1-policy*.json), plus a read-only observer.
 
-Separate from P1/P5: profile, logs, observer events and process registry live in
-runtime/r1/. Tarin's existing password is read from runtime/p1/secrets.json and
-never printed; P1's files and checkpoint are not modified. Nothing here sends a
-game action: OpenKore's own AI acts, the observer only writes events.
+--character tarin (account 2000030, runtime/r1/, port 8772) or nilo (account
+2000031, runtime/r1-nilo/, port 8773). Profile, logs, observer events and process
+registry live in the character's own directory. The existing password is read
+from the P1/P5 secrets and never printed; P1/P5 files and checkpoints are not
+modified. Nothing here sends a game action: OpenKore's own AI acts, the observer
+only writes events.
 
   preflight  services, ports, registries, RAM and GPU (read-only)
   prepare    write the profile
@@ -12,8 +14,8 @@ game action: OpenKore's own AI acts, the observer only writes events.
   watch      run up to --seconds with stop guards, then stop and summarize
   stop       stop the R1 client
   report     summarize runtime/r1/observer/events.jsonl
-  first-job  irreversible class change on the reconciled bridge: Tarin's R1 profile
-             in --ai=manual with m1_bridge (port 8772), travel to the Job Changer,
+  first-job  irreversible class change on the reconciled bridge: the R1 profile
+             in --ai=manual with m1_bridge (own port), travel to the Job Changer,
              one first_job request; success only from the server's job packet
 """
 import argparse
@@ -34,6 +36,15 @@ from scripts import m1, build_r1_profile
 from scripts.bench_m2 import ram_sample
 from scripts.prepare_m4 import bind_runtime
 
+# Per character: login, bridge port, client name, runtime dir, secrets, policy and
+# the registries of other profiles on the same account (never run two at once).
+CHARACTERS = {
+    'tarin': {'name': 'Tarin', 'userid': 'p1solo', 'port': 8772, 'client': 'r1-tarin', 'dir': 'r1',
+              'secrets': 'p1/secrets.json', 'policy': 'config/r1-policy.json', 'same_account': ['p1/processes.json']},
+    'nilo': {'name': 'Nilo', 'userid': 'p5novice', 'port': 8773, 'client': 'r1-nilo', 'dir': 'r1-nilo',
+             'secrets': 'p5/secrets.json', 'policy': 'config/r1-policy-nilo.json', 'same_account': ['p5/processes.json']},
+}
+WHO = 'tarin'
 NAME, USERID, PORT, CLIENT = 'Tarin', 'p1solo', 8772, 'r1-tarin'
 PLUGINS = 'r1_observer,r1_reload,raiseStat,raiseSkill'
 JOBS = {0: 'Novice', 1: 'Swordman'}  # OpenKore jobID -> classes the generator knows skill prefixes for
@@ -44,9 +55,25 @@ RAM_MIN, GPU_MAX = 2 * 1024**3, 14336
 DEATHS_MAX, DEATH_WINDOW_S = 3, 900
 
 
+def use(who):
+    """Select the character every command acts on."""
+    global WHO, NAME, USERID, PORT, CLIENT
+    c = CHARACTERS[who]
+    WHO, NAME, USERID, PORT, CLIENT = who, c['name'], c['userid'], c['port'], c['client']
+
+
+def default_policy():
+    return ROOT/CHARACTERS[WHO]['policy']
+
+
+def same_account(runtime):
+    """Registered clients of other profiles on this account."""
+    return [n for n in CHARACTERS[WHO]['same_account'] if (runtime.resolve()/n).exists()]
+
+
 def paths(runtime):
-    base = runtime.resolve()/'r1'
-    return {'base': base, 'profile': base/'openkore/tarin', 'observer': base/'observer',
+    base = runtime.resolve()/CHARACTERS[WHO]['dir']
+    return {'base': base, 'profile': base/'openkore'/WHO, 'observer': base/'observer',
             'events': base/'observer/events.jsonl', 'summary': base/'summary.json'}
 
 
@@ -56,12 +83,14 @@ def bind(runtime):
     (m1.RUN/'logs').mkdir(parents=True, exist_ok=True)
 
 
-def prepare(runtime, policy_path=ROOT/'config/r1-policy.json', character=None):
+def prepare(runtime, policy_path=None, character=None):
     """Write the profile. With character (observed facts), only the generated
     files are rewritten, for r1_reload to apply in place."""
     p, template = paths(runtime), runtime.resolve()/'openkore/agent'
-    password = json.loads((runtime.resolve()/'p1/secrets.json').read_text())['password']
-    policy = json.loads(Path(policy_path).read_text(encoding='utf-8'))
+    password = json.loads((runtime.resolve()/CHARACTERS[WHO]['secrets']).read_text())['password']
+    policy = json.loads(Path(policy_path or default_policy()).read_text(encoding='utf-8'))
+    if policy['identity'] != NAME:
+        raise ValueError(f'policy is for {policy["identity"]}, not {NAME}')
     if character:
         policy['character'] = character
     result = build_r1_profile.translate(policy, build_r1_profile.load_tables())
@@ -145,11 +174,11 @@ def preflight(runtime):
     root = runtime.resolve()
     services = json.loads((root/'processes.json').read_text())
     out = {'services': {n: alive(v['pid']) for n, v in services.items()},
-           'p1_registry': (root/'p1/processes.json').exists(), 'p5_registry': (root/'p5/processes.json').exists(),
+           'character': NAME, 'same_account_registries': same_account(runtime),
            'r1_registry': (paths(runtime)['base']/'processes.json').exists(),
-           'ports_free': {port: m1.available(port) for port in (8770, 8771, PORT)}, **resources()}
+           'ports_free': {port: m1.available(port) for port in (8770, 8771, 8772, 8773)}, **resources()}
     out['ok'] = (all(out['services'][n] for n in ('mariadb', 'login-server', 'char-server', 'map-server'))
-                 and not out['p1_registry'] and not out['r1_registry']
+                 and not out['same_account_registries'] and not out['r1_registry'] and out['ports_free'][PORT]
                  and out['ram_available'] >= RAM_MIN and out['gpu_used_mib'] < GPU_MAX)
     print(json.dumps(out, indent=1))
     return out
@@ -158,8 +187,8 @@ def preflight(runtime):
 def start(runtime):
     p = paths(runtime)
     bind(runtime)
-    if (runtime.resolve()/'p1/processes.json').exists():
-        raise RuntimeError('P1 client registered for the same account; refusing')
+    if same_account(runtime):
+        raise RuntimeError(f'another client registered for the same account: {same_account(runtime)}; refusing')
     registry = m1.RUN/'processes.json'
     if registry.exists():
         raise RuntimeError('R1 registry exists; stop it first')
@@ -182,12 +211,12 @@ def first_job(runtime, job):
     from bridge.client import Bridge
     p = paths(runtime)
     bind(runtime)
-    if (runtime.resolve()/'p1/processes.json').exists() or (m1.RUN/'processes.json').exists():
+    if same_account(runtime) or (m1.RUN/'processes.json').exists():
         raise RuntimeError('A client for this account is registered; stop it first')
     bridge_dir = p['base']/'bridge'
     bridge_dir.mkdir(parents=True, exist_ok=True)
     config = bridge_dir/'bridge.json'
-    m1.write(config, json.dumps({'agent_id': 'tarin', 'port': PORT, 'token': secrets.token_hex(20),
+    m1.write(config, json.dumps({'agent_id': WHO, 'port': PORT, 'token': secrets.token_hex(20),
                                  'native_navigation': True}))
     sys_txt = p['profile']/'sys.txt'
     auto_plugins = sys_txt.read_text()
@@ -344,9 +373,10 @@ def lock_map(policy_path):
     return json.loads(Path(policy_path).read_text(encoding='utf-8'))['rules'][0]['do']['hunt']['field']
 
 
-def watch(runtime, seconds, policy_path=ROOT/'config/r1-policy.json', summary=None, ram_min=RAM_MIN):
+def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN):
     """Supervise one bounded run: only guards and measurement, never game input."""
     p = paths(runtime)
+    policy_path = policy_path or default_policy()
     lock = lock_map(policy_path)
     bind(runtime)
     pid = json.loads((m1.RUN/'processes.json').read_text())[CLIENT]['pid']
@@ -425,11 +455,13 @@ def main():
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('--seconds', type=int, default=3600)
     parser.add_argument('--since', type=float, default=0)
-    parser.add_argument('--policy', type=Path, default=ROOT/'config/r1-policy.json')
-    parser.add_argument('--summary', type=Path, help='summary path (default runtime/r1/summary.json)')
+    parser.add_argument('--character', default='tarin', choices=sorted(CHARACTERS))
+    parser.add_argument('--policy', type=Path, help="default: the character's config/r1-policy*.json")
+    parser.add_argument('--summary', type=Path, help='summary path (default <character dir>/summary.json)')
     parser.add_argument('--ram-min-gib', type=float, default=RAM_MIN / 2**30,
                         help='stop below this free RAM (default 2; the user may lower it)')
     args = parser.parse_args()
+    use(args.character)
     if args.command == 'preflight':
         preflight(args.runtime)
     elif args.command == 'prepare':
@@ -444,7 +476,7 @@ def main():
         log = first_job(args.runtime, args.job)
         print(json.dumps({k: log.get(k) for k in ('outcome', 'before', 'after')}, default=str))
     else:
-        print(json.dumps(summarize(read_events(paths(args.runtime)['events'], args.since), lock_map(args.policy), args.since or None), indent=1))
+        print(json.dumps(summarize(read_events(paths(args.runtime)['events'], args.since), lock_map(args.policy or default_policy()), args.since or None), indent=1))
 
 
 if __name__ == '__main__':

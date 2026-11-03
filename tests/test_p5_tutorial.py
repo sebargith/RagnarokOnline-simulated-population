@@ -162,7 +162,7 @@ class ContractTests(unittest.TestCase):
         self.assertIn("sendTalkText($p->{npc_bin}, $char->{name})", bridge)
         self.assertEqual(bridge.count('sendTalkText'), 1)  # No other text input path.
         self.assertIn("'Network::Receive::map_changed', \\&map_changed", bridge)
-        self.assertIn('877[012]', bridge)  # 8772: R1 profile
+        self.assertIn('877[0-3]', bridge)  # 8772/8773: R1 profiles
 
 
 def npc_block(text, map_name, x, y):

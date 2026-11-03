@@ -86,5 +86,26 @@ class Refit(unittest.TestCase):
         self.assertEqual(run_r1.summarize(events, LOCK, 0)['refits'][0]['id'], 'refit-6-1')
 
 
+class Characters(unittest.TestCase):
+    def tearDown(self):
+        run_r1.use('tarin')
+
+    def test_each_character_has_its_own_profile_port_and_registry(self):
+        import json, tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            runtime = Path(tmp)
+            run_r1.use('nilo')
+            p = run_r1.paths(runtime)
+            self.assertEqual((run_r1.NAME, run_r1.PORT, run_r1.CLIENT), ('Nilo', 8773, 'r1-nilo'))
+            self.assertEqual(p['base'], runtime.resolve()/'r1-nilo')
+            self.assertEqual(json.loads(run_r1.default_policy().read_text(encoding='utf-8'))['identity'], 'Nilo')
+            (runtime/'p5').mkdir()
+            (runtime/'p5/processes.json').write_text('{}')
+            self.assertEqual(run_r1.same_account(runtime), ['p5/processes.json'])  # P5 client: refuse
+            run_r1.use('tarin')
+            self.assertEqual((run_r1.paths(runtime)['base'], run_r1.PORT), (runtime.resolve()/'r1', 8772))
+            self.assertEqual(run_r1.same_account(runtime), [])  # another account's registry does not block
+
+
 if __name__ == '__main__':
     unittest.main()
