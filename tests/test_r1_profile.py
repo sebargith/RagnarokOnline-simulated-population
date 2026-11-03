@@ -149,5 +149,17 @@ class Goto(unittest.TestCase):
         self.assertEqual(r1.translate(POLICY, TABLES)['config']['lockMap'], POLICY['rules'][0]['do']['hunt']['field'])
 
 
+class ServerWarps(unittest.TestCase):
+    def test_renewal_only_links_are_neither_options_nor_routes(self):
+        warps = TABLES['warps']
+        self.assertIn(('prontera', 'prt_fild08'), warps)
+        self.assertNotIn(('prontera', 's_atelier'), warps)  # npc/re only; OpenKore's table lists it
+        self.assertIn('s_atelier', r1.unconfirmed_maps(TABLES['fields']['portals'], warps))
+        self.assertEqual(r1.translate(POLICY, TABLES)['weights']['s_atelier'], 10000)
+        hops = r1.map_hops(TABLES['fields']['portals'], r1.SUPPLY_TOWN, set(), warps)
+        self.assertNotIn('rachel', hops)  # only through s_atelier within the hop limit
+        self.assertNotIn('ra_fild11', [o['field_id'] for o in r1.field_options(POLICY, TABLES)])
+
+
 if __name__ == '__main__':
     unittest.main()

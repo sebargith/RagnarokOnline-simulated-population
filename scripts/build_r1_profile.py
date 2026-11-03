@@ -59,6 +59,34 @@ def load_shops(paths=None):
     return out
 
 
+def load_warps(confs=None):
+    """Map-to-map links of the warp scripts the pinned pre-Renewal server loads
+    (npc/scripts_warps.conf and npc/pre-re/scripts_warps.conf). OpenKore's portals
+    table is generic kRO and also lists Renewal-only links (prontera -> s_atelier)."""
+    out = set()
+    for conf in confs or (RATHENA/'npc/scripts_warps.conf', RATHENA/'npc/pre-re/scripts_warps.conf'):
+        for line in Path(conf).read_text(encoding='utf-8', errors='replace').splitlines():
+            m = re.match(r'^npc:\s*(\S+)', line)
+            if not m or not (RATHENA/m.group(1)).exists():
+                continue
+            for warp in (RATHENA/m.group(1)).read_text(encoding='utf-8', errors='replace').splitlines():
+                w = re.match(r'^(\w+),\d+,\d+(?:,\d+)?\t(?:warp|warp2)\t[^\t]+\t\d+,\d+,(\w+),\d+,\d+', warp)
+                if w:
+                    out.add((w.group(1), w.group(2)))
+    return out
+
+
+def unconfirmed_maps(portals, warps):
+    """Maps OpenKore's portals reach only through links the server does not load."""
+    reached = {to for links in portals.values() for _, _, to, *_ in links}
+    confirmed = {to for _, to in warps}
+    return sorted(reached - confirmed - set(portals_with_warps(warps)))
+
+
+def portals_with_warps(warps):
+    return {frm for frm, _ in warps}
+
+
 def me_of(character, equipment):
     """The same strength estimate as hunting.profile, from the policy's recorded facts."""
     snap = {'progress': {'stats': {k: {'value': v} for k, v in character['stats'].items()}},
@@ -154,6 +182,10 @@ def translate(policy, tables, danger=None, goto=None):
             for name in active_danger(danger, policy['character']['level']['base']):
                 if name not in SUPPLY_MAPS and name != lock:
                     weights[name] = int(do['avoid_map'])
+            if 'warps' in tables:  # Renewal-only links in OpenKore's table: never route there
+                for name in unconfirmed_maps(tables['fields']['portals'], tables['warps']):
+                    if name not in SUPPLY_MAPS and name != lock:
+                        weights[name] = int(do['avoid_map'])
             mapping.setdefault(rid, []).append(f'routeweights x{len([w for w in weights if w not in TRANSPORT_WEIGHTS])}')
         elif 'warp_fee_max' in do:
             emit(rule, route_maxWarpFee=str(do['warp_fee_max']))
@@ -226,8 +258,9 @@ def translate(policy, tables, danger=None, goto=None):
 GAP_REASONS = {}
 
 
-def map_hops(portals, start, blocked):
-    """Fewest map hops from start over the pinned portals, not entering blocked maps."""
+def map_hops(portals, start, blocked, warps=None):
+    """Fewest map hops from start over the pinned portals (only links the server loads,
+    when warps is given), not entering blocked maps."""
     out, queue = {start: 0}, deque([start])
     while queue:
         here = queue.popleft()
@@ -235,6 +268,8 @@ def map_hops(portals, start, blocked):
             continue
         for exit in portals.get(here, []):
             there = exit[2]
+            if warps is not None and (here, there) not in warps:
+                continue
             if there not in out and there not in blocked:
                 out[there] = out[here] + 1
                 queue.append(there)
@@ -253,7 +288,7 @@ def field_options(policy, tables, danger=None, current=None, history=None):
     wanted = {'boss', 'summoner', 'rare_threat'}
     dangerous = set(active_danger(danger, policy['character']['level']['base']))
     blocked = {n for n, f in fields.items() if hostile(f, monsters, kinds) & wanted} | dangerous
-    hops = map_hops(tables['fields']['portals'], SUPPLY_TOWN, blocked - SUPPLY_MAPS)
+    hops = map_hops(tables['fields']['portals'], SUPPLY_TOWN, blocked - SUPPLY_MAPS, tables.get('warps'))
     history = history or {}
     out = []
     for name in sorted(fields):
@@ -302,7 +337,8 @@ def render(result, template):
 def load_tables():
     return {'monsters': hunting.load_monsters(), 'fields': hunting.load_fields(),
             'builds': build_policy.load_builds(),
-            'equipment': build_policy.load_equipment(), 'summoners': load_summoners(), 'shops': load_shops()}
+            'equipment': build_policy.load_equipment(), 'summoners': load_summoners(), 'shops': load_shops(),
+            'warps': load_warps()}
 
 
 def main():

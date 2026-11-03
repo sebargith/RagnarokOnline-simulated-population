@@ -9,6 +9,14 @@ dirección vigente es [P5](#p5--progresión-autónoma-desde-nivel-1): dos funcio
 de modelo (planificador inteligente y conversador local) y progreso autónomo de un
 novato nuevo hasta primera clase. El texto de P1–P4 se conserva como historial.
 
+Actualización 2026-11-03 (usuario, R1/R2 de la [revisión](research/PROJECT_REVIEW-2026-11.md)):
+- **Ejecutor:** OpenKore `auto` con la política declarativa (`config/r1-policy*.json`) es el ejecutor del camino principal ([arquitectura](ARCHITECTURE.md#camino-principal--r2-2026-11-03)).
+- **El puente** queda para lo irreversible.
+- **Ciclo propio:** el de P2/P5 está congelado.
+- **Pasos de P5:**
+  - el paso 6 (prueba larga) se mide por MTBI ≥ 4 h;
+  - el paso 7 (comunidad) es R3 y no empieza hasta cerrar R2.
+
 ## Resultado que buscamos
 
 Un personaje normal desde nivel 1 que pueda desplazarse, combatir, recuperarse,

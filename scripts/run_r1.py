@@ -16,6 +16,7 @@ only writes events.
   report     summarize the character's observer events
   campaign   one unattended run of --seconds: auto until Job 10, the first-job step,
              the policy for the new class and auto again until the budget ends
+  class-refit  after a completed first-job: field decision and profile for the new class
 
 Field choice: at prepare and on each base level-up or death, the planner role
 (Groq, Gemma fallback) picks one field among code-validated options
@@ -618,6 +619,38 @@ def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN, ser
     return out
 
 
+def class_facts(log, events):
+    """Policy facts after a completed first_job: class and job level from the server's
+    confirmed result (the last observer sample may predate the job packet), the rest
+    from that sample. None unless the step completed."""
+    outcome = log.get('outcome')
+    if not isinstance(outcome, dict) or outcome.get('status') != 'completed' or outcome.get('reason') != 'job_changed':
+        return None
+    samples = [e for e in events if e['type'] == 'sample' and e.get('connected')]
+    facts = facts_of(dict(samples[-1], job_id=0)) if samples else None
+    after = (outcome.get('evidence') or {}).get('after', {}).get('exp', '')
+    if not facts or not re.fullmatch(r'\d+,\d+,\d+,\d+', after):
+        return None
+    base, _, job_level, _ = (int(v) for v in after.split(','))
+    return {**facts, 'source': f'first_job {outcome["request_id"]} completed/job_changed', 'job': log['job'],
+            'level': {'base': base, 'job': job_level}}
+
+
+def class_refit(runtime, service=None):
+    """After a completed first-job step: field decision and profile for the new class."""
+    p = paths(runtime)
+    log = load(p['base']/'first-job.json', {})
+    # The step itself may be too short for a connected sample: the last one before it counts.
+    facts = class_facts(log, read_events(p['events'], log.get('started', 0) - 3600))
+    if not facts:
+        raise RuntimeError('no completed first_job with observed facts')
+    policy = effective_policy(runtime)
+    policy['character'] = facts
+    decided = FieldChoice(runtime, service).decide(policy, 'class_change')
+    prepare(runtime, None, facts)
+    return facts, decided
+
+
 def campaign(runtime, seconds, job, summary_dir, ram_min=RAM_MIN, service=None):
     """One unattended run: auto until Job 10, the reconciled first-job step, the
     policy for the new class and auto again until the budget ends. Any other stop
@@ -635,17 +668,11 @@ def campaign(runtime, seconds, job, summary_dir, ram_min=RAM_MIN, service=None):
         log = first_job(runtime, job)
         legs.append({'first_job': log.get('outcome'), 'before': log.get('before'), 'after': log.get('after')})
         m1.write(summary_dir/'first-job.json', json.dumps(log, indent=1, default=str))
-        outcome = log.get('outcome') or {}
-        if not isinstance(outcome, dict) or outcome.get('status') != 'completed':
-            break
-        samples = [e for e in read_events(p['events'], log['started']) if e['type'] == 'sample' and e.get('connected')]
-        facts = facts_of(samples[-1]) if samples else None
-        if not facts or facts['job'] != job:
-            legs.append({'stop': 'new_class_not_observed'}); break
-        policy = effective_policy(runtime)
-        policy['character'] = facts
-        FieldChoice(runtime, service).decide(policy, 'class_change')
-        prepare(runtime, None, facts)
+        try:
+            facts, decided = class_refit(runtime, service)
+        except RuntimeError as e:
+            legs.append({'stop': str(e)}); break
+        legs.append({'class_refit': facts, 'field': decided['field_id']})
     record = {'started': started, 'ended': time.time(), 'seconds': seconds, 'legs': legs,
               'interventions': 0, 'note': 'interventions counts manual actions during the campaign; it starts at 0 and '
                                           'any manual stop, restart or command ends the campaign'}
@@ -657,7 +684,7 @@ def campaign(runtime, seconds, job, summary_dir, ram_min=RAM_MIN, service=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('command', choices=('preflight', 'prepare', 'start', 'watch', 'stop', 'report', 'first-job',
-                                            'campaign'))
+                                            'campaign', 'class-refit'))
     parser.add_argument('--job', default='Swordman', choices=('Swordman', 'Mage', 'Archer', 'Acolyte', 'Merchant', 'Thief'))
     parser.add_argument('--runtime', required=True, type=Path)
     parser.add_argument('--seconds', type=int, default=3600)
@@ -671,7 +698,8 @@ def main():
     parser.add_argument('--out', type=Path, help='campaign: summaries directory')
     args = parser.parse_args()
     use(args.character)
-    service = None if args.no_inference or args.command not in ('prepare', 'watch', 'campaign') else planner_service()
+    service = None if args.no_inference or args.command not in ('prepare', 'watch', 'campaign', 'class-refit') \
+        else planner_service()
     try:
         run(args, service)
     finally:
@@ -692,6 +720,11 @@ def run(args, service):
         start(args.runtime)
     elif args.command == 'watch':
         watch(args.runtime, args.seconds, args.policy, args.summary, int(args.ram_min_gib * 2**30), service)
+    elif args.command == 'class-refit':
+        bind(args.runtime)
+        facts, decided = class_refit(args.runtime, service)
+        print(json.dumps({'facts': facts, 'field': decided['field_id'], 'decision': decided['decision'],
+                          'served_by': decided['served_by']}))
     elif args.command == 'campaign':
         campaign(args.runtime, args.seconds, args.job, args.out or paths(args.runtime)['base']/'campaign',
                  int(args.ram_min_gib * 2**30), service)

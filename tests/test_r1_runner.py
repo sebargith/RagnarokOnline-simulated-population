@@ -183,5 +183,16 @@ class FieldDecision(unittest.TestCase):
         self.assertEqual(run_r1.summarize(events, LOCK, 0)['time_share_s']['hunt'], 15)
 
 
+class ClassChange(unittest.TestCase):
+    def test_facts_come_from_the_confirmed_result_not_a_stale_sample(self):
+        stale = dict(sample(0, base=13, job=10), job_id=0, equipped=[1201, 2305])
+        log = {'job': 'Swordman', 'outcome': {'status': 'completed', 'reason': 'job_changed', 'request_id': 'c_2',
+                                              'evidence': {'after': {'exp': '13,236,1,0'}, 'observed_job': 1}}}
+        f = run_r1.class_facts(log, [stale])
+        self.assertEqual((f['job'], f['level'], f['equipped']), ('Swordman', {'base': 13, 'job': 1}, [1201, 2305]))
+        for outcome in ({'status': 'unknown'}, 'not_in_prontera', {'status': 'failed', 'reason': 'npc_refused'}):
+            self.assertIsNone(run_r1.class_facts(dict(log, outcome=outcome), [stale]))
+
+
 if __name__ == '__main__':
     unittest.main()
