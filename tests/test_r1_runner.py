@@ -56,7 +56,7 @@ class ObserverContract(unittest.TestCase):
         text = (ROOT/'bridge/r1/r1_observer.pl').read_text()
         for pattern in (r'messageSender', r'Commands::', r'\bsend\w*\(', r'configModify', r'AI::queue', r'ai_\w+\('):
             self.assertIsNone(re.search(pattern, text), pattern)
-        self.assertEqual(run_r1.PLUGINS, 'r1_observer,r1_reload,r1_flee,raiseStat,raiseSkill')  # m1_bridge never loads
+        self.assertEqual(run_r1.PLUGINS, 'r1_observer,r1_reload,r1_flee,r1_equip,raiseStat,raiseSkill')  # m1_bridge never loads
 
     def test_flee_plugin_only_routes_without_attacking(self):
         text = (ROOT/'bridge/r1/r1_flee.pl').read_text()

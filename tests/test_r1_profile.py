@@ -37,6 +37,9 @@ class R1Profile(unittest.TestCase):
 
     def test_every_key_exists_in_pinned_openkore(self):
         for key in self.result['config']:
+            if key.startswith('r1_equip_'):  # read by bridge/r1/r1_equip.pl, not OpenKore core
+                self.assertIn(key[len('r1_equip_'):], (r1.OPENKORE/'src/Globals.pm').read_text(encoding='utf-8', errors='replace'))
+                continue
             self.assertTrue(scalar_known(key), key)
         for block, _, keys in self.result['blocks']:
             for key in keys:
@@ -145,7 +148,7 @@ class Goto(unittest.TestCase):
         self.assertEqual((c['lockMap'], c['lockMap_x'], c['lockMap_y'], c['route_randomWalk'], c['attackAuto']),
                          ('prontera', '153', '190', '0', '1'))
         for key in c:
-            self.assertTrue(scalar_known(key), key)
+            self.assertTrue(scalar_known(key) or key.startswith('r1_equip_'), key)
         self.assertEqual(r1.translate(POLICY, TABLES)['config']['lockMap'], POLICY['rules'][0]['do']['hunt']['field'])
 
 

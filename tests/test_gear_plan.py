@@ -55,7 +55,7 @@ class Plan(unittest.TestCase):
     def test_buys_best_affordable_weapon_first_within_reserve(self):
         d = gear_plan.plan(char(5495), EQUIPMENT, SWORD, PRT, 1000)
         self.assertEqual((d['buy']['id'], d['buy']['shop'], d['reason']), (BLADE, 'Weapon Dealer#prt', 'upgrade_weapon'))
-        self.assertEqual(d['equip'], {'rightHand': BLADE, 'armor': SUIT})
+        self.assertEqual(d['equip'], {'rightHand': BLADE, 'armor': SUIT, 'leftHand': GUARD, 'shoes': 2401})
         self.assertEqual(d['facts']['current'], {'weapon': KNIFE, 'armor': SUIT})
 
     def test_level_unlocks_and_reserve_limits(self):
@@ -68,6 +68,15 @@ class Plan(unittest.TestCase):
         d = gear_plan.plan(char(99999, equipped=(BLADE, SUIT)), EQUIPMENT, SWORD, PRT, 1000)
         self.assertNotEqual(d['buy']['id'], KATANA)
         self.assertNotIn('Both_Hand', EQUIPMENT[str(d['buy']['id'])]['locations'])
+
+    def test_one_trip_buys_every_affordable_slot(self):
+        d = gear_plan.plan(char(5495), EQUIPMENT, SWORD, PRT, 1000)
+        self.assertEqual([b['id'] for b in d['buys']][:2], [BLADE, GUARD])  # 2900 + 500 of 4495
+        self.assertLessEqual(sum(b['price'] for b in d['buys']), 4495)
+        self.assertEqual(d['buy'], d['buys'][0])
+        result = r1.translate(Translation.policy(None, 5495), r1.load_tables())
+        gear = [v for n, v, _ in result['blocks'] if n == 'buyAuto' and v not in ('512', '601')]
+        self.assertEqual(gear, [str(b['id']) for b in d['buys']])
 
     def test_after_weapon_the_body_and_shield(self):
         d = gear_plan.plan(char(1600, level=14, equipped=(RAPIER, SUIT)), EQUIPMENT, SWORD, PRT, 1000)
@@ -97,14 +106,23 @@ class Translation(unittest.TestCase):
 
     def test_native_blocks_and_keep(self):
         result = r1.translate(self.policy(5495), r1.load_tables())
-        blocks = {name: (value, keys) for name, value, keys in result['blocks'] if name in ('equipAuto', 'buyAuto') and value != '512' and value != '601'}
-        self.assertEqual(blocks['equipAuto'], ('', {'armor': str(SUIT), 'rightHand': str(BLADE)}))
+        blocks = {name: (value, keys) for name, value, keys in result['blocks'] if name == 'buyAuto' and value == str(BLADE)}
+        self.assertEqual({k: v for k, v in result['config'].items() if k.startswith('r1_equip_')},
+                         {'r1_equip_armor': str(SUIT), 'r1_equip_rightHand': str(BLADE),
+                          'r1_equip_leftHand': str(GUARD), 'r1_equip_shoes': '2401'})
+        self.assertNotIn('equipAuto', [name for name, _, _ in result['blocks']])
         self.assertEqual(blocks['buyAuto'], (str(BLADE), {'npc': 'prt_in 172 130', 'minAmount': '0', 'maxAmount': '1',
                                                           'price': '2900', 'zeny': '>= 3900'}))
         self.assertEqual(result['items'][str(BLADE)], '1 0 0')
         text = r1.render(result, 'equipAuto {\n\ttopHead\n}\n')['config.txt']
-        self.assertIn('\nequipAuto {\n\tarmor 2305\n\trightHand 1107\n}\n', text)
-        self.assertNotIn('topHead', text)
+        self.assertIn('\nr1_equip_rightHand 1107\n', text)
+        self.assertNotIn('topHead', text)  # the empty template equipAuto block is dropped
+
+    def test_equip_plugin_only_equips(self):
+        text = (ROOT/'bridge/r1/r1_equip.pl').read_text(encoding='utf-8')
+        self.assertIn('Actor::Item::bulkEquip', text)
+        for forbidden in ('sendTo', 'messageSender', 'Commands::run', 'ai_talkNPC', 'parseReload'):
+            self.assertNotIn(forbidden, text)
 
     def test_no_zeny_no_purchase(self):
         result = r1.translate(self.policy(0), r1.load_tables())

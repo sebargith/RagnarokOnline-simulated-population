@@ -212,24 +212,26 @@ def translate(policy, tables, danger=None, goto=None):
                            'zeny': f'>= {req["zeny_at_least"]}'}))
             mapping.setdefault(rid, []).append(f'buyAuto {buy["name"]}')
         elif 'upgrade_gear' in do:
-            # agent/gear_plan.py: best owned item per slot (equipAuto, native) and at most
-            # one NPC purchase (buyAuto max 1, which counts equipped items too).
+            # agent/gear_plan.py: best owned item per slot (r1_equip_<slot> for the r1_equip
+            # plugin: OpenKore's equipAuto reads numbers as inventory indexes) and at most one
+            # NPC purchase (native buyAuto max 1, which counts equipped items too).
             up = do['upgrade_gear']
             gear = tables['builds'][up['build']].get('gear', {})
             decision = gear_plan.plan(policy['character'], tables['equipment'], gear, up['shops'],
                                       int(up['reserve_zeny']))
-            if decision['equip']:
-                blocks.append(('equipAuto', '', {k: str(v) for k, v in decision['equip'].items()}))
+            for slot, iid in decision['equip'].items():
+                config[f'r1_equip_{slot}'] = str(iid)
             for iid in decision['equip'].values():
                 items[str(iid)] = '1 0 0'  # never sell the planned gear
-            b = decision['buy']
-            if b:
+            # One block per purchase, in plan order: OpenKore rechecks each block's zeny
+            # condition after the previous buys, so the reserve holds for the whole trip.
+            for b in decision['buys']:
                 blocks.append(('buyAuto', str(b['id']), {'npc': tables['shops'][b['shop']],
                                'minAmount': '0', 'maxAmount': '1', 'price': str(b['price']),
                                'zeny': f'>= {b["price"] + int(up["reserve_zeny"])}'}))
             gear_decision = decision
-            mapping.setdefault(rid, []).append(f'equipAuto x{len(decision["equip"])}'
-                                               + (f', buyAuto {b["name"]}' if b else ''))
+            mapping.setdefault(rid, []).append(f'plugin:r1_equip x{len(decision["equip"])}'
+                                               + ''.join(f', buyAuto {b["name"]}' for b in decision['buys']))
         elif 'raise_build' in do:
             build = tables['builds'][do['raise_build']]
             prefix = JOB_SKILL_PREFIX[policy['character']['job']]

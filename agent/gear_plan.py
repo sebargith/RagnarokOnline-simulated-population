@@ -3,8 +3,9 @@
 From the policy's recorded facts (class, level, equipped, inventory, Zeny) and
 the generated equipment table, decide:
 - equip: per OpenKore slot, the best wearable item the character already owns;
-- buy: at most one purchase, the best affordable strict upgrade in the first slot
-  (by priority) that has one, kept within a Zeny reserve for consumables.
+- buys: in slot priority order, the best affordable strict upgrade per slot, each
+  paid from what the previous ones leave, all within a Zeny reserve for consumables,
+  so one trip to town buys them all; buy is the first of them (or None).
 No model is involved; the decision carries its facts so it can be audited.
 """
 from agent.build_policy import _score, _slot, can_wear
@@ -54,7 +55,7 @@ def best_owned(character, equipment, gear):
 
 
 def plan(character, equipment, gear, shops, reserve):
-    """-> {'equip': {okslot: id}, 'buy': {...} | None, 'reason': str, 'facts': {...}}.
+    """-> {'equip': {okslot: id}, 'buys': [...], 'buy': buys[0] | None, 'reason': str, 'facts': {...}}.
     shops: allowed NPC shop names in preference order. reserve: Zeny kept for consumables."""
     have = best_owned(character, equipment, gear)
     zeny = int(character.get('zeny') or 0)
@@ -62,7 +63,7 @@ def plan(character, equipment, gear, shops, reserve):
     facts = {'job': character['job'], 'base_level': character['level']['base'], 'zeny': zeny,
              'reserve': reserve, 'current': {s: have[s][1] for s in sorted(have)}}
     equip = {OPENKORE_SLOT[s]: iid for s, (_, iid) in sorted(have.items())}
-    buy, reason = None, 'no_affordable_upgrade' if budget > 0 else 'below_reserve'
+    buys, reason = [], 'no_affordable_upgrade' if budget > 0 else 'below_reserve'
     for slot in PRIORITY if budget > 0 else ():
         if slot == 'shield' and gear.get('shield') is False:
             continue
@@ -76,9 +77,10 @@ def plan(character, equipment, gear, shops, reserve):
         if options:
             _, price, iid, shop = min(options)
             entry = equipment[str(iid)]
-            buy = {'id': iid, 'name': entry['name'], 'slot': slot, 'okslot': OPENKORE_SLOT[slot],
-                   'price': price, 'shop': shop, 'score': _score(entry), 'gain': _score(entry) - current}
+            buys.append({'id': iid, 'name': entry['name'], 'slot': slot, 'okslot': OPENKORE_SLOT[slot],
+                         'price': price, 'shop': shop, 'score': _score(entry), 'gain': _score(entry) - current})
             equip[OPENKORE_SLOT[slot]] = iid
-            reason = f'upgrade_{slot}'
-            break
-    return {'equip': equip, 'buy': buy, 'reason': reason, 'facts': facts}
+            budget -= price
+            if not reason.startswith('upgrade_'):
+                reason = f'upgrade_{slot}'
+    return {'equip': equip, 'buys': buys, 'buy': buys[0] if buys else None, 'reason': reason, 'facts': facts}

@@ -56,7 +56,7 @@ CHARACTERS = {
 }
 WHO = 'tarin'
 NAME, USERID, PORT, CLIENT = 'Tarin', 'p1solo', 8772, 'r1-tarin'
-PLUGINS = 'r1_observer,r1_reload,r1_flee,raiseStat,raiseSkill'
+PLUGINS = 'r1_observer,r1_reload,r1_flee,r1_equip,raiseStat,raiseSkill'
 JOBS = {0: 'Novice', 1: 'Swordman'}  # OpenKore jobID -> classes the generator knows skill prefixes for
 RELOAD_CONFIRM_S = 60
 SUPPLY_AI = {'sellAuto', 'buyAuto', 'storageAuto'}
