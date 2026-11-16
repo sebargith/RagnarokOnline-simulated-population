@@ -23,7 +23,8 @@
    "walk_speed": 200,
    "attack_delay": 1564,
    "base_exp": 287,
-   "job_exp": 176
+   "job_exp": 176,
+   "size": "Small"
   },
   "1002": {
    "name": "Poring",
@@ -41,7 +42,8 @@
    "walk_speed": 400,
    "attack_delay": 1872,
    "base_exp": 2,
-   "job_exp": 1
+   "job_exp": 1,
+   "size": "Medium"
   },
   "1004": {
    "name": "Hornet",
@@ -59,7 +61,8 @@
    "walk_speed": 150,
    "attack_delay": 1292,
    "base_exp": 19,
-   "job_exp": 15
+   "job_exp": 15,
+   "size": "Small"
   },
   "1007": {
    "name": "Fabre",
@@ -77,7 +80,8 @@
    "walk_speed": 400,
    "attack_delay": 1672,
    "base_exp": 3,
-   "job_exp": 2
+   "job_exp": 2,
+   "size": "Small"
   },
   "1008": {
    "name": "Pupa",
@@ -95,7 +99,8 @@
    "walk_speed": 1000,
    "attack_delay": 1001,
    "base_exp": 2,
-   "job_exp": 4
+   "job_exp": 4,
+   "size": "Small"
   },
   "1009": {
    "name": "Condor",
@@ -113,7 +118,8 @@
    "walk_speed": 150,
    "attack_delay": 1148,
    "base_exp": 6,
-   "job_exp": 5
+   "job_exp": 5,
+   "size": "Medium"
   },
   "1010": {
    "name": "Willow",
@@ -131,7 +137,8 @@
    "walk_speed": 200,
    "attack_delay": 1672,
    "base_exp": 5,
-   "job_exp": 4
+   "job_exp": 4,
+   "size": "Medium"
   },
   "1011": {
    "name": "Chonchon",
@@ -149,7 +156,8 @@
    "walk_speed": 200,
    "attack_delay": 1076,
    "base_exp": 5,
-   "job_exp": 4
+   "job_exp": 4,
+   "size": "Small"
   },
   "1012": {
    "name": "Roda Frog",
@@ -167,7 +175,8 @@
    "walk_speed": 200,
    "attack_delay": 2016,
    "base_exp": 6,
-   "job_exp": 5
+   "job_exp": 5,
+   "size": "Medium"
   },
   "1013": {
    "name": "Wolf",
@@ -185,7 +194,8 @@
    "walk_speed": 200,
    "attack_delay": 1054,
    "base_exp": 329,
-   "job_exp": 199
+   "job_exp": 199,
+   "size": "Medium"
   },
   "1014": {
    "name": "Spore",
@@ -203,7 +213,8 @@
    "walk_speed": 200,
    "attack_delay": 1872,
    "base_exp": 66,
-   "job_exp": 108
+   "job_exp": 108,
+   "size": "Medium"
   },
   "1018": {
    "name": "Creamy",
@@ -221,7 +232,8 @@
    "walk_speed": 150,
    "attack_delay": 1136,
    "base_exp": 105,
-   "job_exp": 70
+   "job_exp": 70,
+   "size": "Small"
   },
   "1019": {
    "name": "Peco Peco",
@@ -239,7 +251,8 @@
    "walk_speed": 200,
    "attack_delay": 1564,
    "base_exp": 159,
-   "job_exp": 72
+   "job_exp": 72,
+   "size": "Large"
   },
   "1020": {
    "name": "Mandragora",
@@ -257,7 +270,8 @@
    "walk_speed": 1000,
    "attack_delay": 1768,
    "base_exp": 45,
-   "job_exp": 32
+   "job_exp": 32,
+   "size": "Medium"
   },
   "1023": {
    "name": "Orc Warrior",
@@ -275,7 +289,8 @@
    "walk_speed": 200,
    "attack_delay": 1864,
    "base_exp": 408,
-   "job_exp": 160
+   "job_exp": 160,
+   "size": "Medium"
   },
   "1024": {
    "name": "Wormtail",
@@ -293,7 +308,8 @@
    "walk_speed": 200,
    "attack_delay": 1048,
    "base_exp": 59,
-   "job_exp": 40
+   "job_exp": 40,
+   "size": "Medium"
   },
   "1025": {
    "name": "Boa",
@@ -311,7 +327,8 @@
    "walk_speed": 200,
    "attack_delay": 1576,
    "base_exp": 72,
-   "job_exp": 48
+   "job_exp": 48,
+   "size": "Medium"
   },
   "1030": {
    "name": "Anacondaq",
@@ -329,7 +346,8 @@
    "walk_speed": 200,
    "attack_delay": 1576,
    "base_exp": 300,
-   "job_exp": 149
+   "job_exp": 149,
+   "size": "Medium"
   },
   "1031": {
    "name": "Poporing",
@@ -347,7 +365,8 @@
    "walk_speed": 300,
    "attack_delay": 1672,
    "base_exp": 81,
-   "job_exp": 44
+   "job_exp": 44,
+   "size": "Medium"
   },
   "1033": {
    "name": "Elder Willow",
@@ -365,7 +384,8 @@
    "walk_speed": 200,
    "attack_delay": 1372,
    "base_exp": 163,
-   "job_exp": 101
+   "job_exp": 101,
+   "size": "Medium"
   },
   "1035": {
    "name": "Hunter Fly",
@@ -383,7 +403,8 @@
    "walk_speed": 150,
    "attack_delay": 676,
    "base_exp": 1517,
-   "job_exp": 952
+   "job_exp": 952,
+   "size": "Small"
   },
   "1037": {
    "name": "Side Winder",
@@ -401,7 +422,8 @@
    "walk_speed": 200,
    "attack_delay": 1576,
    "base_exp": 1996,
-   "job_exp": 993
+   "job_exp": 993,
+   "size": "Medium"
   },
   "1040": {
    "name": "Golem",
@@ -419,7 +441,8 @@
    "walk_speed": 300,
    "attack_delay": 1608,
    "base_exp": 465,
-   "job_exp": 94
+   "job_exp": 94,
+   "size": "Large"
   },
   "1042": {
    "name": "Steel Chonchon",
@@ -437,7 +460,8 @@
    "walk_speed": 150,
    "attack_delay": 1076,
    "base_exp": 109,
-   "job_exp": 71
+   "job_exp": 71,
+   "size": "Small"
   },
   "1047": {
    "name": "Peco Peco Egg",
@@ -455,7 +479,8 @@
    "walk_speed": 1000,
    "attack_delay": 1001,
    "base_exp": 4,
-   "job_exp": 4
+   "job_exp": 4,
+   "size": "Small"
   },
   "1048": {
    "name": "Thief Bug Egg",
@@ -473,7 +498,8 @@
    "walk_speed": 1000,
    "attack_delay": 701,
    "base_exp": 8,
-   "job_exp": 4
+   "job_exp": 4,
+   "size": "Small"
   },
   "1049": {
    "name": "Picky",
@@ -491,7 +517,8 @@
    "walk_speed": 200,
    "attack_delay": 988,
    "base_exp": 4,
-   "job_exp": 3
+   "job_exp": 3,
+   "size": "Small"
   },
   "1050": {
    "name": "Picky",
@@ -509,7 +536,8 @@
    "walk_speed": 200,
    "attack_delay": 988,
    "base_exp": 5,
-   "job_exp": 4
+   "job_exp": 4,
+   "size": "Small"
   },
   "1051": {
    "name": "Thief Bug",
@@ -527,7 +555,8 @@
    "walk_speed": 150,
    "attack_delay": 1288,
    "base_exp": 17,
-   "job_exp": 5
+   "job_exp": 5,
+   "size": "Small"
   },
   "1052": {
    "name": "Rocker",
@@ -545,7 +574,8 @@
    "walk_speed": 200,
    "attack_delay": 1864,
    "base_exp": 20,
-   "job_exp": 16
+   "job_exp": 16,
+   "size": "Medium"
   },
   "1053": {
    "name": "Thief Bug Female",
@@ -563,7 +593,8 @@
    "walk_speed": 200,
    "attack_delay": 988,
    "base_exp": 35,
-   "job_exp": 18
+   "job_exp": 18,
+   "size": "Medium"
   },
   "1054": {
    "name": "Thief Bug Male",
@@ -581,7 +612,8 @@
    "walk_speed": 300,
    "attack_delay": 988,
    "base_exp": 223,
-   "job_exp": 93
+   "job_exp": 93,
+   "size": "Medium"
   },
   "1055": {
    "name": "Muka",
@@ -599,7 +631,8 @@
    "walk_speed": 300,
    "attack_delay": 1960,
    "base_exp": 273,
-   "job_exp": 120
+   "job_exp": 120,
+   "size": "Large"
   },
   "1056": {
    "name": "Smokie",
@@ -617,7 +650,8 @@
    "walk_speed": 200,
    "attack_delay": 1576,
    "base_exp": 134,
-   "job_exp": 86
+   "job_exp": 86,
+   "size": "Small"
   },
   "1057": {
    "name": "Yoyo",
@@ -635,7 +669,8 @@
    "walk_speed": 200,
    "attack_delay": 1054,
    "base_exp": 280,
-   "job_exp": 111
+   "job_exp": 111,
+   "size": "Small"
   },
   "1058": {
    "name": "Metaller",
@@ -653,7 +688,8 @@
    "walk_speed": 200,
    "attack_delay": 1708,
    "base_exp": 241,
-   "job_exp": 152
+   "job_exp": 152,
+   "size": "Medium"
   },
   "1059": {
    "name": "Mistress",
@@ -671,7 +707,8 @@
    "walk_speed": 100,
    "attack_delay": 1148,
    "base_exp": 39325,
-   "job_exp": 27170
+   "job_exp": 27170,
+   "size": "Small"
   },
   "1060": {
    "name": "Bigfoot",
@@ -689,7 +726,8 @@
    "walk_speed": 300,
    "attack_delay": 1260,
    "base_exp": 310,
-   "job_exp": 188
+   "job_exp": 188,
+   "size": "Large"
   },
   "1063": {
    "name": "Lunatic",
@@ -707,7 +745,8 @@
    "walk_speed": 200,
    "attack_delay": 1456,
    "base_exp": 6,
-   "job_exp": 2
+   "job_exp": 2,
+   "size": "Small"
   },
   "1067": {
    "name": "Cornutus",
@@ -725,7 +764,8 @@
    "walk_speed": 200,
    "attack_delay": 1248,
    "base_exp": 240,
-   "job_exp": 149
+   "job_exp": 149,
+   "size": "Small"
   },
   "1068": {
    "name": "Hydra",
@@ -743,7 +783,8 @@
    "walk_speed": 1000,
    "attack_delay": 800,
    "base_exp": 59,
-   "job_exp": 40
+   "job_exp": 40,
+   "size": "Small"
   },
   "1073": {
    "name": "Crab",
@@ -761,7 +802,8 @@
    "walk_speed": 200,
    "attack_delay": 992,
    "base_exp": 163,
-   "job_exp": 101
+   "job_exp": 101,
+   "size": "Small"
   },
   "1074": {
    "name": "Shellfish",
@@ -779,7 +821,8 @@
    "walk_speed": 200,
    "attack_delay": 864,
    "base_exp": 66,
-   "job_exp": 44
+   "job_exp": 44,
+   "size": "Small"
   },
   "1077": {
    "name": "Poison Spore",
@@ -797,7 +840,8 @@
    "walk_speed": 200,
    "attack_delay": 1672,
    "base_exp": 186,
-   "job_exp": 93
+   "job_exp": 93,
+   "size": "Medium"
   },
   "1078": {
    "name": "Red Plant",
@@ -815,7 +859,8 @@
    "walk_speed": 1000,
    "attack_delay": 1,
    "base_exp": 0,
-   "job_exp": 0
+   "job_exp": 0,
+   "size": "Small"
   },
   "1079": {
    "name": "Blue Plant",
@@ -833,7 +878,8 @@
    "walk_speed": 1000,
    "attack_delay": 1,
    "base_exp": 0,
-   "job_exp": 0
+   "job_exp": 0,
+   "size": "Small"
   },
   "1080": {
    "name": "Green Plant",
@@ -851,7 +897,8 @@
    "walk_speed": 1000,
    "attack_delay": 1,
    "base_exp": 0,
-   "job_exp": 0
+   "job_exp": 0,
+   "size": "Small"
   },
   "1081": {
    "name": "Yellow Plant",
@@ -869,7 +916,8 @@
    "walk_speed": 1000,
    "attack_delay": 1,
    "base_exp": 0,
-   "job_exp": 0
+   "job_exp": 0,
+   "size": "Small"
   },
   "1082": {
    "name": "White Plant",
@@ -887,7 +935,8 @@
    "walk_speed": 1000,
    "attack_delay": 1,
    "base_exp": 0,
-   "job_exp": 0
+   "job_exp": 0,
+   "size": "Small"
   },
   "1083": {
    "name": "Shining Plant",
@@ -905,7 +954,8 @@
    "walk_speed": 1000,
    "attack_delay": 1,
    "base_exp": 0,
-   "job_exp": 0
+   "job_exp": 0,
+   "size": "Small"
   },
   "1084": {
    "name": "Black Mushroom",
@@ -923,7 +973,8 @@
    "walk_speed": 1000,
    "attack_delay": 1,
    "base_exp": 0,
-   "job_exp": 0
+   "job_exp": 0,
+   "size": "Small"
   },
   "1085": {
    "name": "Red Mushroom",
@@ -941,7 +992,8 @@
    "walk_speed": 1000,
    "attack_delay": 1,
    "base_exp": 0,
-   "job_exp": 0
+   "job_exp": 0,
+   "size": "Small"
   },
   "1087": {
    "name": "Orc Hero",
@@ -959,7 +1011,8 @@
    "walk_speed": 150,
    "attack_delay": 1678,
    "base_exp": 58630,
-   "job_exp": 32890
+   "job_exp": 32890,
+   "size": "Large"
   },
   "1088": {
    "name": "Vocal",
@@ -977,7 +1030,8 @@
    "walk_speed": 200,
    "attack_delay": 1080,
    "base_exp": 110,
-   "job_exp": 88
+   "job_exp": 88,
+   "size": "Medium"
   },
   "1089": {
    "name": "Toad",
@@ -995,7 +1049,8 @@
    "walk_speed": 200,
    "attack_delay": 1236,
    "base_exp": 100,
-   "job_exp": 50
+   "job_exp": 50,
+   "size": "Medium"
   },
   "1090": {
    "name": "Mastering",
@@ -1013,7 +1068,8 @@
    "walk_speed": 300,
    "attack_delay": 1072,
    "base_exp": 30,
-   "job_exp": 10
+   "job_exp": 10,
+   "size": "Medium"
   },
   "1091": {
    "name": "Dragon Fly",
@@ -1031,7 +1087,8 @@
    "walk_speed": 100,
    "attack_delay": 1076,
    "base_exp": 88,
-   "job_exp": 44
+   "job_exp": 44,
+   "size": "Small"
   },
   "1092": {
    "name": "Vagabond Wolf",
@@ -1049,7 +1106,8 @@
    "walk_speed": 150,
    "attack_delay": 1048,
    "base_exp": 247,
-   "job_exp": 176
+   "job_exp": 176,
+   "size": "Medium"
   },
   "1093": {
    "name": "Eclipse",
@@ -1067,7 +1125,8 @@
    "walk_speed": 200,
    "attack_delay": 1456,
    "base_exp": 60,
-   "job_exp": 55
+   "job_exp": 55,
+   "size": "Medium"
   },
   "1094": {
    "name": "Ambernite",
@@ -1085,7 +1144,8 @@
    "walk_speed": 400,
    "attack_delay": 2048,
    "base_exp": 57,
-   "job_exp": 38
+   "job_exp": 38,
+   "size": "Large"
   },
   "1095": {
    "name": "Andre",
@@ -1103,7 +1163,8 @@
    "walk_speed": 300,
    "attack_delay": 1288,
    "base_exp": 109,
-   "job_exp": 71
+   "job_exp": 71,
+   "size": "Small"
   },
   "1096": {
    "name": "Angeling",
@@ -1121,7 +1182,8 @@
    "walk_speed": 200,
    "attack_delay": 1072,
    "base_exp": 163,
-   "job_exp": 144
+   "job_exp": 144,
+   "size": "Medium"
   },
   "1097": {
    "name": "Ant Egg",
@@ -1139,7 +1201,8 @@
    "walk_speed": 1000,
    "attack_delay": 1001,
    "base_exp": 5,
-   "job_exp": 4
+   "job_exp": 4,
+   "size": "Small"
   },
   "1099": {
    "name": "Argiope",
@@ -1157,7 +1220,8 @@
    "walk_speed": 300,
    "attack_delay": 1792,
    "base_exp": 1797,
-   "job_exp": 849
+   "job_exp": 849,
+   "size": "Large"
   },
   "1100": {
    "name": "Argos",
@@ -1175,7 +1239,8 @@
    "walk_speed": 300,
    "attack_delay": 1468,
    "base_exp": 388,
-   "job_exp": 188
+   "job_exp": 188,
+   "size": "Large"
   },
   "1103": {
    "name": "Caramel",
@@ -1193,7 +1258,8 @@
    "walk_speed": 200,
    "attack_delay": 1604,
    "base_exp": 264,
-   "job_exp": 162
+   "job_exp": 162,
+   "size": "Small"
   },
   "1104": {
    "name": "Coco",
@@ -1211,7 +1277,8 @@
    "walk_speed": 150,
    "attack_delay": 1864,
    "base_exp": 120,
-   "job_exp": 78
+   "job_exp": 78,
+   "size": "Small"
   },
   "1105": {
    "name": "Deniro",
@@ -1229,7 +1296,8 @@
    "walk_speed": 150,
    "attack_delay": 1288,
    "base_exp": 135,
-   "job_exp": 85
+   "job_exp": 85,
+   "size": "Small"
   },
   "1106": {
    "name": "Desert Wolf",
@@ -1247,7 +1315,8 @@
    "walk_speed": 200,
    "attack_delay": 1120,
    "base_exp": 427,
-   "job_exp": 266
+   "job_exp": 266,
+   "size": "Medium"
   },
   "1107": {
    "name": "Baby Desert Wolf",
@@ -1265,7 +1334,8 @@
    "walk_speed": 300,
    "attack_delay": 1600,
    "base_exp": 20,
-   "job_exp": 16
+   "job_exp": 16,
+   "size": "Small"
   },
   "1110": {
    "name": "Dokebi",
@@ -1283,7 +1353,8 @@
    "walk_speed": 250,
    "attack_delay": 1156,
    "base_exp": 889,
-   "job_exp": 455
+   "job_exp": 455,
+   "size": "Small"
   },
   "1113": {
    "name": "Drops",
@@ -1301,7 +1372,8 @@
    "walk_speed": 400,
    "attack_delay": 1372,
    "base_exp": 4,
-   "job_exp": 3
+   "job_exp": 3,
+   "size": "Medium"
   },
   "1114": {
    "name": "Dustiness",
@@ -1319,7 +1391,8 @@
    "walk_speed": 150,
    "attack_delay": 1004,
    "base_exp": 218,
-   "job_exp": 140
+   "job_exp": 140,
+   "size": "Small"
   },
   "1115": {
    "name": "Eddga",
@@ -1337,7 +1410,8 @@
    "walk_speed": 300,
    "attack_delay": 872,
    "base_exp": 25025,
-   "job_exp": 12870
+   "job_exp": 12870,
+   "size": "Large"
   },
   "1116": {
    "name": "Eggyra",
@@ -1355,7 +1429,8 @@
    "walk_speed": 200,
    "attack_delay": 1816,
    "base_exp": 215,
-   "job_exp": 220
+   "job_exp": 220,
+   "size": "Medium"
   },
   "1118": {
    "name": "Flora",
@@ -1373,7 +1448,8 @@
    "walk_speed": 1000,
    "attack_delay": 1432,
    "base_exp": 357,
-   "job_exp": 226
+   "job_exp": 226,
+   "size": "Large"
   },
   "1119": {
    "name": "Frilldora",
@@ -1391,7 +1467,8 @@
    "walk_speed": 300,
    "attack_delay": 1540,
    "base_exp": 529,
-   "job_exp": 319
+   "job_exp": 319,
+   "size": "Medium"
   },
   "1120": {
    "name": "Ghostring",
@@ -1409,7 +1486,8 @@
    "walk_speed": 300,
    "attack_delay": 1220,
    "base_exp": 101,
-   "job_exp": 108
+   "job_exp": 108,
+   "size": "Medium"
   },
   "1121": {
    "name": "Giearth",
@@ -1427,7 +1505,8 @@
    "walk_speed": 200,
    "attack_delay": 1848,
    "base_exp": 495,
-   "job_exp": 301
+   "job_exp": 301,
+   "size": "Small"
   },
   "1122": {
    "name": "Goblin",
@@ -1445,7 +1524,8 @@
    "walk_speed": 100,
    "attack_delay": 1120,
    "base_exp": 310,
-   "job_exp": 188
+   "job_exp": 188,
+   "size": "Medium"
   },
   "1123": {
    "name": "Goblin",
@@ -1463,7 +1543,8 @@
    "walk_speed": 150,
    "attack_delay": 1320,
    "base_exp": 287,
-   "job_exp": 176
+   "job_exp": 176,
+   "size": "Medium"
   },
   "1124": {
    "name": "Goblin",
@@ -1481,7 +1562,8 @@
    "walk_speed": 250,
    "attack_delay": 1624,
    "base_exp": 357,
-   "job_exp": 176
+   "job_exp": 176,
+   "size": "Medium"
   },
   "1125": {
    "name": "Goblin",
@@ -1499,7 +1581,8 @@
    "walk_speed": 200,
    "attack_delay": 1624,
    "base_exp": 264,
-   "job_exp": 164
+   "job_exp": 164,
+   "size": "Medium"
   },
   "1126": {
    "name": "Goblin",
@@ -1517,7 +1600,8 @@
    "walk_speed": 300,
    "attack_delay": 3074,
    "base_exp": 241,
-   "job_exp": 152
+   "job_exp": 152,
+   "size": "Medium"
   },
   "1127": {
    "name": "Hode",
@@ -1535,7 +1619,8 @@
    "walk_speed": 200,
    "attack_delay": 1480,
    "base_exp": 550,
-   "job_exp": 300
+   "job_exp": 300,
+   "size": "Medium"
   },
   "1128": {
    "name": "Horn",
@@ -1553,7 +1638,8 @@
    "walk_speed": 200,
    "attack_delay": 1528,
    "base_exp": 134,
-   "job_exp": 86
+   "job_exp": 86,
+   "size": "Medium"
   },
   "1133": {
    "name": "Kobold",
@@ -1571,7 +1657,8 @@
    "walk_speed": 150,
    "attack_delay": 1028,
    "base_exp": 988,
-   "job_exp": 625
+   "job_exp": 625,
+   "size": "Medium"
   },
   "1134": {
    "name": "Kobold",
@@ -1589,7 +1676,8 @@
    "walk_speed": 200,
    "attack_delay": 1528,
    "base_exp": 806,
-   "job_exp": 407
+   "job_exp": 407,
+   "size": "Medium"
   },
   "1135": {
    "name": "Kobold",
@@ -1607,7 +1695,8 @@
    "walk_speed": 300,
    "attack_delay": 1228,
    "base_exp": 644,
-   "job_exp": 407
+   "job_exp": 407,
+   "size": "Medium"
   },
   "1138": {
    "name": "Magnolia",
@@ -1625,7 +1714,8 @@
    "walk_speed": 250,
    "attack_delay": 1560,
    "base_exp": 393,
-   "job_exp": 248
+   "job_exp": 248,
+   "size": "Small"
   },
   "1139": {
    "name": "Mantis",
@@ -1643,7 +1733,8 @@
    "walk_speed": 200,
    "attack_delay": 1528,
    "base_exp": 393,
-   "job_exp": 248
+   "job_exp": 248,
+   "size": "Medium"
   },
   "1155": {
    "name": "Petite",
@@ -1661,7 +1752,8 @@
    "walk_speed": 200,
    "attack_delay": 1624,
    "base_exp": 1677,
-   "job_exp": 1034
+   "job_exp": 1034,
+   "size": "Medium"
   },
   "1156": {
    "name": "Petite",
@@ -1679,7 +1771,8 @@
    "walk_speed": 150,
    "attack_delay": 1420,
    "base_exp": 1758,
-   "job_exp": 1075
+   "job_exp": 1075,
+   "size": "Medium"
   },
   "1159": {
    "name": "Phreeoni",
@@ -1697,7 +1790,8 @@
    "walk_speed": 200,
    "attack_delay": 1020,
    "base_exp": 32175,
-   "job_exp": 16445
+   "job_exp": 16445,
+   "size": "Large"
   },
   "1160": {
    "name": "Piere",
@@ -1715,7 +1809,8 @@
    "walk_speed": 200,
    "attack_delay": 1288,
    "base_exp": 122,
-   "job_exp": 78
+   "job_exp": 78,
+   "size": "Small"
   },
   "1162": {
    "name": "Rafflesia",
@@ -1733,7 +1828,8 @@
    "walk_speed": 150,
    "attack_delay": 512,
    "base_exp": 333,
-   "job_exp": 333
+   "job_exp": 333,
+   "size": "Small"
   },
   "1165": {
    "name": "Sandman",
@@ -1751,7 +1847,8 @@
    "walk_speed": 250,
    "attack_delay": 1672,
    "base_exp": 810,
-   "job_exp": 492
+   "job_exp": 492,
+   "size": "Medium"
   },
   "1166": {
    "name": "Savage",
@@ -1769,7 +1866,8 @@
    "walk_speed": 150,
    "attack_delay": 1960,
    "base_exp": 521,
-   "job_exp": 248
+   "job_exp": 248,
+   "size": "Large"
   },
   "1167": {
    "name": "Savage Babe",
@@ -1787,7 +1885,8 @@
    "walk_speed": 400,
    "attack_delay": 1624,
    "base_exp": 14,
-   "job_exp": 12
+   "job_exp": 12,
+   "size": "Small"
   },
   "1174": {
    "name": "Stainer",
@@ -1805,7 +1904,8 @@
    "walk_speed": 200,
    "attack_delay": 1688,
    "base_exp": 105,
-   "job_exp": 70
+   "job_exp": 70,
+   "size": "Small"
   },
   "1180": {
    "name": "Nine Tail",
@@ -1823,7 +1923,8 @@
    "walk_speed": 150,
    "attack_delay": 840,
    "base_exp": 2812,
-   "job_exp": 825
+   "job_exp": 825,
+   "size": "Medium"
   },
   "1189": {
    "name": "Orc Archer",
@@ -1841,7 +1942,8 @@
    "walk_speed": 300,
    "attack_delay": 1960,
    "base_exp": 1729,
-   "job_exp": 1787
+   "job_exp": 1787,
+   "size": "Medium"
   },
   "1190": {
    "name": "Orc Lord",
@@ -1859,7 +1961,8 @@
    "walk_speed": 100,
    "attack_delay": 1248,
    "base_exp": 62205,
-   "job_exp": 8580
+   "job_exp": 8580,
+   "size": "Large"
   },
   "1199": {
    "name": "Punk",
@@ -1877,7 +1980,8 @@
    "walk_speed": 300,
    "attack_delay": 1500,
    "base_exp": 1699,
-   "job_exp": 1033
+   "job_exp": 1033,
+   "size": "Small"
   },
   "1206": {
    "name": "Anolian",
@@ -1895,7 +1999,8 @@
    "walk_speed": 190,
    "attack_delay": 900,
    "base_exp": 5900,
-   "job_exp": 3700
+   "job_exp": 3700,
+   "size": "Medium"
   },
   "1213": {
    "name": "High Orc",
@@ -1913,7 +2018,8 @@
    "walk_speed": 150,
    "attack_delay": 1500,
    "base_exp": 3618,
-   "job_exp": 1639
+   "job_exp": 1639,
+   "size": "Large"
   },
   "1214": {
    "name": "Choco",
@@ -1931,7 +2037,8 @@
    "walk_speed": 200,
    "attack_delay": 1500,
    "base_exp": 1265,
-   "job_exp": 1265
+   "job_exp": 1265,
+   "size": "Small"
   },
   "1215": {
    "name": "Stem Worm",
@@ -1949,7 +2056,8 @@
    "walk_speed": 200,
    "attack_delay": 1500,
    "base_exp": 1452,
-   "job_exp": 939
+   "job_exp": 939,
+   "size": "Medium"
   },
   "1242": {
    "name": "Marin",
@@ -1967,7 +2075,8 @@
    "walk_speed": 400,
    "attack_delay": 1872,
    "base_exp": 66,
-   "job_exp": 44
+   "job_exp": 44,
+   "size": "Medium"
   },
   "1243": {
    "name": "Sasquatch",
@@ -1985,7 +2094,8 @@
    "walk_speed": 300,
    "attack_delay": 1260,
    "base_exp": 529,
-   "job_exp": 319
+   "job_exp": 319,
+   "size": "Large"
   },
   "1252": {
    "name": "Hatii",
@@ -2003,7 +2113,8 @@
    "walk_speed": 400,
    "attack_delay": 608,
    "base_exp": 50050,
-   "job_exp": 20020
+   "job_exp": 20020,
+   "size": "Large"
   },
   "1253": {
    "name": "Gargoyle",
@@ -2021,7 +2132,8 @@
    "walk_speed": 200,
    "attack_delay": 1020,
    "base_exp": 1650,
-   "job_exp": 1650
+   "job_exp": 1650,
+   "size": "Medium"
   },
   "1254": {
    "name": "Raggler",
@@ -2039,7 +2151,8 @@
    "walk_speed": 200,
    "attack_delay": 1000,
    "base_exp": 218,
-   "job_exp": 140
+   "job_exp": 140,
+   "size": "Small"
   },
   "1256": {
    "name": "Pest",
@@ -2057,7 +2170,8 @@
    "walk_speed": 165,
    "attack_delay": 700,
    "base_exp": 1238,
-   "job_exp": 752
+   "job_exp": 752,
+   "size": "Small"
   },
   "1258": {
    "name": "Goblin Archer",
@@ -2075,7 +2189,8 @@
    "walk_speed": 200,
    "attack_delay": 1172,
    "base_exp": 461,
-   "job_exp": 284
+   "job_exp": 284,
+   "size": "Small"
   },
   "1259": {
    "name": "Gryphon",
@@ -2093,7 +2208,8 @@
    "walk_speed": 100,
    "attack_delay": 704,
    "base_exp": 5896,
-   "job_exp": 4400
+   "job_exp": 4400,
+   "size": "Large"
   },
   "1261": {
    "name": "Wild Rose",
@@ -2111,7 +2227,8 @@
    "walk_speed": 100,
    "attack_delay": 964,
    "base_exp": 1113,
-   "job_exp": 688
+   "job_exp": 688,
+   "size": "Small"
   },
   "1262": {
    "name": "Mutant Dragonoid",
@@ -2129,7 +2246,8 @@
    "walk_speed": 250,
    "attack_delay": 1280,
    "base_exp": 4730,
-   "job_exp": 3536
+   "job_exp": 3536,
+   "size": "Large"
   },
   "1266": {
    "name": "Aster",
@@ -2147,7 +2265,8 @@
    "walk_speed": 400,
    "attack_delay": 1264,
    "base_exp": 122,
-   "job_exp": 78
+   "job_exp": 78,
+   "size": "Small"
   },
   "1271": {
    "name": "Alligator",
@@ -2165,7 +2284,8 @@
    "walk_speed": 200,
    "attack_delay": 1100,
    "base_exp": 1379,
-   "job_exp": 866
+   "job_exp": 866,
+   "size": "Medium"
   },
   "1273": {
    "name": "Orc Lady",
@@ -2183,7 +2303,8 @@
    "walk_speed": 200,
    "attack_delay": 1050,
    "base_exp": 644,
-   "job_exp": 407
+   "job_exp": 407,
+   "size": "Medium"
   },
   "1277": {
    "name": "Greatest General",
@@ -2201,7 +2322,8 @@
    "walk_speed": 200,
    "attack_delay": 1152,
    "base_exp": 1238,
-   "job_exp": 752
+   "job_exp": 752,
+   "size": "Medium"
   },
   "1278": {
    "name": "Stalactic Golem",
@@ -2219,7 +2341,8 @@
    "walk_speed": 200,
    "attack_delay": 1264,
    "base_exp": 5808,
-   "job_exp": 2695
+   "job_exp": 2695,
+   "size": "Large"
   },
   "1280": {
    "name": "Goblin Steamrider",
@@ -2237,7 +2360,8 @@
    "walk_speed": 200,
    "attack_delay": 1008,
    "base_exp": 864,
-   "job_exp": 495
+   "job_exp": 495,
+   "size": "Medium"
   },
   "1282": {
    "name": "Kobold Archer",
@@ -2255,7 +2379,8 @@
    "walk_speed": 200,
    "attack_delay": 1008,
    "base_exp": 739,
-   "job_exp": 455
+   "job_exp": 455,
+   "size": "Small"
   },
   "1296": {
    "name": "Kobold Leader",
@@ -2273,7 +2398,8 @@
    "walk_speed": 150,
    "attack_delay": 1028,
    "base_exp": 7432,
-   "job_exp": 2713
+   "job_exp": 2713,
+   "size": "Medium"
   },
   "1299": {
    "name": "Goblin Leader",
@@ -2291,7 +2417,8 @@
    "walk_speed": 120,
    "attack_delay": 1120,
    "base_exp": 6036,
-   "job_exp": 2184
+   "job_exp": 2184,
+   "size": "Medium"
   },
   "1308": {
    "name": "Panzer Goblin",
@@ -2309,7 +2436,8 @@
    "walk_speed": 200,
    "attack_delay": 960,
    "base_exp": 7212,
-   "job_exp": 2697
+   "job_exp": 2697,
+   "size": "Medium"
   },
   "1313": {
    "name": "Mobster",
@@ -2327,7 +2455,8 @@
    "walk_speed": 250,
    "attack_delay": 1100,
    "base_exp": 4424,
-   "job_exp": 1688
+   "job_exp": 1688,
+   "size": "Medium"
   },
   "1317": {
    "name": "Seal",
@@ -2345,7 +2474,8 @@
    "walk_speed": 200,
    "attack_delay": 1612,
    "base_exp": 3765,
-   "job_exp": 1824
+   "job_exp": 1824,
+   "size": "Medium"
   },
   "1321": {
    "name": "Dragon Tail",
@@ -2363,7 +2493,8 @@
    "walk_speed": 175,
    "attack_delay": 862,
    "base_exp": 3587,
-   "job_exp": 1453
+   "job_exp": 1453,
+   "size": "Medium"
   },
   "1323": {
    "name": "Sea Otter",
@@ -2381,7 +2512,8 @@
    "walk_speed": 190,
    "attack_delay": 1132,
    "base_exp": 3048,
-   "job_exp": 1642
+   "job_exp": 1642,
+   "size": "Medium"
   },
   "1366": {
    "name": "Lava Golem",
@@ -2399,7 +2531,8 @@
    "walk_speed": 400,
    "attack_delay": 2190,
    "base_exp": 6470,
-   "job_exp": 3879
+   "job_exp": 3879,
+   "size": "Large"
   },
   "1368": {
    "name": "Geographer",
@@ -2417,7 +2550,8 @@
    "walk_speed": 1000,
    "attack_delay": 1308,
    "base_exp": 2715,
-   "job_exp": 2000
+   "job_exp": 2000,
+   "size": "Medium"
   },
   "1369": {
    "name": "Grand Peco",
@@ -2435,7 +2569,8 @@
    "walk_speed": 165,
    "attack_delay": 1460,
    "base_exp": 2387,
-   "job_exp": 1361
+   "job_exp": 1361,
+   "size": "Large"
   },
   "1372": {
    "name": "Goat",
@@ -2453,7 +2588,8 @@
    "walk_speed": 165,
    "attack_delay": 1380,
    "base_exp": 3357,
-   "job_exp": 2015
+   "job_exp": 2015,
+   "size": "Medium"
   },
   "1376": {
    "name": "Harpy",
@@ -2471,7 +2607,8 @@
    "walk_speed": 155,
    "attack_delay": 972,
    "base_exp": 3562,
-   "job_exp": 2133
+   "job_exp": 2133,
+   "size": "Medium"
   },
   "1378": {
    "name": "Demon Pungus",
@@ -2489,7 +2626,8 @@
    "walk_speed": 170,
    "attack_delay": 1260,
    "base_exp": 3148,
-   "job_exp": 1817
+   "job_exp": 1817,
+   "size": "Small"
   },
   "1380": {
    "name": "Driller",
@@ -2507,7 +2645,8 @@
    "walk_speed": 165,
    "attack_delay": 1300,
    "base_exp": 3215,
-   "job_exp": 1860
+   "job_exp": 1860,
+   "size": "Medium"
   },
   "1384": {
    "name": "Deleter",
@@ -2525,7 +2664,8 @@
    "walk_speed": 175,
    "attack_delay": 1020,
    "base_exp": 3403,
-   "job_exp": 2066
+   "job_exp": 2066,
+   "size": "Medium"
   },
   "1385": {
    "name": "Deleter",
@@ -2543,7 +2683,8 @@
    "walk_speed": 175,
    "attack_delay": 1024,
    "base_exp": 3403,
-   "job_exp": 2066
+   "job_exp": 2066,
+   "size": "Medium"
   },
   "1386": {
    "name": "Sleeper",
@@ -2561,7 +2702,8 @@
    "walk_speed": 195,
    "attack_delay": 1350,
    "base_exp": 3603,
-   "job_exp": 2144
+   "job_exp": 2144,
+   "size": "Medium"
   },
   "1388": {
    "name": "Arc Angeling",
@@ -2579,7 +2721,8 @@
    "walk_speed": 180,
    "attack_delay": 1072,
    "base_exp": 4152,
-   "job_exp": 2173
+   "job_exp": 2173,
+   "size": "Medium"
   },
   "1391": {
    "name": "Galapago",
@@ -2597,7 +2740,8 @@
    "walk_speed": 165,
    "attack_delay": 1430,
    "base_exp": 3204,
-   "job_exp": 1966
+   "job_exp": 1966,
+   "size": "Small"
   },
   "1392": {
    "name": "Rotar Zairo",
@@ -2615,7 +2759,8 @@
    "walk_speed": 155,
    "attack_delay": 2416,
    "base_exp": 351,
-   "job_exp": 215
+   "job_exp": 215,
+   "size": "Large"
   },
   "1400": {
    "name": "Karakasa",
@@ -2633,7 +2778,8 @@
    "walk_speed": 155,
    "attack_delay": 1638,
    "base_exp": 489,
-   "job_exp": 322
+   "job_exp": 322,
+   "size": "Medium"
   },
   "1402": {
    "name": "Poison Toad",
@@ -2651,7 +2797,8 @@
    "walk_speed": 160,
    "attack_delay": 1148,
    "base_exp": 1929,
-   "job_exp": 1457
+   "job_exp": 1457,
+   "size": "Medium"
   },
   "1404": {
    "name": "Miyabi Doll",
@@ -2669,7 +2816,8 @@
    "walk_speed": 250,
    "attack_delay": 1938,
    "base_exp": 795,
-   "job_exp": 453
+   "job_exp": 453,
+   "size": "Medium"
   },
   "1406": {
    "name": "Kapha",
@@ -2687,7 +2835,8 @@
    "walk_speed": 165,
    "attack_delay": 2012,
    "base_exp": 2278,
-   "job_exp": 1552
+   "job_exp": 1552,
+   "size": "Medium"
   },
   "1409": {
    "name": "Dumpling Child",
@@ -2705,7 +2854,8 @@
    "walk_speed": 160,
    "attack_delay": 647,
    "base_exp": 231,
-   "job_exp": 149
+   "job_exp": 149,
+   "size": "Small"
   },
   "1413": {
    "name": "Hermit Plant",
@@ -2723,7 +2873,8 @@
    "walk_speed": 140,
    "attack_delay": 512,
    "base_exp": 1038,
-   "job_exp": 692
+   "job_exp": 692,
+   "size": "Small"
   },
   "1415": {
    "name": "Baby Leopard",
@@ -2741,7 +2892,8 @@
    "walk_speed": 150,
    "attack_delay": 318,
    "base_exp": 352,
-   "job_exp": 201
+   "job_exp": 201,
+   "size": "Small"
   },
   "1417": {
    "name": "Zipper Bear",
@@ -2759,7 +2911,8 @@
    "walk_speed": 155,
    "attack_delay": 780,
    "base_exp": 370,
-   "job_exp": 225
+   "job_exp": 225,
+   "size": "Medium"
   },
   "1493": {
    "name": "Dryad",
@@ -2777,7 +2930,8 @@
    "walk_speed": 170,
    "attack_delay": 950,
    "base_exp": 2763,
-   "job_exp": 1493
+   "job_exp": 1493,
+   "size": "Medium"
   },
   "1494": {
    "name": "Beetle King",
@@ -2795,7 +2949,8 @@
    "walk_speed": 165,
    "attack_delay": 1247,
    "base_exp": 679,
-   "job_exp": 442
+   "job_exp": 442,
+   "size": "Small"
   },
   "1495": {
    "name": "Stone Shooter",
@@ -2813,7 +2968,8 @@
    "walk_speed": 175,
    "attack_delay": 2413,
    "base_exp": 1238,
-   "job_exp": 752
+   "job_exp": 752,
+   "size": "Medium"
   },
   "1498": {
    "name": "Wootan Shooter",
@@ -2831,7 +2987,8 @@
    "walk_speed": 200,
    "attack_delay": 857,
    "base_exp": 886,
-   "job_exp": 453
+   "job_exp": 453,
+   "size": "Medium"
   },
   "1499": {
    "name": "Wootan Fighter",
@@ -2849,7 +3006,8 @@
    "walk_speed": 200,
    "attack_delay": 912,
    "base_exp": 1790,
-   "job_exp": 833
+   "job_exp": 833,
+   "size": "Medium"
   },
   "1500": {
    "name": "Parasite",
@@ -2867,7 +3025,8 @@
    "walk_speed": 400,
    "attack_delay": 864,
    "base_exp": 1098,
-   "job_exp": 1453
+   "job_exp": 1453,
+   "size": "Medium"
   },
   "1503": {
    "name": "Gibbet",
@@ -2885,7 +3044,8 @@
    "walk_speed": 180,
    "attack_delay": 917,
    "base_exp": 4011,
-   "job_exp": 1824
+   "job_exp": 1824,
+   "size": "Large"
   },
   "1504": {
    "name": "Dullahan",
@@ -2903,7 +3063,8 @@
    "walk_speed": 155,
    "attack_delay": 847,
    "base_exp": 4517,
-   "job_exp": 2963
+   "job_exp": 2963,
+   "size": "Medium"
   },
   "1505": {
    "name": "Loli Ruri",
@@ -2921,7 +3082,8 @@
    "walk_speed": 125,
    "attack_delay": 747,
    "base_exp": 6641,
-   "job_exp": 4314
+   "job_exp": 4314,
+   "size": "Large"
   },
   "1506": {
    "name": "Disguise",
@@ -2939,7 +3101,8 @@
    "walk_speed": 147,
    "attack_delay": 516,
    "base_exp": 2815,
-   "job_exp": 1919
+   "job_exp": 1919,
+   "size": "Medium"
   },
   "1507": {
    "name": "Bloody Murderer",
@@ -2957,7 +3120,8 @@
    "walk_speed": 175,
    "attack_delay": 914,
    "base_exp": 9742,
-   "job_exp": 3559
+   "job_exp": 3559,
+   "size": "Large"
   },
   "1508": {
    "name": "Quve",
@@ -2975,7 +3139,8 @@
    "walk_speed": 150,
    "attack_delay": 912,
    "base_exp": 414,
-   "job_exp": 306
+   "job_exp": 306,
+   "size": "Small"
   },
   "1509": {
    "name": "Lude",
@@ -2993,7 +3158,8 @@
    "walk_speed": 150,
    "attack_delay": 890,
    "base_exp": 392,
-   "job_exp": 247
+   "job_exp": 247,
+   "size": "Small"
   },
   "1510": {
    "name": "Heirozoist",
@@ -3011,7 +3177,8 @@
    "walk_speed": 155,
    "attack_delay": 741,
    "base_exp": 2314,
-   "job_exp": 1297
+   "job_exp": 1297,
+   "size": "Small"
   },
   "1515": {
    "name": "Baby Hatii",
@@ -3029,7 +3196,8 @@
    "walk_speed": 450,
    "attack_delay": 879,
    "base_exp": 1022,
-   "job_exp": 2980
+   "job_exp": 2980,
+   "size": "Medium"
   },
   "1516": {
    "name": "Mi Gao",
@@ -3047,7 +3215,8 @@
    "walk_speed": 445,
    "attack_delay": 106,
    "base_exp": 2760,
-   "job_exp": 2110
+   "job_exp": 2110,
+   "size": "Medium"
   },
   "1582": {
    "name": "Deviling",
@@ -3065,7 +3234,8 @@
    "walk_speed": 200,
    "attack_delay": 1072,
    "base_exp": 211,
-   "job_exp": 412
+   "job_exp": 412,
+   "size": "Medium"
   },
   "1586": {
    "name": "Leaf Cat",
@@ -3083,7 +3253,8 @@
    "walk_speed": 150,
    "attack_delay": 960,
    "base_exp": 165,
-   "job_exp": 1212
+   "job_exp": 1212,
+   "size": "Small"
   },
   "1613": {
    "name": "Metaling",
@@ -3101,7 +3272,8 @@
    "walk_speed": 300,
    "attack_delay": 384,
    "base_exp": 492,
-   "job_exp": 249
+   "job_exp": 249,
+   "size": "Small"
   },
   "1614": {
    "name": "Mineral",
@@ -3119,7 +3291,8 @@
    "walk_speed": 250,
    "attack_delay": 648,
    "base_exp": 3563,
-   "job_exp": 1768
+   "job_exp": 1768,
+   "size": "Small"
   },
   "1615": {
    "name": "Obsidian",
@@ -3137,7 +3310,8 @@
    "walk_speed": 350,
    "attack_delay": 720,
    "base_exp": 2799,
-   "job_exp": 1802
+   "job_exp": 1802,
+   "size": "Small"
   },
   "1618": {
    "name": "Ungoliant",
@@ -3155,7 +3329,8 @@
    "walk_speed": 350,
    "attack_delay": 420,
    "base_exp": 8211,
-   "job_exp": 142
+   "job_exp": 142,
+   "size": "Large"
   },
   "1619": {
    "name": "Porcellio",
@@ -3173,7 +3348,8 @@
    "walk_speed": 150,
    "attack_delay": 720,
    "base_exp": 512,
-   "job_exp": 346
+   "job_exp": 346,
+   "size": "Small"
   },
   "1627": {
    "name": "Anopheles",
@@ -3191,7 +3367,8 @@
    "walk_speed": 200,
    "attack_delay": 140,
    "base_exp": 99,
-   "job_exp": 55
+   "job_exp": 55,
+   "size": "Small"
   },
   "1628": {
    "name": "Holden",
@@ -3209,7 +3386,8 @@
    "walk_speed": 300,
    "attack_delay": 140,
    "base_exp": 268,
-   "job_exp": 172
+   "job_exp": 172,
+   "size": "Small"
   },
   "1680": {
    "name": "Hill Wind",
@@ -3227,7 +3405,8 @@
    "walk_speed": 170,
    "attack_delay": 504,
    "base_exp": 2132,
-   "job_exp": 1722
+   "job_exp": 1722,
+   "size": "Medium"
   },
   "1686": {
    "name": "Orc Baby",
@@ -3245,7 +3424,8 @@
    "walk_speed": 200,
    "attack_delay": 672,
    "base_exp": 220,
-   "job_exp": 220
+   "job_exp": 220,
+   "size": "Small"
   },
   "1687": {
    "name": "Grove",
@@ -3263,7 +3443,8 @@
    "walk_speed": 200,
    "attack_delay": 720,
    "base_exp": 2400,
-   "job_exp": 2050
+   "job_exp": 2050,
+   "size": "Medium"
   },
   "1692": {
    "name": "Breeze",
@@ -3281,7 +3462,8 @@
    "walk_speed": 100,
    "attack_delay": 140,
    "base_exp": 2390,
-   "job_exp": 1340
+   "job_exp": 1340,
+   "size": "Medium"
   },
   "1693": {
    "name": "Plasma",
@@ -3299,7 +3481,8 @@
    "walk_speed": 100,
    "attack_delay": 608,
    "base_exp": 2200,
-   "job_exp": 2100
+   "job_exp": 2100,
+   "size": "Small"
   },
   "1694": {
    "name": "Plasma",
@@ -3317,7 +3500,8 @@
    "walk_speed": 150,
    "attack_delay": 608,
    "base_exp": 2000,
-   "job_exp": 1000
+   "job_exp": 1000,
+   "size": "Small"
   },
   "1695": {
    "name": "Plasma",
@@ -3335,7 +3519,8 @@
    "walk_speed": 150,
    "attack_delay": 608,
    "base_exp": 2000,
-   "job_exp": 1000
+   "job_exp": 1000,
+   "size": "Small"
   },
   "1696": {
    "name": "Plasma",
@@ -3353,7 +3538,8 @@
    "walk_speed": 150,
    "attack_delay": 608,
    "base_exp": 2000,
-   "job_exp": 1000
+   "job_exp": 1000,
+   "size": "Small"
   },
   "1697": {
    "name": "Plasma",
@@ -3371,7 +3557,8 @@
    "walk_speed": 150,
    "attack_delay": 608,
    "base_exp": 2000,
-   "job_exp": 1000
+   "job_exp": 1000,
+   "size": "Small"
   },
   "1715": {
    "name": "Novus",
@@ -3389,7 +3576,8 @@
    "walk_speed": 110,
    "attack_delay": 151,
    "base_exp": 1320,
-   "job_exp": 1002
+   "job_exp": 1002,
+   "size": "Small"
   },
   "1718": {
    "name": "Novus",
@@ -3407,7 +3595,8 @@
    "walk_speed": 100,
    "attack_delay": 252,
    "base_exp": 1411,
-   "job_exp": 1100
+   "job_exp": 1100,
+   "size": "Small"
   },
   "1721": {
    "name": "Dragon Egg",
@@ -3425,7 +3614,8 @@
    "walk_speed": 1000,
    "attack_delay": 24,
    "base_exp": 6740,
-   "job_exp": 0
+   "job_exp": 0,
+   "size": "Medium"
   },
   "1780": {
    "name": "Muscipular",
@@ -3443,7 +3633,8 @@
    "walk_speed": 1000,
    "attack_delay": 672,
    "base_exp": 1706,
-   "job_exp": 1706
+   "job_exp": 1706,
+   "size": "Medium"
   },
   "1781": {
    "name": "Drosera",
@@ -3461,7 +3652,8 @@
    "walk_speed": 1000,
    "attack_delay": 864,
    "base_exp": 2612,
-   "job_exp": 1022
+   "job_exp": 1022,
+   "size": "Medium"
   },
   "1782": {
    "name": "Roween",
@@ -3479,7 +3671,8 @@
    "walk_speed": 200,
    "attack_delay": 412,
    "base_exp": 1669,
-   "job_exp": 1266
+   "job_exp": 1266,
+   "size": "Medium"
   },
   "1783": {
    "name": "Galion",
@@ -3497,7 +3690,8 @@
    "walk_speed": 150,
    "attack_delay": 864,
    "base_exp": 10020,
-   "job_exp": 3368
+   "job_exp": 3368,
+   "size": "Medium"
   },
   "1784": {
    "name": "Stapo",
@@ -3515,7 +3709,8 @@
    "walk_speed": 300,
    "attack_delay": 936,
    "base_exp": 332,
-   "job_exp": 221
+   "job_exp": 221,
+   "size": "Small"
   },
   "1785": {
    "name": "Atroce",
@@ -3533,7 +3728,8 @@
    "walk_speed": 150,
    "attack_delay": 576,
    "base_exp": 295550,
-   "job_exp": 118895
+   "job_exp": 118895,
+   "size": "Large"
   },
   "1836": {
    "name": "Magmaring",
@@ -3551,7 +3747,8 @@
    "walk_speed": 300,
    "attack_delay": 1472,
    "base_exp": 2110,
-   "job_exp": 1910
+   "job_exp": 1910,
+   "size": "Small"
   },
   "1917": {
    "name": "Wounded Morocc",
@@ -3569,7 +3766,8 @@
    "walk_speed": 100,
    "attack_delay": 576,
    "base_exp": 3600000,
-   "job_exp": 3000000
+   "job_exp": 3000000,
+   "size": "Large"
   },
   "1918": {
    "name": "Incarnation of Morocc",
@@ -3587,7 +3785,8 @@
    "walk_speed": 110,
    "attack_delay": 576,
    "base_exp": 61000,
-   "job_exp": 140000
+   "job_exp": 140000,
+   "size": "Large"
   },
   "1919": {
    "name": "Incarnation of Morocc",
@@ -3605,7 +3804,8 @@
    "walk_speed": 150,
    "attack_delay": 576,
    "base_exp": 65000,
-   "job_exp": 120000
+   "job_exp": 120000,
+   "size": "Medium"
   },
   "1920": {
    "name": "Incarnation of Morocc",
@@ -3623,7 +3823,8 @@
    "walk_speed": 150,
    "attack_delay": 212,
    "base_exp": 50000,
-   "job_exp": 80000
+   "job_exp": 80000,
+   "size": "Medium"
   },
   "1921": {
    "name": "Incarnation of Morocc",
@@ -3641,7 +3842,8 @@
    "walk_speed": 150,
    "attack_delay": 1536,
    "base_exp": 51000,
-   "job_exp": 70000
+   "job_exp": 70000,
+   "size": "Medium"
   },
   "1986": {
    "name": "Tatacho",
@@ -3659,7 +3861,8 @@
    "walk_speed": 150,
    "attack_delay": 1000,
    "base_exp": 23700,
-   "job_exp": 13825
+   "job_exp": 13825,
+   "size": "Medium"
   },
   "1987": {
    "name": "Centipede",
@@ -3677,7 +3880,8 @@
    "walk_speed": 150,
    "attack_delay": 1000,
    "base_exp": 27397,
-   "job_exp": 15982
+   "job_exp": 15982,
+   "size": "Medium"
   },
   "1988": {
    "name": "Nepenthes",
@@ -3695,7 +3899,8 @@
    "walk_speed": 1000,
    "attack_delay": 500,
    "base_exp": 5175,
-   "job_exp": 2587
+   "job_exp": 2587,
+   "size": "Medium"
   },
   "1989": {
    "name": "Hillslion",
@@ -3713,7 +3918,8 @@
    "walk_speed": 100,
    "attack_delay": 400,
    "base_exp": 20760,
-   "job_exp": 12110
+   "job_exp": 12110,
+   "size": "Small"
   },
   "1990": {
    "name": "Hardrock Mammoth",
@@ -3731,7 +3937,8 @@
    "walk_speed": 150,
    "attack_delay": 1000,
    "base_exp": 827400,
-   "job_exp": 413700
+   "job_exp": 413700,
+   "size": "Large"
   },
   "1991": {
    "name": "Tendrilion",
@@ -3749,7 +3956,8 @@
    "walk_speed": 100,
    "attack_delay": 500,
    "base_exp": 731466,
-   "job_exp": 365733
+   "job_exp": 365733,
+   "size": "Medium"
   },
   "1992": {
    "name": "Cornus",
@@ -3767,7 +3975,8 @@
    "walk_speed": 120,
    "attack_delay": 1000,
    "base_exp": 30854,
-   "job_exp": 4427
+   "job_exp": 4427,
+   "size": "Medium"
   },
   "1993": {
    "name": "Naga",
@@ -3785,7 +3994,8 @@
    "walk_speed": 150,
    "attack_delay": 400,
    "base_exp": 30360,
-   "job_exp": 16348
+   "job_exp": 16348,
+   "size": "Large"
   },
   "1994": {
    "name": "Luciola Vespa",
@@ -3803,7 +4013,8 @@
    "walk_speed": 110,
    "attack_delay": 1000,
    "base_exp": 16300,
-   "job_exp": 11410
+   "job_exp": 11410,
+   "size": "Medium"
   },
   "1995": {
    "name": "Pinguicula",
@@ -3821,7 +4032,8 @@
    "walk_speed": 150,
    "attack_delay": 700,
    "base_exp": 6840,
-   "job_exp": 3420
+   "job_exp": 3420,
+   "size": "Medium"
   },
   "1999": {
    "name": "Centipede Larva",
@@ -3839,7 +4051,8 @@
    "walk_speed": 150,
    "attack_delay": 1000,
    "base_exp": 3600,
-   "job_exp": 4800
+   "job_exp": 4800,
+   "size": "Small"
   },
   "2024": {
    "name": "Bradium Golem",
@@ -3857,7 +4070,8 @@
    "walk_speed": 300,
    "attack_delay": 1008,
    "base_exp": 14000,
-   "job_exp": 18920
+   "job_exp": 18920,
+   "size": "Large"
   }
  }
 }

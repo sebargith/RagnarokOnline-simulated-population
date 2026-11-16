@@ -9,7 +9,8 @@
 - **Estado:** Nilo Swordman Base 13 / Job 5, `prt_fild00`, 1 695 Zeny; cliente detenido. Servidores rAthena/MariaDB activos. Suite: 305 OK (hay pruebas de tiempo intermitentes en P3/P5).
 - **E3 hecho:** métricas por kill en el observador y `agent/progress.py`. A/B en vivo Knife vs Blade: +22 % kills y +35 % EXP por hora de caza, menos de lo esperado por el modificador de tamaño (espada 75 % contra pequeños).
 - **Estado tras E3:** Nilo Swordman Base 15, Blade equipado, `prt_fild00`; cliente detenido. Suite: 310 OK.
-- **Siguiente:** puntuar el arma por tamaño de los monstruos del campo; después R3 con E5.
+- **Arma por tamaño:** hecho; el arma se puntúa por la mezcla de tamaños del campo. En `prt_fild00` sigue eligiendo Blade. Suite: 315 OK.
+- **Siguiente:** R3 (Tarin y Nilo juntos) con la economía entre agentes (E5).
 
 ## R2 — camino principal nativo con Nilo (2026-11-03, Claude)
 

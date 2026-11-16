@@ -42,6 +42,11 @@ def load_equipment(path=None):
     return json.loads(Path(path or ROOT/'config/p5-equipment.json').read_text(encoding='utf-8'))['items']
 
 
+def load_size_fix(path=None):
+    """Weapon type -> {Small, Medium, Large} % (pinned rAthena size_fix.yml, pre-Renewal)."""
+    return json.loads(Path(path or ROOT/'config/p5-equipment.json').read_text(encoding='utf-8'))['size_fix']
+
+
 def can_wear(entry, progress, base_level):
     """Same rule as M1Progress::validate_equip, so the bridge will not refuse it."""
     gender = entry.get('gender', 'Both')

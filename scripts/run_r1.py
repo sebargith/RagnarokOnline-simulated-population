@@ -261,7 +261,9 @@ def gear_buy(policy, facts, tables):
         up = rule['do'].get('upgrade_gear')
         if up:
             gear = tables['builds'][up['build']].get('gear', {})
-            return (gear_plan.plan(facts, tables['equipment'], gear, up['shops'], int(up['reserve_zeny']))['buy'] or {}).get('id')
+            decision = gear_plan.plan(facts, tables['equipment'], gear, up['shops'], int(up['reserve_zeny']),
+                                      gear_plan.field_mix(policy, tables), tables.get('size_fix'))
+            return (decision['buy'] or {}).get('id')
     return None
 
 
@@ -564,8 +566,8 @@ def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN, ser
     refit_level = policy['character']['level']['base']
     pending, refit_log, choice, deaths_seen, since_decision = None, [], FieldChoice(runtime, service), 0, started
     died_since_choice, choice_facts, approach = False, None, None
-    gear_tables = {'equipment': build_r1_profile.build_policy.load_equipment(),
-                   'builds': build_r1_profile.build_policy.load_builds()}
+    gear_tables = {k: v for k, v in build_r1_profile.load_tables().items()
+                   if k in ('equipment', 'builds', 'size_fix', 'monsters', 'fields')}
     gear_loaded, gear_refit_t = last_gear_buy(p['gear']), 0
     try:
         while time.time() - started < seconds:

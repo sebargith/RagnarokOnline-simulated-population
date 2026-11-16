@@ -74,7 +74,8 @@ def monster(m):
             'can_move': bool(mode & MD_CANMOVE), 'boss': m.get('Class', 'Normal') != 'Normal',
             'walk_speed': int(m.get('WalkSpeed', DEFAULT_WALK_SPEED)),
             'attack_delay': int(m.get('AttackDelay', 0)),
-            'base_exp': int(m.get('BaseExp', 0)), 'job_exp': int(m.get('JobExp', 0))}
+            'base_exp': int(m.get('BaseExp', 0)), 'job_exp': int(m.get('JobExp', 0)),
+            'size': m.get('Size', 'Small')}  # mob_db default; weapon damage depends on it (size_fix.yml)
 
 
 def field_scripts():

@@ -161,8 +161,13 @@ Fuera de alcance: cartas y equipo con ranuras como requisito, modelo de daño pr
 
   Muestras pequeñas (44–45 kills); 0 muertes y 0 inesperados en ambas.
 - **Hallazgo de mecánica:** la mejora existe pero es mucho menor que 17 → 53 ATK. En pre-Renewal
-  (`db/size_fix.yml`) la espada de una mano hace el **75 %** a monstruos pequeños y la daga el 100 %; casi todo
-  `prt_fild00` es pequeño. Con DEX 9, además, el ATK del arma varía mucho. El plan de E2 compara solo ATK bruto:
-  aquí un Main Gauche (daga, 43) rendiría más que el Blade (≈ 40 efectivo).
-- **Siguiente propuesto:** puntuar el arma por el ATK efectivo contra la mezcla de tamaños del campo
-  (tabla fija de rAthena, sin modelo de daño), y repetir la A/B.
+  (`db/size_fix.yml`) la espada de una mano hace el **75 %** a monstruos pequeños y la daga el 100 %; el 80 % de
+  los spawns de `prt_fild00` son pequeños.
+- **Ajuste hecho:** el arma se puntúa por ATK × modificador de tamaño medio del campo de caza (spawns normales por
+  cantidad; tabla fija `size_fix` en `config/p5-equipment.json`; `size` en `config/p5-monsters.json`). Lo que se lleva
+  y lo que se vende se puntúan igual. En `prt_fild00` el Blade sigue ganando (42,3 frente a 40,9 del Main Gauche,
+  por el 20 % de Poring mediano), así que la A/B no se repitió; en un campo solo de pequeños elegiría la daga.
+- **Sin explicar del todo [por verificar]:** aun con tamaño, el Blade debería rendir ~2,6 veces el Knife en ATK de arma
+  y solo dio +8 % de daño por golpe a Hornet. Hipótesis: con DEX 9, el ATK del arma sale al azar entre un mínimo
+  ligado a la DEX y su máximo, más el ATK por STR y la maestría, que no cambian. No se modela (la revisión
+  desaconseja un modelo de daño propio); la medición de E3 es la referencia.

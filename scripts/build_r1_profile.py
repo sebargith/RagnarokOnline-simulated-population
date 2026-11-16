@@ -218,7 +218,8 @@ def translate(policy, tables, danger=None, goto=None):
             up = do['upgrade_gear']
             gear = tables['builds'][up['build']].get('gear', {})
             decision = gear_plan.plan(policy['character'], tables['equipment'], gear, up['shops'],
-                                      int(up['reserve_zeny']))
+                                      int(up['reserve_zeny']), gear_plan.field_mix(policy, tables),
+                                      tables.get('size_fix'))
             for slot, iid in decision['equip'].items():
                 config[f'r1_equip_{slot}'] = str(iid)
             for iid in decision['equip'].values():
@@ -358,7 +359,8 @@ def render(result, template):
 def load_tables():
     return {'monsters': hunting.load_monsters(), 'fields': hunting.load_fields(),
             'builds': build_policy.load_builds(),
-            'equipment': build_policy.load_equipment(), 'summoners': load_summoners(), 'shops': load_shops(),
+            'equipment': build_policy.load_equipment(), 'size_fix': build_policy.load_size_fix(),
+            'summoners': load_summoners(), 'shops': load_shops(),
             'warps': load_warps()}
 
 

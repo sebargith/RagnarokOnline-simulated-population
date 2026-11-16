@@ -31,7 +31,8 @@ Swordman). Siguiente: demostrar ≥ 4 h sin intervención y empezar R3 (comunida
 2026-11-16 (Claude): tanda de ≥ 4 h aparcada por el usuario. E1–E2 de docs/PROGRESSION_ECONOMY.md hechos
 y vistos en vivo (Nilo compró y lleva Blade, Guard y Sandals; plugin bridge/r1/r1_equip.pl, ya que
 equipAuto no sirve con ids). E3 hecho (métricas por kill; A/B Knife vs Blade: +22 % kills por hora
-de caza; la espada pierde 25 % contra monstruos pequeños). Siguiente: arma según tamaños del campo; luego R3 con E5.
+de caza; la espada pierde 25 % contra monstruos pequeños). Arma ya puntuada por tamaños del campo
+(en prt_fild00 sigue Blade). Siguiente: R3 con E5.
 Servidores rAthena/MariaDB arrancados con D:/Ragnarok Agents/scripts/m1.py (el m1.py de este checkout
 apunta a vendor/ propio, no usarlo para start); registro viejo apartado en runtime/processes.stale-20261101.json.
 ## Archivos relevantes

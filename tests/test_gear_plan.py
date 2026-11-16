@@ -169,3 +169,36 @@ class GearRefit(unittest.TestCase):
             self.assertIsNone(run_r1.last_gear_buy(path))
             path.write_text(json.dumps({'buy': None}) + '\n' + json.dumps({'buy': {'id': BLADE}}) + '\n')
             self.assertEqual(run_r1.last_gear_buy(path), BLADE)
+
+
+class SizeAware(unittest.TestCase):
+    FIX = build_policy.load_size_fix()
+
+    def test_size_fix_is_the_pre_renewal_table(self):
+        self.assertEqual(self.FIX['Dagger'], {'Small': 100, 'Medium': 75, 'Large': 50})
+        self.assertEqual(self.FIX['1hSword'], {'Small': 75, 'Medium': 100, 'Large': 75})
+        self.assertEqual(self.FIX['Knuckle'], {'Small': 100, 'Medium': 75, 'Large': 50})  # pre-re import override
+
+    def test_field_mix_counts_ordinary_spawns(self):
+        tables = r1.load_tables()
+        mix = gear_plan.size_mix(tables['fields']['fields']['prt_fild00']['monsters'], tables['monsters'])
+        self.assertEqual(set(mix), {'Small', 'Medium'})
+        self.assertAlmostEqual(sum(mix.values()), 1, places=3)
+        self.assertGreater(mix['Small'], 0.75)
+
+    def test_dagger_beats_sword_on_small_only(self):
+        small = gear_plan.plan(char(3400), EQUIPMENT, SWORD, PRT, 0, {'Small': 1.0}, self.FIX)
+        self.assertEqual(small['buy']['id'], 1207)  # Main Gauche 43 x 100 % > Blade 53 x 75 %
+        medium = gear_plan.plan(char(3400), EQUIPMENT, SWORD, PRT, 0, {'Medium': 1.0}, self.FIX)
+        self.assertEqual(medium['buy']['id'], BLADE)
+        self.assertEqual(small['facts']['size_mix'], {'Small': 1.0})
+
+    def test_owned_weapon_is_scored_the_same_way(self):
+        # Wearing a Blade on an all-small field: a Main Gauche is an upgrade (40.0 -> 43).
+        d = gear_plan.plan(char(3400, equipped=(BLADE, SUIT)), EQUIPMENT, SWORD, PRT, 0, {'Small': 1.0}, self.FIX)
+        self.assertEqual((d['facts']['scores']['weapon'], d['buy']['id']), (39.8, 1207))
+
+    def test_translator_uses_the_hunt_field_mix(self):
+        p = Translation.policy(None, 5495)
+        result = r1.translate(p, r1.load_tables())
+        self.assertEqual(set(result['gear']['facts']['size_mix']), {'Small', 'Medium'})
