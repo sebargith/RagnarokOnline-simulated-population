@@ -28,10 +28,11 @@ Swordman). Siguiente: demostrar ≥ 4 h sin intervención y empezar R3 (comunida
 - P4 (iRO Wiki Classic como fuente primaria) y R3 (comunidad) sin empezar.
 - No editar vendor/openkore/tables/monsters.txt; claves en runtime/secrets/model-keys.env (no leer valores).
 ## Próxima acción
-2026-11-16 (Claude): el usuario aparcó la tanda de ≥ 4 h. Diseño propuesto en
-docs/PROGRESSION_ECONOMY.md (equipo con tiendas NPC → métricas → economía en R3); la política R1
-nunca mejora el equipo. 1) Aprobación del usuario. 2) E1 (ampliar `build_p5_equipment.py` con precio,
-tienda y peso) y E2 (spike `buyAuto`+equipar con Nilo). 3) R3 con E5.
+2026-11-16 (Claude): tanda de ≥ 4 h aparcada por el usuario. E1–E2 de docs/PROGRESSION_ECONOMY.md hechos
+y vistos en vivo (Nilo compró y lleva Blade, Guard y Sandals; plugin bridge/r1/r1_equip.pl, ya que
+equipAuto no sirve con ids). Siguiente: E3 (métricas de progreso por monstruo), luego R3 con E5.
+Servidores rAthena/MariaDB arrancados con D:/Ragnarok Agents/scripts/m1.py (el m1.py de este checkout
+apunta a vendor/ propio, no usarlo para start); registro viejo apartado en runtime/processes.stale-20261101.json.
 ## Archivos relevantes
 - docs/evidence/R1-openkore-auto.md; docs/evidence/R2-native-main-path.md; docs/research/PROJECT_REVIEW-2026-11.md.
 - scripts/run_r1.py; scripts/build_r1_profile.py; config/r1-policy*.json; bridge/r1/; docs/ARCHITECTURE.md.

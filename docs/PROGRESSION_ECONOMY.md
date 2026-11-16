@@ -1,6 +1,7 @@
 # Diseño — equipo, economía y progresión observable
 
-Estado: **propuesta** (2026-11-16, Claude). Nada de esto está implementado. Pendiente de aprobación del usuario.
+Estado (2026-11-16, Claude): aprobado por el usuario. **E1 y E2 implementados y vistos en vivo** con Nilo
+(ver «Resultado E1–E2» al final). E3–E5 sin empezar.
 
 ## Problema
 
@@ -120,3 +121,23 @@ frente a un agente que no comercia. Así la comunidad se mide por valor, no solo
 
 Orden: E1 → E2 → E3 → (E4) → E5 dentro de R3. Cada paso, con su prueba corta en vivo; nada de tandas de horas.
 Fuera de alcance: cartas y equipo con ranuras como requisito, modelo de daño propio, LLM para elegir equipo.
+
+## Resultado E1–E2 (2026-11-16)
+
+- **E1:** `scripts/build_p5_equipment.py` añade precio, tiendas, peso, ranuras y refinado; `scripts/build_p5_loot.py`
+  genera `config/p5-loot.json` (botín de 214 monstruos con tasa 1x y valor de venta NPC).
+- **E2:** `agent/gear_plan.py` (sin LLM) elige la mejor pieza propia por ranura y las compras asequibles en orden de
+  prioridad, todas en un viaje y dentro de la reserva. Regla `upgrade_gear` en `config/r1-policy*.json`; decisiones
+  con sus datos en `runtime/r1-*/gear-decisions.jsonl`. El supervisor regenera el perfil si cambia la compra
+  (sin planner, como mucho una vez cada 120 s); las reglas configuradas ya llegan a un personaje en marcha.
+- **Ejecución:** compra nativa con `buyAuto` (máx. 1). Equipar **no** puede ser nativo: la puerta de `equipAuto`
+  lee un número como índice de inventario y los nombres vienen de la tabla coreana. El plugin `bridge/r1/r1_equip.pl`
+  llama a `bulkEquip` de OpenKore con los ids de `r1_equip_<ranura>`.
+- **En vivo (Nilo, Swordman 13, `prt_fild00`):**
+  - tanda 1 (15 min): compró Blade, Guard y Sandals (3 400 z de 5 495) pero no los equipó (fallo de `equipAuto`);
+    3 viajes a la ciudad, 336 s de abastecimiento. 0 muertes, 0 eventos inesperados;
+  - tanda 2 (6 min, con `r1_equip` y compras agrupadas ya en el código): equipó las tres piezas en el campo en un solo
+    paso; 0 refits, 0 muertes, 0 inesperados.
+- **Sin demostrar:** la mejora de poder. Kills por hora de caza: 301/h con Knife (26 en 311 s) y 269/h con Blade
+  (27 en 361 s); muestras demasiado pequeñas. Medirlo es E3 (tiempo por kill y daño recibido por monstruo).
+- **Pendiente:** ver en vivo un viaje con varias compras agrupadas; sexo no observado (solo piezas `Both`).

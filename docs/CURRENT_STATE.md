@@ -1,11 +1,13 @@
 
 # Estado actual
 
-## Diseño: equipo, economía y progresión (2026-11-16, Claude)
+## E1–E2: equipo de tiendas NPC (2026-11-16, Claude)
 
-- **Propuesta, sin implementar:** [PROGRESSION_ECONOMY.md](PROGRESSION_ECONOMY.md). Equipo autosuficiente con tiendas NPC (E1–E2), métricas de progreso (E3), refinado opcional (E4) y economía entre agentes dentro de R3 (E5).
-- **Hallazgo:** la política R1 nunca mejora el equipo; Nilo sigue con Knife teniendo 5 495 Zeny.
-- **Decisión del usuario:** la tanda de ≥ 4 h queda aparcada; se prioriza este diseño. Pendiente su aprobación.
+- **Diseño aprobado:** [PROGRESSION_ECONOMY.md](PROGRESSION_ECONOMY.md). La tanda de ≥ 4 h queda aparcada por decisión del usuario.
+- **Hecho:** tablas de precio/tienda y de botín (E1); plan de compra determinista, `buyAuto` nativo y plugin `r1_equip` (E2).
+- **En vivo:** Nilo compró y lleva Blade, Guard y Sandals (Knife → Blade). 0 muertes, 0 inesperados. Detalle al final del diseño.
+- **Estado:** Nilo Swordman Base 13 / Job 5, `prt_fild00`, 1 695 Zeny; cliente detenido. Servidores rAthena/MariaDB activos. Suite: 305 OK (hay pruebas de tiempo intermitentes en P3/P5).
+- **Siguiente:** E3, métricas de progreso (tiempo por kill y daño por monstruo) para medir la mejora.
 
 ## R2 — camino principal nativo con Nilo (2026-11-03, Claude)
 
