@@ -28,9 +28,10 @@ Swordman). Siguiente: demostrar ≥ 4 h sin intervención y empezar R3 (comunida
 - P4 (iRO Wiki Classic como fuente primaria) y R3 (comunidad) sin empezar.
 - No editar vendor/openkore/tables/monsters.txt; claves en runtime/secrets/model-keys.env (no leer valores).
 ## Próxima acción
-1) Tanda ≥ 4 h con Nilo (`run_r1.py campaign --character nilo`, `--ram-min-gib 0.5`), con preflight
-y aviso al usuario. 2) Después, R3: Tarin y Nilo en el mismo campo con chat local, grupo e
-intercambio; métricas sociales y normas de chat según docs/research/PROJECT_REVIEW-2026-11.md §4 y §7.
+2026-11-16 (Claude): el usuario aparcó la tanda de ≥ 4 h. Diseño propuesto en
+docs/PROGRESSION_ECONOMY.md (equipo con tiendas NPC → métricas → economía en R3); la política R1
+nunca mejora el equipo. 1) Aprobación del usuario. 2) E1 (ampliar `build_p5_equipment.py` con precio,
+tienda y peso) y E2 (spike `buyAuto`+equipar con Nilo). 3) R3 con E5.
 ## Archivos relevantes
 - docs/evidence/R1-openkore-auto.md; docs/evidence/R2-native-main-path.md; docs/research/PROJECT_REVIEW-2026-11.md.
 - scripts/run_r1.py; scripts/build_r1_profile.py; config/r1-policy*.json; bridge/r1/; docs/ARCHITECTURE.md.

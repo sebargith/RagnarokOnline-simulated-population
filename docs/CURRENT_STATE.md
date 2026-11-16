@@ -1,6 +1,12 @@
 
 # Estado actual
 
+## Diseño: equipo, economía y progresión (2026-11-16, Claude)
+
+- **Propuesta, sin implementar:** [PROGRESSION_ECONOMY.md](PROGRESSION_ECONOMY.md). Equipo autosuficiente con tiendas NPC (E1–E2), métricas de progreso (E3), refinado opcional (E4) y economía entre agentes dentro de R3 (E5).
+- **Hallazgo:** la política R1 nunca mejora el equipo; Nilo sigue con Knife teniendo 5 495 Zeny.
+- **Decisión del usuario:** la tanda de ≥ 4 h queda aparcada; se prioriza este diseño. Pendiente su aprobación.
+
 ## R2 — camino principal nativo con Nilo (2026-11-03, Claude)
 
 - **Resultado:** Nilo pasa a OpenKore `auto` (`run_r1.py --character nilo`, `runtime/r1-nilo/`, puerto 8773). [Evidencia](evidence/R2-native-main-path.md).
