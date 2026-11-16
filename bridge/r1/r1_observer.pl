@@ -17,12 +17,21 @@ use constant SAMPLE_S => 5;
 my $dir = $ENV{R1_OBSERVER_DIR} or die "R1_OBSERVER_DIR is not set\n";
 my $json = JSON::PP->new->canonical;
 my ($last, $hooks) = (0, undef);
+my %engaged;  # monster ID -> time of our first attack_start on it
 
 Plugins::register('r1_observer', 'R1 read-only observer', \&unload);
 $hooks = Plugins::addHooks(
     ['AI_pre', \&tick],
+    ['attack_start', sub { my $id = $_[1]{ID}; $engaged{$id} //= time if defined $id;
+        %engaged = map { $_ => $engaged{$_} } grep { time - $engaged{$_} < 600 } keys %engaged }],
     ['target_died', sub { my $m = $_[1]{monster} || {};
-        event(kill => {name_id => 0 + ($m->{nameID} // 0), name => $m->{name} // ''}) }],
+        my $start = defined $m->{ID} ? delete $engaged{$m->{ID}} : undef;
+        # Per-kill combat facts OpenKore already keeps on the monster (Misc::updateDamageTables).
+        event(kill => {name_id => 0 + ($m->{nameID} // 0), name => $m->{name} // '',
+            duration_s => defined $start ? 0 + sprintf('%.2f', time - $start) : undef,
+            dmg_dealt => 0 + ($m->{dmgFromYou} // 0), hits => 0 + ($m->{numAtkFromYou} // 0),
+            misses => 0 + ($m->{missedFromYou} // 0), dmg_taken => 0 + ($m->{dmgToYou} // 0),
+            dodged => 0 + ($m->{missedYou} // 0)}) }],
     ['self_died', sub { event(died => sample()) }],
     ['exp_gained', sub { event(exp => level()) }],
     ['base_level_changed', sub { event(level => level()) }],

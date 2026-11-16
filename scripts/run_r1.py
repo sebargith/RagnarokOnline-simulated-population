@@ -273,6 +273,21 @@ def last_gear_buy(path):
     return (json.loads(lines[-1]).get('buy') or {}).get('id') if lines else None
 
 
+def progress_report(runtime, since=0, lock=None):
+    """E3 progression metrics over this character's observer events (agent/progress.py)."""
+    from agent import progress
+    loot = json.loads((ROOT/'config/p5-loot.json').read_text(encoding='utf-8'))['items']
+    events = read_events(paths(runtime)['events'], since)
+    hunt = None if lock is None else {lock} | {e['lockMap'] for e in events if e['type'] == 'reloaded' and e.get('ok')
+                                                and e.get('lockMap') and e['lockMap'] not in build_r1_profile.SUPPLY_MAPS}
+    out = progress.report(events, build_r1_profile.build_policy.load_equipment(), loot, hunt)
+    p = paths(runtime)
+    if p['gear'].exists():
+        out['gear_decisions'] = [d for d in (json.loads(l) for l in p['gear'].read_text(encoding='utf-8').splitlines())
+                                 if d['t'] >= since]
+    return out
+
+
 def ready_for_first_job(sample):
     """Novice at Job 10 with no unspent skill points: the custom Job Changer's own rule
     (config/npc/first-job-changer.txt). The class change itself goes through the bridge."""
@@ -659,6 +674,7 @@ def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN, ser
                               if d['t'] >= started] if p['decisions'].exists() else []
     cpu = [r for r in res if r['cpu_s'] is not None]
     out['refit_requests'] = refit_log
+    out['progress'] = progress_report(runtime, started, lock)
     out.update({'ram_min_gib': round(ram_min / 2**30, 2), 'stop_reason': reason, 'started': started, 'ended': time.time(), 'pid': pid,
                 'resources': {'samples': len(res),
                               'cpu_pct_one_core': round(100 * (cpu[-1]['cpu_s'] - cpu[0]['cpu_s']) / (cpu[-1]['t'] - cpu[0]['t']), 2) if len(cpu) > 1 else None,
@@ -734,7 +750,7 @@ def campaign(runtime, seconds, job, summary_dir, ram_min=RAM_MIN, service=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('command', choices=('preflight', 'prepare', 'start', 'watch', 'stop', 'report', 'first-job',
+    parser.add_argument('command', choices=('preflight', 'prepare', 'start', 'watch', 'stop', 'report', 'progress', 'first-job',
                                             'campaign', 'class-refit'))
     parser.add_argument('--job', default='Swordman', choices=('Swordman', 'Mage', 'Archer', 'Acolyte', 'Merchant', 'Thief'))
     parser.add_argument('--runtime', required=True, type=Path)
@@ -781,6 +797,9 @@ def run(args, service):
                  int(args.ram_min_gib * 2**30), service)
     elif args.command == 'stop':
         stop(args.runtime)
+    elif args.command == 'progress':
+        print(json.dumps(progress_report(args.runtime, args.since, lock_map(effective_policy(args.runtime, args.policy))),
+                         indent=1))
     elif args.command == 'first-job':
         log = first_job(args.runtime, args.job)
         print(json.dumps({k: log.get(k) for k in ('outcome', 'before', 'after')}, default=str))
