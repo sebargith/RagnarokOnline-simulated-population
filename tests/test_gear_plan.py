@@ -136,3 +136,18 @@ class Translation(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class GearRefit(unittest.TestCase):
+    def test_supervisor_sees_a_new_purchase_and_the_loaded_one(self):
+        tables = {'equipment': EQUIPMENT, 'builds': BUILDS}
+        policy = json.loads((ROOT/'config/r1-policy-nilo.json').read_text(encoding='utf-8'))
+        self.assertEqual(run_r1.gear_buy(policy, char(5495), tables), BLADE)
+        self.assertIsNone(run_r1.gear_buy(policy, char(500), tables))
+        policy['rules'] = [r for r in policy['rules'] if r['id'] != 'upgrade_gear']
+        self.assertIsNone(run_r1.gear_buy(policy, char(5495), tables))
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)/'gear-decisions.jsonl'
+            self.assertIsNone(run_r1.last_gear_buy(path))
+            path.write_text(json.dumps({'buy': None}) + '\n' + json.dumps({'buy': {'id': BLADE}}) + '\n')
+            self.assertEqual(run_r1.last_gear_buy(path), BLADE)

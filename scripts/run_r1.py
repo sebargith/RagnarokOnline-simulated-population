@@ -66,6 +66,7 @@ DEATHS_MAX, DEATH_WINDOW_S = 3, 900
 FLY_WING = '601'
 JOB_CHANGER = ('prontera', 153, 190)  # config/npc/first-job-changer.txt; the first-job step talks from here
 APPROACH_S, APPROACH_NEAR = 900, 3
+GEAR_REFIT_S = 120  # at most one gear-only refit per this many seconds
 
 
 def use(who):
@@ -250,6 +251,26 @@ def field_history(events):
         elif e['type'] == 'kill' and here:
             out.setdefault(here, {'kills': 0, 'hunt_s': 0})['kills'] += 1
     return {k: {'kills': v['kills'], 'hunt_s': round(v['hunt_s'])} for k, v in out.items()}
+
+
+def gear_buy(policy, facts, tables):
+    """The purchase agent/gear_plan.py would choose from these facts (id or None), or None
+    when the policy has no upgrade_gear rule."""
+    from agent import gear_plan
+    for rule in policy['rules']:
+        up = rule['do'].get('upgrade_gear')
+        if up:
+            gear = tables['builds'][up['build']].get('gear', {})
+            return (gear_plan.plan(facts, tables['equipment'], gear, up['shops'], int(up['reserve_zeny']))['buy'] or {}).get('id')
+    return None
+
+
+def last_gear_buy(path):
+    """The purchase in the profile last written (gear-decisions.jsonl), or None."""
+    if not path.exists():
+        return None
+    lines = path.read_text(encoding='utf-8').splitlines()
+    return (json.loads(lines[-1]).get('buy') or {}).get('id') if lines else None
 
 
 def ready_for_first_job(sample):
@@ -528,6 +549,9 @@ def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN, ser
     refit_level = policy['character']['level']['base']
     pending, refit_log, choice, deaths_seen, since_decision = None, [], FieldChoice(runtime, service), 0, started
     died_since_choice, choice_facts, approach = False, None, None
+    gear_tables = {'equipment': build_r1_profile.build_policy.load_equipment(),
+                   'builds': build_r1_profile.build_policy.load_builds()}
+    gear_loaded, gear_refit_t = last_gear_buy(p['gear']), 0
     try:
         while time.time() - started < seconds:
             time.sleep(10)
@@ -579,6 +603,24 @@ def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN, ser
                         since_decision = time.time()
                     except ValueError as e:  # no validated option: keep the loaded profile
                         refit_log.append({'t': time.time(), 'facts': facts, 'error': str(e)})
+                if (not why and facts and not pending and not choice.pending and not approach
+                        and time.time() - gear_refit_t > GEAR_REFIT_S):
+                    # Gear-only refit (e.g. after selling): same field, no planner request.
+                    policy = effective_policy(runtime)
+                    policy['character'] = facts
+                    want = gear_buy(policy, facts, gear_tables)
+                    if want and want != gear_loaded:
+                        gear_refit_t = time.time()
+                        try:
+                            result = prepare(runtime, None, facts)
+                        except ValueError as e:
+                            refit_log.append({'t': time.time(), 'trigger': 'gear', 'error': str(e)})
+                            result = None
+                        if result:
+                            gear_loaded = (result['gear']['buy'] or {}).get('id') if result.get('gear') else None
+                            pending = (f'gear-{base}-{int(time.time())}', time.time())
+                            m1.write(p['observer']/'reload.request', pending[0])
+                            refit_log.append({'t': time.time(), 'id': pending[0], 'trigger': 'gear', 'buy': gear_loaded})
                 decided = choice.poll()
                 if decided:
                     # Single sync point: regenerate from observed facts and the chosen field, then ask r1_reload.
@@ -588,6 +630,7 @@ def watch(runtime, seconds, policy_path=None, summary=None, ram_min=RAM_MIN, ser
                         refit_log.append({'t': time.time(), 'field': decided['field_id'], 'error': str(e)})
                         result = None
                     if result:
+                        gear_loaded = ((result.get('gear') or {}).get('buy') or {}).get('id')
                         pending = (f'refit-{base}-{int(time.time())}', time.time())
                         m1.write(p['observer']/'reload.request', pending[0])
                         refit_log.append({'t': time.time(), 'id': pending[0], 'trigger': decided['trigger'],
