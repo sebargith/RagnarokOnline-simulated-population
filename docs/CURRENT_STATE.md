@@ -7,7 +7,9 @@
 - **Hecho:** tablas de precio/tienda y de botín (E1); plan de compra determinista, `buyAuto` nativo y plugin `r1_equip` (E2).
 - **En vivo:** Nilo compró y lleva Blade, Guard y Sandals (Knife → Blade). 0 muertes, 0 inesperados. Detalle al final del diseño.
 - **Estado:** Nilo Swordman Base 13 / Job 5, `prt_fild00`, 1 695 Zeny; cliente detenido. Servidores rAthena/MariaDB activos. Suite: 305 OK (hay pruebas de tiempo intermitentes en P3/P5).
-- **Siguiente:** E3, métricas de progreso (tiempo por kill y daño por monstruo) para medir la mejora.
+- **E3 hecho:** métricas por kill en el observador y `agent/progress.py`. A/B en vivo Knife vs Blade: +22 % kills y +35 % EXP por hora de caza, menos de lo esperado por el modificador de tamaño (espada 75 % contra pequeños).
+- **Estado tras E3:** Nilo Swordman Base 15, Blade equipado, `prt_fild00`; cliente detenido. Suite: 310 OK.
+- **Siguiente:** puntuar el arma por tamaño de los monstruos del campo; después R3 con E5.
 
 ## R2 — camino principal nativo con Nilo (2026-11-03, Claude)
 

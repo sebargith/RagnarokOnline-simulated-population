@@ -1,7 +1,7 @@
 # Diseño — equipo, economía y progresión observable
 
-Estado (2026-11-16, Claude): aprobado por el usuario. **E1 y E2 implementados y vistos en vivo** con Nilo
-(ver «Resultado E1–E2» al final). E3–E5 sin empezar.
+Estado (2026-11-16, Claude): aprobado por el usuario. **E1, E2 y E3 implementados y vistos en vivo** con Nilo
+(ver «Resultado E1–E2» y «Resultado E3» al final). E4–E5 sin empezar.
 
 ## Problema
 
@@ -141,3 +141,28 @@ Fuera de alcance: cartas y equipo con ranuras como requisito, modelo de daño pr
 - **Sin demostrar:** la mejora de poder. Kills por hora de caza: 301/h con Knife (26 en 311 s) y 269/h con Blade
   (27 en 361 s); muestras demasiado pequeñas. Medirlo es E3 (tiempo por kill y daño recibido por monstruo).
 - **Pendiente:** ver en vivo un viaje con varias compras agrupadas; sexo no observado (solo piezas `Both`).
+
+## Resultado E3 (2026-11-16)
+
+- **Medición:** `r1_observer` añade a cada kill el tiempo desde `attack_start`, golpes, fallos, daño hecho y recibido y
+  esquivas (datos que OpenKore ya guarda en el monstruo). `agent/progress.py` da poder del equipo puesto, patrimonio a
+  precio NPC, combate por monstruo **separado por equipo puesto** y kills/EXP por hora de caza. Va en cada resumen de
+  `watch` y en `run_r1.py progress`.
+- **Comparación A/B en vivo** (Nilo, `prt_fild00`, mismo Guard/Suit/Sandals, 10 min cada una; en A se forzó el Knife
+  editando solo `r1_equip_rightHand` del perfil generado; B empezó en nivel 13 y subió a 14, A fue en 14):
+
+  | Métrica | Knife (ATK 17) | Blade (ATK 53) |
+  |---|---|---|
+  | Kills / hora de caza | 322 | 394 (+22 %) |
+  | EXP base / hora de caza | 2 623 | 3 546 (+35 %) |
+  | Hornet: golpes por kill / daño recibido por kill | 5,0 / 38,0 | 4,2 / 31,6 |
+  | Daño por golpe: Hornet (pequeño) / Poring (mediano) | 55,5 / 61,3 | 59,9 / 74,4 |
+  | Kills por hora total (con descanso) | 263 | 269 |
+
+  Muestras pequeñas (44–45 kills); 0 muertes y 0 inesperados en ambas.
+- **Hallazgo de mecánica:** la mejora existe pero es mucho menor que 17 → 53 ATK. En pre-Renewal
+  (`db/size_fix.yml`) la espada de una mano hace el **75 %** a monstruos pequeños y la daga el 100 %; casi todo
+  `prt_fild00` es pequeño. Con DEX 9, además, el ATK del arma varía mucho. El plan de E2 compara solo ATK bruto:
+  aquí un Main Gauche (daga, 43) rendiría más que el Blade (≈ 40 efectivo).
+- **Siguiente propuesto:** puntuar el arma por el ATK efectivo contra la mezcla de tamaños del campo
+  (tabla fija de rAthena, sin modelo de daño), y repetir la A/B.
