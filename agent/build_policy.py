@@ -31,6 +31,10 @@ def load_builds(path=None):
         for handle, level in build['skills']:
             if not SKILL.match(handle) or type(level) is not int or not 1 <= level <= 10:
                 raise ValueError(f'{name}: invalid skill step')
+        gear = build.get('gear', {})
+        if (set(gear) - {'weapon_types', 'shield'} or not isinstance(gear.get('shield', False), bool)
+                or not all(isinstance(t, str) for t in gear.get('weapon_types', []))):
+            raise ValueError(f'{name}: invalid gear preference')
     return doc['builds']
 
 

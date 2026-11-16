@@ -89,7 +89,7 @@ def paths(runtime):
     return {'base': base, 'profile': base/'openkore'/WHO, 'observer': base/'observer',
             'events': base/'observer/events.jsonl', 'summary': base/'summary.json',
             'field': base/'field.json', 'decisions': base/'field-decisions.jsonl', 'danger': base/'danger.json',
-            'effective': base/'policy-effective.json'}
+            'effective': base/'policy-effective.json', 'gear': base/'gear-decisions.jsonl'}
 
 
 def load(path, default):
@@ -97,11 +97,15 @@ def load(path, default):
 
 
 def effective_policy(runtime, policy_path=None):
-    """The policy as last applied (observed facts and chosen field), else the configured one."""
+    """The configured rules with the facts last applied (observed character and chosen
+    field), so a rule added to the policy file reaches a running character at its next refit."""
     p = paths(runtime)
+    configured = json.loads(Path(policy_path or default_policy()).read_text(encoding='utf-8'))
     if p['effective'].exists() and policy_path is None:
-        return load(p['effective'], None)
-    return json.loads(Path(policy_path or default_policy()).read_text(encoding='utf-8'))
+        applied = load(p['effective'], None)
+        configured['character'] = applied['character']
+        configured['rules'][0] = applied['rules'][0]  # hunt_field: the field last applied
+    return configured
 
 
 def with_field(policy, field):
@@ -131,6 +135,9 @@ def prepare(runtime, policy_path=None, character=None, goto=None):
     result = build_r1_profile.translate(policy, build_r1_profile.load_tables(), load(p['danger'], {}), goto)
     p['base'].mkdir(parents=True, exist_ok=True)
     m1.write(p['effective'], json.dumps(policy, indent=1, ensure_ascii=False))
+    if result.get('gear'):  # docs/PROGRESSION_ECONOMY.md E2: every gear decision with its facts
+        with p['gear'].open('a', encoding='utf-8') as f:
+            f.write(json.dumps({'t': time.time(), **result['gear']}) + '\n')
     files = build_r1_profile.render(result, (template/'config.txt').read_text(encoding='utf-8'))
     for key, value in {'username': USERID, 'password': password}.items():
         files['config.txt'] = re.sub(rf'(?m)^{key}(?:[ \t].*)?$', lambda _: f'{key} {value}', files['config.txt'], count=1)
@@ -258,7 +265,8 @@ def facts_of(sample):
         return None
     return {'source': f'observer sample t={sample["t"]}', 'job': job,
             'level': {'base': sample['level']['base'], 'job': sample['level']['job']},
-            'stats': sample['stats'], 'hp_max': sample['hp_max'], 'equipped': sample['equipped']}
+            'stats': sample['stats'], 'hp_max': sample['hp_max'], 'equipped': sample['equipped'],
+            'zeny': sample.get('zeny', 0), 'inventory': sample.get('inventory', {})}
 
 
 def resources(pid=None):

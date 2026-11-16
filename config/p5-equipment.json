@@ -1,5 +1,5 @@
 {
- "version": 1,
+ "version": 2,
  "source": {
   "rathena_commit": "d4b8e7b8f16061cc2496d377ac8f777ce72a4f39",
   "item_db": "db/pre-re/item_db_equip.yml",
@@ -30,7 +30,22 @@
    "gender": "Both",
    "min_level": 2,
    "attack": 25,
-   "defense": 0
+   "defense": 0,
+   "buy": 100,
+   "sell": 50,
+   "weight": 50.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alb",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#iz",
+    "Weapon Dealer#pay",
+    "Weapon Dealer#prt",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1104": {
    "name": "Falchion",
@@ -48,7 +63,20 @@
    "gender": "Both",
    "min_level": 2,
    "attack": 39,
-   "defense": 0
+   "defense": 0,
+   "buy": 1500,
+   "sell": 750,
+   "weight": 60.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alb",
+    "Weapon Dealer#iz",
+    "Weapon Dealer#pay",
+    "Weapon Dealer#prt"
+   ]
   },
   "1107": {
    "name": "Blade",
@@ -66,7 +94,28 @@
    "gender": "Both",
    "min_level": 2,
    "attack": 53,
-   "defense": 0
+   "defense": 0,
+   "buy": 2900,
+   "sell": 1450,
+   "weight": 70.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alb",
+    "Weapon Dealer#ama",
+    "Weapon Dealer#ayo",
+    "Weapon Dealer#gon",
+    "Weapon Dealer#iz",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#lou",
+    "Weapon Dealer#mosk",
+    "Weapon Dealer#pay",
+    "Weapon Dealer#prt",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#ve"
+   ]
   },
   "1110": {
    "name": "Rapier",
@@ -84,7 +133,17 @@
    "gender": "Both",
    "min_level": 14,
    "attack": 70,
-   "defense": 0
+   "defense": 0,
+   "buy": 10000,
+   "sell": 5000,
+   "weight": 50.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#prt"
+   ]
   },
   "1113": {
    "name": "Scimitar",
@@ -102,7 +161,17 @@
    "gender": "Both",
    "min_level": 14,
    "attack": 85,
-   "defense": 0
+   "defense": 0,
+   "buy": 17000,
+   "sell": 8500,
+   "weight": 70.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#prt"
+   ]
   },
   "1116": {
    "name": "Katana",
@@ -117,7 +186,27 @@
    "gender": "Both",
    "min_level": 4,
    "attack": 60,
-   "defense": 0
+   "defense": 0,
+   "buy": 2000,
+   "sell": 1000,
+   "weight": 100.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#ama",
+    "Weapon Dealer#ayo",
+    "Weapon Dealer#gon",
+    "Weapon Dealer#hu",
+    "Weapon Dealer#iz",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#lou",
+    "Weapon Dealer#mosk",
+    "Weapon Dealer#prt",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#ve"
+   ]
   },
   "1119": {
    "name": "Tsurugi",
@@ -134,7 +223,17 @@
    "gender": "Both",
    "min_level": 27,
    "attack": 130,
-   "defense": 0
+   "defense": 0,
+   "buy": 51000,
+   "sell": 25500,
+   "weight": 120.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#prt"
+   ]
   },
   "1122": {
    "name": "Ring Pommel Saber",
@@ -151,7 +250,25 @@
    "gender": "Both",
    "min_level": 14,
    "attack": 100,
-   "defense": 0
+   "defense": 0,
+   "buy": 24000,
+   "sell": 12000,
+   "weight": 90.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#ama",
+    "Weapon Dealer#ayo",
+    "Weapon Dealer#gon",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#lou",
+    "Weapon Dealer#mosk",
+    "Weapon Dealer#prt",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#ve"
+   ]
   },
   "1123": {
    "name": "Haedonggum",
@@ -168,7 +285,17 @@
    "gender": "Both",
    "min_level": 27,
    "attack": 120,
-   "defense": 0
+   "defense": 0,
+   "buy": 50000,
+   "sell": 25000,
+   "weight": 90.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#prt"
+   ]
   },
   "1126": {
    "name": "Saber",
@@ -185,7 +312,17 @@
    "gender": "Both",
    "min_level": 27,
    "attack": 115,
-   "defense": 0
+   "defense": 0,
+   "buy": 49000,
+   "sell": 24500,
+   "weight": 100.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#prt"
+   ]
   },
   "1146": {
    "name": "Town Sword",
@@ -200,7 +337,21 @@
    "gender": "Both",
    "min_level": 30,
    "attack": 100,
-   "defense": 0
+   "defense": 0,
+   "buy": 42000,
+   "sell": 21000,
+   "weight": 80.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Weapon Dealer#alb2",
+    "Weapon Dealer#alde2",
+    "Weapon Dealer#gef",
+    "Weapon Dealer#moc2",
+    "Weapon Dealer#pay2",
+    "Weapon Dealer#prt3"
+   ]
   },
   "1151": {
    "name": "Slayer",
@@ -215,7 +366,17 @@
    "gender": "Both",
    "min_level": 18,
    "attack": 90,
-   "defense": 0
+   "defense": 0,
+   "buy": 15000,
+   "sell": 7500,
+   "weight": 130.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#iz"
+   ]
   },
   "1154": {
    "name": "Bastard Sword",
@@ -230,7 +391,26 @@
    "gender": "Both",
    "min_level": 18,
    "attack": 115,
-   "defense": 0
+   "defense": 0,
+   "buy": 22500,
+   "sell": 11250,
+   "weight": 160.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#ama",
+    "Weapon Dealer#ayo",
+    "Weapon Dealer#gon",
+    "Weapon Dealer#hu",
+    "Weapon Dealer#iz",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#lou",
+    "Weapon Dealer#mosk",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#ve"
+   ]
   },
   "1157": {
    "name": "Two-Handed Sword",
@@ -245,7 +425,17 @@
    "gender": "Both",
    "min_level": 33,
    "attack": 160,
-   "defense": 0
+   "defense": 0,
+   "buy": 60000,
+   "sell": 30000,
+   "weight": 220.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#iz"
+   ]
   },
   "1160": {
    "name": "Broad Sword",
@@ -260,7 +450,17 @@
    "gender": "Both",
    "min_level": 33,
    "attack": 140,
-   "defense": 0
+   "defense": 0,
+   "buy": 65000,
+   "sell": 32500,
+   "weight": 200.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#iz"
+   ]
   },
   "1201": {
    "name": "Knife",
@@ -280,7 +480,29 @@
    "gender": "Both",
    "min_level": 1,
    "attack": 17,
-   "defense": 0
+   "defense": 0,
+   "buy": 50,
+   "sell": 25,
+   "weight": 40.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alb",
+    "Weapon Dealer#alde",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#hu",
+    "Weapon Dealer#iz",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#moc1",
+    "Weapon Dealer#pay",
+    "Weapon Dealer#prt",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#ve",
+    "Weapon Dealer#xmas",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1204": {
    "name": "Cutter",
@@ -300,7 +522,25 @@
    "gender": "Both",
    "min_level": 1,
    "attack": 30,
-   "defense": 0
+   "defense": 0,
+   "buy": 1250,
+   "sell": 625,
+   "weight": 50.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alb",
+    "Weapon Dealer#alde",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#iz",
+    "Weapon Dealer#moc1",
+    "Weapon Dealer#pay",
+    "Weapon Dealer#prt",
+    "Weapon Dealer#xmas",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1207": {
    "name": "Main Gauche",
@@ -320,7 +560,33 @@
    "gender": "Both",
    "min_level": 1,
    "attack": 43,
-   "defense": 0
+   "defense": 0,
+   "buy": 2400,
+   "sell": 1200,
+   "weight": 60.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alb",
+    "Weapon Dealer#alde",
+    "Weapon Dealer#ama",
+    "Weapon Dealer#ayo",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#gon",
+    "Weapon Dealer#iz",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#lou",
+    "Weapon Dealer#moc1",
+    "Weapon Dealer#mosk",
+    "Weapon Dealer#pay",
+    "Weapon Dealer#prt",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#ve",
+    "Weapon Dealer#xmas",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1210": {
    "name": "Dirk",
@@ -340,7 +606,21 @@
    "gender": "Both",
    "min_level": 12,
    "attack": 59,
-   "defense": 0
+   "defense": 0,
+   "buy": 8500,
+   "sell": 4250,
+   "weight": 50.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alde",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#moc1",
+    "Weapon Dealer#xmas",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1213": {
    "name": "Dagger",
@@ -360,7 +640,21 @@
    "gender": "Both",
    "min_level": 12,
    "attack": 73,
-   "defense": 0
+   "defense": 0,
+   "buy": 14000,
+   "sell": 7000,
+   "weight": 60.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alde",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#moc1",
+    "Weapon Dealer#xmas",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1216": {
    "name": "Stiletto",
@@ -380,7 +674,29 @@
    "gender": "Both",
    "min_level": 12,
    "attack": 87,
-   "defense": 0
+   "defense": 0,
+   "buy": 19500,
+   "sell": 9750,
+   "weight": 70.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alde",
+    "Weapon Dealer#ama",
+    "Weapon Dealer#ayo",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#gon",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#lou",
+    "Weapon Dealer#moc1",
+    "Weapon Dealer#mosk",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#ve",
+    "Weapon Dealer#xmas",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1219": {
    "name": "Gladius",
@@ -399,7 +715,19 @@
    "gender": "Both",
    "min_level": 24,
    "attack": 105,
-   "defense": 0
+   "defense": 0,
+   "buy": 43000,
+   "sell": 21500,
+   "weight": 70.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alde",
+    "Weapon Dealer#moc1",
+    "Weapon Dealer#xmas"
+   ]
   },
   "1222": {
    "name": "Damascus",
@@ -418,7 +746,19 @@
    "gender": "Both",
    "min_level": 24,
    "attack": 118,
-   "defense": 0
+   "defense": 0,
+   "buy": 49000,
+   "sell": 24500,
+   "weight": 80.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alde",
+    "Weapon Dealer#moc1",
+    "Weapon Dealer#xmas"
+   ]
   },
   "1245": {
    "name": "Cinquedea",
@@ -433,7 +773,21 @@
    "gender": "Both",
    "min_level": 30,
    "attack": 110,
-   "defense": 0
+   "defense": 0,
+   "buy": 40000,
+   "sell": 20000,
+   "weight": 70.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Weapon Dealer#alb2",
+    "Weapon Dealer#alde2",
+    "Weapon Dealer#gef",
+    "Weapon Dealer#moc2",
+    "Weapon Dealer#pay2",
+    "Weapon Dealer#prt3"
+   ]
   },
   "1247": {
    "name": "Kindle Dagger",
@@ -453,7 +807,16 @@
    "gender": "Both",
    "min_level": 1,
    "attack": 39,
-   "defense": 0
+   "defense": 0,
+   "buy": 10000,
+   "sell": 5000,
+   "weight": 60.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Weapon Dealer#ein"
+   ]
   },
   "1248": {
    "name": "Obsidian Dagger",
@@ -473,7 +836,16 @@
    "gender": "Both",
    "min_level": 1,
    "attack": 39,
-   "defense": 0
+   "defense": 0,
+   "buy": 10000,
+   "sell": 5000,
+   "weight": 60.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Weapon Dealer#ein"
+   ]
   },
   "1249": {
    "name": "Fisherman's Dagger",
@@ -493,7 +865,16 @@
    "gender": "Both",
    "min_level": 1,
    "attack": 39,
-   "defense": 0
+   "defense": 0,
+   "buy": 10000,
+   "sell": 5000,
+   "weight": 60.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Weapon Dealer#ein"
+   ]
   },
   "1301": {
    "name": "Axe",
@@ -511,7 +892,20 @@
    "gender": "Both",
    "min_level": 3,
    "attack": 38,
-   "defense": 0
+   "defense": 0,
+   "buy": 500,
+   "sell": 250,
+   "weight": 80.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Axe Dealer#nif",
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#alb",
+    "Weapon Dealer#iz",
+    "Weapon Dealer#prt"
+   ]
   },
   "1351": {
    "name": "Battle Axe",
@@ -527,7 +921,18 @@
    "gender": "Both",
    "min_level": 3,
    "attack": 80,
-   "defense": 0
+   "defense": 0,
+   "buy": 5400,
+   "sell": 2700,
+   "weight": 150.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Axe Dealer#nif",
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#alb"
+   ]
   },
   "1354": {
    "name": "Hammer",
@@ -543,7 +948,28 @@
    "gender": "Both",
    "min_level": 16,
    "attack": 120,
-   "defense": 0
+   "defense": 0,
+   "buy": 15500,
+   "sell": 7750,
+   "weight": 200.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Axe Dealer#nif",
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#alb",
+    "Weapon Dealer#ama",
+    "Weapon Dealer#ayo",
+    "Weapon Dealer#bra",
+    "Weapon Dealer#gon",
+    "Weapon Dealer#hu",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#lou",
+    "Weapon Dealer#mosk",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#ve2"
+   ]
   },
   "1357": {
    "name": "Buster",
@@ -559,7 +985,18 @@
    "gender": "Both",
    "min_level": 30,
    "attack": 155,
-   "defense": 0
+   "defense": 0,
+   "buy": 34000,
+   "sell": 17000,
+   "weight": 220.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Axe Dealer#nif",
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#alb"
+   ]
   },
   "1360": {
    "name": "Two-Handed Axe",
@@ -575,7 +1012,18 @@
    "gender": "Both",
    "min_level": 30,
    "attack": 185,
-   "defense": 0
+   "defense": 0,
+   "buy": 55000,
+   "sell": 27500,
+   "weight": 250.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Axe Dealer#nif",
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#alb"
+   ]
   },
   "1401": {
    "name": "Javelin",
@@ -590,7 +1038,18 @@
    "gender": "Both",
    "min_level": 4,
    "attack": 28,
-   "defense": 0
+   "defense": 0,
+   "buy": 150,
+   "sell": 75,
+   "weight": 70.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#cmd2",
+    "Weapon Dealer#prt2"
+   ]
   },
   "1404": {
    "name": "Spear",
@@ -605,7 +1064,18 @@
    "gender": "Both",
    "min_level": 4,
    "attack": 44,
-   "defense": 0
+   "defense": 0,
+   "buy": 1700,
+   "sell": 850,
+   "weight": 85.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#cmd2",
+    "Weapon Dealer#prt2"
+   ]
   },
   "1407": {
    "name": "Pike",
@@ -620,7 +1090,27 @@
    "gender": "Both",
    "min_level": 4,
    "attack": 60,
-   "defense": 0
+   "defense": 0,
+   "buy": 3450,
+   "sell": 1725,
+   "weight": 100.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#ama",
+    "Weapon Dealer#ayo",
+    "Weapon Dealer#bra",
+    "Weapon Dealer#cmd2",
+    "Weapon Dealer#gon",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#lou",
+    "Weapon Dealer#mosk",
+    "Weapon Dealer#prt2",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#ve2"
+   ]
   },
   "1410": {
    "name": "Lance",
@@ -635,7 +1125,18 @@
    "gender": "Both",
    "min_level": 33,
    "attack": 185,
-   "defense": 0
+   "defense": 0,
+   "buy": 60000,
+   "sell": 30000,
+   "weight": 250.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#cmd2",
+    "Weapon Dealer#prt2"
+   ]
   },
   "1451": {
    "name": "Guisarme",
@@ -650,7 +1151,18 @@
    "gender": "Both",
    "min_level": 18,
    "attack": 84,
-   "defense": 0
+   "defense": 0,
+   "buy": 13000,
+   "sell": 6500,
+   "weight": 100.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#cmd2",
+    "Weapon Dealer#prt2"
+   ]
   },
   "1454": {
    "name": "Glaive",
@@ -665,7 +1177,18 @@
    "gender": "Both",
    "min_level": 18,
    "attack": 104,
-   "defense": 0
+   "defense": 0,
+   "buy": 20000,
+   "sell": 10000,
+   "weight": 120.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#cmd2",
+    "Weapon Dealer#prt2"
+   ]
   },
   "1457": {
    "name": "Partizan",
@@ -680,7 +1203,27 @@
    "gender": "Both",
    "min_level": 18,
    "attack": 124,
-   "defense": 0
+   "defense": 0,
+   "buy": 27000,
+   "sell": 13500,
+   "weight": 200.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#ama",
+    "Weapon Dealer#ayo",
+    "Weapon Dealer#bra",
+    "Weapon Dealer#cmd2",
+    "Weapon Dealer#gon",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#lou",
+    "Weapon Dealer#mosk",
+    "Weapon Dealer#prt2",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#ve2"
+   ]
   },
   "1460": {
    "name": "Trident",
@@ -695,7 +1238,18 @@
    "gender": "Both",
    "min_level": 33,
    "attack": 150,
-   "defense": 0
+   "defense": 0,
+   "buy": 51000,
+   "sell": 25500,
+   "weight": 120.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#cmd2",
+    "Weapon Dealer#prt2"
+   ]
   },
   "1463": {
    "name": "Halberd",
@@ -710,7 +1264,18 @@
    "gender": "Both",
    "min_level": 33,
    "attack": 165,
-   "defense": 0
+   "defense": 0,
+   "buy": 54000,
+   "sell": 27000,
+   "weight": 250.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Two Hand Weapon Dealer",
+    "Weapon Dealer#cmd2",
+    "Weapon Dealer#prt2"
+   ]
   },
   "1501": {
    "name": "Club",
@@ -728,7 +1293,18 @@
    "gender": "Both",
    "min_level": 2,
    "attack": 23,
-   "defense": 0
+   "defense": 0,
+   "buy": 120,
+   "sell": 60,
+   "weight": 70.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Nun#prt",
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#um"
+   ]
   },
   "1504": {
    "name": "Mace",
@@ -746,7 +1322,18 @@
    "gender": "Both",
    "min_level": 2,
    "attack": 37,
-   "defense": 0
+   "defense": 0,
+   "buy": 1600,
+   "sell": 800,
+   "weight": 80.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Nun#prt",
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#um"
+   ]
   },
   "1507": {
    "name": "Smasher",
@@ -764,7 +1351,18 @@
    "gender": "Both",
    "min_level": 14,
    "attack": 54,
-   "defense": 0
+   "defense": 0,
+   "buy": 9000,
+   "sell": 4500,
+   "weight": 100.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Nun#prt",
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#um"
+   ]
   },
   "1510": {
    "name": "Flail",
@@ -781,7 +1379,18 @@
    "gender": "Both",
    "min_level": 14,
    "attack": 69,
-   "defense": 0
+   "defense": 0,
+   "buy": 16000,
+   "sell": 8000,
+   "weight": 90.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Nun#prt",
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#um"
+   ]
   },
   "1513": {
    "name": "Morning Star",
@@ -798,7 +1407,18 @@
    "gender": "Both",
    "min_level": 27,
    "attack": 110,
-   "defense": 0
+   "defense": 0,
+   "buy": 41000,
+   "sell": 20500,
+   "weight": 150.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Nun#prt",
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#um"
+   ]
   },
   "1516": {
    "name": "Sword Mace",
@@ -815,7 +1435,17 @@
    "gender": "Both",
    "min_level": 27,
    "attack": 130,
-   "defense": 0
+   "defense": 0,
+   "buy": 50000,
+   "sell": 25000,
+   "weight": 120.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Trader#moc4"
+   ]
   },
   "1519": {
    "name": "Chain",
@@ -832,7 +1462,27 @@
    "gender": "Both",
    "min_level": 14,
    "attack": 84,
-   "defense": 0
+   "defense": 0,
+   "buy": 23000,
+   "sell": 11500,
+   "weight": 80.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Nun#prt",
+    "One Hand Weapon Dealer",
+    "Weapon Dealer#ama",
+    "Weapon Dealer#ayo",
+    "Weapon Dealer#bra",
+    "Weapon Dealer#gon",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#lou",
+    "Weapon Dealer#mosk",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#um",
+    "Weapon Dealer#ve2"
+   ]
   },
   "1522": {
    "name": "Stunner",
@@ -847,7 +1497,17 @@
    "gender": "Both",
    "min_level": 27,
    "attack": 140,
-   "defense": 0
+   "defense": 0,
+   "buy": 60000,
+   "sell": 30000,
+   "weight": 200.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "One Hand Weapon Dealer",
+    "Trader#moc4"
+   ]
   },
   "1601": {
    "name": "Rod",
@@ -864,7 +1524,27 @@
    "gender": "Both",
    "min_level": 1,
    "attack": 15,
-   "defense": 0
+   "defense": 0,
+   "buy": 50,
+   "sell": 25,
+   "weight": 40.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Magical Item Seller#gef",
+    "Magical Item Seller#ve",
+    "Magical Item Seller#yuno",
+    "Wand Dealer#lhz",
+    "Weapon Dealer#alb",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#iz",
+    "Weapon Dealer#moc1",
+    "Weapon Dealer#pay",
+    "Weapon Dealer#prt",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1604": {
    "name": "Wand",
@@ -881,7 +1561,22 @@
    "gender": "Both",
    "min_level": 12,
    "attack": 25,
-   "defense": 0
+   "defense": 0,
+   "buy": 2500,
+   "sell": 1250,
+   "weight": 40.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Magical Item Seller#gef",
+    "Magical Item Seller#ve",
+    "Magical Item Seller#yuno",
+    "Wand Dealer#lhz",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1607": {
    "name": "Staff",
@@ -897,7 +1592,22 @@
    "gender": "Both",
    "min_level": 12,
    "attack": 40,
-   "defense": 0
+   "defense": 0,
+   "buy": 9500,
+   "sell": 4750,
+   "weight": 40.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Magical Item Seller#gef",
+    "Magical Item Seller#ve",
+    "Magical Item Seller#yuno",
+    "Wand Dealer#lhz",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1610": {
    "name": "Arc Wand",
@@ -913,7 +1623,20 @@
    "gender": "Both",
    "min_level": 24,
    "attack": 60,
-   "defense": 0
+   "defense": 0,
+   "buy": 45000,
+   "sell": 22500,
+   "weight": 40.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Magical Item Seller#gef",
+    "Magical Item Seller#ve",
+    "Magical Item Seller#yuno",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1617": {
    "name": "Survivor's Rod",
@@ -929,7 +1652,16 @@
    "gender": "Both",
    "min_level": 24,
    "attack": 50,
-   "defense": 0
+   "defense": 0,
+   "buy": 85000,
+   "sell": 42500,
+   "weight": 100.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Wand Dealer#lhz"
+   ]
   },
   "1619": {
    "name": "Survivor's Rod",
@@ -945,7 +1677,16 @@
    "gender": "Both",
    "min_level": 24,
    "attack": 50,
-   "defense": 0
+   "defense": 0,
+   "buy": 85000,
+   "sell": 42500,
+   "weight": 100.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Wand Dealer#lhz"
+   ]
   },
   "1701": {
    "name": "Bow",
@@ -961,7 +1702,23 @@
    "gender": "Both",
    "min_level": 4,
    "attack": 15,
-   "defense": 0
+   "defense": 0,
+   "buy": 1000,
+   "sell": 500,
+   "weight": 50.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Bow Dealer#hu",
+    "Weapon Dealer#alb",
+    "Weapon Dealer#gef2",
+    "Weapon Dealer#iz",
+    "Weapon Dealer#moc1",
+    "Weapon Dealer#pay",
+    "Weapon Dealer#prt",
+    "Weapon Dealer#yuno"
+   ]
   },
   "1704": {
    "name": "Composite Bow",
@@ -977,7 +1734,16 @@
    "gender": "Both",
    "min_level": 4,
    "attack": 29,
-   "defense": 0
+   "defense": 0,
+   "buy": 2500,
+   "sell": 1250,
+   "weight": 60.0,
+   "slots": 3,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Weapon Dealer#pay"
+   ]
   },
   "1707": {
    "name": "Great Bow",
@@ -993,7 +1759,17 @@
    "gender": "Both",
    "min_level": 18,
    "attack": 50,
-   "defense": 0
+   "defense": 0,
+   "buy": 10000,
+   "sell": 5000,
+   "weight": 100.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Bow Dealer#hu",
+    "Weapon Dealer#pay"
+   ]
   },
   "1710": {
    "name": "Crossbow",
@@ -1009,7 +1785,16 @@
    "gender": "Both",
    "min_level": 18,
    "attack": 65,
-   "defense": 0
+   "defense": 0,
+   "buy": 17000,
+   "sell": 8500,
+   "weight": 90.0,
+   "slots": 2,
+   "refineable": true,
+   "weapon_level": 2,
+   "shops": [
+    "Weapon Dealer#pay"
+   ]
   },
   "1713": {
    "name": "Arbalest",
@@ -1025,7 +1810,16 @@
    "gender": "Both",
    "min_level": 33,
    "attack": 90,
-   "defense": 0
+   "defense": 0,
+   "buy": 48000,
+   "sell": 24000,
+   "weight": 100.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Weapon Dealer#pay"
+   ]
   },
   "1714": {
    "name": "Gakkung Bow",
@@ -1041,7 +1835,17 @@
    "gender": "Both",
    "min_level": 33,
    "attack": 100,
-   "defense": 0
+   "defense": 0,
+   "buy": 42000,
+   "sell": 21000,
+   "weight": 110.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Bow Dealer#hu",
+    "Weapon Dealer#pay"
+   ]
   },
   "1721": {
    "name": "Repeating Crossbow",
@@ -1056,7 +1860,16 @@
    "gender": "Both",
    "min_level": 65,
    "attack": 95,
-   "defense": 0
+   "defense": 0,
+   "buy": 89000,
+   "sell": 44500,
+   "weight": 200.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Mr. King's Shop#yuno"
+   ]
   },
   "2101": {
    "name": "Guard",
@@ -1077,7 +1890,29 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 3
+   "defense": 3,
+   "buy": 500,
+   "sell": 250,
+   "weight": 30.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#gef",
+    "Armor Dealer#gon",
+    "Armor Dealer#hu",
+    "Armor Dealer#lhz",
+    "Armor Dealer#lou",
+    "Armor Dealer#moc",
+    "Armor Dealer#mosk",
+    "Armor Dealer#prt",
+    "Armor Dealer#ra",
+    "Armor Dealer#ve",
+    "Armor Dealer#yuno"
+   ]
   },
   "2103": {
    "name": "Buckler",
@@ -1095,7 +1930,32 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 14000,
+   "sell": 7000,
+   "weight": 60.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#alde",
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#gon",
+    "Armor Dealer#hu",
+    "Armor Dealer#iz",
+    "Armor Dealer#lhz",
+    "Armor Dealer#lou",
+    "Armor Dealer#moc",
+    "Armor Dealer#mosk",
+    "Armor Dealer#prt",
+    "Armor Dealer#ra",
+    "Armor Dealer#ve",
+    "Armor Dealer#xmas"
+   ]
   },
   "2105": {
    "name": "Shield",
@@ -1110,7 +1970,21 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 6
+   "defense": 6,
+   "buy": 56000,
+   "sell": 28000,
+   "weight": 130.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alde",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#hu",
+    "Armor Dealer#iz",
+    "Armor Dealer#xmas"
+   ]
   },
   "2107": {
    "name": "Mirror Shield",
@@ -1125,7 +1999,17 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 60000,
+   "sell": 30000,
+   "weight": 100.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#gef",
+    "Armor Dealer#yuno"
+   ]
   },
   "2113": {
    "name": "Novice Shield",
@@ -1140,7 +2024,16 @@
    "gender": "Both",
    "min_level": 40,
    "attack": 0,
-   "defense": 3
+   "defense": 3,
+   "buy": 5000,
+   "sell": 2500,
+   "weight": 100.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Beginner's Merchant#lhz"
+   ]
   },
   "2201": {
    "name": "Sunglasses",
@@ -1161,7 +2054,17 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 5000,
+   "sell": 2500,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Tool Dealer#hu2"
+   ]
   },
   "2203": {
    "name": "Glasses",
@@ -1182,7 +2085,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 4000,
+   "sell": 2000,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb"
+   ]
   },
   "2205": {
    "name": "Diver Goggles",
@@ -1203,7 +2115,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 3500,
+   "sell": 1750,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb"
+   ]
   },
   "2206": {
    "name": "Wedding Veil",
@@ -1224,7 +2145,17 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 23000,
+   "sell": 11500,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Wedding Shop Dealer#lhz",
+    "Wedding Shop Dealer#prt"
+   ]
   },
   "2208": {
    "name": "Ribbon",
@@ -1245,7 +2176,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 1
+   "defense": 1,
+   "buy": 800,
+   "sell": 400,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#pay"
+   ]
   },
   "2211": {
    "name": "Bandana",
@@ -1266,7 +2206,21 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 1
+   "defense": 1,
+   "buy": 400,
+   "sell": 200,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#gon",
+    "Armor Dealer#lou",
+    "Armor Dealer#mosk",
+    "Armor Dealer#pay"
+   ]
   },
   "2212": {
    "name": "Eye Patch",
@@ -1287,7 +2241,17 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 1000,
+   "sell": 500,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#pay",
+    "Toy Supplier#lhz"
+   ]
   },
   "2216": {
    "name": "Biretta",
@@ -1302,7 +2266,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 9000,
+   "sell": 4500,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Nun#prt"
+   ]
   },
   "2218": {
    "name": "Flu Mask",
@@ -1323,7 +2296,17 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 300,
+   "sell": 150,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#moc",
+    "Flu Mask Dealer#ein"
+   ]
   },
   "2220": {
    "name": "Hat",
@@ -1344,7 +2327,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 2
+   "defense": 2,
+   "buy": 1000,
+   "sell": 500,
+   "weight": 20.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#prt"
+   ]
   },
   "2222": {
    "name": "Turban",
@@ -1364,7 +2356,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 3
+   "defense": 3,
+   "buy": 4500,
+   "sell": 2250,
+   "weight": 30.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Mr. King's Shop#yuno"
+   ]
   },
   "2224": {
    "name": "Goggles",
@@ -1383,7 +2384,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 5
+   "defense": 5,
+   "buy": 20,
+   "sell": 10,
+   "weight": 30.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#hu"
+   ]
   },
   "2226": {
    "name": "Cap",
@@ -1401,7 +2411,21 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 12000,
+   "sell": 6000,
+   "weight": 40.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#hu",
+    "Armor Dealer#iz",
+    "Armor Dealer#prt"
+   ]
   },
   "2228": {
    "name": "Helm",
@@ -1416,7 +2440,20 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 6
+   "defense": 6,
+   "buy": 44000,
+   "sell": 22000,
+   "weight": 60.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alde",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#iz",
+    "Armor Dealer#xmas"
+   ]
   },
   "2230": {
    "name": "Gemmed Sallet",
@@ -1433,7 +2470,18 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 50000,
+   "sell": 25000,
+   "weight": 50.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#gef",
+    "Armor Dealer#yuno",
+    "Mr. King's Shop#yuno"
+   ]
   },
   "2232": {
    "name": "Circlet",
@@ -1449,7 +2497,19 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 3
+   "defense": 3,
+   "buy": 7500,
+   "sell": 3750,
+   "weight": 30.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#hu",
+    "Magical Item Seller#gef",
+    "Magical Item Seller#ve",
+    "Magical Item Seller#yuno"
+   ]
   },
   "2239": {
    "name": "Monocle",
@@ -1470,7 +2530,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 10000,
+   "sell": 5000,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Tool Dealer#prt1"
+   ]
   },
   "2241": {
    "name": "Grampa Beard",
@@ -1491,7 +2560,17 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 5000,
+   "sell": 2500,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Tool Dealer#gef",
+    "Toy Supplier#lhz"
+   ]
   },
   "2242": {
    "name": "Purple Glasses",
@@ -1512,7 +2591,18 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 1
+   "defense": 1,
+   "buy": 24000,
+   "sell": 12000,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Tool Dealer#moc2",
+    "Tool Dealer#tu",
+    "Toy Supplier#lhz"
+   ]
   },
   "2243": {
    "name": "Geek Glasses",
@@ -1533,7 +2623,17 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 1
+   "defense": 1,
+   "buy": 20000,
+   "sell": 10000,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Tool Dealer#alb2",
+    "Toy Supplier#lhz"
+   ]
   },
   "2301": {
    "name": "Cotton Shirt",
@@ -1554,7 +2654,21 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 1
+   "defense": 1,
+   "buy": 10,
+   "sell": 5,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#gef",
+    "Armor Dealer#moc",
+    "Armor Dealer#pay",
+    "Armor Dealer#prt",
+    "Armor Dealer#yuno"
+   ]
   },
   "2303": {
    "name": "Jacket",
@@ -1575,7 +2689,22 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 2
+   "defense": 2,
+   "buy": 200,
+   "sell": 100,
+   "weight": 20.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#gef",
+    "Armor Dealer#iz",
+    "Armor Dealer#moc",
+    "Armor Dealer#pay",
+    "Armor Dealer#prt",
+    "Armor Dealer#yuno"
+   ]
   },
   "2305": {
    "name": "Adventurer's Suit",
@@ -1596,7 +2725,29 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 3
+   "defense": 3,
+   "buy": 1000,
+   "sell": 500,
+   "weight": 30.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#gef",
+    "Armor Dealer#gon",
+    "Armor Dealer#iz",
+    "Armor Dealer#lou",
+    "Armor Dealer#moc",
+    "Armor Dealer#mosk",
+    "Armor Dealer#pay",
+    "Armor Dealer#prt",
+    "Armor Dealer#yuno"
+   ]
   },
   "2307": {
    "name": "Mantle",
@@ -1616,7 +2767,25 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 10000,
+   "sell": 5000,
+   "weight": 60.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#alde",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#hu",
+    "Armor Dealer#iz",
+    "Armor Dealer#moc",
+    "Armor Dealer#pay",
+    "Armor Dealer#prt",
+    "Armor Dealer#xmas"
+   ]
   },
   "2309": {
    "name": "Coat",
@@ -1636,7 +2805,27 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 5
+   "defense": 5,
+   "buy": 22000,
+   "sell": 11000,
+   "weight": 120.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#alde",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#iz",
+    "Armor Dealer#lhz",
+    "Armor Dealer#moc",
+    "Armor Dealer#pay",
+    "Armor Dealer#prt",
+    "Armor Dealer#ra",
+    "Armor Dealer#ve",
+    "Armor Dealer#xmas"
+   ]
   },
   "2312": {
    "name": "Padded Armor",
@@ -1653,7 +2842,22 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 7
+   "defense": 7,
+   "buy": 48000,
+   "sell": 24000,
+   "weight": 280.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#alde",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#iz",
+    "Armor Dealer#prt",
+    "Armor Dealer#xmas"
+   ]
   },
   "2314": {
    "name": "Chain Mail",
@@ -1670,7 +2874,25 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 8
+   "defense": 8,
+   "buy": 65000,
+   "sell": 32500,
+   "weight": 330.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#alde",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#iz",
+    "Armor Dealer#lhz",
+    "Armor Dealer#prt",
+    "Armor Dealer#ra",
+    "Armor Dealer#ve",
+    "Armor Dealer#xmas"
+   ]
   },
   "2316": {
    "name": "Full Plate",
@@ -1685,7 +2907,20 @@
    "gender": "Both",
    "min_level": 40,
    "attack": 0,
-   "defense": 10
+   "defense": 10,
+   "buy": 80000,
+   "sell": 40000,
+   "weight": 450.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alde",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#iz",
+    "Armor Dealer#xmas"
+   ]
   },
   "2321": {
    "name": "Silk Robe",
@@ -1703,7 +2938,33 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 3
+   "defense": 3,
+   "buy": 8000,
+   "sell": 4000,
+   "weight": 40.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#gef",
+    "Armor Dealer#gon",
+    "Armor Dealer#lhz",
+    "Armor Dealer#lou",
+    "Armor Dealer#moc",
+    "Armor Dealer#mosk",
+    "Armor Dealer#pay",
+    "Armor Dealer#ra",
+    "Armor Dealer#ve",
+    "Armor Dealer#yuno",
+    "Magical Item Seller#gef",
+    "Magical Item Seller#ve",
+    "Magical Item Seller#yuno"
+   ]
   },
   "2323": {
    "name": "Scapulare",
@@ -1718,7 +2979,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 6500,
+   "sell": 3250,
+   "weight": 40.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Nun#prt"
+   ]
   },
   "2325": {
    "name": "Saint's Robe",
@@ -1734,7 +3004,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 6
+   "defense": 6,
+   "buy": 54000,
+   "sell": 27000,
+   "weight": 60.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Nun#prt"
+   ]
   },
   "2328": {
    "name": "Wooden Mail",
@@ -1750,7 +3029,25 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 5500,
+   "sell": 2750,
+   "weight": 100.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#gon",
+    "Armor Dealer#iz",
+    "Armor Dealer#lou",
+    "Armor Dealer#moc",
+    "Armor Dealer#mosk",
+    "Armor Dealer#pay",
+    "Armor Dealer#prt"
+   ]
   },
   "2330": {
    "name": "Tights",
@@ -1765,7 +3062,16 @@
    "gender": "Both",
    "min_level": 45,
    "attack": 0,
-   "defense": 6
+   "defense": 6,
+   "buy": 71000,
+   "sell": 35500,
+   "weight": 50.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#pay"
+   ]
   },
   "2332": {
    "name": "Silver Robe",
@@ -1780,7 +3086,28 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 7000,
+   "sell": 3500,
+   "weight": 70.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#gef",
+    "Armor Dealer#gon",
+    "Armor Dealer#lou",
+    "Armor Dealer#moc",
+    "Armor Dealer#mosk",
+    "Armor Dealer#pay",
+    "Armor Dealer#yuno",
+    "Magical Item Seller#gef",
+    "Magical Item Seller#ve",
+    "Magical Item Seller#yuno"
+   ]
   },
   "2335": {
    "name": "Thief Clothes",
@@ -1795,7 +3122,21 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 6
+   "defense": 6,
+   "buy": 74000,
+   "sell": 37000,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#lhz",
+    "Armor Dealer#moc",
+    "Armor Dealer#ra",
+    "Armor Dealer#ve"
+   ]
   },
   "2338": {
    "name": "Wedding Dress",
@@ -1815,7 +3156,17 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 43000,
+   "sell": 21500,
+   "weight": 50.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Wedding Shop Dealer#lhz",
+    "Wedding Shop Dealer#prt"
+   ]
   },
   "2340": {
    "name": "Novice Breastplate",
@@ -1830,7 +3181,16 @@
    "gender": "Both",
    "min_level": 10,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 89000,
+   "sell": 44500,
+   "weight": 50.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Mr. King's Shop#yuno"
+   ]
   },
   "2401": {
    "name": "Sandals",
@@ -1851,7 +3211,27 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 1
+   "defense": 1,
+   "buy": 400,
+   "sell": 200,
+   "weight": 20.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#gef",
+    "Armor Dealer#gon",
+    "Armor Dealer#hu",
+    "Armor Dealer#lou",
+    "Armor Dealer#moc",
+    "Armor Dealer#mosk",
+    "Armor Dealer#pay",
+    "Armor Dealer#prt",
+    "Armor Dealer#yuno"
+   ]
   },
   "2403": {
    "name": "Shoes",
@@ -1871,7 +3251,28 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 2
+   "defense": 2,
+   "buy": 3500,
+   "sell": 1750,
+   "weight": 40.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#gon",
+    "Armor Dealer#iz",
+    "Armor Dealer#lhz",
+    "Armor Dealer#lou",
+    "Armor Dealer#moc",
+    "Armor Dealer#mosk",
+    "Armor Dealer#pay",
+    "Armor Dealer#prt",
+    "Armor Dealer#ra",
+    "Armor Dealer#ve"
+   ]
   },
   "2405": {
    "name": "Boots",
@@ -1889,7 +3290,26 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 18000,
+   "sell": 9000,
+   "weight": 60.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#alde",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#iz",
+    "Armor Dealer#lhz",
+    "Armor Dealer#moc",
+    "Armor Dealer#pay",
+    "Armor Dealer#ra",
+    "Armor Dealer#ve",
+    "Armor Dealer#xmas"
+   ]
   },
   "2416": {
    "name": "Novice Shoes",
@@ -1904,7 +3324,16 @@
    "gender": "Both",
    "min_level": 40,
    "attack": 0,
-   "defense": 2
+   "defense": 2,
+   "buy": 35000,
+   "sell": 17500,
+   "weight": 50.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Beginner's Merchant#lhz"
+   ]
   },
   "2501": {
    "name": "Hood",
@@ -1925,7 +3354,28 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 1
+   "defense": 1,
+   "buy": 1000,
+   "sell": 500,
+   "weight": 20.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#gef",
+    "Armor Dealer#gon",
+    "Armor Dealer#hu",
+    "Armor Dealer#lou",
+    "Armor Dealer#moc",
+    "Armor Dealer#mosk",
+    "Armor Dealer#nif",
+    "Armor Dealer#pay",
+    "Armor Dealer#prt",
+    "Armor Dealer#yuno"
+   ]
   },
   "2503": {
    "name": "Muffler",
@@ -1945,7 +3395,31 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 2
+   "defense": 2,
+   "buy": 5000,
+   "sell": 2500,
+   "weight": 40.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#gon",
+    "Armor Dealer#iz",
+    "Armor Dealer#lhz",
+    "Armor Dealer#lou",
+    "Armor Dealer#moc",
+    "Armor Dealer#mosk",
+    "Armor Dealer#nif",
+    "Armor Dealer#pay",
+    "Armor Dealer#prt",
+    "Armor Dealer#ra",
+    "Armor Dealer#ve"
+   ]
   },
   "2505": {
    "name": "Manteau",
@@ -1962,7 +3436,23 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 32000,
+   "sell": 16000,
+   "weight": 60.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#alde",
+    "Armor Dealer#cmd",
+    "Armor Dealer#cmd2",
+    "Armor Dealer#iz",
+    "Armor Dealer#nif",
+    "Armor Dealer#pay",
+    "Armor Dealer#xmas"
+   ]
   },
   "2512": {
    "name": "Novice Manteau",
@@ -1977,7 +3467,16 @@
    "gender": "Both",
    "min_level": 40,
    "attack": 0,
-   "defense": 2
+   "defense": 2,
+   "buy": 50000,
+   "sell": 25000,
+   "weight": 50.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Beginner's Merchant#lhz"
+   ]
   },
   "2608": {
    "name": "Rosary",
@@ -1997,7 +3496,16 @@
    "gender": "Both",
    "min_level": 20,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 15000,
+   "sell": 7500,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Nun#prt"
+   ]
   },
   "2609": {
    "name": "Skull Ring",
@@ -2018,7 +3526,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 10000,
+   "sell": 5000,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Trader#moc4"
+   ]
   },
   "2612": {
    "name": "Flower Ring",
@@ -2039,7 +3556,17 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 1500,
+   "sell": 750,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Gift Seller#xmas",
+    "Trader#moc3"
+   ]
   },
   "2613": {
    "name": "Diamond Ring",
@@ -2060,7 +3587,18 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 45000,
+   "sell": 22500,
+   "weight": 10.0,
+   "slots": 0,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Gift Seller#xmas",
+    "Jeweler#lhz",
+    "Jeweler#moc2"
+   ]
   },
   "2627": {
    "name": "Belt",
@@ -2081,7 +3619,22 @@
    "gender": "Both",
    "min_level": 25,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 20000,
+   "sell": 10000,
+   "weight": 120.0,
+   "slots": 1,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alde",
+    "Armor Dealer#ama",
+    "Armor Dealer#ayo",
+    "Armor Dealer#gon",
+    "Armor Dealer#lou",
+    "Armor Dealer#mosk",
+    "Armor Dealer#prt"
+   ]
   },
   "2628": {
    "name": "Novice Armlet",
@@ -2096,7 +3649,26 @@
    "gender": "Both",
    "min_level": 1,
    "attack": 0,
-   "defense": 0
+   "defense": 0,
+   "buy": 400,
+   "sell": 200,
+   "weight": 20.0,
+   "slots": 1,
+   "refineable": false,
+   "weapon_level": null,
+   "shops": [
+    "Armor Dealer#alb",
+    "Armor Dealer#alde",
+    "Armor Dealer#gef",
+    "Armor Dealer#iz",
+    "Armor Dealer#lhz",
+    "Armor Dealer#moc",
+    "Armor Dealer#pay",
+    "Armor Dealer#prt",
+    "Armor Dealer#ra",
+    "Armor Dealer#ve",
+    "Armor Dealer#yuno"
+   ]
   },
   "5112": {
    "name": "Super Novice Hat",
@@ -2111,7 +3683,16 @@
    "gender": "Both",
    "min_level": 40,
    "attack": 0,
-   "defense": 4
+   "defense": 4,
+   "buy": 8500,
+   "sell": 4250,
+   "weight": 40.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Beginner's Merchant#lhz"
+   ]
   },
   "5114": {
    "name": "Bucket Hat",
@@ -2132,7 +3713,16 @@
    "gender": "Both",
    "min_level": 0,
    "attack": 0,
-   "defense": 3
+   "defense": 3,
+   "buy": 6000,
+   "sell": 3000,
+   "weight": 30.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": null,
+   "shops": [
+    "Flu Mask Dealer#ein"
+   ]
   },
   "13000": {
    "name": "Jujube Dagger",
@@ -2152,7 +3742,16 @@
    "gender": "Both",
    "min_level": 1,
    "attack": 39,
-   "defense": 0
+   "defense": 0,
+   "buy": 10000,
+   "sell": 5000,
+   "weight": 60.0,
+   "slots": 0,
+   "refineable": true,
+   "weapon_level": 1,
+   "shops": [
+    "Weapon Dealer#ein"
+   ]
   },
   "13003": {
    "name": "Cowardice Blade",
@@ -2167,7 +3766,19 @@
    "gender": "Both",
    "min_level": 55,
    "attack": 80,
-   "defense": 0
+   "defense": 0,
+   "buy": 52000,
+   "sell": 26000,
+   "weight": 70.0,
+   "slots": 1,
+   "refineable": true,
+   "weapon_level": 3,
+   "shops": [
+    "Weapon Dealer#bra",
+    "Weapon Dealer#lhz",
+    "Weapon Dealer#ra",
+    "Weapon Dealer#ve2"
+   ]
   }
  }
 }
